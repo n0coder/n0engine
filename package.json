@@ -1,0 +1,19 @@
+{
+  "name": "n0engine",
+  "version": "1.0.0",
+  "description": "a sandbox javascript game engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "TBA"
+  },
+  "keywords": [
+    "game",
+    "engine"
+  ],
+  "author": "n0coder",
+  "license": "MIT"
+}
