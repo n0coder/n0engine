@@ -1,3 +1,19 @@
 body {
-    background-color: #222222;
+    background-color: #0d0b10;
+}
+
+  #game { /*trying to center game on div*/
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height:100%;
+    justify-content: center;  
+    align-items: center;      /* Vertical centering */
+  }
+  
+#menu {  /*we now have the ability to slide open a utility menu*/
+    width: 0px;
+    background-color: #111111;
+    height: 512px;
+    transition: width 1s, height 1s;
 }
