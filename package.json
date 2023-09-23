@@ -19,6 +19,7 @@
   "author": "n0coder",
   "license": "MIT",
   "dependencies": {
+    "alea": "^1.0.1",
     "eslint": "^8.50.0",
     "mocha": "^10.2.0",
     "p5": "^1.7.0",

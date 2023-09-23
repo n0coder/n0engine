@@ -26,3 +26,12 @@ going to add shared n0engine features to the repo
    pretty easy tech to make in my opinion. (i've literally done it before)
 
 # backtracking tech? (i don't get how to do this properly still...)
+
+
+https://www.npmjs.com/package/simplex-noise 
+//i use this noise algorithm since it supports alea
+//i still have to figure out specifically what's going on; i don't trust noise algorithms to remain deterministic (yet).
+
+https://github.com/prettymuchbryce/easystarjs
+i think i used easy star in my original implementation of the pathfinding
+
