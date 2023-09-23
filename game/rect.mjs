@@ -1,12 +1,20 @@
 import { p } from "../engine/core/p5engine.mjs";
 
 
-export class Circle {
+export class Rect {
     constructor(x,y,w,h) {
-        this.x = x;
-        this.y = y;
+        this.vx = x;
+        this.vy = y;
         this.w = w;
         this.h = h;
+        this.offsetx = this.w/2
+        this.offsety = this.h/2
+    }
+    get x() {
+        return this.vx+this.offsetx
+    }
+    get y() {
+        return this.vy+this.offsety
     }
     draw() {
         if (this.inBounds(p.mouseX, p.mouseY))
@@ -15,8 +23,6 @@ export class Circle {
             p.fill(255,255,255)
     
         p.rect(this.x,this.y,this.w,this.h,2);
-
-        p.ellipse(p.mouseX, p.mouseY, 5,5)
     }
     inBounds(x,y) {
         return (x > this.x&& x<this.x+this.w && y > this.y && y < this.y+this.h)
