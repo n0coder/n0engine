@@ -21,16 +21,16 @@ export class Grid {
     }
 
     get boundingBox() {
-      const width = this.columns * this.tileSize;
+      const width = this.cols * this.tileSize;
       const height = this.rows * this.tileSize;
       const x = this.x;
       const y = this.y;
-      return { x, y, width, height };
+      return { x: x, y: y, w: width, h: height };
     }
   
     get gridCenter() {
       const centerX = this.x + (this.rows * this.tileSize) / 2;
-      const centerY = this.y + (this.columns * this.tileSize) / 2;
+      const centerY = this.y + (this.cols * this.tileSize) / 2;
       return { x: centerX, y: centerY };
     }
   
