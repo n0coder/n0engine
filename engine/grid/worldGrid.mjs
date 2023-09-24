@@ -12,6 +12,74 @@ export class WorldGrid {
     get halfTileSize() {
         return this.tileSize / 2
     }
+    getGridTileRect(x, y,w=1,h=1) {
+        return {
+            x: x,
+            y: y,
+            w: w, // Assuming grid cells are 1x1
+            h: h,
+            toScreenRect: function() {
+                return {
+                    x: this.x * this.tileSize,
+                    y: this.y * this.tileSize,
+                    w: this.w * this.tileSize,
+                    h: this.h * this.tileSize
+                }
+            },
+            toScreenBoundingBox: function() {
+                return {
+                    x: this.x * this.tileSize,
+                    y: this.y * this.tileSize,
+                    x2: (this.x + this.w) * this.tileSize,
+                    y2: (this.y + this.h) * this.tileSize
+                }
+            },
+            toGridBoundingBox: function() {
+                return {
+                    x: this.x,
+                    y: this.y,
+                    x2: this.x + this.w,
+                    y2: this.y + this.h
+                }
+            }
+        }
+    }
+    
+    //this technically isn't bounds is it?
+    getScreenTileRect(x,y,w=1,h=1) {
+        return {
+            x: x*this.tileSize,
+            y: y*this.tileSize,
+            w: w*this.tileSize,
+            h: h*this.tileSize,
+            toScreenBoundingBox: function() {
+                return {
+                    x: this.x,
+                    y: this.y,
+                    x2: this.x+this.w,
+                    y2: this.y+this.h
+                    
+                }
+            },
+            toGridBoundingBox: function() {
+                return {
+                    x: Math.floor(this.x/this.tileSize),
+                    y: Math.floor(this.y/this.tileSize),
+                    x2: Math.floor(this.x/this.tileSize)+Math.floor(this.w/this.tileSize),
+                    y2: Math.floor(this.y/this.tileSize)+Math.floor(this.h/this.tileSize)
+                    
+                }
+            },
+            toGridRect: function() {
+                return {
+                    x: Math.floor(this.x/this.tileSize),
+                    y: Math.floor(this.y/this.tileSize),
+                    w: Math.floor(this.w/this.tileSize),
+                    h: Math.floor(this.h/this.tileSize)
+                }
+            }
+        }
+    }
     worldToScreenPosition(x,y) {
         if (Array.isArray(x)) [x,y] = x; 
         return [x*this.scaledTileSize, y*this.scaledTileSize]
