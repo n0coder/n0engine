@@ -1,5 +1,12 @@
 going to add shared n0engine features to the repo
 
+
+going to make a small grid tech that i can place in world space
+
+# small grid tech
+   - the ability to specify bounding box
+   - drop into world space, or specify custom space
+
 # world grid tech
    - set basic tile size, set basic chunk size, and scale
    - convert between screen space, tile space, and chunk space
