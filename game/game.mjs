@@ -1,6 +1,9 @@
 //will find a worthy first game idea here
 //...
 
+import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { FishGame } from "./fishGame.mjs";
+
 //ok fishing game
 
 //click water
@@ -24,3 +27,6 @@
 //if you find sugary fish, you can turn evil ais good
 
 //(the nanoais are your friends and they will have their own lives)
+
+var fish = new FishGame();
+cosmicEntityManager.addEntity(fish);
