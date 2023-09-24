@@ -15,11 +15,16 @@ export class Grid {
       for (let i = 0; i < this.rows; i++) {
         this.grid[i] = new Array(this.cols);
         for (let j = 0; j < this.cols; j++) {
-          this.grid[i][j] = i * this.cols + j;
+          this.grid[i][j] = null;
         }
       }
     }
-
+    shift(item,x,y) {
+      this.grid[item.y][item.x] = this.grid[y][x]
+      item.x = x;
+      item.y = y;
+      this.grid[y][x] = item;
+    }
     get boundingBox() {
       const width = this.cols * this.tileSize;
       const height = this.rows * this.tileSize;
