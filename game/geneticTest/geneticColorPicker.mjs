@@ -1,17 +1,25 @@
 //i want to try to write a manual genetic algorithm
 import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { TargetColorRect } from "./TargetColorRect.mjs";
+import { DistanceVisualizer } from "./distanceVisualizer.mjs";
 import { GeneticSquare } from "./geneticSquare.mjs";
 
 let mut = 15;
+var csquare = new TargetColorRect(10*56, 0, 56*12);
 
-var tsquare = new TargetColorRect(10, 0, 56);
+cosmicEntityManager.addEntity(csquare);
+var tsquare = new TargetColorRect(10*56, (56*4)+(27), 56*12);
 cosmicEntityManager.addEntity(tsquare);
+tsquare.randomize();
 
 let copies = []
-var gSquare=new GeneticSquare(255, 255, 255, 7,4,56);
+
+var gSquare=new GeneticSquare(255, 255, 255, 4,4,56);
 gSquare.selected =mainSquareSelected;
 cosmicEntityManager.addEntity(gSquare);
-
+csquare.color = gSquare;
+var vis = new DistanceVisualizer(csquare, tsquare);
+cosmicEntityManager.addEntity(vis);
 setBoard(255, 255, 255);
 function setBoard(r,g,b) {
     gSquare.r = r;
