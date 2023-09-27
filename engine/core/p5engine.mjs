@@ -1,6 +1,6 @@
 import { cosmicEntityManager } from "./CosmicEntity/CosmicEntityManager.mjs";
 import { calculateDeltaTime, deltaTime, previousTime } from "./Time/n0Time.mjs";
-import { gameH, gameW } from "./n0config.mjs";
+import { backgroundColor, gameH, gameW } from "./n0config.mjs";
 class P5engine {
     constructor(){
         this.p = new window.p5(this.p5);
@@ -18,7 +18,7 @@ class P5engine {
           };
           
           p.draw = function(...args)  {
-            p.background(34.5, 34.5, 34.5);
+            p.background(backgroundColor);
             p.noStroke();
             calculateDeltaTime();
             
