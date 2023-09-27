@@ -2,10 +2,11 @@ import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityMan
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Crop } from "./farm/crop.mjs";
 import { CottonCandyPlant } from "./farm/proceduralPlantTest/cottonCandy.mjs";
+import { Nanoai } from "./nanoai.mjs";
 worldGrid.tileSize = 64;
 
 cosmicEntityManager.addEntity(new CottonCandyPlant());
-
+cosmicEntityManager.addEntity(new Nanoai());
 /*
 var crop = new Crop(3,1);
 cosmicEntityManager.addEntity(crop);
