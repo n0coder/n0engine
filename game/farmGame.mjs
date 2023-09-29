@@ -2,9 +2,11 @@ import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityMan
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Crop } from "./farm/crop.mjs";
 import { CottonCandyPlant } from "./farm/proceduralPlantTest/cottonCandy.mjs";
+import { PopFlower } from "./farm/proceduralPlantTest/popFlower.mjs";
 import { Nanoai } from "./nanoai.mjs";
 worldGrid.tileSize = 64;
 
+cosmicEntityManager.addEntity(new PopFlower());
 cosmicEntityManager.addEntity(new CottonCandyPlant());
 cosmicEntityManager.addEntity(new Nanoai());
 /*

@@ -5,18 +5,79 @@
 
 import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
 import { p } from "../../../engine/core/p5engine.mjs"
-export class CottonCandyPlant {
+import { Offseter } from "../../../engine/n0math/offseter.mjs";
+import {inverseLerp} from "../../../engine/n0math/ranges.mjs"
+export class CottonCandyPlant { //THIS TURNED INTO HELL
     constructor() {
         this.s = 32;
-        this.pos = {x: 64, y: 64}
+        this.pos = new Offseter(128,128)
         this.t = 0;
-    }
-    draw() { //hard work...
-        this.t += deltaTime;
-        this.reCany(this.pos.x, this.pos.y, this.pos.x+(7*Math.cos(2.5*this.t)), this.pos.y+(2.5*Math.sin(1*this.t)))
-        p.ellipse(this.pos.x, this.pos.y,5,5);
-    }
+        this.color = [255, 180, 180]
+        this.lineColor = [185, 190, 140]
+        this.highlight = [-11, 46, 36]
+        this.tree = {
+          backgroundClouds: [{
+            posX: 6, posY: -44, angleOffset: 1.5, size: 34 , color: this.mutateColor(this.color, 32) 
+          },{
+            posX: 16, posY: -54, angleOffset: 1.5, size: 28 , color: this.mutateColor(this.color, 32)   
+          }],
+          foregroundClouds: [{
+            posX: 0, posY: -64, angleOffset: 1, size: 48  , color: this.mutateColor(this.color, 32)
+          },{
+            posX: -16, posY: -54, angleOffset: 1.2, size: 28  , color: this.mutateColor(this.color, 32)
+          }]
 
+        }
+    }
+    draw() { 
+        this.t +=  deltaTime;
+        var angle = (8*Math.cos(2.5*this.t));
+        
+        this.clouds(this.tree.backgroundClouds, angle);
+        var pos = this.pos.rotate(0,-64, angle);
+        this.line (this.pos.x, this.pos.y, pos.x, pos.y, this.lineColor, this.highlight)
+        this.clouds(this.tree.foregroundClouds, angle)
+        
+    }
+    mutateColor(color, mutSize) {
+      let [r, g, b] = color;
+
+      let halfMutSize = mutSize/2;
+          if (Math.random() < 0.5) {
+          if (Math.random() > 0.15)
+              r = Math.min(255, Math.max(0, r + Math.floor(Math.random() * mutSize) - halfMutSize));
+      
+          if (Math.random() > 0.15)
+              g = Math.min(255, Math.max(0, g + Math.floor(Math.random() * mutSize) - halfMutSize));
+     
+          if (Math.random() > 0.15)
+              b = Math.min(255, Math.max(0, b + Math.floor(Math.random() * mutSize) - halfMutSize));
+          }
+          return [r,g,b]
+  }
+  clouds(clouds, angle) {
+    clouds.forEach(c => {
+      var cld = this.pos.rotate(c.posX, c.posY, angle * c.angleOffset);
+      this.cloud(cld.x, cld.y, -.1, .1, c.size, c.color, this.highlight);
+    });
+  }
+
+    rotate(x2, y2, degrees) {
+      // Convert degrees to radians
+      var radians = degrees * (Math.PI/180);
+  
+      // Calculate the distance from the center
+      var differenceFromCentre = {
+        x: x2 - this.x,
+        y: y2 - this.y
+      };
+  
+      // Calculate the new point after rotation
+      var newX = this.x + Math.cos(radians) * differenceFromCentre.x - Math.sin(radians) * differenceFromCentre.y;
+      var newY = this.y + Math.sin(radians) * differenceFromCentre.x + Math.cos(radians) * differenceFromCentre.y;
+      
+      return {x: newX, y: newY};
+    }
 
 // Define a function to draw a cloud
 drawCloud(x, y, x2, y2, size) {
@@ -35,20 +96,25 @@ drawCloud(x, y, x2, y2, size) {
   }
   
   // Use these functions in your cany function
-  reCany(baseX, baseY, headX, headY) {
+  reCany(baseX, baseY, headX, headY, angle) {
     const clouds = [
-      { x: headX + this.s * 1, y: headY + this.s * 0.75, x2: -0.1, y2: 0.1, size: .77*this.s },
-      { x: headX + this.s * 1.25, y: headY + this.s, x2: -0.1, y2: 0.1, size: .64*this.s },
-      { x: headX + this.s * 0.5, y: headY + this.s, x2: -0.1, y2: 0.1, size: .55*this.s },
-      { x: headX + this.s * 1.1, y: headY + this.s * 0.95, x2: -0.1, y2: 0.1, size: .62*this.s },
-      { x: headX + this.s * 1, y: headY + this.s * 0.75, x2: -0.1, y2: 0.1, size: .47*this.s },
+      { x: this.s * 1, y:  -this.s * 0.75, x2: -0.1, y2: 0.1, size: .77*this.s },
+      { x: this.s * 1.25, y:  -this.s, x2: -0.1, y2: 0.1, size: .64*this.s },
+      { x: this.s * 0.5, y:  -this.s, x2: -0.1, y2: 0.1, size: .55*this.s },
+      { x: this.s * 1.1, y: -this.s * 0.95, x2: -0.1, y2: 0.1, size: .62*this.s },
+      { x: this.s * 1, y: -this.s * 0.75, x2: -0.1, y2: 0.1, size: .47*this.s },
     ];
   
     const lines = [
-      { x1: headX + this.s * 1, y1: headY + this.s * 0.75, x2: baseX + this.s * 1, y2: baseY + this.s * 2 },
+      { x1: headX + this.s * 1, y1: headY + this.s * 0.75, x2: baseX , y2: baseY},
     ];
     lines.forEach(line => this.line(line.x1, line.y1, line.x2, line.y2));
-    clouds.forEach(cloud => this.cloud(cloud.x, cloud.y, cloud.x2, cloud.y2, cloud.size));
+    
+
+    clouds.forEach(cloud =>{
+      var c = this.pos.rotate(cloud.x, cloud.y, angle);
+      this.cloud(c.x, c.y, cloud.x2, cloud.y2, cloud.size)
+    });
     
   }
   
@@ -66,26 +132,29 @@ drawCloud(x, y, x2, y2, size) {
 
         p.pop()
     }
-    line(baseX, baseY, headX, headY) {
+    line(baseX, baseY, headX, headY, color, highlight) {
+      var [r,g,b] =color
+      var [hr, hg, hb]= highlight
         p.push()
-        p.strokeWeight(.15*this.s);
-        p.stroke([185+44, 190+46, 140+36])
+        p.strokeWeight(.25*this.s);
+        p.stroke([r+hr, g+hg, b+hb])
         p.line(headX+(this.s*.02),headY, baseX+(this.s*.05),baseY);
-        p.strokeWeight(.15*this.s);
-        p.stroke([185, 190, 140])
+        p.strokeWeight(.25*this.s);
+        p.stroke([r, g, b])
         p.line(headX,headY, baseX,baseY);
         p.pop();
     }
-    cloud(x,y, x2, y2, size) {
+    cloud(x,y, x2, y2, size, color, highlight) {
         //size *= this.s;
         x2 *= size;
         y2 *= size;
-        p.fill([233, 180-22, 180-36])
+        //p.fill([233, 180-22, 180-36])
         //p.ellipse( x+(x2*1.5),y+(y2*1.5),size,size )
-
-        p.fill([244, 180+46, 180+36])
+        var [r,g,b] = color
+        var [hr, hg, hb]= highlight
+        p.fill([r-hr, g+hg, b+hb])
         p.ellipse( x,y,size*1.2,size )
-        p.fill([255, 180, 180])
+        p.fill([r, g, b])
         p.ellipse( x+x2,y+y2,size,size )
     }
 
