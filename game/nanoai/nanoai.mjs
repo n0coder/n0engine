@@ -1,5 +1,5 @@
-import { p } from "../engine/core/p5engine.mjs";
-import { NanoaiBrain } from "./nanoai/nanoaiBrain.mjs";
+import { p } from "../../engine/core/p5engine.mjs";
+import { NanoaiBrain } from "./nanoaiBrain.mjs";
 export class Nanoai {
     constructor(x,y) {
         this.x = x

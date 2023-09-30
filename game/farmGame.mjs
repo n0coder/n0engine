@@ -3,7 +3,7 @@ import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Crop } from "./farm/crop.mjs";
 import { CottonCandyPlant } from "./farm/proceduralPlantTest/cottonCandy.mjs";
 import { PopFlower } from "./farm/proceduralPlantTest/popFlower.mjs";
-import { Nanoai } from "./nanoai.mjs";
+import { Nanoai } from "./nanoai/nanoai.mjs";
 worldGrid.tileSize = 64;
 
 var nano = new Nanoai(64, 64);

@@ -6,6 +6,7 @@ export class NanoaiBrain {
       this.currentActivity = null;
       this.stateMachine = {
         idle: function(nano) {
+          nano.idling();
           //find something to do
           //check battery
           //call radio
