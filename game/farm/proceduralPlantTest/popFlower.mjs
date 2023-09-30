@@ -10,8 +10,12 @@ export class PopFlower {
         this.rx = 1+Math.random()
         this.ry = 1+Math.random()
         this.s = .5*(1+Math.random())
+        this.angle = 14;
+        this.pieceAngleOffset = .3
+        this.length =48
+        this.lineSegments = 3;
         this.t = 0;
-        this.count = 1+Math.floor(Math.random() * 5)
+        this.count = 1+Math.floor(Math.random() * 6)
         this.pos = new Offseter(164,128)
         this.color = [255, 180, 180]
         this.lineColor = [185, 190, 140]
@@ -19,17 +23,27 @@ export class PopFlower {
     }
     draw() {
         this.t += deltaTime;
-        var angle = (4*Math.cos(5*this.t))
-        var vsv = this.pos.rotate(0, -48*this.s, angle)
+        var angle = (Math.cos(5*this.t))
+        var vsv = this.pos.rotate(0, -this.length*this.s, this.angle*angle)
         var cx = vsv.x, cy = vsv.y;
         var distance = 12*this.s;
         var vlength = 10*this.s*(remap(-1,1, .5, 1, Math.sin(this.t)));
         var hlength = 8*this.s;
         var pluses =this.count;
         //console.log([radians, pluses, radians*pluses])
+        var angleSegments = this.angle/this.lineSegments
+        var lengthSegments = this.length/this.lineSegments
+        var startX = this.pos.x;
+        var startY = this.pos.y;
+        for (let linez = 0; linez <= this.lineSegments; linez++) {
+            const a = linez*angleSegments*angle;
+            const b = linez*lengthSegments;
+            var pos = this.pos.rotate(0,-b*this.s, a);
+            this.line (startX, startY, pos.x, pos.y, this.lineColor, this.highlight)
+            startX = pos.x;
+            startY = pos.y;
+        }
         
-        var pos = this.pos.rotate(0,-48*this.s, angle);
-        this.line (this.pos.x, this.pos.y, pos.x, pos.y, this.lineColor, this.highlight)
         var [r,g,b] = this.color
         var [hr, hg, hb]= this.highlight
         p.fill([r, g, b])
