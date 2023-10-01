@@ -1,5 +1,10 @@
 body {
-    background-color: #0d0b10;
+    /*background-color: #ffffff;*/
+    
+    background-image: url('./background.png');
+    background-position: bottom center;
+    background-size: cover;
+   
 }
 
   #game { /*trying to center game on div*/
@@ -10,10 +15,23 @@ body {
     justify-content: center;  
     align-items: center;      /* Vertical centering */
   }
-  
+  #sketch-holder {
+    box-shadow: #000000 0px 0px 25px 5px ;
+  }
 #menu {  /*we now have the ability to slide open a utility menu*/
     width: 0px;
     background-color: #111111;
     height: 512px;
     transition: width 1s, height 1s;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.9); /* Black with 50% opacity */
+  /*backdrop-filter: blur(4px);  Blur effect */
+  z-index: -1; /* Make sure the pseudo-element is behind the content */
 }

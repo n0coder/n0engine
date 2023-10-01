@@ -8,9 +8,9 @@ import { p } from "../../../engine/core/p5engine.mjs"
 import { Offseter } from "../../../engine/n0math/offseter.mjs";
 import {inverseLerp} from "../../../engine/n0math/ranges.mjs"
 export class CottonCandyPlant { //THIS TURNED INTO HELL
-    constructor() {
+    constructor(x,y) {
         this.s = 32;
-        this.pos = new Offseter(128,128)
+        this.pos = new Offseter(x,y)
         this.t = 0;
         this.color = [255, 180, 180]
         this.lineColor = [185, 190, 140]

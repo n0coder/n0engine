@@ -1,5 +1,11 @@
+import { camera } from "./Camera/camera.mjs";
 import { cosmicEntityManager } from "./CosmicEntity/CosmicEntityManager.mjs";
-export const globalEntities = []; //? i don't understand this
+
+//this is a script that makes sure a select few entities are loaded long before any others.
+
+export const globalEntities = []; 
+
+globalEntities.push(camera)
 
 export function startGlobalEntities() {
     for (const entity of globalEntities) {

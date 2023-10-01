@@ -1,8 +1,8 @@
 //will find a worthy first game idea here
 //...
-
-import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { FishGame } from "./fishGame.mjs";
+//
+//import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+//import { FishGame } from "./fishGame.mjs";
 
 //ok fishing game
 
@@ -28,5 +28,7 @@ import { FishGame } from "./fishGame.mjs";
 
 //(the nanoais are your friends and they will have their own lives)
 
-var fish = new FishGame();
-cosmicEntityManager.addEntity(fish);
+//var fish = new FishGame();
+//cosmicEntityManager.addEntity(fish);
+
+import {} from "./geneticTest/geneticColorPicker.mjs"

@@ -3,17 +3,18 @@ import { p } from "../../engine/core/p5engine.mjs";
 export class NanoaiBrain {
     constructor() {
       this.state = "active";
+      this.queue = []
       this.currentActivity = null;
       this.stateMachine = {
         idle: function(nano) {
-          nano.idling();
-          //find something to do
-          //check battery
-          //call radio
-          //check feelings (wants to do hobby or chat with friend)?
+          if (nano.brain.queue.length > 0) {
+            nano.brain.currentActivity = nano.brain.queue.shift()
+            nano.brain.state = "active";
+          } else nano.idle();
         }, 
         active: function(nano) {
             if (nano.brain.currentActivity) {
+                console.log(nano.brain);
                 var ou = nano.brain.currentActivity.work(nano);
                 if (!ou) {
                     nano.brain.state = "idle";

@@ -1,14 +1,20 @@
+import { camera } from "../engine/core/Camera/camera.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
+import { p } from "../engine/core/p5engine.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Crop } from "./farm/crop.mjs";
 import { CottonCandyPlant } from "./farm/proceduralPlantTest/cottonCandy.mjs";
 import { PopFlower } from "./farm/proceduralPlantTest/popFlower.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
 worldGrid.tileSize = 64;
+startGlobalEntities(); //set up globals like camera etc
+camera.s=3
 
-var nano = new Nanoai(64, 64);
+var nano = new Nanoai('n0',64, 64);
 cosmicEntityManager.addEntity(nano); //what should i do with the add entity calls? 
-var nano2 = new Nanoai(128, 64);
+camera.follow(nano)
+var nano2 = new Nanoai('abi',128, 64);
 cosmicEntityManager.addEntity(nano2);
 //we need a handful of activities to test the nano ai on
 document.nanos = [nano, nano2]
@@ -16,12 +22,12 @@ document.nanos = [nano, nano2]
 //later we can figure out a system for procedural activity generation
 //what i mean is not hardcode these systems
 
-nano.talk(nano2);
+//nano.talk(nano2);
 
 
 //walk position
-nano.walk(256, 256);
-nano2.walk(270, 256);
+nano.walk(0, 0);
+nano2.walk(20, 0);
 
 //a pickup
 var circle = new Circle(); //pick
