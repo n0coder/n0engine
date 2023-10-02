@@ -3,31 +3,36 @@ import { nanoaiActions } from "./nanoaiActions.mjs";
 
 export class NanoaiBrain {
     constructor() {
-      this.state = "active";
+      this.state = "idle";
       this.queue = []
+      
       this.currentActivity = null;
       this.stateMachine = {
         idle: function(nano) {
           if (nano.brain.queue.length > 0) {
             var q = nano.brain.queue[0];
+            //console.log([nano.name, q]);
             if (Array.isArray(q)) {
-              q.forEach(o => nano.brain.queue.push(o))
+              let ov = []
+              q.forEach(o => ov.push(o))
               nano.brain.queue.shift();
+              nano.brain.queue.splice(0,0,...ov)
               return;
             }
-
             nano.brain.currentActivity = q;
             nano.brain.active(nano)
           } else nano.brain.done(nano);
         }, 
         active: function(nano) {
+         
             if (nano.brain.currentActivity) {
+
                 var ou = nano.brain.currentActivity.work(nano);
                 if (!ou) {
                     nano.brain.done(nano)
-                    nano.brain.currentActivity = null;
                 }
             } else {
+              
               nano.brain.done(nano);
             }
         }
@@ -50,6 +55,7 @@ export class NanoaiBrain {
     done(nano) {
       nano.brain.state = "idle"
       nano.brain.queue.shift();
+      nano.brain.currentActivity = null;
     }
     idle(nano) {
       nano.brain.state = "idle"

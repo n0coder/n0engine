@@ -4,7 +4,10 @@ export function atomicClone(oldObj) {
     for (let key in oldObj) {
         if (oldObj[key] === null) {
             newObj[key] = oldObj[key];
-        }else if (typeof oldObj[key] === 'object') {
+        }else if (Array.isArray(oldObj[key])) {
+            newObj[key] = oldObj[key].slice()
+        }
+        else if (typeof oldObj[key] === 'object') {
             newObj[key] = atomicClone(oldObj[key])
         } else {
             newObj[key] = oldObj[key];

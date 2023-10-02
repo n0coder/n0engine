@@ -37,19 +37,32 @@ document.nanos = [nano, nano2]
 //deleting the hardcoded ties to the functions
 //i only added them to test setup lol
 //i'm not sure i want this tech, but i like the idea of actions based on concepts
-nano.brain.do("walk", 256, 0);
-nano.brain.do("follow", nano2);
-nano2.brain.do("walk",20, 0); 
-nano.brain.do("walk",0, 0);
+
+//nano.brain.do("walk", 256, 0);
+//nano.brain.do("follow", nano2);
+//nano2.brain.do("walk",20, 0); 
+//nano.brain.do("walk",0, 0);
+
 //nano.brain.do("deactivate"); needed to test disabling (entity) self at will
 //its not death it's more shifting into the data dimension lol
 //a pickup
 var circle = new Circle(80,0,5); //pick
-cosmicEntityManager.addEntity(circle)
-nano.brain.do("follow", circle);
+//nano.brain.do("follow", circle);
 nano.brain.do("pickup",circle);
+//nano.inventory.add(circle);
+var circle2 = new Circle(140,82,5);
+nano.brain.do("pickup",circle2);
 
-camera.follow(circle)
+
+var circle3 = new Circle(100,40,5); //pick
+//nano.brain.do("follow", circle);
+nano2.brain.do("pickup",circle3);
+//nano.inventory.add(circle);
+var circle4 = new Circle(120,62,5);
+nano2.brain.do("pickup",circle4);
+
+camera.follow(nano)
+nano.brain.do("pickup",nano2);
 
 //a crop
 var crop = new Crop();

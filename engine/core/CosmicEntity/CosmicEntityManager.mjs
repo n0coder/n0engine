@@ -74,19 +74,14 @@ export const cosmicEntityManager = new CosmicEntityManager();
 
 
 export function setActive(state) {
-    
   var exists = cosmicEntityManager.contains(this)
   if (state) {
       if (!exists) {
           cosmicEntityManager.addEntity(this);
-      } else {
-          console.error([this, "is already active"])
       }
   } else {
       if (exists) {
           cosmicEntityManager.removeEntity(this);
-      } else {
-          console.error([this, "is not active"])
-      }
+      } 
   }
 }

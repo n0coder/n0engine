@@ -1,3 +1,4 @@
+import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 
 //i don't like to overcomplicate things
@@ -8,6 +9,8 @@ export class Circle{
         this.x = x;
         this.y = y;
         this.s = s;
+        this.setActive = setActive;
+        this.setActive(true);
     }
     draw() {
         p.ellipse(this.x, this.y, this.s, this.s);

@@ -27,10 +27,9 @@ export const nanoaiActions = new Map([
     }],
     ["pickup", { 
         args: [],
-        before: [["follow"]], 
+        before: ["follow"], 
         work: function (nano) {
-            p.ellipse(nano.x, nano.y, 15); //really nice that we can run p5 draw functions here lol
-            return true
+            return !nano.inventory.add(this.args[0])
         },
         clone: function(...args) {
             return handleClone(this, ...args)
@@ -39,13 +38,21 @@ export const nanoaiActions = new Map([
 ])
 
 export function handleClone(obj,...args) {
-    obj.args  =[...args];
+    //clone the object deeply
+    let clone = atomicClone(obj);
+    //drop in args
+    clone.args  = [...args];
+    //collect prerequisite actions
     let action = [];
-    if (obj.before)
-        obj.before.forEach(action => {
-        action.push(nanoaiActions.get(action[0]).clone(...args))
-    });
-    action.push(atomicClone(obj)) 
+    if (clone.before != undefined) { 
+        for (let i = 0; i < clone.before.length; i++) {
+            var beforeAction = handleClone(nanoaiActions.get(clone.before[i]),...args);
+            action.push(...beforeAction)
+        }
+    };
+    //push the current clone afterwards
+    action.push(clone) 
+    //send in prerequisite actions and current action
     return action;
 }
 

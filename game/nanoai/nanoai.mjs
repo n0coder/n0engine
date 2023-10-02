@@ -2,6 +2,7 @@ import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/C
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { NanoInventory } from "./nanoInventory.mjs";
 import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
 export class Nanoai {
@@ -14,6 +15,9 @@ export class Nanoai {
             this.img = img;
         });
         this.brain = new NanoaiBrain(this);
+        this.inventory = new NanoInventory(3, [[-7,-10], [7,-10], [0, -20]]);
+        //inventory ideas... physical, + inphysical lol tf
+
         this.setActive = setActive;
         this.setActive(true)
     }
@@ -40,6 +44,7 @@ export class Nanoai {
         if (this.img) {
             p.image(this.img, this.centerX, this.centerY);
         }
+        this.inventory.draw(this);
     }
     //if i put this on every object it can feel hard to use...
     
