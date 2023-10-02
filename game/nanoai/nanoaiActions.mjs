@@ -6,21 +6,36 @@ export const nanoaiActions = new Map([
         x: 0,
         y: 0,
         work: function (nano) {
-           return walk(nano, this.x,this.y, .25)
+           return walk(nano, this.x,this.y, 1)
         },
         clone: function(x,y) {
-            this.x = x;
-            this.y = y;
-            return atomicClone(this);   
+            let clone =  atomicClone(this)
+            clone.x = x;
+            clone.y = y;
+            return clone;   
         }
     }],
     ["follow", {
         nano2: null,
         work: function (nano) {
-            return this.nano2&&walk(nano, this.nano2.x,this.nano2.y, .25)
+            var nano2x = this.nano2;
+            var walko = nano2x && walk(nano, this.nano2.x,this.nano2.y, 1)
+            
+            return walko
         },
+        //clone before setting the variable
         clone: function(nano2) {
-            this.nano2 = nano2;
+            let clone =  atomicClone(this)
+            clone.nano2 = nano2;
+            return clone; 
+        }
+    }],
+    ["deactivate", {
+        work: function (nano) {
+            nano.setActive(false)
+            return false
+        },
+        clone: function() {
             return atomicClone(this);   
         }
     }]

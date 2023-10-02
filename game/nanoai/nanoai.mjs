@@ -1,3 +1,4 @@
+import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
@@ -11,9 +12,10 @@ export class Nanoai {
         this.speed = 48;
         p.loadImage('../nanoai.png', img => {
             this.img = img;
-            console.log('Image loaded');
         });
-        this.brain = new NanoaiBrain();
+        this.brain = new NanoaiBrain(this);
+        this.setActive = setActive;
+        this.setActive(true)
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
@@ -39,20 +41,9 @@ export class Nanoai {
             p.image(this.img, this.centerX, this.centerY);
         }
     }
-    talk(nano2) {
-        /*this.brain.queue.push({
-            nano2: nano2,
-            work: function(nano) {
-              //nano.chat(nano2, "hi",function(){ nano.brain.state = "idle"} );
-            }
-        });*/
-    }
-    walk(x, y) {
-        this.brain.do("walk", x,y)
-    }
-    follow(nano2) {
-        this.brain.do("follow", nano2)
-    }
+    //if i put this on every object it can feel hard to use...
+    
+    
     chat(nano2, msg, done) {
         //i have to figure out how to get nanoais to chat, this won't work for now
         let progress = 0;

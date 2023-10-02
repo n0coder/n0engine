@@ -38,7 +38,6 @@ while (proto !== null && proto.constructor.name !== 'Object') {
     }
 
     for (const [functionName, entityList] of this.functions) {
-      console.log(['removing', functionName, entityList]);
       const index = entityList.indexOf(entity);
       if (index > -1) {
         entityList.splice(index, 1);
@@ -63,6 +62,31 @@ while (proto !== null && proto.constructor.name !== 'Object') {
     return this.entities.get(type) || [];
   }
 
+  contains(entity) {
+    var c = this.entities.get(entity.constructor.name);
+    if (!c) return false;
+    return c.includes(entity);
+  }
+
 }
 
 export const cosmicEntityManager = new CosmicEntityManager();
+
+
+export function setActive(state) {
+    
+  var exists = cosmicEntityManager.contains(this)
+  if (state) {
+      if (!exists) {
+          cosmicEntityManager.addEntity(this);
+      } else {
+          console.error([this, "is already active"])
+      }
+  } else {
+      if (exists) {
+          cosmicEntityManager.removeEntity(this);
+      } else {
+          console.error([this, "is not active"])
+      }
+  }
+}
