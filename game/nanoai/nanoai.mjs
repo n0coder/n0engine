@@ -1,40 +1,32 @@
+import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
+import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
 export class Nanoai {
-    constructor(name, x,y) {
+    constructor(name, x, y) {
         this.name = name
         this.x = x
         this.y = y
-         p.loadImage('../nanoai.png', img => {
+        this.speed = 48;
+        p.loadImage('../nanoai.png', img => {
             this.img = img;
             console.log('Image loaded');
-          });
-          this.brain = new NanoaiBrain();
-        this.activityMap = new Map([
-            ["walk", {
-                x: x,
-                y: y,
-                work: function(nano) {
-                  // this should realistically be more of a walking code
-                  nano.x = this.x;
-                  nano.y = this.y;
-                  return false;
-                }
-            }]
-        ])
+        });
+        this.brain = new NanoaiBrain();
     }
     //keeping track of an unknown x and y center is easier with this calculation function
-    get centerX() { 
-        if (this.img) 
-          return this.x + this.img.width / 2;        
+    get centerX() {
+        if (this.img)
+            return this.x - this.img.width / 2;
         return this.x;
-      }
-    
-      get centerY() {
-        if (this.img) 
-          return this.y + this.img.height;
+    }
+
+    get centerY() {
+        if (this.img)
+            return this.y - this.img.height;
         return this.y;
-      }
+    }
     idle() {
         //find something to do
         //check battery
@@ -44,10 +36,10 @@ export class Nanoai {
     draw() {
         this.brain.work(this);
         if (this.img) {
-            p.image(this.img, this.x, this.y);
+            p.image(this.img, this.centerX, this.centerY);
         }
     }
-    talk(nano2){
+    talk(nano2) {
         /*this.brain.queue.push({
             nano2: nano2,
             work: function(nano) {
@@ -55,23 +47,24 @@ export class Nanoai {
             }
         });*/
     }
-    walk(x,y) {
-        var walk = this.activityMap.get("walk")
-        walk.x = x;
-        walk.y = y;
-        this.brain.currentActivity = walk;
-        this.brain.state = "active"
+    walk(x, y) {
+        this.brain.do("walk", x,y)
     }
-    chat (nano2, msg, done) { 
+    follow(nano2) {
+        this.brain.do("follow", nano2)
+    }
+    chat(nano2, msg, done) {
         //i have to figure out how to get nanoais to chat, this won't work for now
         let progress = 0;
         if (progress === 0) {
-        console.log(`${this.name}: ${msg} ${nano2.name}`)
-        nano2.chat(this, "hi back", () => progress++)
+            console.log(`${this.name}: ${msg} ${nano2.name}`)
+            nano2.chat(this, "hi back", () => progress++)
         }
         if (progress >= 1) done();
     }
     pickup(item) {
+        this.brain.do("walk", item.x,item.y) //this is sick wtf
+        
         //this involves walking to and lifting an object off the ground
     }
     harvest(crop) {

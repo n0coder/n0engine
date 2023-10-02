@@ -13,13 +13,16 @@ export class Camera {
     }
     follow(o) { 
         this.target = o;
-        console.log(o.x, o.y)
+        this.x =gameW/2- o.x*this.s;
+        this.y =gameH/2- o.y*this.s;
     }
     draw() {
         p.ellipse(gameW/2, gameH/2, 3, 3)
         //update
-        var tx = gameW/2-((this.target.centerX||this.target.x))*this.s
-        var ty = gameH/2-((this.target.centerY||this.target.y))*this.s;
+        //this is an issue, the smooth movement is annoying
+        //maybe i should do what phind said and just lerp
+        var tx = gameW/2-((this.target.x))*this.s
+        var ty = gameH/2-((this.target.y))*this.s;
         var vx = tx-this.x;
         var vy = ty-this.y;
         this.x += vx*deltaTime;

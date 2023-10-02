@@ -3,6 +3,7 @@ import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityMan
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 import { p } from "../engine/core/p5engine.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { Circle } from "./farm/circle.mjs";
 import { Crop } from "./farm/crop.mjs";
 import { CottonCandyPlant } from "./farm/proceduralPlantTest/cottonCandy.mjs";
 import { PopFlower } from "./farm/proceduralPlantTest/popFlower.mjs";
@@ -12,10 +13,15 @@ startGlobalEntities(); //set up globals like camera etc
 camera.s=3
 
 var nano = new Nanoai('n0',64, 64);
-cosmicEntityManager.addEntity(nano); //what should i do with the add entity calls? 
-camera.follow(nano)
+cosmicEntityManager.addEntity(nano);
+
 var nano2 = new Nanoai('abi',128, 64);
 cosmicEntityManager.addEntity(nano2);
+
+//try to make pictures of this when possible:
+//var nano = new Nanoai('n0',64, 64); cosmicEntityManager.addEntity(nano); camera.follow(nano) var nano2 = new Nanoai('abi',128, 64); cosmicEntityManager.addEntity(nano2);
+
+
 //we need a handful of activities to test the nano ai on
 document.nanos = [nano, nano2]
 //what if we queue nano activites? 
@@ -26,12 +32,16 @@ document.nanos = [nano, nano2]
 
 
 //walk position
-nano.walk(0, 0);
+nano.walk(256, 0);
+nano.follow(nano2);
 nano2.walk(20, 0);
-
+nano.walk(0, 0);
 //a pickup
-var circle = new Circle(); //pick
+var circle = new Circle(80,0,5); //pick
+cosmicEntityManager.addEntity(circle)
 nano.pickup(circle);
+
+camera.follow(circle)
 
 //a crop
 var crop = new Crop();
