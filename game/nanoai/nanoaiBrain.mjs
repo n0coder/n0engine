@@ -9,19 +9,26 @@ export class NanoaiBrain {
       this.stateMachine = {
         idle: function(nano) {
           if (nano.brain.queue.length > 0) {
-            nano.brain.currentActivity = nano.brain.queue.shift()
+            var q = nano.brain.queue[0];
+            if (Array.isArray(q)) {
+              q.forEach(o => nano.brain.queue.push(o))
+              nano.brain.queue.shift();
+              return;
+            }
+
+            nano.brain.currentActivity = q;
             nano.brain.active(nano)
-          } else nano.idle();
+          } else nano.brain.done(nano);
         }, 
         active: function(nano) {
             if (nano.brain.currentActivity) {
                 var ou = nano.brain.currentActivity.work(nano);
                 if (!ou) {
-                    nano.brain.idle(nano)
+                    nano.brain.done(nano)
                     nano.brain.currentActivity = null;
                 }
             } else {
-              nano.brain.idle(nano);
+              nano.brain.done(nano);
             }
         }
       };
@@ -38,6 +45,11 @@ export class NanoaiBrain {
     }
     active(nano) {
       nano.brain.state = "active";
+    }
+
+    done(nano) {
+      nano.brain.state = "idle"
+      nano.brain.queue.shift();
     }
     idle(nano) {
       nano.brain.state = "idle"
