@@ -1,3 +1,5 @@
+import { p } from "../p5engine.mjs";
+
 //this is a function to deep copy something so hard it duplicates atoms
 export function atomicClone(oldObj) {
     let newObj = new Object();
@@ -14,4 +16,21 @@ export function atomicClone(oldObj) {
         }
     }
     return newObj;
+}
+
+export const imageMap = new Map();
+
+export function loadImg(obj, vari, path) {
+    var imga =imageMap.get(path);
+    console.log(["loading image", imga?"sending catched img":"loading a new img"])
+    if (imga) { //if we already loaded the image, copy it into the new object
+        obj[vari]=imga;
+    } else if (obj[vari] === undefined && !obj["loading"]) {
+        p.loadImage(path, img => {
+            imageMap.set(path, img);
+            obj[vari] = img;
+            delete obj["loading"]
+        });
+        obj["loading"] = true;
+    }
 }

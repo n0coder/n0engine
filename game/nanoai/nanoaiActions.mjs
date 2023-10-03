@@ -34,6 +34,18 @@ export const nanoaiActions = new Map([
         clone: function(...args) {
             return handleClone(this, ...args)
         }
+    }],
+    ["harvest", { 
+        args: [],
+        before: ["follow"], 
+        work: function (nano) {
+            if (this.args[0].harvest) 
+                return this.args[0].harvest(nano);
+            return false
+        },
+        clone: function(...args) {
+            return handleClone(this, ...args)
+        }
     }]
 ])
 

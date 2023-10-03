@@ -14,6 +14,9 @@ export class NanoInventory{
             return o>0;
         }
     }
+    isOpen(){
+        return this.list.length < this.slots
+    }
     remove(item) {
         if (this.list.includes(item)) {
             var i = this.list.indexOf(item);

@@ -1,6 +1,6 @@
 import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
-import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
+import { atomicClone, loadImg } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { walk } from "./nanoaiActions.mjs";
@@ -10,14 +10,10 @@ export class Nanoai {
         this.name = name
         this.x = x
         this.y = y
-        this.speed = 48;
-        p.loadImage('../nanoai.png', img => {
-            this.img = img;
-        });
+        this.speed = 48;        
+        loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(3, [[-7,-10], [7,-10], [0, -20]]);
-        //inventory ideas... physical, + inphysical lol tf
-
         this.setActive = setActive;
         this.setActive(true)
     }
@@ -41,35 +37,13 @@ export class Nanoai {
     }
     draw() {
         this.brain.work(this);
-        if (this.img) {
+        if (this.img) { 
             p.image(this.img, this.centerX, this.centerY);
+        } else {
+            p.rect(this.img, this.centerX, this.centerY, 48,20)
         }
         this.inventory.draw(this);
     }
-    //if i put this on every object it can feel hard to use...
+
     
-    
-    chat(nano2, msg, done) {
-        //i have to figure out how to get nanoais to chat, this won't work for now
-        let progress = 0;
-        if (progress === 0) {
-            console.log(`${this.name}: ${msg} ${nano2.name}`)
-            nano2.chat(this, "hi back", () => progress++)
-        }
-        if (progress >= 1) done();
-    }
-    pickup(item) {
-        this.brain.do("walk", item.x,item.y) //this is sick wtf
-        
-        //this involves walking to and lifting an object off the ground
-    }
-    harvest(crop) {
-        //this involves picking items from plants
-    }
-    equip(item) {
-        //this involves getting an object ready to use
-    }
-    use(obj) {
-        //this involves using an object from inventory or world
-    }
 }

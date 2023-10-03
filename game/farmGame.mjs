@@ -12,7 +12,7 @@ import { Nanoai } from "./nanoai/nanoai.mjs";
 import { Water } from "./world/water.mjs";
 worldGrid.tileSize = 64;
 startGlobalEntities(); //set up globals like camera etc
-camera.s=3
+camera.s=1
 
 //so there should be an easier way to shift in and out of world space
 //what that means is that we need to handle cosmic entity status somewhere
@@ -26,6 +26,7 @@ var nano2 = new Nanoai('abi',128, 64);
 
 //we need a handful of activities to test the nano ai on
 document.nanos = [nano, nano2]
+
 //what if we queue nano activites? 
 //later we can figure out a system for procedural activity generation
 //what i mean is not hardcode these systems
@@ -65,14 +66,24 @@ camera.follow(nano)
 nano.brain.do("pickup",nano2);
 
 //a crop
-var crop = new Crop();
+//calling harvest on a plant, will activate the plant specific action hook
+var crop = new Crop(0, 0);
 nano.brain.do("harvest",crop)
-
+document.crops = [crop]
 //fishing pole
 var water = new Water();
 var pole = new FishingPole();
+
 nano.brain.do("equip",pole);
 nano.brain.do("use",water); 
+
+//normally trying to "use" water (without an item equipped), 
+//would do what for a nano ai?
+
+//abiai said "it can help cool the ai down", i had the idea of cleaning the ai when it gets dirty
+//so it's a cleanup/cooldown use
+
+
 //i don't understand how to get this working
 //lol of course i dont lol... it was too early lol
 

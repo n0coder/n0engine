@@ -5,10 +5,11 @@ import { p } from "../../engine/core/p5engine.mjs";
 //we can pickup any object with a position
 
 export class Circle{
-    constructor(x=0,y=0, s=15) {
+    constructor(x=0,y=0, s=15, ms=15) {
         this.x = x;
         this.y = y;
         this.s = s;
+        this.ms = ms;
         this.setActive = setActive;
         this.setActive(true);
     }

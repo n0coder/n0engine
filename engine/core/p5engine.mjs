@@ -14,7 +14,6 @@ class P5engine {
           p.setup = function(...args)  {
             p.createCanvas(gameW,gameH).parent("sketch-holder");
             cosmicEntityManager.invoke("setup", ...args);
-           
           };
           
           p.draw = function(...args)  {
