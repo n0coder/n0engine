@@ -16,6 +16,8 @@ export class Nanoai {
         this.inventory = new NanoInventory(3, [[-7,-10], [7,-10], [0, -20]]);
         this.setActive = setActive;
         this.setActive(true)
+
+        this.working =false
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
@@ -29,6 +31,7 @@ export class Nanoai {
             return this.y - this.img.height;
         return this.y;
     }
+
     idle() {
         //find something to do
         //check battery
@@ -36,14 +39,18 @@ export class Nanoai {
         //check feelings (wants to do hobby or chat with friend)?
     }
     draw() {
-        this.brain.work(this);
         if (this.img) { 
             p.image(this.img, this.centerX, this.centerY);
         } else {
             p.rect(this.centerX, this.centerY, 48,20)
         }
+        if (!this.working) return;
+        this.brain.work(this);
+        
         this.inventory.draw(this);
     }
 
-    
+    doubleClicked() {
+        this.working = true
+    }
 }

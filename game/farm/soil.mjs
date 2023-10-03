@@ -4,7 +4,7 @@ import { p } from "../../engine/core/p5engine.mjs";
 import {worldGrid} from "../../engine/grid/worldGrid.mjs"
 import { Circle } from "./circle.mjs";
 
-export class Crop {
+export class Soil {
     constructor(x=0,y=0, pops=false) {
         this.x = x
         this.y = y

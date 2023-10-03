@@ -6,6 +6,7 @@ export let previousTime = 0;
 export function calculateDeltaTime() {
     let currentTime = p.millis();
     var dt = (currentTime - previousTime)/1000;
-    deltaTime = Math.min(dt, maxDeltaTime);
+    //testing if deltatime calculation is breaking my game some
+    deltaTime = .025 //= Math.min(dt, maxDeltaTime);
     previousTime = currentTime;
 }

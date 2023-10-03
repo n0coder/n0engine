@@ -4,6 +4,26 @@ export class NanoInventory{
         this.offsets = offsets;
         this.list = [];
     }
+
+    equip(item) {
+        console.log(item)
+        if (this.list.includes(item)) {
+            var i = this.list.indexOf(item)
+            var o = this.list.splice(i,1) //split item out of list
+            return this.list.unshift(item); //add item to beginning
+        } else {
+            return this.list.unshift(item);
+        }
+    }
+    unequip(item) {
+        if (this.list.includes(item)) {
+            var i = this.list.indexOf(item)
+            var o = this.list.splice(i,1) //split item out of list
+            return this.list.splice(this.list.length-1,0, item) //add item to end
+        } else {
+            return false
+        }
+    }
     add(item) { //0
         if (this.list.includes(item)) {
             return false;
@@ -16,6 +36,10 @@ export class NanoInventory{
     }
     isOpen(){
         return this.list.length < this.slots
+    }
+
+    isPhysical(item) {
+        return this.list.indexOf(item) <this.offsets.length
     }
     remove(item) {
         if (this.list.includes(item)) {
@@ -41,6 +65,9 @@ export class NanoInventory{
             //console.log(offset); 
             slot.x = x+offset[0]
             slot.y = y+offset[1]
+            slot.vx = -offset[0];
+            slot.vy = -offset[1] 
+
         }
     }
     //make items visible when there are positions that are available

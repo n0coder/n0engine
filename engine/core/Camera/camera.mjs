@@ -1,15 +1,15 @@
 import { deltaTime } from "../Time/n0Time.mjs";
-import { gameH, gameW } from "../n0config.mjs";
+import { defaultScale, gameH, gameW } from "../../n0config.mjs";
 import { p } from "../p5engine.mjs";
 
 export class Camera {
-    constructor (x=0,y=0, s=1) {
+    constructor (x=0,y=0, s=-1) {
         this.x = x;
         this.y = y;
         this.vx = x;
         this.vy = y; 
         this.target = null;
-        this.s = s;
+        this.s = s==-1?defaultScale:s;
     }
     follow(o) { 
         this.target = o;

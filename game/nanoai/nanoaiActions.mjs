@@ -16,8 +16,9 @@ export const nanoaiActions = new Map([
         args: [],
         work: function (nano) {
             var nano2x = this.args[0];
-            var walko = nano2x && walk(nano, nano2x.x,nano2x.y, 1)
-            //p.ellipse(nano.x, nano.y, 10);
+            if (nano2x) {
+                return walk(nano, nano2x.x,nano2x.y, 1)
+            }
             return walko
         },
         //clone before setting the variable
@@ -30,6 +31,15 @@ export const nanoaiActions = new Map([
         before: ["follow"], 
         work: function (nano) {
             return !nano.inventory.add(this.args[0])
+        },
+        clone: function(...args) {
+            return handleClone(this, ...args)
+        }
+    }],
+    ["equip", { 
+        args: [],
+        work: function (nano) {
+            return !nano.inventory.equip(this.args[0])
         },
         clone: function(...args) {
             return handleClone(this, ...args)

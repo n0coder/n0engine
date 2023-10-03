@@ -4,7 +4,7 @@ import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 import { p } from "../engine/core/p5engine.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Circle } from "./farm/circle.mjs";
-import { Crop } from "./farm/crop.mjs";
+import { Soil } from "./farm/soil.mjs";
 import { CottonCandyPlant } from "./farm/proceduralPlantTest/cottonCandy.mjs";
 import { PopFlower } from "./farm/proceduralPlantTest/popFlower.mjs";
 import { FishingPole } from "./items/fishingPole.mjs";
@@ -12,7 +12,6 @@ import { Nanoai } from "./nanoai/nanoai.mjs";
 import { Water } from "./world/water.mjs";
 worldGrid.tileSize = 64;
 startGlobalEntities(); //set up globals like camera etc
-camera.s=1
 
 //so there should be an easier way to shift in and out of world space
 //what that means is that we need to handle cosmic entity status somewhere
@@ -41,7 +40,7 @@ document.nanos = [nano, nano2]
 
 //nano.brain.do("walk", 256, 0);
 //nano.brain.do("follow", nano2);
-//nano2.brain.do("walk",20, 0); 
+//nano.brain.do("walk",200, 0); 
 //nano.brain.do("walk",0, 0);
 
 //nano.brain.do("deactivate"); needed to test disabling (entity) self at will
@@ -49,10 +48,10 @@ document.nanos = [nano, nano2]
 //a pickup
 var circle = new Circle(80,0,5); //pick
 //nano.brain.do("follow", circle);
-nano.brain.do("pickup",circle);
+//nano.brain.do("pickup",circle);
 //nano.inventory.add(circle);
 var circle2 = new Circle(140,82,5);
-nano.brain.do("pickup",circle2);
+//nano.brain.do("pickup",circle2);
 
 
 var circle3 = new Circle(100,40,5); //pick
@@ -63,18 +62,24 @@ var circle4 = new Circle(120,62,5);
 nano2.brain.do("pickup",circle4);
 
 camera.follow(nano)
-nano.brain.do("pickup",nano2);
 
 //a crop
 //calling harvest on a plant, will activate the plant specific action hook
-var crop = new Crop(0, 0);
-nano.brain.do("harvest",crop)
-document.crops = [crop]
+var soil = new Soil(0, 0);
+//nano.brain.do("harvest",soil)
+document.crops = [soil]
+
+//nano.brain.do("equip", nano2);
+
 //fishing pole
 var water = new Water();
-var pole = new FishingPole();
-
+var pole = new FishingPole(62,15);
+var pole2 = new FishingPole(102,15);
+nano.brain.do("follow", pole);
 nano.brain.do("equip",pole);
+nano.brain.do("follow", pole2);
+nano.brain.do("equip",pole2);
+nano.brain.do("pickup",nano2);
 nano.brain.do("use",water); 
 
 //normally trying to "use" water (without an item equipped), 
