@@ -40,7 +40,7 @@ export class Nanoai {
         if (this.img) { 
             p.image(this.img, this.centerX, this.centerY);
         } else {
-            p.rect(this.img, this.centerX, this.centerY, 48,20)
+            p.rect(this.centerX, this.centerY, 48,20)
         }
         this.inventory.draw(this);
     }

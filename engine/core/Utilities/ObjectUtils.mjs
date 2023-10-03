@@ -22,7 +22,6 @@ export const imageMap = new Map();
 
 export function loadImg(obj, vari, path) {
     var imga =imageMap.get(path);
-    console.log(["loading image", imga?"sending catched img":"loading a new img"])
     if (imga) { //if we already loaded the image, copy it into the new object
         obj[vari]=imga;
     } else if (obj[vari] === undefined && !obj["loading"]) {
