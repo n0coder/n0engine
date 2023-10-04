@@ -10,9 +10,11 @@ import { PopFlower } from "./farm/proceduralPlantTest/popFlower.mjs";
 import { FishingPole } from "./items/fishingPole.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
 import { Water } from "./world/water.mjs";
-worldGrid.tileSize = 64;
+
+//worldGrid.tileSize = 64;
 startGlobalEntities(); //set up globals like camera etc
 
+var water = new Water(85,-33);
 //so there should be an easier way to shift in and out of world space
 //what that means is that we need to handle cosmic entity status somewhere
 var nano = new Nanoai('n0',64, 64);
@@ -56,10 +58,10 @@ var circle2 = new Circle(140,82,5);
 
 var circle3 = new Circle(100,40,5); //pick
 //nano.brain.do("follow", circle);
-nano2.brain.do("pickup",circle3);
+//nano2.brain.do("pickup",circle3);
 //nano.inventory.add(circle);
 var circle4 = new Circle(120,62,5);
-nano2.brain.do("pickup",circle4);
+//nano2.brain.do("pickup",circle4);
 
 camera.follow(nano)
 
@@ -72,15 +74,28 @@ document.crops = [soil]
 //nano.brain.do("equip", nano2);
 
 //fishing pole
-var water = new Water();
 var pole = new FishingPole(62,15);
 var pole2 = new FishingPole(102,15);
+var pole3 = new FishingPole(122,30);
+var pole4 = new FishingPole(77,30);
 nano.brain.do("follow", pole);
 nano.brain.do("equip",pole);
 nano.brain.do("follow", pole2);
 nano.brain.do("equip",pole2);
+
+
+nano2.brain.do("follow", pole3);
+nano2.brain.do("equip",pole3);
+nano2.brain.do("follow", pole4);
+nano2.brain.do("equip",pole4);
+
+//nano.brain.do("follow", pole3);
+//nano.brain.do("equip",pole3);
 nano.brain.do("pickup",nano2);
+nano.brain.do("follow",water, 16)
 nano.brain.do("use",water); 
+nano2.brain.do("use",water); 
+
 
 //normally trying to "use" water (without an item equipped), 
 //would do what for a nano ai?

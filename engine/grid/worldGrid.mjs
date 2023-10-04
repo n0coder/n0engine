@@ -1,7 +1,7 @@
 export class WorldGrid {
     constructor() {
         this.tileSize = 32;
-        this.scale =2; 
+        this.scale =1; 
     }
     get scaledTileSize() {
         return this.tileSize * this.scale;

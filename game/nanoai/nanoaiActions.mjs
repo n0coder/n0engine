@@ -16,8 +16,9 @@ export const nanoaiActions = new Map([
         args: [],
         work: function (nano) {
             var nano2x = this.args[0];
+            var nanowok = this.args[1] || 1
             if (nano2x) {
-                return walk(nano, nano2x.x,nano2x.y, 1)
+                return walk(nano, nano2x.x,nano2x.y, nanowok)
             }
             return walko
         },
@@ -52,6 +53,21 @@ export const nanoaiActions = new Map([
             if (this.args[0].harvest) 
                 return this.args[0].harvest(nano);
             return false
+        },
+        clone: function(...args) {
+            return handleClone(this, ...args)
+        }
+    }],
+    ["use", { 
+        args: [], 
+        work: function (nano) {
+            var nano2x = this.args[0];
+            if (nano2x) {
+                if (nano2x.use) {
+                    return nano2x.use(nano);
+                    }
+                    return true
+            } else return false;
         },
         clone: function(...args) {
             return handleClone(this, ...args)

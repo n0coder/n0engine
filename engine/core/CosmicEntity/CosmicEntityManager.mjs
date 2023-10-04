@@ -3,12 +3,13 @@ export class CosmicEntityManager {
     this.entities = new Map();
     this.functions = new Map();
   }
-  addEntity(entity) {
+  addEntity(entity, renderOrder = 0) {
     if (!this.entities.has(entity.constructor.name)) {
       this.entities.set(entity.constructor.name, []);
     }
     this.entities.get(entity.constructor.name).push(entity);
-
+    if (!entity.renderOrder)
+    entity.renderOrder = renderOrder
     let proto = Object.getPrototypeOf(entity);
     while (proto !== null && proto.constructor.name !== 'Object') {
       const propertyNames = Object.getOwnPropertyNames(proto);
@@ -44,7 +45,10 @@ export class CosmicEntityManager {
   }
 
   invoke(functionName, ...args) {
+    
     const entitiesWithFunction = this.functions.get(functionName) || [];
+    if (functionName === "draw") 
+      entitiesWithFunction.sort((a,b)=>a.renderOrder - b.renderOrder)
     entitiesWithFunction.forEach(entity => {
       if (typeof entity[functionName] === "function") {
         entity[functionName](...args);

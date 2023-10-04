@@ -16,7 +16,7 @@ export class Nanoai {
         this.inventory = new NanoInventory(3, [[-7,-10], [7,-10], [0, -20]]);
         this.setActive = setActive;
         this.setActive(true)
-
+        this.renderOrder =1;
         this.working =false
     }
     //keeping track of an unknown x and y center is easier with this calculation function
