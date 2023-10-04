@@ -6,13 +6,17 @@ export class NanoInventory{
     }
 
     equip(item) {
-        console.log(item)
+        //console.log(item)
         if (this.list.includes(item)) {
             var i = this.list.indexOf(item)
             var o = this.list.splice(i,1) //split item out of list
             return this.list.unshift(item); //add item to beginning
         } else {
-            return this.list.unshift(item);
+            if (this.list.length<this.slots) {
+                item.renderOrder = 2 
+                return this.list.unshift(item);
+                }
+            return false;
         }
     }
     unequip(item) {
@@ -28,10 +32,15 @@ export class NanoInventory{
         if (this.list.includes(item)) {
             return false;
         } else {
-            console.log("item added")
+            
+            //console.log("item added")
+            if (this.list.length < this.slots) {
+                item.renderOrder =  2  
             var o = this.list.push(item); //1
             this.refresh()
             return o>0;
+            }
+            return false;
         }
     }
     isOpen(){
@@ -47,6 +56,7 @@ export class NanoInventory{
             var o = this.list.splice(i, 1);
             this.refresh()
             item.setActive(true);
+            item.renderOrder = 0   
             return o;
         } else {
             return false;
@@ -73,7 +83,8 @@ export class NanoInventory{
     //make items visible when there are positions that are available
     refresh() {
         for (let i = 0; i < this.list.length; i++) {
-            this.list[i].setActive(i < this.offsets.length)            
+            this.list[i].setActive(i < this.offsets.length)   
+                  
         }
     }
 

@@ -61,13 +61,10 @@ export const nanoaiActions = new Map([
     ["use", { 
         args: [], 
         work: function (nano) {
-            var nano2x = this.args[0];
-            if (nano2x) {
-                if (nano2x.use) {
-                    return nano2x.use(nano);
-                    }
-                    return true
-            } else return false;
+            if (this.args[0].use) {
+                var action = this.args[0].use(nano);
+                return action
+            }
         },
         clone: function(...args) {
             return handleClone(this, ...args)
