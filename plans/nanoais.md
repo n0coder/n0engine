@@ -11,14 +11,46 @@ a farmer is more likely to do more farming jobs than a fishing or distribution j
 they also gain friendships based on who they interact with most which will increase the choice on a specific job based on if their friend is working there
 some ais are competitive and others are cooperative
 
+they may like some specific item and they'll do whatever they can to get more of that item, or to work with that item.
+
+lets say one nanoai likes cloudium more than other items
+they will take jobs that work with cloudium more often
+they will try to maximize the amount of cloudium they can hold
+this can involve picking up storage bags, and filling them with cloudium. if they can afford it they will upgrade their storage options whenever possible all to get more and more cloudium.
+
+a nanoai that likes money will do the same thing but with money
+a money nanoai may like to work directly with money, they become a banker or a shopkeeper
+
+these nanoais will become sad if they can not get the item they want
+
+the nanoais will reflect their favorite activity through actions and emotion bubbles. as a nanoai thinks about their money they will have a thought bubble appear with a bag of money or a coin, or a face with coins for eyes
+
+at some point the nanoai that likes to hold money may try to maximize how much money their holding. as they gather more of a specific item they can get a title "money bags" given to the ai that fills more than one bag full of money
+
+not only are there item storage related needs, but also action needs. one nanoai may like to carry heavy things, one may just like to give away money, one may want to recieve money. another may enjoy crafting things, some may like the activity of crafting anything, others mmay like crafting specific items. if a nanoai gets ahold of metals they may try to craft coins from the metal or tools. they specialize in what they like doing
+
+i think it would be a cool idea to have the nanoais praying or crusing the gods when they're forced to do something they dislike. like one ai may hate paperwork, and if they are assigned paperwork they start to get angry and they storm out of the workplace. they'll get depressed and pray to the gods that they are given some job that they don't hate
 
 
+## phindai's summary of item
 
+Imagine an AI entity, called a nanoai, that has a favorite item, such as cloudium or money. This preference drives their behavior:
 
+1. They are more likely to choose jobs that involve their favorite item. If a nanoai likes cloudium, they might work more with cloudium-related tasks.
 
+2. They will try to maximize the amount of their favorite item they can hold. They might pick up storage bags and fill them with their preferred item, or even upgrade their storage capacity if they can afford it.
 
+3. Their emotional state is tied to their ability to access their favorite item. They will become unhappy if they can't get the item they want.
 
+4. They express their favorite activities and thoughts through actions and "emotion bubbles." For example, a nanoai that likes money might have a thought bubble appear with a bag of money or a coin.
 
+5. They can earn titles based on their behaviors. For example, a nanoai that gathers a lot of money might be given the title "money bags."
+
+6. They have preferences not just for items, but also for activities. Some nanoais might like to carry heavy things, give away money, receive money, or craft items. They might even specialize in crafting specific items if they have the materials.
+
+7. They have emotional reactions to tasks they don't enjoy. For example, if a nanoai dislikes paperwork and is assigned a paperwork task, they might get angry, leave the workplace, and pray for a better job.
+
+This concept allows for a wide variety of behaviors and interactions among the nanoais, making their world dynamic and interesting
 
 
 ### n0

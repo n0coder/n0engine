@@ -48,7 +48,13 @@ export class NanoInventory{
     }
 
     isPhysical(item) {
-        return this.list.indexOf(item) <this.offsets.length
+        let index = this.list.indexOf(item);
+        return index >= 0 && index < this.offsets.length
+    }
+    has(item) {
+        let index = this.list.indexOf(item);
+        console.log(index);
+        return index >= 0
     }
     remove(item) {
         if (this.list.includes(item)) {

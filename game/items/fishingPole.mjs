@@ -16,8 +16,8 @@ export class FishingPole {
         this.vy = vy;
         this.setActive = setActive
         this.setActive(true);
-        this.fishrect = null;
         this.renderOrder = 0
+        this.fishrect = null;
 
         this.t = 0;
     }

@@ -16,7 +16,7 @@ export const nanoaiActions = new Map([
         args: [],
         work: function (nano) {
             var nano2x = this.args[0];
-            var nanowok = this.args[1] || 1
+            var nanowok = !isNaN(this.args[1]) ? this.args[1] : 1
             if (nano2x) {
                 return walk(nano, nano2x.x,nano2x.y, nanowok)
             }
@@ -64,6 +64,20 @@ export const nanoaiActions = new Map([
             if (this.args[0].use) {
                 var action = this.args[0].use(nano);
                 return action
+            }
+        },
+        clone: function(...args) {
+            return handleClone(this, ...args)
+        }
+    }],
+    ["plant", { 
+        args: [],
+        before: ["follow"],
+        work: function (nano) {
+            var plant = this.args[0].plant;
+            if (plant) {
+                var wait = plant(nano, this.args[1]);
+                return wait
             }
         },
         clone: function(...args) {

@@ -10,9 +10,7 @@ export class Soil {
         this.y = y
         this.color = [150, 255, 150]
         this.inventory = []
-        this.seed = Circle; //i should have a more dedicated seed object
-        this.t = 0;
-        this.spawnT = 1;
+
         this.maxCount = 2;
         this.pops = pops
         this.setActive = setActive;
@@ -25,23 +23,23 @@ export class Soil {
             if (p.s <= p.ms) 
                 p.s += deltaTime*10
         })
-        this.t+=deltaTime;
-        if (this.t > this.spawnT && this.inventory.length < this.maxCount) {
-            
-            var p = new this.seed(this.x+(Math.random()*15), this.y+(Math.random()*15), 0, 15+(Math.random()*15));
-            this.inventory.push(p)
-            
-            this.t = 0;
+    }
+    plant(nano, seed) {
+        
+        if (nano.inventory.has(seed)) {
+            console.log("seed is in inventory")
+        } else {
+            console.log("seed is not in inventory")
         }
     }
     harvest(nano) {
         if (!nano.inventory.isOpen()) return false;
         
         var plant = this.inventory.find(p=>p.s >= p.ms)
-        if (nano.inventory.add(plant)) {
+        if (plant&&nano.inventory.add(plant)) {
             var i = this.inventory.indexOf(plant)
             this.inventory.splice(i, 1)
         }
-        return this.inventory.find(p=>p.s >= p.ms);
+        return plant;
     }
 }
