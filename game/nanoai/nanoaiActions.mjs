@@ -1,6 +1,7 @@
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { Mommyai, Puff } from "./mommyai.mjs";
 
 export const nanoaiActions = new Map([
     ["walk", {
@@ -31,7 +32,7 @@ export const nanoaiActions = new Map([
         args: [],
         before: ["follow"], 
         work: function (nano) {
-            return !nano.inventory.add(this.args[0])
+            return !nano.inventory.add(this.args[0], this.args[1])
         },
         clone: function(...args) {
             return handleClone(this, ...args)
@@ -79,6 +80,40 @@ export const nanoaiActions = new Map([
                 var wait = plant(nano, this.args[1]);
                 return wait
             }
+        },
+        clone: function(...args) {
+            return handleClone(this, ...args)
+        }
+    }], 
+    ["transform", { 
+        args: [],
+        work: function (nano) {
+
+            var nano2 = nano.inventory.hasItem("Nanoai")
+            console.log(nano2)
+            if (nano2) {
+                console.log("holding nanoai")
+            var cloudium = nano.inventory.hasItems("Circle", 2)
+            if (cloudium) {
+                var cloudium2 = nano2.inventory.hasItems("Circle", 2)
+                if (cloudium2) {
+                    this.puff = new Puff(nano.x,nano.y,10,60,16, ()=> {
+                    nano.mommy = new Mommyai(nano.name, nano.x, nano.y);
+                    nano.mommy.nano = nano;
+                    nano.mommy.nano2 = nano2;
+                    nano.inventory.transfer(nano.mommy.inventory)
+                    nano2.inventory.transfer(nano.mommy.inventory)
+                    nano.mommy.inventory.remove(nano)
+                    nano.mommy.inventory.remove(nano2)
+                    nano.setActive(false)
+                    nano2.setActive(false)
+                    nano.mommy.inventory.refresh();
+                    })
+                }
+                else console.log("held nanoai is not holding cloudium")
+            } else console.log("not holding cloudium")
+            } else console.log("not holding nanoai")
+            return false
         },
         clone: function(...args) {
             return handleClone(this, ...args)

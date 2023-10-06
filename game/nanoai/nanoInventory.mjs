@@ -28,6 +28,13 @@ export class NanoInventory{
             return false
         }
     }
+    transfer(inventory) {
+        var all = this.list.splice(0)
+        inventory.transferRecieve(all)
+    }
+    transferRecieve(all) {
+        all.forEach(i => this.add(i));
+    }
     add(item) { //0
         if (this.list.includes(item)) {
             return false;
@@ -56,6 +63,29 @@ export class NanoInventory{
         console.log(index);
         return index >= 0
     }
+    hasItem(kind) {
+        for (let index = 0; index < this.list.length; index++) {
+            const element = this.list[index];
+            if (element && element.constructor.name === kind) {
+                return element;
+            }
+        }
+        return null;
+    }
+    
+    hasItems(kind, count) {
+        let i = []
+        for (let index = 0; index < this.list.length; index++) {
+            const element = this.list[index];
+            if (element&&element.constructor.name === kind) {
+                i.push(element)
+                if (i.length >= count ) {
+                    return i;
+                }
+            }
+        }
+        return null;
+    }
     remove(item) {
         if (this.list.includes(item)) {
             var i = this.list.indexOf(item);
@@ -77,6 +107,7 @@ export class NanoInventory{
         }
         for (let i = 0; i < Math.min(this.list.length, this.offsets.length); i++) {
             var slot = this.list[i];   
+            if (slot === null) continue;
             var offset = this.offsets[i]
             //console.log(offset); 
             slot.x = x+offset[0]
@@ -89,7 +120,8 @@ export class NanoInventory{
     //make items visible when there are positions that are available
     refresh() {
         for (let i = 0; i < this.list.length; i++) {
-            this.list[i].setActive(i < this.offsets.length)   
+            if (this.list[i] === null) continue;
+                this.list[i].setActive(i < this.offsets.length)   
                   
         }
     }
