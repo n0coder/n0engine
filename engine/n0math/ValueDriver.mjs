@@ -1,9 +1,10 @@
 export class ValueDriver {
     constructor(value) {
-      this.value = value;
+      this.value = value||0;
     }
   
-    getValue() {
+    getValue(x,y) {
+        
         if (typeof this.value === 'number') {
         return this.value;
       } else if (this.value.getValue) {
@@ -21,6 +22,11 @@ export class ValueDriver {
       } else {
         return 0;
       }
+    }
+    init(a,b,c) {
+        if(this.value.init) {
+            this.value.init(a,b,c)
+        }
     }
   }
   
