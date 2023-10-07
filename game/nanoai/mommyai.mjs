@@ -3,9 +3,11 @@ import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone, loadImg } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
+import { Poser } from "./poser.mjs";
 export class Puff {
     constructor(x,y,w,h,s=15, boom) {
         this.x = x;
@@ -19,8 +21,8 @@ export class Puff {
         this. r = 15;
         this. puffs = []
         for (let pp = 0; pp < this.r; pp++) {
-            var rx = ((Math.random()-.5)*2)*this.w
-            var ry = Math.random()*-this.h;
+            var rx = ((Math.random()-.5)*2)*(this.w + 5)
+            var ry =-(this.h)+(( Math.random()-.5))*-this.h;
             var rs = lerp(.6, 1,Math.random())*this.s
             this.puffs.push({rx, ry, rs})
         } 
@@ -30,14 +32,14 @@ export class Puff {
     }
     draw() {
         this.t-=deltaTime
-        var size = clamp(0,1,inverseLerp(2,0, this.t)*inverseLerp(0,2,this.t))*8
+        var size = clamp(0,1,inverseLerp(4,0, this.t)*inverseLerp(0,3.5,this.t))*8
         for (let o = 0; o < this.puffs.length; o++) {
             var puff = this.puffs[o]
-            var ox = 4+this.x+-(this.t*10) + puff.rx;
+            var ox = 4+this.x+ puff.rx*clamp(0,1,inverseLerp(0,3.5,this.t));
             var oy =this.y+(this.t*10) + puff.ry
-            p.ellipse(ox,oy, puff.rs*size);
+            p.ellipse(ox,oy, puff.rs*size*clamp(0,1,inverseLerp(0,3.5,this.t)));
         }
-        if (this.t < 1&&!this.done) {
+        if (this.t < 3.5&&!this.done) {
             this.done = true;
             this.boom?.()
         }
@@ -49,14 +51,14 @@ export class Mommyai {
         this.x = x
         this.y = y
         this.speed = 48;        
-        loadImg(this, "img", '../mommyai.png');
+        loadImg(this, "img", '../mommyaiCloudForm.png');
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(10, [[-6,-25], [9,-25],[-5,-30], [7,-30], [0, -50]]);
         this.setActive = setActive;
         this.setActive(true)
         this.renderOrder =1;
         this.working =false
-        
+        this.poser = new Poser();
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
@@ -83,6 +85,8 @@ export class Mommyai {
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
+        p.fill(226, 159, 159)
+
         this.brain.work(this);
         this.inventory.draw(this);
     }

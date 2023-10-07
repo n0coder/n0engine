@@ -90,9 +90,7 @@ export const nanoaiActions = new Map([
         work: function (nano) {
 
             var nano2 = nano.inventory.hasItem("Nanoai")
-            console.log(nano2)
             if (nano2) {
-                console.log("holding nanoai")
             var cloudium = nano.inventory.hasItems("Circle", 2)
             if (cloudium) {
                 var cloudium2 = nano2.inventory.hasItems("Circle", 2)

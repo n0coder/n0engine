@@ -2,6 +2,7 @@ import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
 import { p } from "../../../engine/core/p5engine.mjs";
 import { Offseter } from "../../../engine/n0math/offseter.mjs";
 import { inverseLerp, remap } from "../../../engine/n0math/ranges.mjs";
+import { perpandicular } from "../../../engine/n0math/vectorMath.mjs";
 
 
 //plans to make the little red part of the flower pop off as a sweet fruit
@@ -73,7 +74,7 @@ export class PopFlower {
             let x = Math.sin(i * radians + this.t * .2);
             let y = Math.cos(i * radians + this.t * .2);
             //x and y are vectors
-            var perp = this.perpandicular(x, y);
+            var perp = perpandicular(x, y);
 
             var upx1 = (x * vlength);
             var upy1 = (y * vlength);
@@ -107,7 +108,5 @@ export class PopFlower {
         p.endShape(p.CLOSE);
     }
 
-    perpandicular(x,y) {
-        return {x: -y, y: x} 
-    }
+    
 }

@@ -3,8 +3,8 @@ export const gameH = 512;
 export const gameW = gameH*1.77777;
 
 //global scene variables
-export const backgroundColor = [64,128,84];
-export const defaultScale = 3;
+export const backgroundColor = [33,33,33];
+export const defaultScale = 4;
 
 
 //this is a quirk of the original implementation of the engine

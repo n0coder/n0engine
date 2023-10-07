@@ -2,6 +2,7 @@ import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/C
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone, loadImg } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
@@ -44,7 +45,9 @@ export class Nanoai {
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
-        if (!this.working) return;
+
+        p2.variableLine(128, 68,this.centerX, this.centerY, 10,5)
+        ///if (!this.working) return;
         this.brain.work(this);
         
         this.inventory.draw(this);
