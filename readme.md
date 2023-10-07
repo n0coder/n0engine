@@ -56,7 +56,7 @@ going to add shared n0engine features to the repo
    i should do some practice runs on getting backtracking
 
 https://www.npmjs.com/package/simplex-noise 
-//i use this noise algorithm since it supports alea
+//i use this noise algorithm since it supports alea (i became a fan of alea because of it)
 //i still have to figure out specifically what's going on; i don't trust noise algorithms to remain deterministic (yet).
 
 https://github.com/prettymuchbryce/easystarjs

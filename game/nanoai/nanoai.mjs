@@ -46,7 +46,6 @@ export class Nanoai {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
 
-        p2.variableLine(128, 68,this.centerX, this.centerY, 10,5)
         ///if (!this.working) return;
         this.brain.work(this);
         
