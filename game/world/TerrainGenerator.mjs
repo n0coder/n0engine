@@ -61,7 +61,7 @@ export class TerrainGenerator {
                 //var brightness = inverseLerp(-1,1, this.getNoise((x),(y), 50, 4, .5,2));
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 var biome = getBiome(x + gw, y + gh) // *255
-                biome ||= [0, 0, 0]
+                biome ||= [0, 0, 0] //when no value, display black
                 obj.set(`${x},${y}`, { biome })
             }
         }

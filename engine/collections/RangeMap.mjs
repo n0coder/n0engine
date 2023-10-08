@@ -27,8 +27,12 @@ export class RangeMap {
         for (let i = 0; i < length; i++) {
           const item = this.array[i];
           let size = item.weight / this.total;
-          size = lerp(this.i, this.o, size);
-          outputRanges.push([item.biome, accumulatedSize, accumulatedSize + size, this.total]);
+          //size = 
+
+          var aSziz = lerp(this.i, this.o, accumulatedSize);
+          var aszizS = lerp(this.i, this.o, accumulatedSize+ size);
+
+          outputRanges.push([item.biome, aSziz, aszizS, this.total]);
           accumulatedSize += size;
         }
         
