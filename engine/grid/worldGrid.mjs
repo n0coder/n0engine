@@ -1,7 +1,7 @@
 export class WorldGrid {
     constructor() {
-        this.gridSize = 8;
-        this.chunkSize = 8
+        this.gridSize = 32;
+        this.chunkSize = 4
     }
     get halfTileSize() {
         return this.tileSize / 2

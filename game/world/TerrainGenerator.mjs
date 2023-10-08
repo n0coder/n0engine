@@ -6,7 +6,7 @@ import { createNoise2D } from 'simplex-noise'
 import { blend, blendw, clamp, inverseLerp, lerp } from '../../engine/n0math/ranges.mjs'
 import { gameH, gameW } from "../../engine/n0config.mjs";
 import { RangeMap } from "../../engine/collections/RangeMap.mjs"
-import { getBiome, worldFactors } from "./FactorManager.mjs";
+import { getBiome, minmax, worldFactors } from "./FactorManager.mjs";
 export class TerrainGenerator {
     constructor(nano) {
         this.setActive = setActive;
@@ -24,7 +24,7 @@ export class TerrainGenerator {
             v.init(createNoise2D(this.alea));
         }
     }
-
+    /*
     setup() {
 
         let menuDiv = p.select("#menu"); // Select the menu div using its id
@@ -47,29 +47,30 @@ export class TerrainGenerator {
             this.outputText.html(this.lengthSlider.value())
         });
     }
-    
+    */
 
     updateMap() {
         var obj = new Map();
 
-        for (let x = 0; x < worldGrid.chunkSize * 14; x++) {
-            for (let y = 0; y < worldGrid.chunkSize * 8; y++) {
+        for (let x = 0; x < worldGrid.chunkSize * 7; x++) {
+            for (let y = 0; y < worldGrid.chunkSize * 4; y++) {
 
                 var gridNano = worldGrid.screenToGridPoint(this.nano.x, this.nano.y);
 
                 var gw = gridNano.x, gh = gridNano.y
                 //var brightness = inverseLerp(-1,1, this.getNoise((x),(y), 50, 4, .5,2));
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
-                var biome = getBiome(x + gw, y + gh)// *255
+                var biome = getBiome(x + gw, y + gh) // *255
                 biome ||= [0, 0, 0]
                 obj.set(`${x},${y}`, { biome })
             }
         }
+        console.log(minmax);
         this.map = obj;
     }
     draw() {
-        for (let x = 0; x < worldGrid.chunkSize * 14; x++) {
-            for (let y = 0; y < worldGrid.chunkSize * 8; y++) {
+        for (let x = 0; x < worldGrid.chunkSize * 7; x++) {
+            for (let y = 0; y < worldGrid.chunkSize * 4; y++) {
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 if (this.map) {
                     var biome = this.map.get(`${x},${y}`)
