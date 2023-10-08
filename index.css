@@ -6,6 +6,24 @@ body {
     background-size: cover;
    
 }
+#test {
+  width: 100%;
+  color: white;
+  display: flex;
+  flex-direction:column;
+  justify-content: center;
+  justify-items: center;
+  overflow: hidden;
+}
+
+#test2{
+  height: 128px;
+  width: 233px;
+  text-align: center;
+  background: #222222;
+  border-radius: 10px;
+  margin: 10px;
+}
 
   #game { /*trying to center game on div*/
     display: flex;
@@ -22,7 +40,7 @@ body {
     width: 0px;
     background-color: #111111;
     height: 512px;
-    transition: width 1s, height 1s;
+    transition: width 1.5s, height 1.5s;
 }
 body::before {
   content: "";
