@@ -17,14 +17,13 @@ export class TerrainGenerator {
         this.nano = nano;
         this.min = Infinity;
         this.max = -Infinity;
-
+        this.length = 10
     }
     init() {
         for (const [k, v] of worldFactors) {
             v.init(createNoise2D(this.alea));
         }
     }
-    /*
     setup() {
 
         let menuDiv = p.select("#menu"); // Select the menu div using its id
@@ -35,25 +34,26 @@ export class TerrainGenerator {
         let testDiv2 = p.createDiv(); // Create a new div
         testDiv2.id("test2"); // Set the id of the div to "test"
         testDiv2.parent(testDiv);
-        this.lengthSlider = p.createSlider(0, 512, length);
+        this.lengthSlider = p.createSlider(0, 20, this.length);
         this.lengthSlider.parent('test2');
 
         this.outputText = p.createP();
         this.outputText.parent('test2');
-
+/*
         let button = p.createButton("update");
         button.parent('test2');
         button.mousePressed(() => {
             this.outputText.html(this.lengthSlider.value())
         });
+        */
     }
-    */
 
     updateMap() {
         var obj = new Map();
-
-        for (let x = 0; x < worldGrid.chunkSize * 7; x++) {
-            for (let y = 0; y < worldGrid.chunkSize * 4; y++) {
+        var xv =  worldGrid.chunkSize * 14
+        var yv =  worldGrid.chunkSize * 8;
+        for (let x = 0; x < xv ; x++) {
+            for (let y = 0; y < yv; y++) {
 
                 var gridNano = worldGrid.screenToGridPoint(this.nano.x, this.nano.y);
 
@@ -67,10 +67,12 @@ export class TerrainGenerator {
         }
         console.log(minmax);
         this.map = obj;
+
+        this.noise = createNoise2D(this.alea)
     }
     draw() {
-        for (let x = 0; x < worldGrid.chunkSize * 7; x++) {
-            for (let y = 0; y < worldGrid.chunkSize * 4; y++) {
+        for (let x = 0; x < worldGrid.chunkSize * 14; x++) {
+            for (let y = 0; y < worldGrid.chunkSize * 8; y++) {
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 if (this.map) {
                     var biome = this.map.get(`${x},${y}`)
@@ -79,5 +81,6 @@ export class TerrainGenerator {
                 }
             }
         }
+        
     }
 }

@@ -1,4 +1,4 @@
-# nanofarm
+> # nanofarm
 the main game i feel the drive to make is called nanofarm
 a game about nanoais farming in a big open world
 
@@ -13,6 +13,16 @@ if i make a big farming world, and add dunctions for an rpg then
 the player will have a place to visit on the surface
 
 going to add shared n0engine features to the repo
+
+## currently working on:
+ ### biome mechanics 
+the goal is to go from this height map style generation **as of oct 8 2023 (5 am mst)**, to something more, beautiful. we have this rather ugly generation.
+
+> <img src="currently.jpg" alt="drawing" width="400"/>
+
+what i mean is the end goal is to have something worth exploring. I literally did this all before, that's how i got this following image... (lost the code due to corrupted boot file)
+
+> <img src="goal.png" alt="drawing" width="400"/>
 
 ## nanoai 
    - nanoai.brain.do("walk", 2,5) //ask the nanoai to walk to position 2, 5

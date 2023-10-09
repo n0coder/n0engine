@@ -20,7 +20,9 @@ export class RangeMap {
           this.total -= this.array[index].weight;
         }
       }
-      exportRanges() {
+      exportRanges(i,o) {
+        i = i||this.i||0
+        o= o||this.o||0
         const outputRanges = [];
         let accumulatedSize = 0;
         let length = this.array.length;
@@ -29,8 +31,8 @@ export class RangeMap {
           let size = item.weight / this.total;
           //size = 
 
-          var aSziz = lerp(this.i, this.o, accumulatedSize);
-          var aszizS = lerp(this.i, this.o, accumulatedSize+ size);
+          var aSziz = lerp(i, o, accumulatedSize);
+          var aszizS = lerp(i, o, accumulatedSize+ size);
 
           outputRanges.push([item.biome, aSziz, aszizS, this.total]);
           accumulatedSize += size;
@@ -39,8 +41,8 @@ export class RangeMap {
         return outputRanges;
       }
       //i think we're comparing
-    get(value) {
-        var v = inverseLerp(this.i, this.o, value)
+    get(value, i,o) {
+        var v = inverseLerp(i||this.i||0, o||this.o||0, value)
         //lookup value
 
 
