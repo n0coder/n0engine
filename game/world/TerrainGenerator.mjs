@@ -24,6 +24,7 @@ export class TerrainGenerator {
             v.init(createNoise2D(this.alea));
         }
     }
+    /*
     setup() {
 
         let menuDiv = p.select("#menu"); // Select the menu div using its id
@@ -39,15 +40,10 @@ export class TerrainGenerator {
 
         this.outputText = p.createP();
         this.outputText.parent('test2');
-/*
-        let button = p.createButton("update");
-        button.parent('test2');
-        button.mousePressed(() => {
-            this.outputText.html(this.lengthSlider.value())
-        });
-        */
+   
     }
-
+    */
+    
     updateMap() {
         var obj = new Map();
         var xv =  worldGrid.chunkSize * 14

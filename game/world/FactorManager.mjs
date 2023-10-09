@@ -74,7 +74,7 @@ export let ooo = false,oom=-1,moo=1;
 export let minmax = [Infinity, -Infinity, 0,0]
 export function getBiome(x,y) {
     var elevation = worldFactors.get("elevation");
-    var val = elevation.getValue(x+245,y+285);
+    var val = elevation.getValue(-205+x+245,y+285);
     var elevationValue = val.sum
     //console.log(val)
 
@@ -92,7 +92,7 @@ export function getBiome(x,y) {
 worldGrid.gridSize = 8
 worldGrid.chunkSize= 8 
 var scl = 8;
-var scale = 1
+var scale = 25
 var squish = new NoiseGenerator({ scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:-3253, offsetY:-3222, blend:[0.01,2]})
 
 var noi3 = new NoiseGenerator({ scale: scale*20, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3253, offsetY:3222, amp:3})
