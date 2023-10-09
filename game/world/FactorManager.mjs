@@ -10,7 +10,7 @@ export const worldFactors = new Map();
 export const biomes = new RangeMap(-6.25, 6.25)
 
 biomes.add([11, 1, 150], .15) //deep water
-biomes.add([50, 50, 200], 1.5) //water
+biomes.add([50, 50, 200], 1.7) //water
 biomes.add([170, 170, 125], .015) //beach
 biomes.add([50, 200, 50], 3) // land
 biomes.add([150, 200, 150],1) //mountain
@@ -97,20 +97,27 @@ export const one = false; //to display only one pixel (helpful for debugging)
 worldGrid.gridSize = 8
 worldGrid.chunkSize= 8 
 var scl = 8;
-var scale =10
+var scale =1
+
+
+//this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!
 //var ansquish = new NoiseGenerator({ scale: scale*1000, lowClip: 0, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, offsetX:-3883, offsetY:3222})
-var squish2 = new NoiseGenerator({ scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:323, offsetY:-322, blend:[1,.1]})
-var squish1 = new NoiseGenerator({ scale: scale*250, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:-353, offsetY:-3222, amp:1, blend:[1,3.5]})
-var squish = new NoiseGenerator({ scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, blend:[squish1,squish1,squish2], offsetX:-3353, offsetY:-3212}) //, blend:[squish1,squish2]
+var squish2 = new NoiseGenerator({ scale: scale*300, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:323, offsetY:-322, blend:[1,.01]})
+var squish1 = new NoiseGenerator({ scale: scale*300, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:-353, offsetY:-3222, amp:1, blend:[1,3.5]})
+var squish = new NoiseGenerator({ scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, blend:[squish1,squish2], offsetX:-3353, offsetY:-3212}) //, blend:[squish1,squish2]
 
 var riverWorks2 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3153, offsetY:3222, amp:1})
 var riverWorks = new NoiseGenerator({ scale: scale*50, abs:true, octaves: 3, persistance: .5, lacunarity: 1.75, offsetX:1553, add:[riverWorks2], amp:1})
 
+var riverWorksR2 = new NoiseGenerator({ scale: scale*450, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetY:1553, amp:2, blend:[-1,-.2] })
+var riverWorksR = new NoiseGenerator({ scale: scale*150, abs:true, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetX:1253, amp:3, blend:[riverWorksR2,0] })
 
-var justTips = new NoiseGenerator({ scale: scale*25, lowClip:0, power: 3, octaves: 3, persistance: .5, lacunarity: 1.75,offsetY:-1722, offsetX:-1553, amp:1})
+var justTips = new NoiseGenerator({ scale: scale*25, lowClip:0, power: 3, highClip:1, octaves: 3, persistance: .5, lacunarity: 1.75,offsetY:-1722, offsetX:-1553, amp:1})
 
-var noi3 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3253, offsetY:3222, amp:3})
+var noi3 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:-1, offsetX:3253, offsetY:3222, amp:3})
 var noi2 = new NoiseGenerator({ scale: scale*15, octaves: 2, persistance: .5, lacunarity: 1.4, offsetX:253, offsetY:222, offset:noi3, amp:1})
-var noi = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3,  persistance: .5, lacunarity: 2, add: [[noi2,-1],[riverWorks,5]] });
+var noi = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3, persistance: .5, lacunarity: 2, add: [[noi2,-1],[riverWorks,10],[riverWorksR,4]] });
+
+
 noi.a="noi",noi2.a="noi2",noi3.a="noi3"
 worldFactors.set("elevation", noi)

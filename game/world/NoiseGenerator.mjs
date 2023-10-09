@@ -6,11 +6,11 @@ import { blendw, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs
 //
 
 export class NoiseGenerator {
-    constructor(huh={ scale: 5, amp:1, abs:false, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power:1, offsetX: 0, offsetY: 0, offset:0, add: [], multiply: [], blend: [] }) {
+    constructor(huh={ scale: 5, amp:1, abs:false, blendWeight: 1, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power:1, offsetX: 0, offsetY: 0, offset:0, add: [], multiply: [], blend: [] }) {
         this.offsetX = new ValueDriver(huh.offsetX||0);
         this.offsetY = new ValueDriver(huh.offsetY||0);
         this.offset = new ValueDriver(huh.offset||0)
-        
+        this.blendWeight = new ValueDriver(huh.blendWeight||1)
         this.highClip =new ValueDriver(huh.highClip!=null?huh.highClip:Infinity) 
         this.lowClip=new ValueDriver(huh.lowClip!=null?huh.lowClip:-Infinity) 
         this.abs = huh.abs||false;
@@ -35,11 +35,11 @@ export class NoiseGenerator {
         this.scale.init(noise2d)
         this.octaves.init(noise2d)
         this.persistance.init(noise2d)
+        this.blendWeight.init(noise2d);
         this.lacunarity.init(noise2d)
         this.power.init(noise2d)
         this.amp.init(noise2d)
         this.multiply.forEach(a =>{
-            
             if (a.init) {
                 a.init(noise2d)
               } else if (Array.isArray(a)) {
@@ -80,6 +80,7 @@ export class NoiseGenerator {
         var lac = this.toValue(this.lacunarity,x,y)
         var ampa = this.amp.getValue(x,y)// this.toValue(this.amp,x,y)
         var scale = this.toValue(this.scale,x,y)
+        var blendWeight = this.toValue(this.blendWeight,x,y)
         var offset = this.offset.getValue(x,y)
 
         var tamp = 1;
@@ -166,7 +167,7 @@ export class NoiseGenerator {
         sum+= offset.sum != null ?offset.sum:offset;
         minm+=offset.minm!= null ?offset.minm:offset;
         maxm+=offset.maxm!= null ?offset.maxm:offset;
-        //sum = clamp(minm, maxm, sum) 
+        sum = clamp(minm, maxm, sum) 
         
         var fudge = 1
         var exponent = this.toValue(this.power, x,y);
@@ -180,7 +181,7 @@ export class NoiseGenerator {
             return v.sum!=null?v.sum:v
         })
 
-        sum = blendw(sums, sim);
+        sum = lerp(sum, blendw(sums, sim), blendWeight);
         }
         var near = this.toValue(this.lowClip,x,y)
         var far = this.toValue(this.highClip,x,y);
