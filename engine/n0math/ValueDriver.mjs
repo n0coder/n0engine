@@ -7,7 +7,7 @@ export class ValueDriver {
         
         if (typeof this.value === 'number') {
         return this.value;
-      } else if (this.value.getValue) {
+      } else if (this.value.getValue!=null) {
         return this.value.getValue(x,y);
       } else if (Array.isArray(value)) {
         var sum = 0;

@@ -1,15 +1,19 @@
 
 import { ValueDriver } from "../../engine/n0math/ValueDriver.mjs";
-import { blendw, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { blendw, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 
 //octaves control how detailed a section is
 //
 
 export class NoiseGenerator {
-    constructor(huh={ scale: 5, amp:1, octaves: 1, persistance: .5, lacunarity: 1, power:1, offsetX: 0, offsetY: 0, offset:0, add: [], multiply: [], blend: [] }) {
+    constructor(huh={ scale: 5, amp:1, abs:false, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power:1, offsetX: 0, offsetY: 0, offset:0, add: [], multiply: [], blend: [] }) {
         this.offsetX = new ValueDriver(huh.offsetX||0);
         this.offsetY = new ValueDriver(huh.offsetY||0);
         this.offset = new ValueDriver(huh.offset||0)
+        
+        this.highClip =new ValueDriver(huh.highClip!=null?huh.highClip:Infinity) 
+        this.lowClip=new ValueDriver(huh.lowClip!=null?huh.lowClip:-Infinity) 
+        this.abs = huh.abs||false;
         this.noise = null
         this.scale = new ValueDriver(huh.scale||5);
         this.octaves = new ValueDriver(huh.octaves||1);
@@ -66,7 +70,7 @@ export class NoiseGenerator {
     }
     toValue(value,x,y) {
         var octaves = value.getValue(x,y)
-        return octaves.sum?octaves.sum:octaves;
+        return octaves.sum != null?octaves.sum:octaves;
     }
     getValue(x, y) {
         var octaves = this.toValue(this.octaves,x,y)
@@ -76,6 +80,8 @@ export class NoiseGenerator {
         var lac = this.toValue(this.lacunarity,x,y)
         var ampa = this.amp.getValue(x,y)// this.toValue(this.amp,x,y)
         var scale = this.toValue(this.scale,x,y)
+        var offset = this.offset.getValue(x,y)
+
         var tamp = 1;
         var minm = 0, maxm = 0
         //console.log([this.a,"init",minm, maxm])
@@ -94,45 +100,47 @@ export class NoiseGenerator {
             amp *= pers;
             freq *= lac;
         } 
-        
+        if (this.abs) {
+            sum = Math.abs(sum);
+            minm = 0;
+            }
         this.multiply.forEach(a=> {
-            //console.log(a)
-            if (a.getValue) {
+           
+            if (a.getValue != null) {
                 var value =a.getValue(x,y)
                 minm *= value.minm;
                 maxm *= value.maxm;
                 //console.log([this.a,"this.multiply multiplied",minm, maxm, value.minm,value.maxm])
-                sum *= value.sum;
+                sum *=value.sum;
                 amp *= value.amp;
                 freq*=value.freq;
-
-               
               } else if (Array.isArray(a)) {
-                    if ( a[0].getValue) {
+                    if ( a[0].getValue != null) {
+                        
                         var value = a[0].getValue(x,y)
-                        //console.log([this.a, {sum, amp, freq}, "comb", value])
+                        
                         sum *= value.sum * a[1];
-                        minm *= value.minm * Math.abs(a[1]);
-                        maxm *= value.maxm * Math.abs(a[1]);
+                        minm *= Math.abs(value.minm * a[1]);
+                        maxm *=  Math.abs(value.maxm * a[1]);
                         //console.log([this.a,"this.multiply multiplied",minm, maxm, value.minm*a[1],value.maxm*a[1]])
                         amp*= value.amp;
                         freq*=value.freq;
                     }
                 };
         })
-        
-       
         this.add.forEach(a=> {
-            if (a.getValue) {
+            if (a.getValue != null) {
                 var value =a.getValue(x,y)
                 sum += value.sum;
                 minm += value.minm;
                 maxm += value.maxm;
+                //console.log([sum,value.sum])
                 //console.log([this.a,"this.add added",minm, maxm, value.minm,value.maxm])
                 amp+= value.amp;
                 freq+=value.freq;
               } else if (Array.isArray(a)) {
-                    if ( a[0].getValue) {
+                    if ( a[0].getValue != null) {
+                        //console.log([sum])
                         var value = a[0].getValue(x,y)
                         sum += value.sum * a[1];
                         minm += value.minm * Math.abs(a[1]);
@@ -144,18 +152,21 @@ export class NoiseGenerator {
                 };
         })
         
-        
-        
-        sum *= ampa.sum?ampa.sum:ampa;
-        minm*=ampa.minm?ampa.minm:ampa;
-        maxm*=ampa.maxm?ampa.maxm:ampa;
+        //
+        //i don't understand why this only affects the holes that fall beneath the oceans... but its cool
+
+
+        sum *= ampa.sum!= null ?ampa.sum:ampa;
+        minm*=ampa.minm!= null ?ampa.minm:ampa;
+        maxm*=ampa.maxm!= null ?ampa.maxm:ampa;
         amp*=ampa
         
         //console.log([this.a,"ampa ampd",minm, maxm,ampa])
         var offset = this.offset.getValue(x,y) // this.toValue(,x,y);
-        sum+= offset.sum?offset.sum:offset;
-        minm+=offset.minm?offset.minm:offset;
-        maxm+=offset.maxm?offset.maxm:offset;
+        sum+= offset.sum != null ?offset.sum:offset;
+        minm+=offset.minm!= null ?offset.minm:offset;
+        maxm+=offset.maxm!= null ?offset.maxm:offset;
+        //sum = clamp(minm, maxm, sum) 
         
         var fudge = 1
         var exponent = this.toValue(this.power, x,y);
@@ -165,12 +176,19 @@ export class NoiseGenerator {
 
         if (this.blend.length > 1) {
         var sums = this.blend.map(b=>{
-            var v = b.getValue?b.getValue(x,y):b
-            return v.sum?v.sum:v
+            var v = b.getValue!=null?b.getValue(x,y):b
+            return v.sum!=null?v.sum:v
         })
 
         sum = blendw(sums, sim);
         }
+        var near = this.toValue(this.lowClip,x,y)
+        var far = this.toValue(this.highClip,x,y);
+        //console.log([near, far]);
+        sum = clamp(this.toValue(this.lowClip,x,y), this.toValue(this.highClip,x,y), sum) 
+
+        minm = Math.max(near, minm)
+        maxm = Math.max(near, maxm)
         //console.log([this.a,"offset",minm, maxm,offset])
         //console.log()
         return {sum, amp, freq, minm, maxm}

@@ -6,7 +6,7 @@ import { createNoise2D } from 'simplex-noise'
 import { blend, blendw, clamp, inverseLerp, lerp } from '../../engine/n0math/ranges.mjs'
 import { gameH, gameW } from "../../engine/n0config.mjs";
 import { RangeMap } from "../../engine/collections/RangeMap.mjs"
-import { getBiome, minmax, worldFactors } from "./FactorManager.mjs";
+import { getBiome, minmax, one, worldFactors } from "./FactorManager.mjs";
 export class TerrainGenerator {
     constructor(nano) {
         this.setActive = setActive;
@@ -46,8 +46,8 @@ export class TerrainGenerator {
     
     updateMap() {
         var obj = new Map();
-        var xv =  worldGrid.chunkSize * 14
-        var yv =  worldGrid.chunkSize * 8;
+        var xv = one?1:  worldGrid.chunkSize * 15
+        var yv = one?1: worldGrid.chunkSize * 8;
         for (let x = 0; x < xv ; x++) {
             for (let y = 0; y < yv; y++) {
 
@@ -56,7 +56,7 @@ export class TerrainGenerator {
                 var gw = gridNano.x, gh = gridNano.y
                 //var brightness = inverseLerp(-1,1, this.getNoise((x),(y), 50, 4, .5,2));
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
-                var biome = getBiome(x + gw, y + gh) // *255
+                var biome = getBiome(x,y) // *255
                 biome ||= [0, 0, 0] //when no value, display black
                 obj.set(`${x},${y}`, { biome })
             }
@@ -67,7 +67,8 @@ export class TerrainGenerator {
         this.noise = createNoise2D(this.alea)
     }
     draw() {
-        for (let x = 0; x < worldGrid.chunkSize * 14; x++) {
+        
+        for (let x = 0; x < worldGrid.chunkSize * 15; x++) {
             for (let y = 0; y < worldGrid.chunkSize * 8; y++) {
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 if (this.map) {
