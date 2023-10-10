@@ -54,6 +54,9 @@ sugarColors.add([248,247,249],.2)
 //deepWater.add("specific deep water biome")
 //elevationMap.get(.3).get(-2)
 
+//we are a handful of techs away from proper biome placement. 
+
+
 //so the elevationMap controls height, the deepwater map controls which deep water biome is placed at that height.
 
 //more properly, we would have a list of biomes at a specific height
@@ -101,6 +104,7 @@ console.log(ranges);
 export let ooo = false,oom=-1,moo=1;
 export let minmax = [Infinity, -Infinity,Infinity, -Infinity]
 export function getBiome(x,y) {
+    
     var vx = -285+x+245;
     var vy = y+2535
     var elevation = worldFactors.get("elevation")
@@ -117,6 +121,11 @@ export function getBiome(x,y) {
     humidity = humidity ? humidity.getValue(vx,vy) : 0;
     minmax[4]=humidity.minm
     minmax[5]=humidity.maxm
+
+    var rivers = worldFactors.get("rivers");
+    rivers = rivers ? rivers.getValue(vx,vy) : 0;
+    minmax[6]=rivers.minm
+    minmax[7]=rivers.maxm
 
     var sugar = worldFactors.get("sugar");
     sugar = sugar ? sugar.getValue(vx,vy) : 0;
@@ -145,7 +154,7 @@ export const one = false; //to display only one pixel (helpful for debugging)
 worldGrid.gridSize = 8
 worldGrid.chunkSize= 8 
 var scl = 8;
-var scale =.5
+var scale =.15
 
 
 //this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!
@@ -169,7 +178,7 @@ var elevation = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3,
 
 elevation.a="noi",elevation2.a="noi2",elevation3.a="noi3"
 worldFactors.set("elevation", elevation);
-
+worldFactors.set("rivers", riverWorksR);
 
 var triverWorks2 = new NoiseGenerator({ power:.7,  scale: scale*550, octaves: 2, persistance: .5, lacunarity: 1, offset:-1, offsetX:3153, offsetY:3222, amp:2})
 var triverWorks = new NoiseGenerator({ scale: scale*550, abs:true, octaves: 3, persistance: .5, offset:0, lacunarity: 1.75, offsetX:1553, add:[triverWorks2], amp:1})
