@@ -7,6 +7,7 @@ import { blend, blendw, clamp, inverseLerp, lerp } from '../../engine/n0math/ran
 import { gameH, gameW } from "../../engine/n0config.mjs";
 import { RangeMap } from "../../engine/collections/RangeMap.mjs"
 import { getBiome, minmax, one, worldFactors } from "./FactorManager.mjs";
+import { jointPossibilities } from "./BiomeWork.mjs";
 export class TerrainGenerator {
     constructor(nano) {
         this.setActive = setActive;
@@ -61,6 +62,7 @@ export class TerrainGenerator {
                 obj.set(`${x},${y}`, { biome })
             }
         }
+        console.log(jointPossibilities)
         console.log(minmax);
         this.map = obj;
 

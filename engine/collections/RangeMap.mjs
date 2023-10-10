@@ -21,8 +21,8 @@ export class RangeMap {
         }
       }
       exportRanges(title, i,o) {
-        i = i||this.i||0
-        o= o||this.o||0
+        i = i!=null?i:this.i!=null?this.i:0
+        o=o!=null?o:this.o!=null?this.o:0
         const outputRanges = [];
         let accumulatedSize = 0;
         let length = this.array.length;
@@ -33,16 +33,16 @@ export class RangeMap {
 
           var start = lerp(i, o, accumulatedSize);
           var end = lerp(i, o, accumulatedSize+ size);
-
           outputRanges.push([item.biome, title, start, end]);
           accumulatedSize += size;
         }
         
+       
         return outputRanges;
       }
       //i think we're comparing
     get(value, i,o) {
-        var v = inverseLerp(i||this.i||0, o||this.o||0, value)
+        var v = inverseLerp(i!=null?i:this.i!=null?this.i:0,o!=null?o:this.o!=null?this.o:0, value)
         //lookup value
 
 

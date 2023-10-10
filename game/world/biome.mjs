@@ -1,18 +1,12 @@
+import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
+
 export class Biome {
     constructor(name, color, factors) {
         this.name = name
-        this.color = color;
-        this.factors = new Map(factors)
+        this.color = color || [255, 0, 255]; 
+        this.factors = factors || []
     }
-
-    isActive(worldFactors) {
-        for (let [factor, range] of this.factors) {
-            let factorValue = worldFactors.get(factor);
-            if (!factorValue) console.warn(`${this.name} requires ${factor}`);
-            if (factorValue < range.min || factorValue > range.max) {
-                return false;
-            }
-        }
-        return true;
+    copy() {
+        return new Biome(this.name, this.color, this.factors);
     }
 }
