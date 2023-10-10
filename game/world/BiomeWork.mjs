@@ -17,23 +17,50 @@ var jungle = new Biome("jungle", [38, 173, 25])
 var flowerForest = new Biome("flowerForest", [96, 189, 133])
 var darkForest = new Biome("darkForest", [28, 130, 18])
 var savannah = new Biome("savannah", [161, 110, 34])
-var desert = new Biome("desert", [237, 226, 123])
+var desert = new Biome("desert", [233, 217, 163])
 
 var river = new Biome("river", [0, 0, 255], [{ factor: "rivers", min: 0, max: 1 }, { factor: "elevation", min: 0, max: 1 }])
-var water = new Biome("water", [60, 147, 171])
+
 export var heightMap = new RangeMap(-5, 5);
 
 var deepBiomes = new RangeMap(-1, 1)
-deepBiomes.add(new Biome("deepwater", [46, 81, 170]), 1)
+deepBiomes.add(new Biome("icydeepwater", [88, 134, 219]), .75)
+
+
+var deepWaterHumid = new RangeMap(-1,1);
+var deepWaterSugar = new RangeMap(-1,1);
+deepWaterSugar.add(new Biome("bitterdeepwater", [30, 54, 84]),1)
+deepWaterSugar.add(new Biome("deepwater", [46, 81, 170]),2)
+deepWaterSugar.add(new Biome("sweetdeepwater", [48, 170, 179]),1)
+deepWaterSugar.add(new Biome("verysweetdeepwater", [137, 159, 209]),1)
+deepWaterHumid.add(deepWaterSugar)
+deepBiomes.add(deepWaterHumid, 4)
+
+//deepBiomes.add(new Biome("deepwater", [46, 81, 170]),2.5)
+deepBiomes.add(new Biome("deepsand", [185, 166, 135]), 1)
 heightMap.add(deepBiomes, .15)
 
 var lowBiomes = new RangeMap(-1, 1)
 
-lowBiomes.add(water, 1)
+lowBiomes.add(new Biome("icywater", [117, 191, 222]), .75)
+
+var lowWaterHumid = new RangeMap(-1,1);
+var lowWaterSugar = new RangeMap(-1,1);
+lowWaterSugar.add(new Biome("bitterwater", [30, 54, 84]), 1)
+lowWaterSugar.add(new Biome("water", [60, 147, 171]), 2)
+lowWaterSugar.add(new Biome("sweetwater",[60, 191, 171]), 1)
+lowWaterSugar.add(new Biome("verysweetwater",[169, 235, 210]), 1)
+lowWaterHumid.add(lowWaterSugar)
+lowBiomes.add(lowWaterHumid, 4)
+
+//lowBiomes.add(new Biome("water", [60, 147, 171]), 4)
+lowBiomes.add(new Biome("lowsand", [204, 193, 143]), 1)
+
 heightMap.add(lowBiomes, 1.3)
 
 var borderBiome = new RangeMap(-1, 1)
-borderBiome.add(new Biome("beach", [237, 226, 123]), 1)
+borderBiome.add(new Biome("icybeach", [211, 226, 209]), .75)
+borderBiome.add(new Biome("beach", [233, 217, 163]), 4)
 heightMap.add(borderBiome, .015);
 
 //var surfaceBiomes = new RangeMap(-1,1) 
@@ -44,7 +71,7 @@ surfaceFrozenHumidityBiomes.add(snowyPlains, 2)
 surfaceFrozenHumidityBiomes.add(snowyTundra, 1)
 surfaceFrozenHumidityBiomes.add(snowyTaiga, 1)
 surfaceFrozenHumidityBiomes.add(taiga, 1)
-surfaceBiomes.add(surfaceFrozenHumidityBiomes)
+surfaceBiomes.add(surfaceFrozenHumidityBiomes,1)
 var surfaceColdHumidityBiomes = new RangeMap(-1, 1)
 surfaceColdHumidityBiomes.add(plains, 4)
 surfaceColdHumidityBiomes.add(forest, 1)
@@ -67,7 +94,8 @@ surfaceBiomes.add(surfaceHotHumidityBiomes)
 heightMap.add(surfaceBiomes, 3)
 
 var highBiomes = new RangeMap(-1, 1)
-highBiomes.add(new Biome("mountain", [200, 200, 210]), 1)
+highBiomes.add(new Biome("icymountain", [163, 200, 222]), 1)
+highBiomes.add(new Biome("mountain", [200, 200, 210]), 4)
 heightMap.add(highBiomes, 1)
 
 var cloudBiomes = new RangeMap(-1, 1)
@@ -113,7 +141,7 @@ function exportBiomes(map, args, biomes, index = 0, collectedFactors = []) {
     return biomes;
 }
 
-var biomesz = exportBiomes(heightMap, ["elevation", "humidity", "temperature"])
+var biomesz = exportBiomes(heightMap, ["elevation", "temperature","humidity", "sugar"])
 
 var biomes = [];
 for (const [k, v] of biomesz) {
