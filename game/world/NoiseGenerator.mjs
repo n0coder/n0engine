@@ -167,7 +167,7 @@ export class NoiseGenerator {
         sum+= offset.sum != null ?offset.sum:offset;
         minm+=offset.minm!= null ?offset.minm:offset;
         maxm+=offset.maxm!= null ?offset.maxm:offset;
-        sum = clamp(minm, maxm, sum) 
+         
         
         var fudge = 1
         var exponent = this.toValue(this.power, x,y);
