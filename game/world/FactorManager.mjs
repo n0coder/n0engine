@@ -106,20 +106,20 @@ export let ooo = "temperature",oom=-1,moo=1;
 export let minmax = [Infinity, -Infinity,Infinity, -Infinity]
 export function getBiome(x,y) {
     
-    var vx = -125+x+2925;
-    var vy = y+7125
+    var vx = -405+x+2425;
+    var vy = y+3325
 
     var biomae = getABiome(vx,vy)
-    //console.log(biomae)
-    var biome = biomae? biomae.color : temp
+
+    var biome = biomae? biomae.color : [0,0,0]
     //console.log({elevation, elevationValue, biome})
     return biome
 }
 export const one = false; //to display only one pixel (helpful for debugging)
-worldGrid.gridSize = 8
+worldGrid.gridSize = 16
 worldGrid.chunkSize= 8
 var scl = 8;
-var scale =.31
+var scale =.1
 
 
 //this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!

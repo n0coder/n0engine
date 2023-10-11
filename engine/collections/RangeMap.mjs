@@ -19,6 +19,7 @@ export class RangeMap {
           this.array.splice(index, 1);
           this.total -= this.array[index].weight;
         }
+        return this;
       }
       exportRanges(title, i,o) {
         i = i!=null?i:this.i!=null?this.i:0
