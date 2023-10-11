@@ -58,7 +58,7 @@ export class TerrainGenerator {
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 var biome = getBiome(x,y) // *255
                 biome ||= [0, 0, 0] //when no value, display black
-                obj.set(`${x},${y}`, { biome })
+                obj.set(`${x},${y}`,  biome )
                 
             }
         }
@@ -74,7 +74,11 @@ export class TerrainGenerator {
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 if (this.map) {
                     var biome = this.map.get(`${x},${y}`)
-                    p.fill(biome?.biome || [0, 0, 0]);
+                    var [r,g,b] = [0,0,0]
+                    if (biome) {
+                        [r,g,b] = biome?.biome?.color || [0,0,0]
+                    }
+                    p.fill([r, g, b]);
                     p.rect(v.x, v.y, v.w, v.h)
                 }
             }

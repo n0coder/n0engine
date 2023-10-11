@@ -23,81 +23,61 @@ humidity.add("moist").add("wet");
 addBiomeFactors(humidity, "humidity");
 
 var sugar = new RangeMap(0,1)
-sugar.add("pureBitter").add("bitter").add("plain")
-sugar.add("sweet").add("pureSweet");
+sugar.add("purepitter").add("bitter").add("plain")
+sugar.add("sweet").add("puresweet");
 addBiomeFactors(sugar, "sugar");
 
-
-var vv =["surface", ["frozen","wet"], ["cold", "wet", "moist"]]
-//var mp =mapDeep(vv, f=> biomeFactorMap.get(f))
-//console.log({vv, mp});
-
-
-//doing this i found that we intersect biomes based on multiple profiles
-//i mean i did see that we had intersecting biomes...
-//what i found, is that the original code allowed for frozen moist taiga 
-//(obviously this shouldn't happen, and so it exposes a bigger issue)
-//biomes that deserve a spot are not given it, 
-//because one biome is greedily taking slots it doesn't have ownership of
-//i need to rewrite my getBiome function to add require sets
-
-//river specific biome placement... gonna figure it out...
-//var rivera = new Biome("river", [0, 0, 255], [{ factor: "rivers", min: 0, max: 1 }, { factor: "elevation", min: 0, max: 1 }])
+var biomes = []
 
 var deepwatera = new Biome("deepwater", [46, 81, 170], ["deep"])
-var icydeepwater = new Biome("icydeepwater", [88, 134, 219],["deep", "frozen"])
+biomes.push(deepwatera)
+biomes.unshift(deepwatera.copy("bitterdeepwater", [30, 54, 84]).addFactor("bitter"))
+biomes.unshift(deepwatera.copy("sweetdeepwater", [48, 170, 179]).addFactor("sweet"))
+biomes.unshift(deepwatera.copy("puresweetdeepwater", [137, 159, 209]).addFactor("puresweet"))
 
-//deepWaterSugar.add(new Biome("bitterdeepwater", [30, 54, 84]),1)
-//deepWaterSugar.add(new Biome("sweetdeepwater", [48, 170, 179]),1)
-//deepWaterSugar.add(new Biome("verysweetdeepwater", [137, 159, 209]),1)
-
-var deepsand = new Biome("deepsand", [185, 166, 135],["deep", "hot"])
+var icydeepwater = new Biome("icydeepwater", [88, 134, 219],["deep", "frozen"]) //make sweet and bitter ice
+biomes.unshift(icydeepwater)
 
 var watera =new Biome("water", [60, 147, 171],["low"])
-var icywater = new Biome("icywater", [117, 191, 222],["low", "frozen"])
+biomes.unshift(watera)
+biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactor("bitter"))
+biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactor("sweet"))
+biomes.unshift(watera.copy("puresweetwater", [169, 235, 210]).addFactor("puresweet"))
 
-//lowWaterSugar.add(new Biome("bitterwater", [30, 54, 84]), 1)
-//lowWaterSugar.add(new Biome("sweetwater",[60, 191, 171]), 1)
-//lowWaterSugar.add(new Biome("verysweetwater",[169, 235, 210]), 1)
+var icywater = new Biome("icywater", [117, 191, 222],["low", "frozen"]) //make sweet and bitter ice
+biomes.unshift(icywater)
 
+var deepsand = new Biome("deepsand", [185, 166, 135],["deep", "hot"])
 let lowsand = new Biome("lowsand", [204, 193, 143],["deep", "hot"])
-
+var deserta = new Biome("desert", [233, 217, 163],["surface", "hot"])
 var beacha = new Biome("beach", [233, 217, 163],["border"])
 var icyBeacha = new Biome("icybeach", [211, 226, 209],["border", "frozen"])
+biomes.unshift(deepsand, lowsand, deserta, beacha)
+biomes.unshift(icyBeacha);
 
 //var dirt = new Biome("dirt", [156, 109, 78],["surface"])
-var snowyPlainsa = new Biome("snowyPlains", [197, 245, 230],["surface", "frozen", "dry", "arid"])
+var snowyPlainsa = new Biome("snowyPlains", [197, 245, 230],["surface", "frozen", ["dry"], ["arid"]])
 var snowyTundraa = new Biome("snowyTundra", [192, 219, 245],["surface", "frozen", "moderate"])
 var snowyTaigaa = new Biome("snowyTaiga", [198, 239, 246],["surface", "frozen", "moist"])
-var taigaa = new Biome("taiga", [140, 196, 108],["surface", ["frozen","wet"], ["cold", "wet", "moist"]])
-var plainsa = new Biome("plains", [190, 199, 104], ["surface", ["cold", "dry", "arid", "moderate"], ["neutral", "dry","moderate"]])
+biomes.unshift(snowyPlainsa,snowyTundraa,snowyTaigaa );
+
+var plainsa = new Biome("plains", [190, 199, 104], ["surface", ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"],["moderate"]]])
+var savannaha = new Biome("savannah", [161, 110, 34],["surface", "warm", ["arid"], ["dry"]])
+biomes.unshift(plainsa,savannaha);
+
+var taigaa = new Biome("taiga", [140, 196, 108],["surface", ["frozen","wet"], ["cold", ["wet"], ["moist"]]])
 var foresta = new Biome("forest", [98, 171, 84],["surface", ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]])
-var junglea = new Biome("jungle", [38, 173, 25],["surface", "warm", "wet", "moist"])
+var junglea = new Biome("jungle", [38, 173, 25],["surface", "warm", ["wet"], ["moist"]])
 var flowerForesta = new Biome("flowerForest", [96, 189, 133],["surface", "neutral", "arid"])
 var darkForesta = new Biome("darkForest", [28, 130, 18],["surface", "neutral", "wet"])
-var savannaha = new Biome("savannah", [161, 110, 34],["surface", "warm", "arid", "dry"])
-var deserta = new Biome("desert", [233, 217, 163],["surface", "hot"])
+biomes.unshift(taigaa,foresta,junglea,flowerForesta,darkForesta);
 
 var mountaina = new Biome("mountain", [200, 200, 210],["high"])
-var icymountaina =new Biome("icymountain", [163, 200, 222], ["high", "cold", "frozen"])
-
+var icymountaina =new Biome("icymountain", [163, 200, 222], ["high", ["cold"], ["frozen"]])
 var mountainTipa = new Biome("mountaintip", [200, 200, 210],["cloud"])
+biomes.unshift(icymountaina,mountaina,mountainTipa);
 
-var biomesz = [
-    deepwatera, icydeepwater, deepsand,
-    watera, icywater, lowsand,
-    beacha, icyBeacha,
-    snowyPlainsa, snowyTaigaa, snowyTundraa,
-    taigaa, plainsa, foresta, junglea,
-    flowerForesta, darkForesta,savannaha, 
-    deserta, 
-    mountaina, icymountaina, mountainTipa
-]
 
-var biomes = [];
-for (const v of biomesz) {
-    biomes.push(v)
-}
 // function to map the objects in the biome array to a true or false value based on the ruleset
 function mapBiome(biome, soku) {
     return biome.map(item => {
@@ -137,30 +117,8 @@ export function getABiome(vx, vy) {
                 }
             var sum = inverseLerp(factor.minm, factor.maxm, factor.sum)
             return sum > s.min && sum < s.max;
-        } );
+        });
         if (pop(mappedBiome)) biomex.push(b);
     }
-    if (biomex.length<=0) {
-        let worldGeno = []
-        for (const [k,vi] of worldFactors) {
-            var factor = genCache.get(k)
-                if (!factor) {
-                    factor = vi.getValue(vx, vy)
-                    genCache.set(k, factor);
-                }
-                var sum = factor.sum
-                for (const [b,f] of biomeFactorMap) {
-                    if (sum > f.min && sum < f.max) {
-                        if (worldGeno.indexOf(b))
-                            worldGeno.push(b);
-                    }
-                    //f.min, f.max
-                    //console.log(b,f);
-                }
-
-            
-        }
-        console.log(worldGeno)
-    }
-    return biomex.length>0? biomex[0]:null;
+    return {genCache, biome:biomex.length>0? biomex[0]:null};
 }

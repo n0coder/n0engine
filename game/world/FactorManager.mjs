@@ -1,6 +1,6 @@
 import { RangeMap } from "../../engine/collections/RangeMap.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { blend, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { blend, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { getABiome } from "./BiomeWork.mjs";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
@@ -44,25 +44,6 @@ sugarColors.add([92,81,103],.2)
 sugarColors.add([89,165,177],.2)
 sugarColors.add([117,250,177],.2)
 sugarColors.add([248,247,249],.2)
-//i used to have a function where... 
-//i could take nested rangemaps and have them output a list of their ranges
-//much like this exportRanges feature
-//the rangemaps inside the rangemaps would share the same range as well as... 
-
-//var elevationMap = new RangeMap(-10, 10)
-//var deepWater = new RangeMap(-3,3);
-//elevationMap.add(deepWater) //deep water biomes
-//deepWater.add("specific deep water biome")
-//elevationMap.get(.3).get(-2)
-
-//we are a handful of techs away from proper biome placement. 
-
-
-//so the elevationMap controls height, the deepwater map controls which deep water biome is placed at that height.
-
-//more properly, we would have a list of biomes at a specific height
-//then we would spill that height factor ranges directly into the biome definition
-//then we would branch out, make a rangemap for specific other types, like temperature and/or humidity
 var octaves = 3;
 var persistance = .5;
 var offset = 0
@@ -106,20 +87,20 @@ export let ooo = "temperature",oom=-1,moo=1;
 export let minmax = [Infinity, -Infinity,Infinity, -Infinity]
 export function getBiome(x,y) {
     
-    var vx = -405+x+2425;
-    var vy = y+3325
+    var vx = -385+x+2435;
+    var vy = y+5325
 
     var biomae = getABiome(vx,vy)
-
-    var biome = biomae? biomae.color : [0,0,0]
+    var factor = biomae.genCache.get("elevation");
+    biomae.elevation = factor 
     //console.log({elevation, elevationValue, biome})
-    return biome
+    return biomae
 }
 export const one = false; //to display only one pixel (helpful for debugging)
-worldGrid.gridSize = 16
-worldGrid.chunkSize= 8
+worldGrid.gridSize = 32
+worldGrid.chunkSize= 4
 var scl = 8;
-var scale =.1
+var scale =.25
 
 
 //this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!
