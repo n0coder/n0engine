@@ -6,7 +6,7 @@ import { createNoise2D } from 'simplex-noise'
 import { blend, blendw, clamp, inverseLerp, lerp } from '../../engine/n0math/ranges.mjs'
 import { gameH, gameW } from "../../engine/n0config.mjs";
 import { RangeMap } from "../../engine/collections/RangeMap.mjs"
-import { getBiome, minmax, one, worldFactors } from "./FactorManager.mjs";
+import { getBiome, one, worldFactors } from "./FactorManager.mjs";
 export class TerrainGenerator {
     constructor(nano) {
         this.setActive = setActive;
@@ -62,7 +62,6 @@ export class TerrainGenerator {
                 
             }
         }
-        console.log(minmax);
         this.map = obj;
         this.noise = createNoise2D(this.alea)
     }

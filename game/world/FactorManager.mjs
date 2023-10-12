@@ -4,10 +4,14 @@ import { blend, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs"
 import { getABiome } from "./BiomeWork.mjs";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
+export const colorMap = new Map() 
+
 export const worldFactors = new Map();
 
 //elevation map
 
+colorMap.set("deep", [11, 1, 150])
+colorMap.set("water",[50, 50, 200])
 export const elevationBiomes = new RangeMap(-6.25, 6.25)
 //elevationBiomes.add([r,g,b], weight)
 elevationBiomes.add([11, 1, 150], .15) //deep water
@@ -34,74 +38,24 @@ humidityColors.add([34, 139, 34], .2); // Moderate (40% to 60%)
 humidityColors.add([0, 255, 0], .2); // Humid (60% to 80%)
 humidityColors.add([0, 255, 255], .2); // Very Humid (80% to 100%)
 
-
-
 var ranges = elevationBiomes.exportRanges()
-
 const sugarColors = new RangeMap(-1,1)
 sugarColors.add([20,17,21],.2)
 sugarColors.add([92,81,103],.2)
 sugarColors.add([89,165,177],.2)
 sugarColors.add([117,250,177],.2)
 sugarColors.add([248,247,249],.2)
-var octaves = 3;
-var persistance = .5;
-var offset = 0
-
-function sis(octaves, persistance,offset=0) {
-var sum =0
-var amp = 1;
-for (let o = 0; o < octaves; o++) {
-    sum+=1*amp
-    amp *= persistance;    
-}
-return sum+offset;
-}
-
-var sum = sis(3,.5)
-sum *= sis(3,.5)
-sum += sis(3, .5)
-console.log(sum);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//this is a clusterf* 
-//the reason is because i'm doing visualization along side work
-console.log(ranges);
-
-export let ooo = "temperature",oom=-1,moo=1;
-export let minmax = [Infinity, -Infinity,Infinity, -Infinity]
 export function getBiome(x,y) {
-    
-    var vx = -385+x+2435;
-    var vy = y+5325
-
-    var biomae = getABiome(vx,vy)
+    var biomae = getABiome(x+offsetX,y+offsetY)
     var factor = biomae.genCache.get("elevation");
     biomae.elevation = factor 
-    //console.log({elevation, elevationValue, biome})
     return biomae
 }
+export var offsetX=5031,offsetY = 2363
 export const one = false; //to display only one pixel (helpful for debugging)
-worldGrid.gridSize = 32
-worldGrid.chunkSize= 4
-var scl = 8;
-var scale =.25
-
+worldGrid.gridSize = 16
+worldGrid.chunkSize= 8
+var scale =.1
 
 //this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!
 //var ansquish = new NoiseGenerator({ scale: scale*1000, lowClip: 0, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, offsetX:-3883, offsetY:3222})
@@ -115,6 +69,10 @@ var riverWorks = new NoiseGenerator({ scale: scale*50, abs:true, octaves: 3, per
 var riverWorksR2 = new NoiseGenerator({ scale: scale*450, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetY:1553, amp:2, blend:[-1,-.2] })
 var riverWorksR = new NoiseGenerator({ scale: scale*150, abs:true, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetX:1253, amp:3, blend:[riverWorksR2,0] })
 
+var riverR2 = new NoiseGenerator({ scale: scale*1000, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetY:1553, amp:2, blend:[.1,.5] })
+var riverR = new NoiseGenerator({ scale: scale*450, power:riverR2, abs:true, octaves:1, persistance: .5, offset:0, lacunarity: 1.75,offsetX:1253, amp:3 })
+
+
 var justTips = new NoiseGenerator({ scale: scale*25, lowClip:0, power: 3, highClip:1, octaves: 3, persistance: .5, lacunarity: 1.75,offsetY:-1722, offsetX:-1553, amp:1})
 
 var elevation3 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:-1, offsetX:3253, offsetY:3222, amp:3})
@@ -123,7 +81,7 @@ var elevation = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3,
 
 
 worldFactors.set("elevation", elevation);
-worldFactors.set("rivers", riverWorksR);
+worldFactors.set("rivers", riverR);
 worldFactors.set("rivex", riverWorks);
 
 var triverWorks2 = new NoiseGenerator({ power:.7,  scale: scale*550, octaves: 2, persistance: .5, lacunarity: 1, offset:-1, offsetX:3153, offsetY:3222, amp:2})

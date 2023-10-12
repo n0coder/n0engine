@@ -58,3 +58,33 @@ function factorial(n) {
 
     return result;
 }
+export function createInterpolator(points) {
+  points.sort((a, b) => a.c - b.c);
+  return function(x) {
+      for(let i = 0; i < points.length; i++) {
+          if(x === points[i].c) {
+              return points[i].y;
+          } else if(i < points.length - 1 && x < points[i+1].c) {
+              let slope = (points[i+1].y - points[i].y) / (points[i+1].c - points[i].c);
+              return points[i].y + slope * (x - points[i].c);
+          }
+      }
+      return null;
+  }
+}
+export function createCubicInterpolator(points) {
+  points.sort((a, b) => a.c - b.c);
+  return function(x) {
+      for(let i = 0; i < points.length - 1; i++) {
+          if(x >= points[i].c && x <= points[i+1].c) {
+              let t = (x - points[i].c) / (points[i+1].c - points[i].c);
+              var ipow =  Math.pow(1 - t,points[i].p?points[i].p:2 )
+              var i1pow =  Math.pow(t, points[i+1].p?points[i+1].p:2 );
+              let a = points[i].y * (1 + 2*t) * ipow;
+              let b = points[i+1].y * (3 - 2*t) *i1pow;
+              return a + b;
+          }
+      }
+      return null;
+  }
+}

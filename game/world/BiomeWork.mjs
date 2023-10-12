@@ -1,5 +1,5 @@
 import { RangeMap } from "../../engine/collections/RangeMap.mjs";
-import { inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { createCubicInterpolator, createInterpolator, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { worldFactors } from "./FactorManager.mjs";
 import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 
@@ -22,11 +22,26 @@ humidity.add("arid").add("dry").add("moderate")
 humidity.add("moist").add("wet");
 addBiomeFactors(humidity, "humidity");
 
+var river = new RangeMap(0,1)
+river.add("river",.01) //lowest part of the map i thought
+river.add("riverborder", 1) //the split i thought
+river.add("otheriver",2.50) //bigest part i thought
+addBiomeFactors(river, "rivers");
+
 var sugar = new RangeMap(0,1)
-sugar.add("purepitter").add("bitter").add("plain")
+sugar.add("purebitter").add("bitter").add("plain")
 sugar.add("sweet").add("puresweet");
 addBiomeFactors(sugar, "sugar");
-
+/*
+const points = createCubicInterpolator([
+    {"c": 0, "y": 0, "p":1.4},
+    {"c": .4, "y": 10, "p":3},
+    {"c": .6, "y": 10, "p":3},
+    {"c": 1, "y": 20, "p":1.4}
+]);
+var inputs = [0,.1, .4,.6,.9,1].map(i=>points(i))
+console.log(inputs);
+*/
 var biomes = []
 
 var deepwatera = new Biome("deepwater", [46, 81, 170], ["deep"])
@@ -38,13 +53,12 @@ biomes.unshift(deepwatera.copy("puresweetdeepwater", [137, 159, 209]).addFactor(
 var icydeepwater = new Biome("icydeepwater", [88, 134, 219],["deep", "frozen"]) //make sweet and bitter ice
 biomes.unshift(icydeepwater)
 
-var watera =new Biome("water", [60, 147, 171],["low"])
+var watera =new Biome("water", [60, 147, 171],[["low"],["deep"]])
 biomes.unshift(watera)
 biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactor("bitter"))
 biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactor("sweet"))
 biomes.unshift(watera.copy("puresweetwater", [169, 235, 210]).addFactor("puresweet"))
-
-var icywater = new Biome("icywater", [117, 191, 222],["low", "frozen"]) //make sweet and bitter ice
+var icywater = new Biome("icywater", [117, 191, 222],["low", "frozen"]) //make sweet and bitter ice/
 biomes.unshift(icywater)
 
 var deepsand = new Biome("deepsand", [185, 166, 135],["deep", "hot"])
@@ -72,6 +86,14 @@ var flowerForesta = new Biome("flowerForest", [96, 189, 133],["surface", "neutra
 var darkForesta = new Biome("darkForest", [28, 130, 18],["surface", "neutral", "wet"])
 biomes.unshift(taigaa,foresta,junglea,flowerForesta,darkForesta);
 
+var not =new Biome("river", [233, 217, 163],["river",["surface"],["border"]])
+var riverborder = new Biome("riverborder", [60, 147, 171],["riverborder",[["humid"],["wet"]], ["surface"],["border"]])
+//biomes.unshift(not)
+//var widerivera =new Biome("wideriver", [0,0 ,0],["wideriver"])
+//biomes.unshift(widerivera)
+//var rivera =new Biome("river", [0, 0,255],["river"])
+biomes.unshift(riverborder)
+biomes.unshift(not)
 var mountaina = new Biome("mountain", [200, 200, 210],["high"])
 var icymountaina =new Biome("icymountain", [163, 200, 222], ["high", ["cold"], ["frozen"]])
 var mountainTipa = new Biome("mountaintip", [200, 200, 210],["cloud"])
@@ -110,6 +132,7 @@ export function getABiome(vx, vy) {
     let biomex = [];
     for (const b of biomes) {
         const mappedBiome = mapBiome(b.factors, s=>{
+            if (s == null) return false;
             var factor = genCache.get(s.factor)
                 if (!factor) {
                     factor = worldFactors.get(s.factor).getValue(vx, vy)
