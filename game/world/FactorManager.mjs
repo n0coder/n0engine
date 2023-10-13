@@ -4,14 +4,8 @@ import { blend, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs"
 import { getABiome } from "./BiomeWork.mjs";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
-export const colorMap = new Map() 
-
 export const worldFactors = new Map();
 
-//elevation map
-
-colorMap.set("deep", [11, 1, 150])
-colorMap.set("water",[50, 50, 200])
 export const elevationBiomes = new RangeMap(-6.25, 6.25)
 //elevationBiomes.add([r,g,b], weight)
 elevationBiomes.add([11, 1, 150], .15) //deep water
@@ -45,23 +39,35 @@ sugarColors.add([92,81,103],.2)
 sugarColors.add([89,165,177],.2)
 sugarColors.add([117,250,177],.2)
 sugarColors.add([248,247,249],.2)
+
+
+export var read = "elevation", readRaw = true;
+export var minmax = []
 export function getBiome(x,y) {
     var biomae = getABiome(x+offsetX,y+offsetY)
     var factor = biomae.genCache.get("elevation");
-    biomae.elevation = factor 
+    if (factor) {
+        //biomae.read = factor 
+        minmax= [factor.minm, factor.maxm]
+    }
+    //console.log(factor);
     return biomae
 }
-export var offsetX=5031,offsetY = 2363
-export const one = false; //to display only one pixel (helpful for debugging)
+export var offsetX=5031,offsetY = 2364
+export const one = true; //to display only one pixel (helpful for debugging)
 worldGrid.gridSize = 16
 worldGrid.chunkSize= 8
-var scale =.1
+var scale =1.5
+
 
 //this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!
 //var ansquish = new NoiseGenerator({ scale: scale*1000, lowClip: 0, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, offsetX:-3883, offsetY:3222})
-var squish2 = new NoiseGenerator({ scale: scale*300, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:323, offsetY:-322, blend:[1,.01]})
-var squish1 = new NoiseGenerator({ scale: scale*300, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:-353, offsetY:-3222, amp:1, blend:[1,3.5]})
-var squish = new NoiseGenerator({ scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, blend:[squish1,squish2], offsetX:-3353, offsetY:-3212}) //, blend:[squish1,squish2]
+var squish2 = new NoiseGenerator({ scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:323, offsetY:-322,  blend:[.01,.121]})
+var squish1 = new NoiseGenerator({ blendPower:2,scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:-353, offsetY:-3222, amp:1, blend:[5,5.5]})
+var squishv = new NoiseGenerator({ blendPower:2, blend:[2,-1,-1,1,2], scale: scale*100, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0,  offsetX:-3353, offsetY:-3212}) //, blend:[squish1,squish2]
+var squish = new NoiseGenerator({blendPower:2, scale: scale*400, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0,  blend:[squish2,squishv,squish1], offsetX:-3353, offsetY:-3212}) //, blend:[squish1,squish2]
+
+
 
 var riverWorks2 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3153, offsetY:3222, amp:1})
 var riverWorks = new NoiseGenerator({ scale: scale*50, abs:true, octaves: 3, persistance: .5, lacunarity: 1.75, offsetX:1553, add:[riverWorks2], amp:1})
@@ -72,33 +78,32 @@ var riverWorksR = new NoiseGenerator({ scale: scale*150, abs:true, octaves:1, pe
 var riverR2 = new NoiseGenerator({ scale: scale*1000, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetY:1553, amp:2, blend:[.1,.5] })
 var riverR = new NoiseGenerator({ scale: scale*450, power:riverR2, abs:true, octaves:1, persistance: .5, offset:0, lacunarity: 1.75,offsetX:1253, amp:3 })
 
-
 var justTips = new NoiseGenerator({ scale: scale*25, lowClip:0, power: 3, highClip:1, octaves: 3, persistance: .5, lacunarity: 1.75,offsetY:-1722, offsetX:-1553, amp:1})
 
 var elevation3 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:-1, offsetX:3253, offsetY:3222, amp:3})
 var elevation2 = new NoiseGenerator({ scale: scale*15, octaves: 2, persistance: .5, lacunarity: 1.4, offsetX:253, offsetY:222, offset:elevation3, amp:1})
-var elevation = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3, persistance: .5, lacunarity: 2, add: [[elevation2,-1],[riverWorks,10],[riverWorksR,-4]] });
+var elevation = new NoiseGenerator({ power:squish, scale: scale*10, octaves: 3, persistance: .5, lacunarity: 2 });
 
 
 worldFactors.set("elevation", elevation);
-worldFactors.set("rivers", riverR);
-worldFactors.set("rivex", riverWorks);
+//worldFactors.set("rivers", riverR);
+//worldFactors.set("rivex", riverWorks);
 
 var triverWorks2 = new NoiseGenerator({ power:.7,  scale: scale*550, octaves: 2, persistance: .5, lacunarity: 1, offset:-1, offsetX:3153, offsetY:3222, amp:2})
 var triverWorks = new NoiseGenerator({ scale: scale*350, abs:true, octaves: 3, persistance: .5, offset:-2, lacunarity: 1.75, offsetX:1553, add:[triverWorks2], amp:1})
 var sprinkle = new NoiseGenerator({ scale: scale*10, octaves: 6, persistance: .25, lacunarity: 2, offset:0});
 var negative =new NoiseGenerator({ scale: scale*1000, power: 1.25, blend:[.25,3] });
 var temp = new NoiseGenerator({power:negative, scale: scale*950, add:[triverWorks], octaves: 3, persistance: .5, lacunarity: 2, offsetY:triverWorks  });
-worldFactors.set("temperature", temp)
+//worldFactors.set("temperature", temp)
 
 var triverWforks2 = new NoiseGenerator({ scale: scale*450, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:-3283, offsetY:3232, amp:2})
 var triverWforks = new NoiseGenerator({ scale: scale*450,  octaves: 1, persistance: .5, offset:0, lacunarity: 1.75, offsetX:1653, add:[triverWforks2], amp:1})
 
 var sprinkle = new NoiseGenerator({ scale: scale*250, abs:true, octaves: 1, persistance: .5, offset:0, lacunarity: 1.75, offsetY:triverWforks,  offsetX:1553, add:[triverWforks2], amp:1})
 var humidity = new NoiseGenerator({scale: scale*550, octaves: 6, persistance: .5, lacunarity: 2, offsetX:-353, offsetY:6662, add:[[triverWforks,7],[sprinkle,1.2],[elevation,.25]] });
-worldFactors.set("humidity", humidity)
+//worldFactors.set("humidity", humidity)
 
 var triverWsforks2 = new NoiseGenerator({ scale: scale*250, octaves: 5, persistance: .5, lacunarity: 1.3, offset:0, offsetX:53, offsetY:3222, amp:2})
 var triverWsforks = new NoiseGenerator({ scale: scale*250, abs:true, octaves: 5, persistance: .5, offset:0, lacunarity: 1.75, offsetY:triverWsforks2, offsetX:1553, add:[triverWsforks2], amp:1})
 var sugar = new NoiseGenerator({scale: scale*250, octaves: 6, persistance: .5, lacunarity: 2, offsetY:elevation, offsetX:triverWsforks, offsetY:-3222});
-worldFactors.set("sugar", sugar)
+//worldFactors.set("sugar", sugar)

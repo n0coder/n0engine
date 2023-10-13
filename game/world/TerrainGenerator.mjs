@@ -6,7 +6,7 @@ import { createNoise2D } from 'simplex-noise'
 import { blend, blendw, clamp, inverseLerp, lerp } from '../../engine/n0math/ranges.mjs'
 import { gameH, gameW } from "../../engine/n0config.mjs";
 import { RangeMap } from "../../engine/collections/RangeMap.mjs"
-import { getBiome, one, worldFactors } from "./FactorManager.mjs";
+import { getBiome, minmax, one, readRaw, worldFactors } from "./FactorManager.mjs";
 export class TerrainGenerator {
     constructor(nano) {
         this.setActive = setActive;
@@ -50,32 +50,31 @@ export class TerrainGenerator {
         var yv = one?1: worldGrid.chunkSize * 4;
         for (let x = 0; x < xv ; x++) {
             for (let y = 0; y < yv; y++) {
-
-                var gridNano = worldGrid.screenToGridPoint(this.nano.x, this.nano.y);
-
-                var gw = gridNano.x, gh = gridNano.y
-                //var brightness = inverseLerp(-1,1, this.getNoise((x),(y), 50, 4, .5,2));
-                var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
-                var biome = getBiome(x,y) // *255
-                biome ||= [0, 0, 0] //when no value, display black
+                var biome = getBiome(x,y) 
+                biome ||= [0, 0, 0] 
                 obj.set(`${x},${y}`,  biome )
-                
             }
         }
         this.map = obj;
+        console.log(minmax)
         this.noise = createNoise2D(this.alea)
     }
+
     draw() {
         var xv = one?1:  (worldGrid.chunkSize * 7)+1
         var yv = one?1: worldGrid.chunkSize * 4;
-        for (let x = 0; x < worldGrid.chunkSize * xv; x++) {
-            for (let y = 0; y < worldGrid.chunkSize * yv; y++) {
+        for (let x = 0; x < xv; x++) {
+            for (let y = 0; y < yv; y++) {
                 var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
                 if (this.map) {
                     var biome = this.map.get(`${x},${y}`)
                     var [r,g,b] = [0,0,0]
                     if (biome) {
-                        [r,g,b] = biome?.biome?.color || [0,0,0]
+                        if (biome.read) {
+                            var rd = readRaw?biome.read.sum*255:inverseLerp(-1,1,biome.read.sum)*255;
+                            [r,g,b] = [rd,rd,rd]
+                        }
+                        else [r,g,b] = biome?.biome?.color || [0,0,0]
                     }
                     p.fill([r, g, b]);
                     p.rect(v.x, v.y, v.w, v.h)

@@ -72,19 +72,40 @@ export function createInterpolator(points) {
       return null;
   }
 }
-export function createCubicInterpolator(points) {
-  points.sort((a, b) => a.c - b.c);
-  return function(x) {
-      for(let i = 0; i < points.length - 1; i++) {
-          if(x >= points[i].c && x <= points[i+1].c) {
-              let t = (x - points[i].c) / (points[i+1].c - points[i].c);
-              var ipow =  Math.pow(1 - t,points[i].p?points[i].p:2 )
-              var i1pow =  Math.pow(t, points[i+1].p?points[i+1].p:2 );
-              let a = points[i].y * (1 + 2*t) * ipow;
-              let b = points[i+1].y * (3 - 2*t) *i1pow;
-              return a + b;
-          }
-      }
-      return null;
-  }
+
+ export function cubicBlendW(points, x, p=2) {
+    for(let i = 0; i < points.length - 1; i++) {
+      var p1=inverseLerp(0,points.length - 1, i)
+      var p2 = inverseLerp(0,points.length - 1, i+1)
+      var bo=x >= p1 && x <= p2; 
+      if (i==0) bo = x <=p2 
+      if (i==points.length-2) bo = x >= p1;
+        if(bo) {
+            let t = (x - p1) / (p2 - p1);
+            let a = points[i] * (1 + 2*t) * Math.pow(1 - t,p );
+            let b = points[i+1] * (3 - 2*t) *Math.pow(t, p );
+            return a + b;
+        }
+    }
+    return null;  
+}
+export function createCubicInterpolator(points) { 
+points.sort((a, b) => a.c - b.c);
+return function(x) {
+    for(let i = 0; i < points.length - 1; i++) {
+      var bo=x >= points[i].c && x <= points[i+1].c;
+      if (i==0) bo = x <= points[i+1].c
+      if (i==points.length-2) bo = x >= points[i].c;
+
+        if(bo) {
+            let t = (x - points[i].c) / (points[i+1].c - points[i].c);
+            var ipow =  Math.pow(1 - t,points[i].p?points[i].p:2 )
+            var i1pow =  Math.pow(t, points[i+1].p?points[i+1].p:2 );
+            let a = points[i].y * (1 + 2*t) * ipow;
+            let b = points[i+1].y * (3 - 2*t) *i1pow;
+            return a + b;
+        }
+    }
+    return null;
+}
 }
