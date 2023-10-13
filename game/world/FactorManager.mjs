@@ -45,17 +45,23 @@ sugarColors.add([92,81,103],.2)
 sugarColors.add([89,165,177],.2)
 sugarColors.add([117,250,177],.2)
 sugarColors.add([248,247,249],.2)
+export var read = "elevation", readRaw = true;
+export var minmax = []
 export function getBiome(x,y) {
     var biomae = getABiome(x+offsetX,y+offsetY)
-    var factor = biomae.genCache.get("elevation");
-    biomae.elevation = factor 
+    var factor = biomae.genCache.get(read);
+    if (factor) {
+        //biomae.read = factor 
+        minmax= [factor.minm, factor.maxm]
+    }
     return biomae
 }
-export var offsetX=5031,offsetY = 2363
+export var offsetX=2051,offsetY = 2363
 export const one = false; //to display only one pixel (helpful for debugging)
 worldGrid.gridSize = 16
 worldGrid.chunkSize= 8
-var scale =.1
+var scale =.0521
+
 
 //this is all hell on earth. try to implement rivers? game says what the fuck are those MORE ISLANDS?!
 //var ansquish = new NoiseGenerator({ scale: scale*1000, lowClip: 0, octaves: 1, persistance: .5, lacunarity: 1.3, offset:0, offsetX:-3883, offsetY:3222})
@@ -77,12 +83,48 @@ var justTips = new NoiseGenerator({ scale: scale*25, lowClip:0, power: 3, highCl
 
 var elevation3 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:-1, offsetX:3253, offsetY:3222, amp:3})
 var elevation2 = new NoiseGenerator({ scale: scale*15, octaves: 2, persistance: .5, lacunarity: 1.4, offsetX:253, offsetY:222, offset:elevation3, amp:1})
-var elevation = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3, persistance: .5, lacunarity: 2, add: [[elevation2,-1],[riverWorks,10],[riverWorksR,-4]] });
+var elevation = new NoiseGenerator({  power:squish, scale: scale*10, octaves: 3, persistance: .5, lacunarity: 2, add: [[elevation2,-1],[riverWorks,10],[riverWorksR,-4]], });
+
+var riverWorksvv2 = new NoiseGenerator({ scale: scale*50, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3153, offsetY:3222, amp:1})
+var riverWorksvv = new NoiseGenerator({ scale: scale*50, abs:true, octaves: 3, persistance: .5, lacunarity: 1.75, offsetX:1553, add:[riverWorksvv2], amp:1,
+    mapSpace: [-1,1],map:[
+        {"c": -.1, "y": 1, "p":2},{"c": 0.05, "y": .4, "p":3}, {"c": .2, "y": 0.099, "p":2},
+        {"c": .222, "y": 0, "p":2},  {"c": .314, "y": -0.8, "p":2},{"c": .5, "y": -0.83, "p":1},
+        {"c": .6, "y": -.83, "p":1},{"c": .62, "y":-.43, "p":2.3},{"c": .76, "y": 0.43, "p":2},
+        {"c": .8, "y": -0.985, "p":2},{"c": 1, "y": -1, "p":2},
+    ]
+})
 
 
-worldFactors.set("elevation", elevation);
-worldFactors.set("rivers", riverR);
-worldFactors.set("rivex", riverWorks);
+var erosion = new NoiseGenerator({scale:scale*300, offsetX:392,offsetY:-352, octaves: 3, persistance: .5, lacunarity: 2,
+    mapSpace: [-1,1],map:[
+        {"c": -.1, "y": 1, "p":2},{"c": 0.05, "y": .4, "p":3}, {"c": .2, "y": 0.099, "p":2},
+        {"c": .222, "y": 0, "p":2},  {"c": .314, "y": -0.8, "p":2},{"c": .5, "y": -0.83, "p":1},
+        {"c": .6, "y": -.83, "p":1},{"c": .62, "y":-.43, "p":2.3},{"c": .76, "y": 0.43, "p":2},
+        {"c": .8, "y": -0.985, "p":2},{"c": 1, "y": -1, "p":2},
+    ]
+})
+var continents = new NoiseGenerator({scale:scale*100, octaves: 3, persistance: .5, lacunarity: 2,
+    mapSpace: [.5,1], map:[
+        {"c": 0, "y": 0.01, "p":3}, {"c": .25, "y": 0.01, "p":1.2},
+        {"c": .3, "y": .4}, {"c": .41, "y": .4},{"c": .45, "y": .7},
+        {"c": .5, "y": .7},{"c": .53, "y": .72, "p":1.8},
+        {"c": .72, "y": .85},{"c": .99, "y": .99, "p":3} 
+    ], add: [[erosion,2]]
+})
+
+var elevationx = new NoiseGenerator({
+    map:[
+        {"c": 0, "y": 2},{"c": 1, "y": 2}
+    ],
+    add: [continents, ]
+})
+worldFactors.set("continents", continents);
+worldFactors.set("erosion", erosion);
+worldFactors.set("elevation", continents);
+worldFactors.set("rix", riverWorksvv)
+//worldFactors.set("rivers", riverR);
+//worldFactors.set("rivex", riverWorks);
 
 var triverWorks2 = new NoiseGenerator({ power:.7,  scale: scale*550, octaves: 2, persistance: .5, lacunarity: 1, offset:-1, offsetX:3153, offsetY:3222, amp:2})
 var triverWorks = new NoiseGenerator({ scale: scale*350, abs:true, octaves: 3, persistance: .5, offset:-2, lacunarity: 1.75, offsetX:1553, add:[triverWorks2], amp:1})

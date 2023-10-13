@@ -53,7 +53,7 @@ biomes.unshift(deepwatera.copy("puresweetdeepwater", [137, 159, 209]).addFactor(
 var icydeepwater = new Biome("icydeepwater", [88, 134, 219],["deep", "frozen"]) //make sweet and bitter ice
 biomes.unshift(icydeepwater)
 
-var watera =new Biome("water", [60, 147, 171],[["low"],["deep"]])
+var watera =new Biome("water", [60, 147, 171],[["low"]])
 biomes.unshift(watera)
 biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactor("bitter"))
 biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactor("sweet"))
@@ -69,7 +69,8 @@ var icyBeacha = new Biome("icybeach", [211, 226, 209],["border", "frozen"])
 biomes.unshift(deepsand, lowsand, deserta, beacha)
 biomes.unshift(icyBeacha);
 
-//var dirt = new Biome("dirt", [156, 109, 78],["surface"])
+var dirt = new Biome("dirt", [156, 109, 78],["surface"])
+biomes.push(dirt);
 var snowyPlainsa = new Biome("snowyPlains", [197, 245, 230],["surface", "frozen", ["dry"], ["arid"]])
 var snowyTundraa = new Biome("snowyTundra", [192, 219, 245],["surface", "frozen", "moderate"])
 var snowyTaigaa = new Biome("snowyTaiga", [198, 239, 246],["surface", "frozen", "moist"])
@@ -135,7 +136,9 @@ export function getABiome(vx, vy) {
             if (s == null) return false;
             var factor = genCache.get(s.factor)
                 if (!factor) {
-                    factor = worldFactors.get(s.factor).getValue(vx, vy)
+                    var vfactor = worldFactors.get(s.factor)
+                    if (vfactor) factor = vfactor.getValue(vx, vy)
+                    else return false;
                     genCache.set(s.factor, factor);
                 }
             var sum = inverseLerp(factor.minm, factor.maxm, factor.sum)

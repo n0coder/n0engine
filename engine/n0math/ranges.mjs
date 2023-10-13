@@ -22,6 +22,7 @@ export function remap(a, b, a2, b2, t) {
 
     return result;
   }
+  
  export function blendw(points, t) {
     // Preprocess the array to handle weighted values
     let processedPoints = [];
@@ -72,11 +73,37 @@ export function createInterpolator(points) {
       return null;
   }
 }
+export function cubicBlendW(points, x, p) {
+      for(let i = 0; i < points.length - 1; i++) {
+        var p1 = i/points.length;
+        var p2 = (i+1)/points.length;
+          if(x >= p1 && x <= p2) {
+              let t = (x - p1) / (p2 - p1);
+              let a = points[i] * (1 + 2*t) * Math.pow(1 - t,p );
+              let b = points[i+1] * (3 - 2*t) *Math.pow(t, p );
+              return a + b;
+          }
+      }
+      return null;  
+}
+
+//to extrapolate we find where we are in the list
+//for i index 0 we can use 
+// x <= points[i+1].c
+//for index 1 to points.length - 2
+// x >= points[i].c
+//for every other index we do both 
+//x >= points[i].c && x <= points[i+1].c
+
 export function createCubicInterpolator(points) {
   points.sort((a, b) => a.c - b.c);
   return function(x) {
       for(let i = 0; i < points.length - 1; i++) {
-          if(x >= points[i].c && x <= points[i+1].c) {
+        var bo=x >= points[i].c && x <= points[i+1].c;
+        if (i==0) bo = x <= points[i+1].c
+        if (i==points.length-2) bo = x >= points[i].c;
+
+          if(bo) {
               let t = (x - points[i].c) / (points[i+1].c - points[i].c);
               var ipow =  Math.pow(1 - t,points[i].p?points[i].p:2 )
               var i1pow =  Math.pow(t, points[i+1].p?points[i+1].p:2 );
