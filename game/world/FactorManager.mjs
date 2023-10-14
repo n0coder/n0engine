@@ -53,10 +53,10 @@ export function getBiome(x,y) {
     //console.log(factor);
     return biomae
 }
-export var offsetX=5075,offsetY = 2366
+export var offsetX=302,offsetY = 330
 export const one = false; //to display only one pixel (helpful for debugging)
-worldGrid.gridSize = 8
-worldGrid.chunkSize= 16
+worldGrid.gridSize = 16
+worldGrid.chunkSize= 8
 var scale =1
 
 
@@ -64,8 +64,8 @@ var rscale = 50;
 var riverWorks2 = new NoiseGenerator({ scale: scale*rscale, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3153, offsetY:3222, amp:1})
 var riverWorks = new NoiseGenerator({ scale: scale*rscale, abs:true, octaves: 3, persistance: .5, lacunarity: 1.75, offsetX:1553, add:[riverWorks2], amp:1})
 
-var xx = 1533, yy = 1263, riverScale = 100;
-var riverWorksR2 = new NoiseGenerator({ scale: scale*riverScale*1.8, add:[riverWorks], octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetX:353, offsetY:3153, blend:[.1,1] })
+var xx = 1533, yy = 1263, riverScale = 175;
+var riverWorksR2 = new NoiseGenerator({ scale: scale*riverScale*2.8, add:[riverWorks], octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetX:353, offsetY:3153, blend:[.1,.7] })
 var riverWorksR = new NoiseGenerator({ power:riverWorksR2, abs:true, scale: scale*riverScale, octaves:1, persistance: .5, offset:0, lacunarity: 1.75, offsetX: xx, offsetY:yy,
     mapSpace: [0,1],map:[ //take in a map, (of relative height, controls)
     {"c": 0, "y": 0, "p":4},{"c": 0.2, "y": .2, "p":2},
