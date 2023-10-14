@@ -8,15 +8,14 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 
 //this work is hard, i need a simpler way to insert things into multiple dimensions of techs
 var height = new RangeMap(0,1)
-height.add("deep", .15).add("low", 1.3).add("border",.015)
-height.add("surface", 3).add("high", 1).add("cloud", .2)
+height.add("deep", .15).add("low", 1).add("border",.015)
+height.add("surface", 2).add("high", 1).add("cloud", .2)
 addBiomeFactors(height, "elevation");
 
 
-
 var temp = new RangeMap(0,1)
-temp.add("frozen").add("cold").add("neutral")
-temp.add("warm").add("hot")
+temp.add("frozen",1).add("cold",1).add("neutral",1)
+temp.add("warm",1).add("hot",1)
 addBiomeFactors(temp, "temperature");
 
 var humidity = new RangeMap(0,1)
@@ -25,15 +24,19 @@ humidity.add("moist").add("wet");
 addBiomeFactors(humidity, "humidity");
 
 var river = new RangeMap(0,1)
-river.add("river",.01) //lowest part of the map i thought
-river.add("riverborder", 1) //the split i thought
-river.add("otheriver",2.50) //bigest part i thought
+river.add("river", 1) //the split i thought
+river.add("riverborder",.1) //lowest part of the map i thought
+river.add("otheriver",3.5) //bigest part i thought
 addBiomeFactors(river, "rivers");
 
 var sugar = new RangeMap(0,1)
 sugar.add("purebitter").add("bitter").add("plain")
 sugar.add("sweet").add("puresweet");
 addBiomeFactors(sugar, "sugar");
+
+var fantasy = new RangeMap(0,1);
+fantasy.add("plain").add("fantasy");
+addBiomeFactors(fantasy, "fantasy");
 
 var biomes = []
 
@@ -54,12 +57,9 @@ biomes.unshift(watera.copy("puresweetwater", [169, 235, 210]).addFactor("pureswe
 var icywater = new Biome("icywater", [117, 191, 222],["low", "frozen"]) //make sweet and bitter ice/
 biomes.unshift(icywater)
 
-var deepsand = new Biome("deepsand", [185, 166, 135],["deep", "hot"])
-let lowsand = new Biome("lowsand", [204, 193, 143],["deep", "hot"])
-var deserta = new Biome("desert", [233, 217, 163],["surface", "hot"])
 var beacha = new Biome("beach", [233, 217, 163],["border"])
 var icyBeacha = new Biome("icybeach", [211, 226, 209],["border", "frozen"])
-biomes.unshift(deepsand, lowsand, deserta, beacha)
+biomes.unshift(beacha)
 biomes.unshift(icyBeacha);
 
 var dirt = new Biome("dirt", [156, 109, 78],["surface"])
@@ -80,20 +80,36 @@ var flowerForesta = new Biome("flowerForest", [96, 189, 133],["surface", "neutra
 var darkForesta = new Biome("darkForest", [28, 130, 18],["surface", "neutral", "wet"])
 biomes.unshift(taigaa,foresta,junglea,flowerForesta,darkForesta);
 
-var not =new Biome("river", [233, 217, 163],["river",["surface"],["border"]])
-var riverborder = new Biome("riverborder", [60, 147, 171],["riverborder",[["humid"],["wet"]], ["surface"],["border"]])
+
+var deepsand = new Biome("deepsand", [185, 166, 135],["deep", "hot"])
+let lowsand = new Biome("lowsand", [204, 193, 143],["low", "hot"])
+var deserta = new Biome("desert", [233, 217, 163],["surface", "hot"])
+biomes.unshift(deepsand, lowsand, deserta);
+
+var riverborder = new Biome("riverborder", [233, 217, 163],["riverborder",[["humid"],["wet"]], ["surface"],["border"]])
+biomes.unshift(riverborder)
+
+var not =new Biome("river", [60, 147, 171],["river",["surface"],["border"]])
+biomes.unshift(not)
+biomes.unshift(not.copy("bitterriverwater", [30, 54, 84]).addFactor("bitter"))
+biomes.unshift(not.copy("sweetriverwater", [60, 191, 171]).addFactor("sweet"))
+biomes.unshift(not.copy("puresweetriverwater", [169, 235, 210]).addFactor("puresweet"))
+
+
+
 //biomes.unshift(not)
 //var widerivera =new Biome("wideriver", [0,0 ,0],["wideriver"])
 //biomes.unshift(widerivera)
 //var rivera =new Biome("river", [0, 0,255],["river"])
-biomes.unshift(riverborder)
-biomes.unshift(not)
-var mountaina = new Biome("mountain", [200, 200, 210],["high"])
+var mountaina = new Biome("mountain", [160, 160, 170],["high"])
 var icymountaina =new Biome("icymountain", [163, 200, 222], ["high", ["cold"], ["frozen"]])
 var mountainTipa = new Biome("mountaintip", [200, 200, 210],["cloud"])
+
 biomes.unshift(icymountaina,mountaina,mountainTipa);
-
-
+var fan = new Biome("fantasy", [255, 255, 255], ["fantasy"])
+biomes.unshift(fan)
+var fabn = new Biome("fabntasy", [0, 0, 0], ["plain"])
+//biomes.unshift(fabn)
 // function to map the objects in the biome array to a true or false value based on the ruleset
 function mapBiome(biome, soku) {
     return biome.map(item => {
