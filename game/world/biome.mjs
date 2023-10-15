@@ -3,9 +3,6 @@ export function mapDeep(arr, mapFn) {
     return arr.map(item => Array.isArray(item) ? mapDeep(item, mapFn) : mapFn(item));
 }
 
-var bosi = ["auwb", 253]
-var siu =mapDeep(bosi, v=>3)
-console.log([bosi, siu])
 export const biomeFactorMap = new Map()
 export function addBiomeFactors(map, factor) {
     var ranges = map.exportRanges(factor)

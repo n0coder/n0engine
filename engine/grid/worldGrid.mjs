@@ -89,6 +89,14 @@ export class WorldGrid {
             h: h*this.chunkSize
         };
     }
+    chunkBoundsScreenSpace(x,y,w,h) {
+        return {
+            x: x * this.gridSize *this.chunkSize,
+            y: y *this.gridSize * this.chunkSize,
+            w: w*this.gridSize *this.chunkSize,
+            h: h*this.gridSize *this.chunkSize
+        };
+    }
     alignPosition(x, y) {
         if (Array.isArray(x)) [x, y] = x;
         

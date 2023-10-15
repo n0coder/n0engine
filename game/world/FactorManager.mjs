@@ -45,6 +45,8 @@ export var read = "fantasy", readRaw = false;
 export var minmax = []
 export function getBiome(x,y) {
     var biomae = getABiome(x+offsetX,y+offsetY)
+    biomae.x = x+offsetX;
+    biomae.y=y+offsetY;
     var factor = biomae.genCache.get(read);
     if (factor) {
         //biomae.read = factor 
@@ -53,12 +55,15 @@ export function getBiome(x,y) {
     //console.log(factor);
     return biomae
 }
-export var offsetX=302,offsetY = 330
+export var offsetX=2302,offsetY = 4730
 export const one = false; //to display only one pixel (helpful for debugging)
-worldGrid.gridSize = 16
-worldGrid.chunkSize= 8
-var scale =1
+worldGrid.gridSize = 32
+worldGrid.chunkSize= 4
+var vvscale =1
 
+
+
+var scale = vvscale*.75
 
 var rscale = 50;
 var riverWorks2 = new NoiseGenerator({ scale: scale*rscale, octaves: 1, persistance: .5, lacunarity: 1, offset:0, offsetX:3153, offsetY:3222, amp:1})
@@ -123,11 +128,11 @@ worldFactors.set("humidity", humidity)
 
 var fantasy = new NoiseGenerator({scale: scale*500, octaves:4, persistance: .5, lacunarity: 1.5,  offsetY:6472, offsetX:-4343,
     mapSpace: [0,1], map:[
-        {"c": 0, "y": 0, "p":2},{"c": 0.6, "y": .1, "p":2},{"c": 0.8, "y": 0.9, "p":2}, {"c": 1, "y": 1, "p":2}], blend:[-1,1]
+        {"c": 0, "y": 0, "p":2},{"c": 0.6, "y": .1, "p":2},{"c": 0.7, "y": 0.9, "p":2}, {"c": 1, "y": 1, "p":2}], blend:[-1,1]
 });
 worldFactors.set("fantasy", fantasy);
 
-var triverWsforks2 = new NoiseGenerator({ power:squish,scale: scale*250, octaves: 5, persistance: .5, lacunarity: 1.3, offset:0, offsetX:53, offsetY:3222, amp:2})
-var triverWsforks = new NoiseGenerator({power:squish, scale: scale*250, abs:true, octaves: 5, persistance: .5, offset:0, lacunarity: 1.75, offsetY:triverWsforks2, offsetX:1553, amp:1})
+var triverWsforks2 = new NoiseGenerator({  scale: scale*250, octaves: 5, persistance: .5, lacunarity: 1.3, offset:0, offsetX:53, offsetY:3222, amp:2})
+var triverWsforks = new NoiseGenerator({ scale: scale*250, abs:true, octaves: 5, persistance: .5, offset:0, lacunarity: 1.75, offsetY:triverWsforks2, offsetX:1553, amp:1})
 var sugar = new NoiseGenerator({scale: scale*250, octaves: 6, persistance: .5, lacunarity: 2, offsetX:triverWsforks, offsetY:-3222});
 worldFactors.set("sugar", sugar)

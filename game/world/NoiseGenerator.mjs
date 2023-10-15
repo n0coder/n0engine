@@ -35,6 +35,7 @@ export class NoiseGenerator {
                 this.mapper = createCubicInterpolator(this.map);
             }
         }
+        this.pointCache = new Map() 
         this.inited = false;
     }
 
@@ -95,6 +96,8 @@ export class NoiseGenerator {
     //this would optimize the way we reuse the same generator
     
     getValue(x, y) {
+        var value = this.pointCache.get(`${x}, ${y}`) //take from cache
+        if (value) return value;
 
         var blendWeight = this.toValue(this.blendWeight, x, y)
         var blendPower = this.toValue(this.blendPower, x, y)
@@ -128,24 +131,14 @@ export class NoiseGenerator {
                 ({ sum, minm, maxm } = this.classicBlend(x, y, sum, minm, maxm, blendWeight));
             } else {
                 let { ominm, omaxm, osum } = this.newBlend(minm, maxm, sum, x, y, blendPower, blendWeight);
-                //console.log({sum, minm, maxm, osum, ominm,omaxm})
                 sum=osum
                 minm=ominm
                 maxm =omaxm
-                //console.log ({sums, sim, min, minm, max,maxm})
             }
         }
-        /*
-        var near = this.toValue(this.lowClip, x, y)
-        var far = this.toValue(this.highClip, x, y);
-        sum = clamp(near, far, sum) 
-
-        minm = Math.max(near, minm)
-        maxm = Math.min(far, maxm)
-        */
-        //console.log({cola:"a4blend",aid: this.a,minm,sum,maxm})
-
-        return {  sum, minm, maxm }
+        value = { sum, minm, maxm }
+        this.pointCache.set(`${x}, ${y}`, value)
+        return value
     }
 
     newBlend( minm, maxm, sum, x, y, blendPower, blendWeight) {
@@ -206,7 +199,7 @@ export class NoiseGenerator {
         if (minm>sum) console.log("sum is lower than minm", {sum, minm})
         var sim = inverseLerp(minm, maxm, sum);
 
-       // console.log([1,minm, sum, maxm])
+        // console.log([1,minm, sum, maxm])
 
         var exponent = this.toValue(this.power, x, y);
 //world low blend

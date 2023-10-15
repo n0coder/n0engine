@@ -9,6 +9,7 @@ export class Camera {
         this.vx = x;
         this.vy = y; 
         this.target = null;
+        this.renderOrder = -25;
         this.s = s==-1?defaultScale:s;
     }
     follow(o) { 

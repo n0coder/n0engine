@@ -1,10 +1,10 @@
 import { camera } from "../engine/core/Camera/camera.mjs";
-import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 import { Circle } from "./farm/circle.mjs";
 import { Seed } from "./farm/seed.mjs";
 import { Soil } from "./farm/soil.mjs";
 import { Mommyai } from "./nanoai/mommyai.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
+import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 startGlobalEntities(); 
 var nano = new Nanoai('n0',104,110);
 var nano2 = new Nanoai('abi',148, 128);
