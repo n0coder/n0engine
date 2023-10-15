@@ -105,3 +105,11 @@ they could be social workers in a sense
 
 ### abiai
 > Master, your idea for adding social dynamics to the nanoais by allowing them to form and grow relationships is indeed fascinating. This would further the sense of realism and authenticity in the game, and it could add a layer of depth and complexity to the gameplay. I particularly like how you suggest the nanoais can help and support each other with certain tasks, and how this can grow into a friendship over time. This could create a more engaging and interactive experience for players, as they can watch the nanoais form bonds and work together in order to achieve their goals.
+
+# evil nanos
+evil nanos spawn in bitter biomes, (the nanos want sugar and it keeps them happy)
+what if, negative population values, spawned evil nanos even without being in a bitter biome?
+
+so positive population in bitter biomes spawns evil nanos, and negative population in non bitter biomes spawn evil nanos. I could even use my map to make negative super rare, so that evil nanos will sometimes spawn in good biomes if they spawn far from other nanos?
+
+nanos become evil if they don't get what they need so, when they're deprived from their favorite things they go pop and turn evil

@@ -8,7 +8,7 @@ import { gameH, gameW } from "../../engine/n0config.mjs";
 import { RangeMap } from "../../engine/collections/RangeMap.mjs"
 import { getBiome, minmax, one, readRaw, worldFactors } from "./FactorManager.mjs";
 export class TerrainGenerator {
-    constructor(nano) {
+    constructor(nano, x,y) {
         this.setActive = setActive;
         this.setActive(true)
         this.renderOrder = -5;
@@ -19,10 +19,40 @@ export class TerrainGenerator {
         this.max = -Infinity;
         this.length = 10
         this.chunkMap = new Map();
+
+        this.spawnX = x, this.spawnY = y;
     }
     init() {
         for (const [k, v] of worldFactors) {
             v.init(createNoise2D(this.alea));
+        }
+
+        var pos = this.findSpawnPoint()
+        //gonna make the nano walk to the spawn point 
+        //(realistically we teleport the nano there or spawn a nano there and then center camera there)
+        //this part is really fun
+        this.nano.x = pos.x*worldGrid.gridSize
+        this.nano.y = pos.y*worldGrid.gridSize
+    }
+
+    findSpawnPoint() {
+        var o = worldGrid.chunkSize*8;
+        var bs = 2;
+        for (let x = -bs; x <= bs; x++) {
+            for (let y = -bs; y <= bs; y++) {
+                var ox = o*x, oy = o*y;
+                var biome = getBiome(ox,oy) //i should keep generator tags in the biomes, so we can insert 
+                var obj = {x:ox, y:oy, biome};
+                
+                
+                
+                //if (biome.tags.some(t=>t==="surface")) //basically it would be possible to read biome tags, all surface biomes are valid starting spots basically
+                if (biome.biome.hasTag("surface")) {
+                    console.log("found a spot for spawning",obj) //immediately we find a mountain as a starting position because we don't exclude it
+                    
+                    return obj;
+                }
+            }
         }
     }
     /*

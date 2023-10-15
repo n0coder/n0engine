@@ -46,8 +46,8 @@ river.add("otheriver",3.5) //bigest part i thought
 addBiomeFactors(river, "rivers");
 
 var sugar = new RangeMap(0,1)
-sugar.add("purebitter").add("bitter").add("plain")
-sugar.add("sweet").add("puresweet");
+sugar.add("purebitter").add("bitter").add("bitteredge",.1).add("plain",.8)
+sugar.add("sweetedge",.1).add("sweet").add("puresweet");
 addBiomeFactors(sugar, "sugar");
 
 var fantasy = new RangeMap(0,1);
@@ -59,8 +59,8 @@ var biomes = []
 
 var deepwatera = new Biome("deepwater", [46, 81, 170], ["deep"])
 biomes.push(deepwatera)
-biomes.unshift(deepwatera.copy("bitterdeepwater", [30, 54, 84]).addFactor("bitter").addFactor("fantasy"))
-biomes.unshift(deepwatera.copy("sweetdeepwater", [48, 170, 179]).addFactor("sweet").addFactor("fantasy"))
+biomes.unshift(deepwatera.copy("bitterdeepwater", [30, 54, 84]).addFactors ([["bitteredge"],["bitter","fantasy"]]))
+biomes.unshift(deepwatera.copy("sweetdeepwater", [48, 170, 179]).addFactors ([["sweetedge"],["sweet","fantasy"]]))
 biomes.unshift(deepwatera.copy("puresweetdeepwater", [137, 159, 209]).addFactor("puresweet").addFactor("fantasy"))
 
 var icydeepwater = new Biome("icydeepwater", [88, 134, 219],["deep", "frozen"]) //make sweet and bitter ice
@@ -68,8 +68,8 @@ biomes.unshift(icydeepwater)
 
 var watera =new Biome("water", [60, 147, 171],[["low"]])
 biomes.unshift(watera)
-biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactor("bitter").addFactor("fantasy"))
-biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactor("sweet").addFactor("fantasy"))
+biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactors ([["bitteredge"],["bitter","fantasy"]]))
+biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactors ([["sweetedge"],["sweet","fantasy"]]))
 biomes.unshift(watera.copy("puresweetwater", [169, 235, 210]).addFactor("puresweet").addFactor("fantasy"))
 var icywater = new Biome("icywater", [117, 191, 222],["low", "frozen"]) //make sweet and bitter ice/
 biomes.unshift(icywater)
@@ -108,8 +108,8 @@ biomes.unshift(riverborder)
 
 var not =new Biome("river", [60, 147, 171],["river",[surface],["border"]])
 biomes.unshift(not)
-biomes.unshift(not.copy("bitterriverwater", [30, 54, 84]).addFactor("bitter").addFactor("fantasy"))
-biomes.unshift(not.copy("sweetriverwater", [60, 191, 171]).addFactor("sweet").addFactor("fantasy"))
+biomes.unshift(not.copy("bitterriverwater", [30, 54, 84]).addFactors ([["bitteredge"],["bitter","fantasy"]]))
+biomes.unshift(not.copy("sweetriverwater", [60, 191, 171]).addFactors ([["sweetedge"],["sweet","fantasy"]]))
 biomes.unshift(not.copy("puresweetriverwater", [169, 235, 210]).addFactor("puresweet").addFactor("fantasy"))
 
 

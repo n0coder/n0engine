@@ -26,9 +26,16 @@ export class Camera {
         var ty = gameH/2-((this.target.y))*this.s;
         var vx = tx-this.x;
         var vy = ty-this.y;
-        this.x += vx*deltaTime;
-        this.y += vy*deltaTime;
-        
+        //if the target is out of screen radius we just tp camera to target
+        var gm = Math.sqrt((gameW*gameW)+(gameH*gameH))
+        var m = Math.sqrt((vx*vx) + (vy*vy))
+        if (m > (gm)) {
+            this.x = tx;
+            this.y = ty
+        } else {
+            this.x += vx*deltaTime;
+            this.y += vy*deltaTime;
+        }
         //render
         p.translate(this.x,this.y)        
         p.scale(this.s);

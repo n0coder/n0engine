@@ -1,4 +1,3 @@
-import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 export function mapDeep(arr, mapFn) {
     return arr.map(item => Array.isArray(item) ? mapDeep(item, mapFn) : mapFn(item));
 }
@@ -15,26 +14,31 @@ export function addBiomeFactors(map, factor) {
 
 
 export class Biome {
-    constructor(name, color, factors) {
-        //console.log([name,factors])
+    constructor(name, color, tags) {
         this.name = name
         this.color = color || [255, 0, 255]; 
-        //allow for creating biomes without factors
-        this.factors = (factors!=null) ? mapDeep(factors, f => biomeFactorMap.get(f)) : []
-        //console.log(this.factors)
+        this.tags = tags; 
+        this.factors = (tags!=null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
     }
     copy(name, color) {
         let biome = new Biome(name||this.name, color||this.color);
         if (this.factors != null)
             biome.factors = this.factors.slice();
+        if (this.tags != null) 
+            biome.tags = this.tags.slice();
         return biome;
     }
-    addFactor(factor) {
-        this.factors.push(biomeFactorMap.get(factor));
+    addFactor(tags) {
+        this.tags.push(tags);
+        this.factors.push(biomeFactorMap.get(tags));
         return this;
     }
-    addFactors(factors) {
-        this.factors.push(...mapDeep(factors, f => biomeFactorMap.get(f)));
+    hasTag(tag) {
+        return this.tags.flat(16).includes(tag);
+    }
+    addFactors(tags) {
+        this.tags.push(...tags)
+        this.factors.push(...mapDeep(tags, f => biomeFactorMap.get(f)));
         return this;
     }
 }
