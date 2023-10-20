@@ -145,6 +145,13 @@ export function walk(nano, x,y, magn = 1) {
     var mag = Math.sqrt((vx * vx) + (vy * vy))
     vx /= mag;
     vy /= mag;
+    if (mag > magn) {
+        nano.vx = vx;
+        nano.vy= vy;
+    } else {
+        nano.vx = 0;
+        nano.vy= 0;
+    }
     nano.x += vx * deltaTime*nano.speed;
     nano.y += vy * deltaTime*nano.speed;
 

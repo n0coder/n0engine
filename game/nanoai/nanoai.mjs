@@ -1,16 +1,29 @@
 import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
-import { atomicClone, loadImg } from "../../engine/core/Utilities/ObjectUtils.mjs";
+import { deltaTime, ticks } from "../../engine/core/Time/n0Time.mjs";
+import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
+
+loadImgArray("assets/nano/up", 4, imgArray => {
+    addAnimationSet("nano", "walkUp", imgArray)
+});
+loadImgArray("assets/nano/down", 4, imgArray => {
+    addAnimationSet("nano", "walkDown", imgArray)
+});
+loadImgArray("assets/nano/right", 4, imgArray => {
+    addAnimationSet("nano", "walkRight", imgArray)
+});
+loadImgArray("assets/nano/left", 4, imgArray => {
+    addAnimationSet("nano", "walkLeft", imgArray)
+});
 export class Nanoai {
     constructor(name, x, y) {
         this.name = name
-        this.x = x
-        this.y = y
+        this.x = x, this.vx = 0
+        this.y = y, this.vy = 0
         this.speed = 48;        
         loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
@@ -19,6 +32,8 @@ export class Nanoai {
         this.setActive(true)
         this.renderOrder =1;
         this.working =false
+        document.nano = this;
+        this.frame = 0, this.t = 0;
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
@@ -39,13 +54,27 @@ export class Nanoai {
         //call radio
         //check feelings (wants to do hobby or chat with friend)?
     }
+
     draw() {
-        if (this.img) { 
-            p.image(this.img, this.centerX, this.centerY);
+        this.cimg = this.img;
+
+        if (this.vy > 0.1) 
+            this.cimg = getAnimation("nano", "walkDown", ticks)
+        else if (this.vy < -0.1) {
+            this.cimg = getAnimation("nano", "walkUp", ticks)
+        } else if (this.vx > 0.1) {
+            this.cimg = getAnimation("nano", "walkRight", ticks)
+        }if (this.vx < -0.1) {
+            this.cimg = getAnimation("nano", "walkLeft", ticks)
+        }
+        
+        if (this.cimg) { 
+            p.image(this.cimg, this.centerX, this.centerY);
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
 
+        if (!this.working) return
         ///if (!this.working) return;
         this.brain.work(this);
         

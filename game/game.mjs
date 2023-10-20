@@ -14,3 +14,8 @@ camera.follow(nano);
 var terrainGenerator = new TerrainGenerator(nano);
 terrainGenerator.init();
 terrainGenerator.updateMap();
+
+nano.brain.do("walk", -2100,0)
+nano.brain.do("walk", -2100,100)
+nano.brain.do("walk", -2000,100)
+nano.brain.do("walk", -2000,0)
