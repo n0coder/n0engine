@@ -1,13 +1,14 @@
 import { loadImg } from "../../../engine/core/Utilities/ObjectUtils.mjs";
 
 export class Tile {
-    constructor(img, edges) {
+    constructor(img, edges, weight) {
         loadImg(this, "img", img );
         var [up, right, down, left] = edges
         this.up = up;
         this.right = right;
         this.down = down;
         this.left = left;
+        this.weight = weight
     }
     init() {
         
