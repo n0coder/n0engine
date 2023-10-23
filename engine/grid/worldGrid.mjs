@@ -4,7 +4,7 @@ export class WorldGrid {
         this.chunkSize = 4
     }
     get halfTileSize() {
-        return this.tileSize / 2
+        return this.gridSize / 2
     }
     
     screenToGridPoint(x,y) {

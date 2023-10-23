@@ -5,22 +5,46 @@ export class NanoaiBrain {
     constructor() {
       this.state = "idle";
       this.queue = []
-      
+      this.laterQueue = []
+
       this.currentActivity = null;
       this.stateMachine = {
         idle: function(nano) {
           if (nano.brain.queue.length > 0) {
-            var q = nano.brain.queue[0];
-            //console.log([nano.name, q]);
-            if (Array.isArray(q)) {
-              let ov = []
-              q.forEach(o => ov.push(o))
-              nano.brain.queue.shift();
-              nano.brain.queue.splice(0,0,...ov)
-              return;
-            }
+            for (let i = 0; i < nano.brain.queue.length; i++) {
+              let q = nano.brain.queue[i];
+              if (Array.isArray(q)) {
+                  nano.brain.queue.splice(i, 1, ...q);
+                  i += q.length - 1; // Adjust the index to skip the newly inserted elements
+              }
+          }
+            var q = nano.brain.queue[0];            
+            nano.brain.currentQueue = nano.brain.queue;
             nano.brain.currentActivity = q;
             nano.brain.active(nano)
+          } 
+          else if (nano.brain.laterQueue.length > 0) { //this is when i should refactor into a function for shared code
+            
+            nano.brain.laterQueue = nano.brain.laterQueue.filter(q=> { 
+                if (Array.isArray(q)||q.condition(...(q.args))) return q  
+              }
+            )
+            for (let i = 0; i < nano.brain.laterQueue.length; i++) {
+              let q = nano.brain.laterQueue[i];
+              if (Array.isArray(q)) {
+                  let ov = q.map(o => ({...o, condition: q.condition}));
+                  nano.brain.laterQueue.splice(i, 1, ...ov);
+                  i += ov.length - 1; // Adjust the index to skip the newly inserted elements
+              }
+          }
+          
+            var q = nano.brain.laterQueue[0];
+            if (q) {
+
+            nano.brain.currentQueue = nano.brain.laterQueue;
+            nano.brain.currentActivity = q;
+            nano.brain.active(nano)
+            }
           } else nano.brain.done(nano);
         }, 
         active: function(nano) {
@@ -48,13 +72,24 @@ export class NanoaiBrain {
         console.error (`there is no action for ${task}`) 
       }
     }
+    doLater(task, condition, ...params) {
+      var action =nanoaiActions.get(task);
+      if (action) {
+        var t = action.clone(...params)
+        
+        t.condition = condition
+        this.laterQueue.splice(0,0,t);
+      } else {
+        console.error (`there is no action for ${task}`) 
+      }
+    }
     active(nano) {
       nano.brain.state = "active";
     }
 
     done(nano) {
       nano.brain.state = "idle"
-      nano.brain.queue.shift();
+      nano.brain.currentQueue.shift();
       nano.brain.currentActivity = null;
     }
     idle(nano) {

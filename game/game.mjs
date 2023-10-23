@@ -5,17 +5,21 @@ import {  } from "./world/BiomeWork.mjs";
 
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 import { camera } from "../engine/core/Camera/camera.mjs";
-startGlobalEntities(); 
+import { NanoFunctionCollapse } from "./world/wave/NanoFunctionCollapse.mjs";
+//startGlobalEntities(); 
 
 
 
 var nano = new Nanoai("n0", 0,0);
-camera.follow(nano);
-var terrainGenerator = new TerrainGenerator(nano);
-terrainGenerator.init();
-terrainGenerator.updateMap();
+//camera.follow(nano);
+//var terrainGenerator = new TerrainGenerator(nano);
+//terrainGenerator.init();
 
-nano.brain.do("walk", -2100,0)
-nano.brain.do("walk", -2100,100)
-nano.brain.do("walk", -2000,100)
-nano.brain.do("walk", -2000,0)
+var nanoFunctionCollapse = new NanoFunctionCollapse(nano);
+
+/*
+nano.brain.do("walk", -100,0)
+nano.brain.do("walk", -100,100)
+nano.brain.do("walk", -0,100)
+nano.brain.do("walk", -0,0)
+*/

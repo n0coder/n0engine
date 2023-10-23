@@ -117,84 +117,37 @@ export class TerrainGenerator {
         var chunk = this.getChunk(pc.x+xv, pc.y+yv)
         var cx = (pc.x+xv)*worldGrid.chunkSize, cy = (pc.y+yv)*worldGrid.chunkSize
         if (chunk) {
-        for (let x = 0; x < worldGrid.chunkSize; x++) {
-            for (let y = 0; y < worldGrid.chunkSize; y++) {
-                var biome = chunk.get(`${(cx+x)},${(cy+y)}`)
-                if (biome) {
-                    var v = worldGrid.gridBoundsScreenSpace((cx+x), (cy+y), 1, 1)
-                    var [r,g,b] = [0,0,0]
-
-                    if (biome) {
-                        if (biome.read) {
-                            var rd = readRaw?biome.read.sum*255:inverseLerp(-1,1,biome.read.sum)*255;
-                            [r,g,b] = [rd,rd,rd]
-                        }
-                        else [r,g,b] = biome?.biome?.color || [0,0,0]
-                    }
-                    p.fill([r, g, b]);
-                    p.rect(v.x-2, v.y-2, v.w+4, v.h+4)
+            for (let x = 0; x < worldGrid.chunkSize; x++) {
+                for (let y = 0; y < worldGrid.chunkSize; y++) {
+                    this.drawTile(chunk, cx,cy, x, y);
                 }
             }
-        }
         }
     }
+    drawTile(chunk, cx, cy, x, y) {
+        var biome = chunk.get(`${(cx + x)},${(cy + y)}`);
+        if (biome) {
+            var v = worldGrid.gridBoundsScreenSpace((cx + x), (cy + y), 1, 1);
+            var [r, g, b] = [0, 0, 0];
+
+            if (biome) {
+                if (biome.read) {
+                    var rd = readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255;
+                    [r, g, b] = [rd, rd, rd];
+                }
+                else[r, g, b] = biome?.biome?.color || [0, 0, 0];
+            }
+            p.fill([r, g, b]);
+            p.rect(v.x - 2, v.y - 2, v.w + 4, v.h + 4);
+        }
+    }
+
     draw() {
         var w = 4, h =3;
-
         for (let x = -w; x <= w; x++) {
             for (let y = -h; y <= h; y++) {
-                this.drawChunk(x,y);
-            
+                this.drawChunk(x,y);            
             }
         }
-        /*
-        var sx = worldGrid.chunkToGrid(pc.x,pc.y)
-
-        var chunk = this.getChunk(pc.x, pc.y);
-        console.log(pc, chunk);
-        for (let x = 0; x < worldGrid.chunkSize; x++) {
-            for (let y = 0; y < worldGrid.chunkSize; y++) {
-                var vx = (sx.x*worldGrid.chunkSize)+x, vy = (sx.y*worldGrid.chunkSize)+y;
-                var v = worldGrid.gridBoundsScreenSpace(vx, vy, 1, 1)
-                let map = chunk;
-                if (map) {
-                    var biome = map.get(`${vx},${vy}`)
-                    var [r,g,b] = [0,0,0]
-                    if (biome) {
-                        if (biome.read) {
-                            var rd = readRaw?biome.read.sum*255:inverseLerp(-1,1,biome.read.sum)*255;
-                            [r,g,b] = [rd,rd,rd]
-                        }
-                        else [r,g,b] = biome?.biome?.color || [0,0,0]
-                    }
-                    p.fill([r, g, b]);
-                    p.rect(v.x, v.y, v.w, v.h)
-                }
-            }
-        }
-        p.noLoop()
-        */
-        /*
-        var xv = one?1:  worldGrid.chunkSize
-        var yv = one?1: worldGrid.chunkSize;
-        for (let x = 0; x < xv; x++) {
-            for (let y = 0; y < yv; y++) {
-                var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1)
-                if (this.map) {
-                    var biome = this.map.get(`${x},${y}`)
-                    var [r,g,b] = [0,0,0]
-                    if (biome) {
-                        if (biome.read) {
-                            var rd = readRaw?biome.read.sum*255:inverseLerp(-1,1,biome.read.sum)*255;
-                            [r,g,b] = [rd,rd,rd]
-                        }
-                        else [r,g,b] = biome?.biome?.color || [0,0,0]
-                    }
-                    p.fill([r, g, b]);
-                    p.rect(v.x, v.y, v.w, v.h)
-                }
-            }
-        }
-        */
     }
 }

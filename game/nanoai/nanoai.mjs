@@ -24,7 +24,7 @@ export class Nanoai {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
-        this.speed = 48;        
+        this.speed = 48*2;        
         loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(3, [[-7,-10], [7,-10], [0, -20]]);
@@ -32,7 +32,6 @@ export class Nanoai {
         this.setActive(true)
         this.renderOrder =1;
         this.working =false
-        document.nano = this;
         this.frame = 0, this.t = 0;
     }
     //keeping track of an unknown x and y center is easier with this calculation function
@@ -56,6 +55,7 @@ export class Nanoai {
     }
 
     draw() {
+        if (!this.cimg) 
         this.cimg = this.img;
 
         if (this.vy > 0.1) 

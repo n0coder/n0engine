@@ -7,7 +7,17 @@ export const nanoaiActions = new Map([
     ["walk", {
         args: [],
         work: function (nano) {
-           return walk(nano, this.args[0],this.args[1], 1) //this kinda sucks 
+           return walk(nano, this.args[0],this.args[1], 5) //this kinda sucks 
+        },
+        clone: function(...args) {
+            return handleClone(this, ...args)
+        }
+    }],
+    ["debug", {
+        args: [],
+        work: function (nano) {
+            console.log(this);
+           return false
         },
         clone: function(...args) {
             return handleClone(this, ...args)
@@ -17,11 +27,11 @@ export const nanoaiActions = new Map([
         args: [],
         work: function (nano) {
             var nano2x = this.args[0];
-            var nanowok = !isNaN(this.args[1]) ? this.args[1] : 1
+            var nanowok = !isNaN(this.args[1]) ? this.args[1] : 5
             if (nano2x) {
                 return walk(nano, nano2x.x,nano2x.y, nanowok)
             }
-            return walko
+            return false
         },
         //clone before setting the variable
         clone: function(...args) {
@@ -51,7 +61,7 @@ export const nanoaiActions = new Map([
         args: [],
         before: ["follow"], 
         work: function (nano) {
-            if (this.args[0].harvest) 
+            if (this.args[0]&&this.args[0].harvest) 
                 return this.args[0].harvest(nano);
             return false
         },
