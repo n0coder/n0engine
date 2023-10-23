@@ -51,7 +51,7 @@ export class WorldGrid {
             maxY: Math.floor(y2 / this.chunkSize)
         };
     }
-    gridBoundsScreenSpace(x,y, w,h) {
+    gridBoundsScreenSpace(x,y, w=1,h=1) {
         return {
             x: x * this.gridSize,
             y: y * this.gridSize,

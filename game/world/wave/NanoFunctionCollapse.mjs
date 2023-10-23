@@ -16,15 +16,15 @@ export class NanoFunctionCollapse {
 
         this.w = 28;
         this.h = 16;
-        this.board = this.init() 
         this.rules = {
-            0: [1],
-            1: [0,2],
-            2: [2, 1]
+            0: [1,0],
+            1: [0,1,2],
+            2: [2,1]
         }
         this.colors = [
             [45], [145], [222]
         ];
+        this.board = this.init() 
         /*
         let fla = this.board.flat(4);
         while (fla.length > 0) {
@@ -43,15 +43,10 @@ export class NanoFunctionCollapse {
             board[i] = []
             for (let o = 0; o < this.h; o++) {
                 let {x,y} = worldGrid.gridToScreenPoint(i,o);
-                let alea = this.alea;
                 board[i][o] = {
                     x:x+worldGrid.halfTileSize, i,
                     y:y+worldGrid.halfTileSize, o,
-                    choices: [0,1,2], ns: [], rules:{
-                        0: [0,1,2],
-                        1: [0,1,2],
-                        2: [0,1,2]
-                    }, alea,
+                    choices: [0,1,2], ns: [], rules:this.rules, alea:this.alea,
                     harvest: function(nano) {
                         if (!Array.isArray(this.choices)) return false;
                         var choice = this.choices[Math.floor(this.alea()*this.choices.length)]
@@ -65,11 +60,7 @@ export class NanoFunctionCollapse {
                             }
                         } 
                         var n = this.ns.filter(o=>( Array.isArray(o.choices) ))
-                        /*
-                        n.forEach(element => {
-                            nano.brain.do("harvest",element)
-                        });
-                         */
+                        
                         var an = Math.floor(this.alea()*n.length);
                         for (let io = 0; io < n.length; io++) {
                             if (an === io) nano.brain.do("harvest",n[an])
@@ -79,12 +70,6 @@ export class NanoFunctionCollapse {
                             }
                         }
 
-                        /*
-                        if (n) {
-                            
-                            nano.brain.do("harvest",n[an])
-                        }
-                        */
                         return false;
                     }
                 }

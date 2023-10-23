@@ -6,7 +6,7 @@ export class NanoaiBrain {
       this.state = "idle";
       this.queue = []
       this.laterQueue = []
-
+      this.currentQueue = this.queue
       this.currentActivity = null;
       this.stateMachine = {
         idle: function(nano) {
