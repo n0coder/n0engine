@@ -6,6 +6,7 @@ import {  } from "./world/BiomeWork.mjs";
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 import { camera } from "../engine/core/Camera/camera.mjs";
 import { NanoFunctionCollapse } from "./world/wave/NanoFunctionCollapse.mjs";
+import { } from "./world/wave/waveImport.mjs"
 import { WaveFunctionCollapse } from "./world/wave/WaveFunctionCollapse.mjs";
 //startGlobalEntities(); 
 
