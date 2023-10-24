@@ -8,9 +8,10 @@ import { camera } from "../engine/core/Camera/camera.mjs";
 import { NanoFunctionCollapse } from "./world/wave/NanoFunctionCollapse.mjs";
 import { } from "./world/wave/waveImport.mjs"
 import { WaveFunctionCollapse } from "./world/wave/WaveFunctionCollapse.mjs";
+import { worldGrid } from "../engine/grid/worldGrid.mjs";
 //startGlobalEntities(); 
 
-
+worldGrid.gridSize=16;
 
 var nano = new Nanoai("n0", 256,256);
 //camera.follow(nano);
