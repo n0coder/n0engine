@@ -7,7 +7,7 @@ import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
 import { camera } from "../engine/core/Camera/camera.mjs";
 import { NanoFunctionCollapse } from "./world/wave/NanoFunctionCollapse.mjs";
 import { } from "./world/wave/waveImport.mjs"
-import { WaveFunctionCollapse } from "./world/wave/WaveFunctionCollapse.mjs";
+import { BiomeFunctionCollapse } from "./world/wave/biomeFunctionCollapse.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 //startGlobalEntities(); 
 
@@ -18,7 +18,7 @@ var nano = new Nanoai("n0", 256,256);
 //var terrainGenerator = new TerrainGenerator(nano);
 //terrainGenerator.init();
 
-var nanoFunctionCollapse = new WaveFunctionCollapse(nano); // NanoFunctionCollapse(nano);
+var nanoFunctionCollapse = new BiomeFunctionCollapse(nano); // NanoFunctionCollapse(nano);
 nanoFunctionCollapse.init();
 /*
 nano.brain.do("walk", -100,0)

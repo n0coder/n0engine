@@ -1,5 +1,5 @@
 import { Tile } from "./Tile.mjs"
-import { n0tiles } from "./n0FunctionCollapse.mjs"
+import { n0jointtiles, n0tiles } from "./n0FunctionCollapse.mjs"
 
 n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]]))
 n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]]))
@@ -15,6 +15,10 @@ n0tiles.set('green3', new Tile('assets/wave/green/3.png', [[2, 2, 2], [2, 2, 2],
 n0tiles.set('green4', new Tile('assets/wave/green/4.png', [[2, 3, 2], [2, 3, 2], [2, 2, 2], [2, 2, 2]]))
 n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]]))
 n0tiles.set('green6', new Tile('assets/wave/green/6.png', [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],1))
+
+n0jointtiles.set('green+purple', ['greenpurple0','greenpurple1','greenpurple2','greenpurple3',
+'greenpurple4','greenpurple5','greenpurple6','greenpurple7','greenpurple8','greenpurple9',
+'greenpurple10','greenpurple11'])
 n0tiles.set('greenpurple0', new Tile('assets/wave/greenpurple/0.png', [[2, 4, 0], [2, 4, 0], [0,0,0], [0,0,0]],.25))
 n0tiles.set('greenpurple1', new Tile('assets/wave/greenpurple/1.png', [[2, 4, 0], [0,0,0], [0,0,0], [2,4,0]],.25))
 n0tiles.set('greenpurple2', new Tile('assets/wave/greenpurple/2.png', [[0,0,0], [0,0,0], [2,4,0], [2, 4, 0]],.25))

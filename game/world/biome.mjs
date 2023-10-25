@@ -14,11 +14,12 @@ export function addBiomeFactors(map, factor) {
 
 
 export class Biome {
-    constructor(name, color, tags) {
+    constructor(name, color, tags, tiles) {
         this.name = name
         this.color = color || [255, 0, 255]; 
         this.tags = tags; 
         this.factors = (tags!=null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
+        this.tiles = tiles || []
     }
     copy(name, color) {
         let biome = new Biome(name||this.name, color||this.color);
