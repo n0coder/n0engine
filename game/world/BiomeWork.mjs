@@ -55,7 +55,7 @@ fantasy.add("plain").add("fantasy");
 addBiomeFactors(fantasy, "fantasy");
 
 
-var biomes = []
+export var biomes = []
 
 var deepwatera = new Biome("deepwater", [46, 81, 170], ["deep"])
 biomes.push(deepwatera)
@@ -86,13 +86,21 @@ var snowyTundraa = new Biome("snowyTundra", [192, 219, 245],[surface, "frozen", 
 var snowyTaigaa = new Biome("snowyTaiga", [198, 239, 246],[surface, "frozen", "moist"])
 biomes.unshift(snowyPlainsa,snowyTundraa,snowyTaigaa );
 
-var plainsTiles = ['purple6']
-var plainsa = new Biome("plains", [190, 199, 104], [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"],["moderate"]]], plainsTiles)
+
+
+var grassy = [
+    "grass0", "grass1", "grass2", "dirt0", "dirt1", "dirt2",
+    "dirtGrass0","dirtGrass1","dirtGrass2","dirtGrass3","dirtGrass4",
+    "dirtGrass5","dirtGrass6","dirtGrass7","dirtGrass8","dirtGrass9",
+    "dirtGrass10","dirtGrass11","dirtGrass12","dirtGrass13","dirtGrass14",
+    "dirtGrass15","dirtGrass16","dirtGrass17"
+]
+var plainsa = new Biome("plains", [190, 199, 104], [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"],["moderate"]]], [...grassy])
 var savannaha = new Biome("savannah", [161, 110, 34],[surface, "warm", ["arid"], ["dry"]])
 biomes.unshift(plainsa,savannaha);
 
 var taigaa = new Biome("taiga", [140, 196, 108],[surface, ["frozen","wet"], ["cold", ["wet"], ["moist"]]])
-var foresta = new Biome("forest", [98, 171, 84],[surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]])
+var foresta = new Biome("forest", [98, 171, 84],[surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]], [...grassy])
 var junglea = new Biome("jungle", [38, 173, 25],[surface, "warm", ["wet"], ["moist"]])
 var flowerForesta = new Biome("flowerForest", [96, 189, 133],[surface, "neutral", "arid"])
 var darkForesta = new Biome("darkForest", [28, 130, 18],[surface, "neutral", "wet"])

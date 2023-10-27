@@ -6,7 +6,7 @@ import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
 import { Biome, addBiomeFactors } from "../biome.mjs";
 import { RangeMap } from "../../../engine/collections/RangeMap.mjs";
-import { worldFactors } from "../FactorManager.mjs";
+import { getBiome, worldFactors } from "../FactorManager.mjs";
 import { inverseLerp } from "../../../engine/n0math/ranges.mjs";
 
 export class BiomeFunctionCollapse {
@@ -24,36 +24,41 @@ export class BiomeFunctionCollapse {
         for (const [k, v] of worldFactors) {
             v.init(createNoise2D(this.alea));
         }
-
-        var fantasy = new RangeMap(0,1);
-        fantasy.add("plain").add("fantasy");
-        addBiomeFactors(fantasy, "sugar");
+        this.chunks = new Map()
+        this.i = 0;
+        this.o = 0;
 
     }
     init() {
-        let biomes = []
-        var biomea = new Biome("green", [166, 145, 100], ['plain'], ["green0","green1","green2","green3","green4","green5","green6"])
-        var biomeb = new Biome("purple", [166, 75, 155], ['fantasy'], ["purple0","purple1","purple2","purple3","purple4","purple5","purple6"])
-        biomes.unshift(biomea, biomeb)
+        //let biomes = []
+        //var biomea = new Biome("green", [166, 145, 100], ['plain'], ["green0","green1","green2","green3","green4","green5","green6"])
+        //var biomeb = new Biome("purple", [166, 75, 155], ['fantasy'], ["purple0","purple1","purple2","purple3","purple4","purple5","purple6"])
+        //biomes.unshift(biomea, biomeb)
         
-        var c = 6;
-        for (let i = 0; i < 13; i++) {
-            for (let o = 0; o < 6; o++) {
-                this.geta(i*c,o*c,c,c, biomes)
-            }
-        }
+        //figuring out underlying issues
+
+        
     }
 
-    geta(x,y,w,h,biomes) {
+    genChunk(x,y,w,h) {
+        var chunk = this.chunks.get(`${x}, ${y}`)
+        if (chunk) return chunk;
+
+        chunk = new Map();
         for (let i = 0; i < w; i++) {
             for (let o = 0; o < h; o++) {
-                //var n = noise(i*.05,o*.05)
-                var biome = this.getABiome(biomes, x+i,y+o)
+                var tile = chunk.get(`${i}, ${o}`) 
+                if (tile) continue;
+
+                var biome = getBiome(x+i,y+o)
                 biome.x = x+i, biome.y = y+o;
-                this.nfc.collapseBiomeTile(x+i,y+o, biome);
+                tile = this.nfc.collapseBiomeTile(x+i,y+o, biome);
+                chunk.set(`${i}, ${o}`, tile) 
             }
         }
+        
         this.nfc.blocksBiome(x,y, w,h,5) 
+        this.chunks.set(`${x}, ${y}`, chunk)
     }
 
     getABiome(biomes, vx, vy) {
@@ -108,12 +113,32 @@ export class BiomeFunctionCollapse {
     */
 
     draw() {
-        
+        //testing entire board shifts
+        var x = 10;
+        var y = 500;
+
+        var c = 8; //grid space
+        this.genChunk((this.i*c)+x,(this.o*c)+y,c,c)
+
+        this.i++;
+        if (this.i > 6) {
+            this.o++
+            this.i = 0;
+            if (this.o > 3) {
+                this.o = 0
+            }
+        }
+
+
         for (let i = 0; i < this.w; i++) {
             for (let o = 0; o < this.h; o++) {
                var v = worldGrid.gridBoundsScreenSpace(i, o, 1, 1);
-               this.nfc.drawTile(i,o, (img)=>p.image(img, v.x, v.y, v.w, v.h)); 
-                
+               this.nfc.drawTile(i+x,o+y, 
+                    (tile, img)=>p.image(img, v.x, v.y, v.w, v.h),
+                    (tile, color)=> {
+                        p.fill(color); p.rect(v.x, v.y, v.w, v.h)
+                    }
+                ); 
             }
         }
         

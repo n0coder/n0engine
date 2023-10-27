@@ -101,6 +101,11 @@ export class n0FunctionCollapse {
     }
     collapseBiomeTile(x, y, biome) {
         let tile = n0grid.get(`${x}, ${y}`)
+
+        if (biome?.biome == null) {
+            return;
+        }
+
         var rules = biome.biome.tiles
         if (rules != null) {
         if (!tile) {
@@ -109,7 +114,7 @@ export class n0FunctionCollapse {
         }
         }
 
-        if (tile.tile.option) return tile.tile.option;
+        if (tile.tile.option) return { later, tile };
         biome.tile = tile; 
         var myOptions = tile.tile.options.slice();
 
@@ -151,12 +156,12 @@ export class n0FunctionCollapse {
 
         tile.tile.option = this.weightedRandom(myOptionvs);
 
-        return { later, option:  tile.tile.option };
+        return { later, tile };
         function checkDir(x, y, conditionFunc) {
             var b = n0grid.get(`${x}, ${y}`)?.tile;
             if (b == null) return;
             if (b.option != null)
-                myOptions = myOptions.filter(a => conditionFunc(a, b));
+                myOptions = myOptions.filter(a => a&& conditionFunc(a, b));
             else later.push([x, y]);
         }
     }
@@ -170,7 +175,9 @@ export class n0FunctionCollapse {
         if (!tile) return null;
         var myOptions = tile.tile.options.slice();
         if (tile.tile.option) return tile;
-
+        
+        
+        
         let later = []
         checkDir(x, y - 1, (a, b) => n0tiles.get(a).isUp(n0tiles.get(b.option)))
         checkDir(x + 1, y, (a, b) => n0tiles.get(a).isRight(n0tiles.get(b.option)))
@@ -196,19 +203,34 @@ export class n0FunctionCollapse {
             if (b == null) return;
             b= b.tile;
             if (b.option != null)
-                myOptions = myOptions.filter(a => conditionFunc(a, b));
+                myOptions = myOptions.filter(a => a&&conditionFunc(a, b));
             else later.push([x, y]);
         }
     }
 
-    drawTile(i, o, draw) {
+    drawTile(i, o, drawImg, drawColor) {
         let index = `${i}, ${o}`;
-        let cell = n0grid.get(index);
-        if (cell && typeof cell.tile.option === 'string') {
-            var img = n0tiles.get(cell.tile.option).img
-            if (img)
-                draw(img);
+
+        if (!drawImg && !drawColor) {
+            console.warn("you are trying to draw a tile without a draw function...")
         }
+
+        let cell = n0grid.get(index);
+if (cell) {
+    var img = null;
+    if (typeof cell.tile.option === 'string') {
+        img = n0tiles.get(cell.tile.option).img;
+    }
+    if (img && drawImg) {
+        drawImg(cell, img);
+    } else {
+        var color = cell?.biome?.biome?.color;
+        if (color && drawColor) {
+            drawColor(cell, color);
+        }
+    }
+}
+
     }
     weightedRandom(items) {
         var broken = items.filter(a => n0tiles.get(a.option) == null)

@@ -55,7 +55,7 @@ export function getBiome(x,y) {
     //console.log(factor);
     return biomae
 }
-export var offsetX=2302,offsetY = 4730
+export var offsetX=2302,offsetY = 0
 export const one = false; //to display only one pixel (helpful for debugging)
 worldGrid.gridSize = 32
 worldGrid.chunkSize= 4

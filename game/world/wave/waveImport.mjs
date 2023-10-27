@@ -1,19 +1,51 @@
 import { Tile } from "./Tile.mjs"
 import { n0jointtiles, n0tiles } from "./n0FunctionCollapse.mjs"
 
-n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{factor: "fantasy",min:.4, max:.945},{factor: "fantasy",min:0, max:.4}]))
-n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{factor: "fantasy",min:.4, max:.875}]))
-n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
-n0tiles.set('purple3', new Tile('assets/wave/purple/3.png', [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
-n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
-n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
+let grassFactors = [{factor: "temperature",min:-.5, max:.5},{factor: "humidity",min:-.18, max:1}]
+
+n0tiles.set('grass0', new Tile('assets/plains/grass.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{factor: "humidity", value:1}]))
+n0tiles.set('grass1', new Tile('assets/plains/grass2.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{factor: "humidity", value:1}]))
+n0tiles.set('grass2', new Tile('assets/plains/grass3.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{factor: "humidity", value:1}]))
+
+let dirtWeight = 1/20
+let humidityDirt = -.5//-((1/20)*50)
+n0tiles.set('dirtGrass0', new Tile('assets/plains/dirtGrass0.png', [[0,0,0], [0,0, 1], [1, 1, 1], [0, 0,1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass1', new Tile('assets/plains/dirtGrass1.png', [[1, 1, 1], [1, 0,0], [0,0,0], [1, 0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass2', new Tile('assets/plains/dirtGrass2.png', [[1, 0,0], [0,0,0], [1,0,0], [1, 1, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass3', new Tile('assets/plains/dirtGrass3.png', [[0,0, 1], [1, 1, 1], [0,0, 1], [0,0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass4', new Tile('assets/plains/dirtGrass4.png', [[0,0, 1], [1, 0,0], [1, 0,0], [0,0, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass5', new Tile('assets/plains/dirtGrass5.png', [[1, 0,0], [0,0, 1], [0,0, 1], [1, 0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass6', new Tile('assets/plains/dirtGrass6.png', [[1, 0,0], [0,0,0], [0,0,0], [1, 0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass7', new Tile('assets/plains/dirtGrass7.png', [[0,0, 1], [1,0,0], [0,0,0], [0,0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass8', new Tile('assets/plains/dirtGrass8.png', [[0,0,0], [0,0,0], [1, 0,0], [0,0, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass9', new Tile('assets/plains/dirtGrass9.png', [[0,0,0], [0,0, 1], [0,0, 1], [0,0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass10', new Tile('assets/plains/dirtGrass10.png', [[0, 0, 1], [1, 1, 1], [1, 1, 1], [0,0, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass11', new Tile('assets/plains/dirtGrass11.png', [[0,0,0], [0, 0, 1], [1, 1, 1], [0, 0, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass12', new Tile('assets/plains/dirtGrass12.png', [[1, 0, 0], [0, 0, 1], [1, 1, 1], [1, 1, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass13', new Tile('assets/plains/dirtGrass13.png', [[0, 0, 1], [1, 1, 1], [0, 0, 1], [0,0,0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass14', new Tile('assets/plains/dirtGrass14.png', [[1, 0, 0], [0,0,0], [1, 0, 0], [1, 1, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass15', new Tile('assets/plains/dirtGrass15.png', [[1, 1, 1], [1, 1, 1], [0, 0, 1], [1, 0, 0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass16', new Tile('assets/plains/dirtGrass16.png', [[1, 1, 1], [1,0,0], [0,0,0], [1,0, 0]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+n0tiles.set('dirtGrass17', new Tile('assets/plains/dirtGrass17.png', [[1, 1, 1], [1, 0,0], [1, 0,0], [1, 1, 1]], dirtWeight, [...grassFactors], [{factor: "humidity", value:humidityDirt}]))
+
+n0tiles.set('dirt0', new Tile('assets/plains/dirt.png', [[0,0,0], [0,0,0], [0,0,0], [0,0,0]], 1, [], [{factor: "humidity", value:humidityDirt*2}]))
+n0tiles.set('dirt1', new Tile('assets/plains/dirt2.png', [[0,0,0], [0,0,0], [0,0,0], [0,0,0]], 1, [], [{factor: "humidity", value:humidityDirt*2}]))
+n0tiles.set('dirt2', new Tile('assets/plains/dirt3.png', [[0,0,0], [0,0,0], [0,0,0], [0,0,0]], 1, [], [{factor: "humidity", value:humidityDirt*2}]))
+
+
+n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{factor: "elevation",min:.4, max:.945},{factor: "elevation",min:0, max:.4}]))
+n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{factor: "elevation",min:.4, max:.875}]))
+n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{factor: "elevation",min:.4, max:.875}], [{factor: "elevation",value:.35}]))
+n0tiles.set('purple3', new Tile('assets/wave/purple/3.png', [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0]], 1, [{factor: "elevation",min:.4, max:.875}], [{factor: "elevation",value:.35}]))
+n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]], 1, [{factor: "elevation",min:.4, max:.875}], [{factor: "elevation",value:.35}]))
+n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]], 1, [{factor: "elevation",min:.4, max:.875}], [{factor: "elevation",value:.35}]))
 n0tiles.set('purple6', new Tile('assets/wave/purple/6.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]],1))
-n0tiles.set('green0', new Tile('assets/wave/green/0.png', [[2, 2, 2], [2, 3, 2], [2, 2, 2], [2, 3, 2]], 1, [{factor: "fantasy",min:-1, max:-.4}]))
-n0tiles.set('green1', new Tile('assets/wave/green/1.png', [[2, 3, 2], [2, 2, 2], [2, 3, 2], [2, 2, 2]], 1, [{factor: "fantasy",min:-1, max:-.4}]))
-n0tiles.set('green2', new Tile('assets/wave/green/2.png', [[2, 3, 2], [2, 2, 2], [2, 2, 2], [2, 3, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
-n0tiles.set('green3', new Tile('assets/wave/green/3.png', [[2, 2, 2], [2, 2, 2], [2, 3, 2], [2, 3, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
-n0tiles.set('green4', new Tile('assets/wave/green/4.png', [[2, 3, 2], [2, 3, 2], [2, 2, 2], [2, 2, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
-n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
+n0tiles.set('green0', new Tile('assets/wave/green/0.png', [[2, 2, 2], [2, 3, 2], [2, 2, 2], [2, 3, 2]], 1, [{factor: "elevation",min:-1, max:-.4}]))
+n0tiles.set('green1', new Tile('assets/wave/green/1.png', [[2, 3, 2], [2, 2, 2], [2, 3, 2], [2, 2, 2]], 1, [{factor: "elevation",min:-1, max:-.4}]))
+n0tiles.set('green2', new Tile('assets/wave/green/2.png', [[2, 3, 2], [2, 2, 2], [2, 2, 2], [2, 3, 2]], 1, [{factor: "elevation",min:-.95, max:-.5}], [{factor: "elevation",value:-.1}]))
+n0tiles.set('green3', new Tile('assets/wave/green/3.png', [[2, 2, 2], [2, 2, 2], [2, 3, 2], [2, 3, 2]], 1, [{factor: "elevation",min:-.95, max:-.5}], [{factor: "elevation",value:-.1}]))
+n0tiles.set('green4', new Tile('assets/wave/green/4.png', [[2, 3, 2], [2, 3, 2], [2, 2, 2], [2, 2, 2]], 1, [{factor: "elevation",min:-.95, max:-.5}], [{factor: "elevation",value:-.1}]))
+n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]], 1, [{factor: "elevation",min:-.95, max:-.5}], [{factor: "elevation",value:-.1}]))
 n0tiles.set('green6', new Tile('assets/wave/green/6.png', [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],1))
 
 n0jointtiles.set('green+purple', ['greenpurple0','greenpurple1','greenpurple2','greenpurple3',
