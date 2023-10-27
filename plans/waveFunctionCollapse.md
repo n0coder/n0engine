@@ -214,3 +214,15 @@ now 6, (later 7) -> now 5 -> now 4 -|
 (later 4 complete? yes), (later 7 complete? no) -> later 7, now 8... etc 
 
 (the ai prioritizes nows over laters)
+
+--- 
+
+##### *you may be wondering why i do not bring up sudoku...* | the game sudoku sets us up for understanding the basics of constraint solving. however it has a major issue. 
+
+##### by using sudoku as the basis for our understanding, we get tricked into thinking in a specific way. we overfit our solvers to the game of sudoku. the idea of starting over when we fail to generate a tile, the idea that we have to propagate neighbor constraints, the idea that we only have a limited number of predefined tiles and finally the idea that entropy has to start out with all predefined tiles all at once.
+ 
+## we don't have to fit our algorithm to the specific ruleset of sudoku.
+
+my design philosophy follows reality closer, it's the idea of perspective, where instead of the grid describing the nature of how things work. the things describe how they work.
+
+> "it is not those above you, who control your life. you get to choose for yourself, how you will live" - n0

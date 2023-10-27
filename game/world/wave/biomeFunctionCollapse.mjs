@@ -27,18 +27,18 @@ export class BiomeFunctionCollapse {
 
         var fantasy = new RangeMap(0,1);
         fantasy.add("plain").add("fantasy");
-        addBiomeFactors(fantasy, "fantasy");
+        addBiomeFactors(fantasy, "sugar");
 
     }
     init() {
         let biomes = []
-        var biomea = new Biome("green", [166, 145, 100], ['plain'], ["green6"])
-        var biomeb = new Biome("purple", [166, 75, 155], ['fantasy'], ["purple6"])
+        var biomea = new Biome("green", [166, 145, 100], ['plain'], ["green0","green1","green2","green3","green4","green5","green6"])
+        var biomeb = new Biome("purple", [166, 75, 155], ['fantasy'], ["purple0","purple1","purple2","purple3","purple4","purple5","purple6"])
         biomes.unshift(biomea, biomeb)
         
-        var c = 5;
-        for (let i = 0; i < 8; i++) {
-            for (let o = 0; o < 3; o++) {
+        var c = 6;
+        for (let i = 0; i < 13; i++) {
+            for (let o = 0; o < 6; o++) {
                 this.geta(i*c,o*c,c,c, biomes)
             }
         }
@@ -50,7 +50,7 @@ export class BiomeFunctionCollapse {
                 //var n = noise(i*.05,o*.05)
                 var biome = this.getABiome(biomes, x+i,y+o)
                 biome.x = x+i, biome.y = y+o;
-                this.nfc.collapseBiomeTile(x+i,y+o, biome.biome);
+                this.nfc.collapseBiomeTile(x+i,y+o, biome);
             }
         }
         this.nfc.blocksBiome(x,y, w,h,5) 

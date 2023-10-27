@@ -1,7 +1,7 @@
 import { loadImg } from "../../../engine/core/Utilities/ObjectUtils.mjs";
 
 export class Tile {
-    constructor(img, edges, weight) {
+    constructor(img, edges, weight, thresholds,biases) {
         loadImg(this, "img", img );
         var [up, right, down, left] = edges
         this.up = up;
@@ -9,6 +9,8 @@ export class Tile {
         this.down = down;
         this.left = left;
         this.weight = weight
+        this.thresholds = thresholds || [];
+        this.biases = biases || [];
     }
     init() {
         

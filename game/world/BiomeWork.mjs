@@ -86,7 +86,8 @@ var snowyTundraa = new Biome("snowyTundra", [192, 219, 245],[surface, "frozen", 
 var snowyTaigaa = new Biome("snowyTaiga", [198, 239, 246],[surface, "frozen", "moist"])
 biomes.unshift(snowyPlainsa,snowyTundraa,snowyTaigaa );
 
-var plainsa = new Biome("plains", [190, 199, 104], [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"],["moderate"]]])
+var plainsTiles = ['purple6']
+var plainsa = new Biome("plains", [190, 199, 104], [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"],["moderate"]]], plainsTiles)
 var savannaha = new Biome("savannah", [161, 110, 34],[surface, "warm", ["arid"], ["dry"]])
 biomes.unshift(plainsa,savannaha);
 

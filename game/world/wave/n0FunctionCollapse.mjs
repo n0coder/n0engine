@@ -1,20 +1,18 @@
 
+import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { Cell } from "./Cell.mjs";
 export var n0grid = new Map();
 export var n0tiles = new Map();
 export var n0jointtiles = new Map();
 export class n0FunctionCollapse {
     constructor(alea) {
-
         this.alea = alea || Math.random
     }
 
     blocks(size = 5, w, h, rules) {
         for (let i = 0; i <= w; i += size - 1) {
             for (let o = 0; o <= h; o += size - 1) {
-                
                 this.block(i, o, size,w,h, rules)
-                
             }
         }
 
@@ -45,13 +43,13 @@ export class n0FunctionCollapse {
                     if (iv.tile.option == null)   {
                         let biomes = []
                         var uiv = n0grid.get(`${ix}, ${oy-1}`)
-                        if (uiv&& uiv.tile.option && uiv.biome) biomes.push(uiv.biome.name)
+                        if (uiv&& uiv.tile.option && uiv.biome) biomes.push(uiv.biome.biome.name)
                         var riv = n0grid.get(`${ix+1}, ${oy}`)
-                        if (riv&& riv.tile.option&& riv.biome)  biomes.push(riv.biome.name)
+                        if (riv&& riv.tile.option&& riv.biome)  biomes.push(riv.biome.biome.name)
                         var div = n0grid.get(`${ix}, ${oy+1}`)
-                        if (div&& div.tile.option&& div.biome)  biomes.push(div.biome.name)
+                        if (div&& div.tile.option&& div.biome)  biomes.push(div.biome.biome.name)
                         var liv = n0grid.get(`${ix-1}, ${oy}`)
-                        if (liv&& liv.tile.option&& liv.biome) biomes.push(liv.biome.name)
+                        if (liv&& liv.tile.option&& liv.biome) biomes.push(liv.biome.biome.name)
                         biomes = [...new Set(biomes)];
                         biomes.sort();
                         var combinations = [];
@@ -62,7 +60,7 @@ export class n0FunctionCollapse {
                         }
                         var rules = combinations.map(c=> n0jointtiles.get(c)) 
                         rules = rules.flat(3);
-                        n0grid.set(k, {tile: new Cell(rules)})
+                        iv.tile = new Cell(rules)
                         broken.push([ix,oy]);
                     }
                 }
@@ -86,12 +84,13 @@ export class n0FunctionCollapse {
 
                 let t = 0;
             var co = this.collapseTile(a[0], a[1]);
-            if (!co) {
+            if (!co || !co.later) {
                 later.shift();
                 continue;
             } 
             let o = co.later;
             visited.set(`${a[0]}, ${a[1]}`, true);
+
                 for (const point of o) {
                     if (visited.get(`${point[0]}, ${point[1]}`)) continue;
                     later.push(point);
@@ -102,21 +101,55 @@ export class n0FunctionCollapse {
     }
     collapseBiomeTile(x, y, biome) {
         let tile = n0grid.get(`${x}, ${y}`)
-        var rules = biome.tiles
+        var rules = biome.biome.tiles
         if (rules != null) {
         if (!tile) {
-           tile = {tile: new Cell(rules), biome}
+            tile = {tile: new Cell(rules), biome}
             n0grid.set(`${x}, ${y}`, tile)
         }
         }
+
+        if (tile.tile.option) return tile.tile.option;
+        biome.tile = tile; 
         var myOptions = tile.tile.options.slice();
+
+
+        for (var o of tile.tile.options) { //loop original array to find tiles to remove from copy
+            var tvt = n0tiles.get(o);
+            let valid = new Map();
+            for (var t of tvt.thresholds) {
+                var factor = biome.genCache.get(t.factor)
+                if (!factor) continue; //if the factor doesn't exist don't use it
+                var sum = inverseLerp(factor.minm, factor.maxm, factor.sum)
+                sum = lerp(-1, 1, sum)
+                valid.set(t.factor, valid.get(t.factor) || (sum > t.min && sum < t.max))
+            }
+            for (var [k,v] of valid) {
+                if (!v) {
+                   var i = myOptions.indexOf(o);
+                   myOptions.splice(i, 1)
+                } 
+            }
+        }
 
         let later = []
         checkDir(x, y - 1, (a, b) => n0tiles.get(a).isUp(n0tiles.get(b.option)))
         checkDir(x + 1, y, (a, b) => n0tiles.get(a).isRight(n0tiles.get(b.option)))
         checkDir(x, y + 1, (a, b) => n0tiles.get(a).isDown(n0tiles.get(b.option)))
         checkDir(x - 1, y, (a, b) => n0tiles.get(a).isLeft(n0tiles.get(b.option)))
-        tile.tile.option = this.weightedRandom(myOptions);
+        var myOptionvs = myOptions.slice().map(o=>{
+            var tvt = n0tiles.get(o);
+            let multiple = 1;
+            for (var t of tvt.biases) {
+                var factor = biome.genCache.get(t.factor)
+                if (!factor) continue; //if the factor doesn't exist don't use it
+                var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
+                multiple *= lerp(-t.value, t.value, bias)
+            }
+            return { option:o, bias:multiple }
+        })
+
+        tile.tile.option = this.weightedRandom(myOptionvs);
 
         return { later, option:  tile.tile.option };
         function checkDir(x, y, conditionFunc) {
@@ -136,14 +169,27 @@ export class n0FunctionCollapse {
         }
         if (!tile) return null;
         var myOptions = tile.tile.options.slice();
+        if (tile.tile.option) return tile;
 
         let later = []
         checkDir(x, y - 1, (a, b) => n0tiles.get(a).isUp(n0tiles.get(b.option)))
         checkDir(x + 1, y, (a, b) => n0tiles.get(a).isRight(n0tiles.get(b.option)))
         checkDir(x, y + 1, (a, b) => n0tiles.get(a).isDown(n0tiles.get(b.option)))
         checkDir(x - 1, y, (a, b) => n0tiles.get(a).isLeft(n0tiles.get(b.option)))
-        tile.tile.option = this.weightedRandom(myOptions);
 
+        var myOptionvs = myOptions.slice().map(o=>{
+            var tvt = n0tiles.get(o);
+            let multiple = 1;
+            for (var t of tvt.biases) {
+                var factor = tile.biome.genCache.get(t.factor)
+                var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
+                multiple *= lerp(-t.value, t.value, bias)
+            }
+            return { option:o, bias }
+        })
+
+        tile.tile.option = this.weightedRandom(myOptionvs);
+        
         return { later, option: tile.tile.option };
         function checkDir(x, y, conditionFunc) {
             var b = n0grid.get(`${x}, ${y}`);
@@ -165,18 +211,18 @@ export class n0FunctionCollapse {
         }
     }
     weightedRandom(items) {
-        var broken = items.filter(a => n0tiles.get(a) == null)
+        var broken = items.filter(a => n0tiles.get(a.option) == null)
         if (broken.length > 0) {
             console.warn("these input rules do not have tiles accociated with them", broken)
-            items = items.filter(a => n0tiles.get(a) != null)
+            items = items.filter(a => n0tiles.get(a.option) != null)
         }
-        var totalWeight = items.reduce((total, item) => total + (n0tiles.get(item).weight || 1), 0);
+        var totalWeight = items.reduce((total, item) => total + (n0tiles.get(item.option).weight+(item.bias||0) || 1), 0);
         var random = this.alea() * totalWeight;
         var cumulativeWeight = 0;
         for (var i = 0; i < items.length; i++) {
-            cumulativeWeight += n0tiles.get(items[i]).weight || 1;
+            cumulativeWeight += n0tiles.get(items[i].option).weight+(items[i].bias||0) || 1;
             if (random < cumulativeWeight) {
-                return items[i];
+                return items[i].option;
             }
         }
     }

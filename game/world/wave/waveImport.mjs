@@ -1,19 +1,19 @@
 import { Tile } from "./Tile.mjs"
 import { n0jointtiles, n0tiles } from "./n0FunctionCollapse.mjs"
 
-n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]]))
-n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]]))
-n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]]))
-n0tiles.set('purple3', new Tile('assets/wave/purple/3.png', [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0]]))
-n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]]))
-n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]]))
-n0tiles.set('purple6', new Tile('assets/wave/purple/6.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 2))
-n0tiles.set('green0', new Tile('assets/wave/green/0.png', [[2, 2, 2], [2, 3, 2], [2, 2, 2], [2, 3, 2]]))
-n0tiles.set('green1', new Tile('assets/wave/green/1.png', [[2, 3, 2], [2, 2, 2], [2, 3, 2], [2, 2, 2]]))
-n0tiles.set('green2', new Tile('assets/wave/green/2.png', [[2, 3, 2], [2, 2, 2], [2, 2, 2], [2, 3, 2]]))
-n0tiles.set('green3', new Tile('assets/wave/green/3.png', [[2, 2, 2], [2, 2, 2], [2, 3, 2], [2, 3, 2]]))
-n0tiles.set('green4', new Tile('assets/wave/green/4.png', [[2, 3, 2], [2, 3, 2], [2, 2, 2], [2, 2, 2]]))
-n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]]))
+n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{factor: "fantasy",min:.4, max:.945},{factor: "fantasy",min:0, max:.4}]))
+n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{factor: "fantasy",min:.4, max:.875}]))
+n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
+n0tiles.set('purple3', new Tile('assets/wave/purple/3.png', [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
+n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
+n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]], 1, [{factor: "fantasy",min:.4, max:.875}], [{factor: "fantasy",value:.35}]))
+n0tiles.set('purple6', new Tile('assets/wave/purple/6.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]],1))
+n0tiles.set('green0', new Tile('assets/wave/green/0.png', [[2, 2, 2], [2, 3, 2], [2, 2, 2], [2, 3, 2]], 1, [{factor: "fantasy",min:-1, max:-.4}]))
+n0tiles.set('green1', new Tile('assets/wave/green/1.png', [[2, 3, 2], [2, 2, 2], [2, 3, 2], [2, 2, 2]], 1, [{factor: "fantasy",min:-1, max:-.4}]))
+n0tiles.set('green2', new Tile('assets/wave/green/2.png', [[2, 3, 2], [2, 2, 2], [2, 2, 2], [2, 3, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
+n0tiles.set('green3', new Tile('assets/wave/green/3.png', [[2, 2, 2], [2, 2, 2], [2, 3, 2], [2, 3, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
+n0tiles.set('green4', new Tile('assets/wave/green/4.png', [[2, 3, 2], [2, 3, 2], [2, 2, 2], [2, 2, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
+n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]], 1, [{factor: "fantasy",min:-.95, max:-.5}], [{factor: "fantasy",value:-.1}]))
 n0tiles.set('green6', new Tile('assets/wave/green/6.png', [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]],1))
 
 n0jointtiles.set('green+purple', ['greenpurple0','greenpurple1','greenpurple2','greenpurple3',

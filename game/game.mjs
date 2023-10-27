@@ -20,6 +20,7 @@ var nano = new Nanoai("n0", 256,256);
 
 var nanoFunctionCollapse = new BiomeFunctionCollapse(nano); // NanoFunctionCollapse(nano);
 nanoFunctionCollapse.init();
+
 /*
 nano.brain.do("walk", -100,0)
 nano.brain.do("walk", -100,100)
