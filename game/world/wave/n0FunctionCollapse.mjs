@@ -4,6 +4,8 @@ import { Cell } from "./Cell.mjs";
 export var n0grid = new Map();
 export var n0tiles = new Map();
 export var n0jointtiles = new Map();
+
+document.an0FailedTiles = [];
 export class n0FunctionCollapse {
     constructor(alea) {
         this.alea = alea || Math.random
@@ -74,7 +76,7 @@ export class n0FunctionCollapse {
     }
 
     collapseAll(x, y) {
-        var visited = new Map;
+        var visited = new Map();
         var later = [];
         var failed = false;
         later.push([x, y]);
@@ -84,9 +86,14 @@ export class n0FunctionCollapse {
 
                 let t = 0;
             var co = this.collapseTile(a[0], a[1]);
-            if (!co || !co.later) {
-                later.shift();
-                continue;
+            if (co) {
+                if (!co.tile) {
+                    console.log(a) 
+                }
+                if (!co.later) {
+                    later.shift();
+                    continue;
+                }
             } 
             let o = co.later;
             visited.set(`${a[0]}, ${a[1]}`, true);
@@ -98,6 +105,7 @@ export class n0FunctionCollapse {
             later.shift();
             } else later.shift();
         } while (later.length > 0);
+        
     }
     collapseBiomeTile(x, y, biome) {
         let tile = n0grid.get(`${x}, ${y}`)
@@ -121,6 +129,7 @@ export class n0FunctionCollapse {
 
         for (var o of tile.tile.options) { //loop original array to find tiles to remove from copy
             var tvt = n0tiles.get(o);
+            if (!tvt) continue;
             let valid = new Map();
             for (var t of tvt.thresholds) {
                 var factor = biome.genCache.get(t.factor)
@@ -138,12 +147,13 @@ export class n0FunctionCollapse {
         }
 
         let later = []
-        checkDir(x, y - 1, (a, b) => n0tiles.get(a).isUp(n0tiles.get(b.option)))
-        checkDir(x + 1, y, (a, b) => n0tiles.get(a).isRight(n0tiles.get(b.option)))
-        checkDir(x, y + 1, (a, b) => n0tiles.get(a).isDown(n0tiles.get(b.option)))
-        checkDir(x - 1, y, (a, b) => n0tiles.get(a).isLeft(n0tiles.get(b.option)))
+        checkDir(x, y - 1, (a, b) =>a.isUp(b))
+        checkDir(x + 1, y, (a, b) => a.isRight(b))
+        checkDir(x, y + 1, (a, b) => a.isDown(b))
+        checkDir(x - 1, y, (a, b) => a.isLeft(b))
         var myOptionvs = myOptions.slice().map(o=>{
             var tvt = n0tiles.get(o);
+            if (!tvt) return null;
             let multiple = 1;
             for (var t of tvt.biases) {
                 var factor = biome.genCache.get(t.factor)
@@ -153,16 +163,25 @@ export class n0FunctionCollapse {
             }
             return { option:o, bias:multiple }
         })
-
+        
         tile.tile.option = this.weightedRandom(myOptionvs);
-
+        
         return { later, tile };
         function checkDir(x, y, conditionFunc) {
             var b = n0grid.get(`${x}, ${y}`)?.tile;
             if (b == null) return;
-            if (b.option != null)
-                myOptions = myOptions.filter(a => a&& conditionFunc(a, b));
+            if (b.option != null) {
+                var bt = n0tiles.get(b.option);
+                myOptions = myOptions.filter(a => {
+                    if (a == null) return false;
+                    var at = n0tiles.get(a);
+                    if (at != null && bt !=null)
+                        return conditionFunc(at, bt)
+                });
+                return bt
+            }
             else later.push([x, y]);
+            return n0tiles.get(b.option);
         }
     }
     collapseTile(x, y, rules) {
@@ -179,14 +198,15 @@ export class n0FunctionCollapse {
         
         
         let later = []
-        checkDir(x, y - 1, (a, b) => n0tiles.get(a).isUp(n0tiles.get(b.option)))
-        checkDir(x + 1, y, (a, b) => n0tiles.get(a).isRight(n0tiles.get(b.option)))
-        checkDir(x, y + 1, (a, b) => n0tiles.get(a).isDown(n0tiles.get(b.option)))
-        checkDir(x - 1, y, (a, b) => n0tiles.get(a).isLeft(n0tiles.get(b.option)))
+        let upoption = checkDir(x, y - 1, (a, b) =>a.isUp(b))
+        let rightoption =checkDir(x + 1, y, (a, b) => a.isRight(b))
+        let downoption =checkDir(x, y + 1, (a, b) => a.isDown(b))
+        let leftoption =checkDir(x - 1, y, (a, b) => a.isLeft(b))
 
         var myOptionvs = myOptions.slice().map(o=>{
             var tvt = n0tiles.get(o);
             let multiple = 1;
+            if (!tvt) return null //{ option:o, bias }
             for (var t of tvt.biases) {
                 var factor = tile.biome.genCache.get(t.factor)
                 var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
@@ -196,15 +216,64 @@ export class n0FunctionCollapse {
         })
 
         tile.tile.option = this.weightedRandom(myOptionvs);
+        if (tile.tile.option == null) {
+            let sides = []
+            let count = 0
         
-        return { later, option: tile.tile.option };
+            if (upoption) {
+                sides.push(upoption.down)
+                count++
+            } else {
+                sides.push(["?,?,?"])
+            }
+        
+            if (rightoption) {
+                sides.push(rightoption.down)
+                count++
+            } else {
+                sides.push(["?,?,?"])
+            }
+        
+            if (downoption) {
+                sides.push(downoption.down)
+                count++
+            } else {
+                sides.push(["?,?,?"])
+            }
+        
+            if (leftoption) {
+                sides.push(leftoption.down)
+                count++
+            } else {
+                sides.push(["?,?,?"])
+            }
+        
+            if (count > 3) {
+                var tzis = [
+                    upoption?.down[0],upoption?.down[1],upoption?.down[2], rightoption?.left[1], rightoption?.left[2],
+                    downoption?.up[0], downoption?.up[0], leftoption?.right[1]
+                ]
+        
+                document.an0FailedTiles.push({tzis, sides})
+            }
+        }
+        
+        return { later, tile };
         function checkDir(x, y, conditionFunc) {
-            var b = n0grid.get(`${x}, ${y}`);
+            var b = n0grid.get(`${x}, ${y}`)?.tile;
             if (b == null) return;
-            b= b.tile;
-            if (b.option != null)
-                myOptions = myOptions.filter(a => a&&conditionFunc(a, b));
+            if (b.option != null) {
+                var bt = n0tiles.get(b.option);
+                myOptions = myOptions.filter(a => {
+                    if (a == null) return false;
+                    var at = n0tiles.get(a);
+                    if (at != null && bt !=null)
+                        return conditionFunc(at, bt)
+                });
+                return bt
+            }
             else later.push([x, y]);
+            return n0tiles.get(b.option);
         }
     }
 
@@ -233,11 +302,8 @@ if (cell) {
 
     }
     weightedRandom(items) {
-        var broken = items.filter(a => n0tiles.get(a.option) == null)
-        if (broken.length > 0) {
-            console.warn("these input rules do not have tiles accociated with them", broken)
-            items = items.filter(a => n0tiles.get(a.option) != null)
-        }
+        items = items.filter(a => a != null && n0tiles.get(a.option) != null)
+        
         var totalWeight = items.reduce((total, item) => total + (n0tiles.get(item.option).weight+(item.bias||0) || 1), 0);
         var random = this.alea() * totalWeight;
         var cumulativeWeight = 0;

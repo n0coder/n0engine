@@ -27,7 +27,7 @@ export class BiomeFunctionCollapse {
         this.chunks = new Map()
         this.i = 0;
         this.o = 0;
-
+this.ready = false;
     }
     init() {
         //let biomes = []
@@ -113,6 +113,7 @@ export class BiomeFunctionCollapse {
     */
 
     draw() {
+        if (!this.ready) return;
         //testing entire board shifts
         var x = 10;
         var y = 500;
@@ -143,5 +144,9 @@ export class BiomeFunctionCollapse {
         }
         
        
+    }
+
+    doubleClicked() {
+        this.ready = true
     }
 }
