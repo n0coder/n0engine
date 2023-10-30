@@ -4,10 +4,9 @@ import { p } from "../../../engine/core/p5engine.mjs";
 import {n0FunctionCollapse} from "./n0FunctionCollapse.mjs";
 import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
-import { Biome, addBiomeFactors } from "../biome.mjs";
-import { RangeMap } from "../../../engine/collections/RangeMap.mjs";
 import { getBiome, worldFactors } from "../FactorManager.mjs";
 import { inverseLerp } from "../../../engine/n0math/ranges.mjs";
+import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
 
 export class BiomeFunctionCollapse {
     constructor(nano) {
@@ -24,41 +23,45 @@ export class BiomeFunctionCollapse {
         for (const [k, v] of worldFactors) {
             v.init(createNoise2D(this.alea));
         }
-        this.chunks = new Map()
+        this.tiles = new Map()
         this.i = 0;
         this.o = 0;
-this.ready = false;
+        this.ready = false;
+        this.useNfc = false; 
+
+        if (this.useNfc) {
+            import('./waveImport.mjs').then(u=>{}) //no
+        n0loader.startLoading("bfc", (loaded)=> this.init(loaded), ["tiles"]) //a wierd issue
+        }
+        else this.init()
     }
-    init() {
+    init(loaded) {
         //let biomes = []
         //var biomea = new Biome("green", [166, 145, 100], ['plain'], ["green0","green1","green2","green3","green4","green5","green6"])
         //var biomeb = new Biome("purple", [166, 75, 155], ['fantasy'], ["purple0","purple1","purple2","purple3","purple4","purple5","purple6"])
         //biomes.unshift(biomea, biomeb)
         
         //figuring out underlying issues
-
-        
+        this.ready = true;
+        loaded?.()
     }
 
     genChunk(x,y,w,h) {
-        var chunk = this.chunks.get(`${x}, ${y}`)
-        if (chunk) return chunk;
 
-        chunk = new Map();
         for (let i = 0; i < w; i++) {
             for (let o = 0; o < h; o++) {
-                var tile = chunk.get(`${i}, ${o}`) 
+                var tile = this.tiles.get(`${x+i}, ${y+o}`) 
                 if (tile) continue;
 
                 var biome = getBiome(x+i,y+o)
                 biome.x = x+i, biome.y = y+o;
-                tile = this.nfc.collapseBiomeTile(x+i,y+o, biome);
-                chunk.set(`${i}, ${o}`, tile) 
+                if (this.useNfc)
+                    tile = this.nfc.collapseBiomeTile(x+i,y+o, biome);
+                this.tiles.set(`${x+i}, ${y+o}`, tile || biome) 
             }
         }
-        
+        if (this.useNfc)
         this.nfc.blocksBiome(x,y, w,h,5) 
-        this.chunks.set(`${x}, ${y}`, chunk)
     }
 
     getABiome(biomes, vx, vy) {
@@ -115,38 +118,45 @@ this.ready = false;
     draw() {
         if (!this.ready) return;
         //testing entire board shifts
-        var x = 10;
+        var x = -100;
         var y = 500;
-
-        var c = 8; //grid space
-        this.genChunk((this.i*c)+x,(this.o*c)+y,c,c)
+        
+        var c = worldGrid.chunkSize*2; //grid space
+        this.genChunk((this.i*(c*2))+x,(this.o*c)+y,c*2,c)
 
         this.i++;
-        if (this.i > 6) {
+        if (this.i >= 2) {
             this.o++
             this.i = 0;
-            if (this.o > 3) {
+            if (this.o >= 2) {
                 this.o = 0
             }
         }
 
-
-        for (let i = 0; i < this.w; i++) {
-            for (let o = 0; o < this.h; o++) {
+        
+        for (let i = 0; i < this.w+1; i++) {
+            for (let o = 0; o < this.h+1; o++) {
                var v = worldGrid.gridBoundsScreenSpace(i, o, 1, 1);
+               if (this.useNfc)
                this.nfc.drawTile(i+x,o+y, 
                     (tile, img)=>p.image(img, v.x, v.y, v.w, v.h),
                     (tile, color)=> {
                         p.fill(color); p.rect(v.x, v.y, v.w, v.h)
                     }
                 ); 
+
+                else {
+                    var biome = this.tiles.get(`${x+i}, ${y+o}`)
+                if (biome&&biome.biome) {
+                    p.fill(biome.biome.color)
+                    p.rect(v.x, v.y, v.w, v.h)
+                }
+                }
             }
         }
-        
-       
     }
 
     doubleClicked() {
-        this.ready = true
+        //this.ready = true
     }
 }

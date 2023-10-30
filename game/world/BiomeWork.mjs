@@ -95,15 +95,16 @@ var grassy = [
     "dirtGrass10","dirtGrass11","dirtGrass12","dirtGrass13","dirtGrass14",
     "dirtGrass15","dirtGrass16","dirtGrass17"
 ]
+//["c0","c1","c2","c3","c4","c5","c6","c7","c8","c9","c10","c11","c12","c13","c14","c15","c16","c17","c18","c19","c20","c21","c22","c23","c24","c25","c26","c27","c28","c29","c30","c31","c32","c33"]
 var plainsa = new Biome("plains", [190, 199, 104], [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"],["moderate"]]], [...grassy])
-var savannaha = new Biome("savannah", [161, 110, 34],[surface, "warm", ["arid"], ["dry"]])
+var savannaha = new Biome("savannah", [161, 110, 34],[surface, "warm", ["arid"], ["dry"]], [...grassy])
 biomes.unshift(plainsa,savannaha);
 
-var taigaa = new Biome("taiga", [140, 196, 108],[surface, ["frozen","wet"], ["cold", ["wet"], ["moist"]]])
+var taigaa = new Biome("taiga", [140, 196, 108],[surface, ["frozen","wet"], ["cold", ["wet"], ["moist"]]], [...grassy])
 var foresta = new Biome("forest", [98, 171, 84],[surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]], [...grassy])
-var junglea = new Biome("jungle", [38, 173, 25],[surface, "warm", ["wet"], ["moist"]])
-var flowerForesta = new Biome("flowerForest", [96, 189, 133],[surface, "neutral", "arid"])
-var darkForesta = new Biome("darkForest", [28, 130, 18],[surface, "neutral", "wet"])
+var junglea = new Biome("jungle", [38, 173, 25],[surface, "warm", ["wet"], ["moist"]], [...grassy])
+var flowerForesta = new Biome("flowerForest", [96, 189, 133],[surface, "neutral", "arid"], [...grassy])
+var darkForesta = new Biome("darkForest", [28, 130, 18],[surface, "neutral", "wet"], [...grassy])
 biomes.unshift(taigaa,foresta,junglea,flowerForesta,darkForesta);
 
 

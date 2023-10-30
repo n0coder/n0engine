@@ -1,9 +1,12 @@
 import { loadImg } from "../../../engine/core/Utilities/ObjectUtils.mjs";
+import { waves } from "./waveImport.mjs";
 
 export class Tile {
     constructor(img, edges, weight, thresholds,biases) {
         loadImg(this, "img", img );
+        if (Array.isArray(edges))
         var [up, right, down, left] = edges
+        else waves.get(edges)
         this.up = up;
         this.right = right;
         this.down = down;
