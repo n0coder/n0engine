@@ -1,7 +1,8 @@
 export class WorldGrid {
     constructor() {
-        this.gridSize = 4;
-        this.chunkSize = 4
+        this.gridSize = 16;
+        this.chunkSize = 8;
+        this.tiles = new Map();
     }
     get halfTileSize() {
         return this.gridSize / 2
@@ -13,12 +14,24 @@ export class WorldGrid {
     screenToChunkPoint(x,y) {
         return { x: Math.floor(x / (this.gridSize*this.chunkSize)), y: Math.floor(y / (this.gridSize*this.chunkSize)) };
     }
-    screenToGridBounds(x1, y1, x2, y2) {
+    screenToGridBounds(x1, y1, x2, y2, pad=0) {
+        let gx1 = Math.floor(x1 / this.gridSize);
+        let gy1 = Math.floor(y1 / this.gridSize);
+        let gx2 = Math.floor(x2 / this.gridSize)
+        let gy2 = Math.floor(y2 / this.gridSize)
         return {
-            minX: Math.floor(x1 / this.gridSize),
-            minY: Math.floor(y1 / this.gridSize),
-            maxX: Math.floor(x2 / this.gridSize),
-            maxY: Math.floor(y2 / this.gridSize)
+            minX: Math.min(gx1, gx2)-pad,
+            minY: Math.min(gy1, gy2)-pad,
+            maxX: Math.max(gx1, gx2)+pad,
+            maxY: Math.max(gy1, gy2)+pad,
+            toRect() {
+                return {
+                    x: this.minX - this.minX,
+                    y: this.minY - this.minY,
+                    w: this.maxX - this.minX,
+                    h: this.maxY - this.minY
+                }
+            }
         };
     }
     screenToChunkBounds(x1, y1, x2, y2) {
@@ -28,6 +41,23 @@ export class WorldGrid {
             maxX: Math.floor(x2 / (this.gridSize*this.chunkSize)),
             maxY: Math.floor(y2 / (this.gridSize*this.chunkSize))
         };
+    }
+    gridBounds(gx1, gy1, gx2, gy2, pad=0) {
+        return {
+            minX: Math.min(gx1, gx2)-pad,
+            minY: Math.min(gy1, gy2)-pad,
+            maxX: Math.max(gx1, gx2)+pad,
+            maxY: Math.max(gy1, gy2)+pad,
+            toRect() {
+                return {
+                    x: 0,
+                    y: 0,
+                    w: this.maxX - this.minX,
+                    h: this.maxY - this.minY 
+                }
+            }
+        };
+
     }
     gridToScreenPoint(x,y) {
         return { x: x * this.gridSize, y: y * this.gridSize };

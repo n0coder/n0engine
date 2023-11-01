@@ -15,15 +15,26 @@ the player will have a place to visit on the surface
 going to add shared n0engine features to the repo
 
 ## currently working on:
-nano animations
 
-biome decoration systems, placing trees, grass, rocks, other native wild life.
-structure planning, figuring out where to place structures
+nanoai techs. attack and defend techs. jobs, and pathfinding.
+possibly emotions.
+
 
 ## nanoai 
    - nanoai.brain.do("walk", 2,5) //ask the nanoai to walk to position 2, 5
    - actions are queued, actions can have prerequisites
    - nanoai.brain.do("pickup", item) //walk to item and pick it up
+
+## path finding tech
+   - a* pathfinding, which uses the world grid to map out tiles in a bounding box... 
+   - waypoint systems
+
+
+later on continue world generator techs. (got burnt out spending two full weeks world building)
+
+biome decoration systems, placing trees, grass, rocks, other native wild life.
+structure planning, figuring out where to place structures
+
 
 ## genetic algorithms
    while the ai itself does not use genetic algorithms to learn the world, 
@@ -45,9 +56,6 @@ structure planning, figuring out where to place structures
    - set basic tile size, set basic chunk size, and scale
    - convert between screen space, tile space, and chunk space
    - find the bounding box in each space given
-
-## path finding tech
-   - a* pathfinding, which uses the world grid to map out tiles in a bounding box... 
 
 ## procedural generation techs
    - use noise to control noise, 

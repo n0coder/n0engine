@@ -1,13 +1,46 @@
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { inverseLerp } from "../../engine/n0math/ranges.mjs";
+import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { Mommyai, Puff } from "./mommyai.mjs";
+import { n0Pathfinder } from "./research/research.mjs";
 
 export const nanoaiActions = new Map([
     ["walk", {
         args: [],
+        path: null,
         work: function (nano) {
-           return walk(nano, this.args[0],this.args[1], 5) //this kinda sucks 
+            if (!this.path)
+                n0Pathfinder.findPath(nano.x, nano.y, this.args[0],this.args[1], 32, 4, (path)=> {
+                this.path = path;
+                console.log(path);
+           });
+           if (this.path)  {
+
+               p.fill(255); 
+                let path = this.path.points.slice();
+                let x = 25;
+                for (let i = 0; i < path.length - 1; i++) {
+                    p2.variableLine(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y, inverseLerp(path.length, 0, i) * x, inverseLerp(path.length, 0, (i + 1)) * x);
+                }
+
+                if (!walkLegacy(nano, this.path.currentPoint.x, this.path.currentPoint.y, 1)) {
+                    if (!this.path.isFinalPoint)
+                        this.path.next();
+                    else {
+                        nano.vx = 0;
+                        nano.vy = 0;
+                        return false;
+                    }    
+                }
+
+                
+           // p2.variableLine(this.path.points[0].x, this.path.points[0].y,this.path.points[this.path.points.length-1].x, this.path.points[this.path.points.length-1].y,16, 8)
+
+           
+        }
+           return true; //walkLegacy(nano, this.args[0],this.args[1], 5) //this kinda sucks 
         },
         clone: function(...args) {
             return handleClone(this, ...args)
@@ -29,7 +62,7 @@ export const nanoaiActions = new Map([
             var nano2x = this.args[0];
             var nanowok = !isNaN(this.args[1]) ? this.args[1] : 5
             if (nano2x) {
-                return walk(nano, nano2x.x,nano2x.y, nanowok)
+                return walkLegacy(nano, nano2x.x,nano2x.y, nanowok)
             }
             return false
         },
@@ -149,10 +182,17 @@ export function handleClone(obj,...args) {
 }
 
 
-export function walk(nano, x,y, magn = 1) {
+
+export function walk(nano, x,y,magn) {
+   
+}
+
+export function walkLegacy(nano, x,y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))
+    if (mag < magn) //if we already at point move next lol
+        return false;
     vx /= mag;
     vy /= mag;
     if (mag > magn) {

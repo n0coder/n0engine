@@ -55,6 +55,9 @@ export class Nanoai {
     }
 
     draw() {
+        if (this.working) 
+        this.brain.work(this);
+
         if (!this.cimg) 
         this.cimg = this.img;
 
@@ -74,9 +77,8 @@ export class Nanoai {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
 
-        if (!this.working) return
-        ///if (!this.working) return;
-        this.brain.work(this);
+        //if (!this.working) return;
+        
         
         this.inventory.draw(this);
     }
