@@ -41,7 +41,7 @@ sugarColors.add([117, 250, 177], .2)
 sugarColors.add([248, 247, 249], .2)
 
 
-export var read = "fantasy", readRaw = false;
+export var read = "sugar", readRaw = false;
 export var minmax = []
 export function getBiome(x, y) {
     var biomae = getABiome(x + offsetX, y + offsetY)
@@ -55,7 +55,7 @@ export function getBiome(x, y) {
     //console.log(factor);
     return biomae
 }
-export var offsetX = 111, offsetY = 0
+export var offsetX = -251, offsetY = 42
 export const one = false; //to display only one pixel (helpful for debugging)
 var vvscale = 1
 
@@ -136,5 +136,12 @@ worldFactors.set("fantasy", fantasy);
 
 var triverWsforks2 = new NoiseGenerator({ scale: scale * 250, octaves: 5, persistance: .5, lacunarity: 1.3, offset: 0, offsetX: 53, offsetY: 3222, amp: 2 })
 var triverWsforks = new NoiseGenerator({ scale: scale * 250, abs: true, octaves: 5, persistance: .5, offset: 0, lacunarity: 1.75, offsetY: triverWsforks2, offsetX: 1553, amp: 1 })
-var sugar = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222 });
-worldFactors.set("sugar", sugar)
+var sugar = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
+var sugarO = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222  });
+var bitter = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
+var sugarZone = new NoiseGenerator({ scale: scale * 250, octaves: 1, persistance: .5, lacunarity: 2, offsetY: -3632 ,
+    mapSpace: [0, 1], map: [
+        { "c": 0, "y": 0, "p": 2 }, { "c": 0.2, "y": .1, "p": 2 }, { "c": 0.5, "y": .5, "p": 2 }, { "c": 0.8, "y": 0.9, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [bitter, sugarO, sugar] //bitter zone, original mix, sugar zone
+    });
+    
+worldFactors.set("sugar", sugarZone)

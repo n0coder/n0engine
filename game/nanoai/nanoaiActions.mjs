@@ -22,7 +22,7 @@ export const nanoaiActions = new Map([
             }
 
             if (!this.path)
-                findPath(nano.x, nano.y, this.args[0], this.args[1], worldGrid.gridSize * 4, 4, (path) => {
+                findPath(nano.x, nano.y, this.args[0], this.args[1], worldGrid.gridSize * 4, 7, (path) => {
                     this.path = path;
                 });
             if (this.path) {

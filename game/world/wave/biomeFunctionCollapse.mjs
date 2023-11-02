@@ -4,7 +4,7 @@ import { p } from "../../../engine/core/p5engine.mjs";
 import { n0FunctionCollapse } from "./n0FunctionCollapse.mjs";
 import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
-import { getBiome, worldFactors } from "../FactorManager.mjs";
+import { getBiome, readRaw, worldFactors } from "../FactorManager.mjs";
 import { inverseLerp } from "../../../engine/n0math/ranges.mjs";
 import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
 
@@ -149,7 +149,11 @@ export class BiomeFunctionCollapse {
                 else {
                     var biome = worldGrid.tiles.get(`${x + i}, ${y + o}`)
                     if (biome && biome.biome) {
-                        p.fill(biome.biome.color)
+                        if (biome.read)
+                            p.fill(readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255)
+                        else 
+                            p.fill(biome.biome.color)
+                        
                         p.rect(v.x, v.y, v.w, v.h)
                     }
                 }
