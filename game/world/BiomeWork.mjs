@@ -67,6 +67,7 @@ var icydeepwater = new Biome("icydeepwater", [88, 134, 219],["deep", "frozen"]) 
 biomes.unshift(icydeepwater)
 
 var watera =new Biome("water", [60, 147, 171],[["low"]])
+watera.difficulty = 4;
 biomes.unshift(watera)
 biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactors ([["bitteredge"],["bitter","fantasy"]]))
 biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactors ([["sweetedge"],["sweet","fantasy"]]))

@@ -4,7 +4,6 @@ import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } fro
 import { p } from "../../engine/core/p5engine.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
-import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
 
 loadImgArray("assets/nano/up", 4, imgArray => {
@@ -55,7 +54,7 @@ export class Nanoai {
     }
 
     draw() {
-        if (this.working) 
+        //if (this.working) 
         this.brain.work(this);
 
         if (!this.cimg) 

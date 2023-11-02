@@ -4,19 +4,8 @@ import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { p2 } from "../../visualizers/lineVisualizer.mjs";
 import star from "easystarjs"
-class N0Pathfinder {
-    constructor() {
-        this.setActive = setActive;
-        this.setActive(true);
-        this.grid = new Map();
 
-        this.x = 256+worldGrid.gridSize*6;
-        this.y =64+ worldGrid.gridSize;
-        this.tzx =256+ worldGrid.gridSize*2;
-        this.tzy =64+ worldGrid.gridSize*13
-    }
-
-    findPath(cX, cY, tX, tY, sightDistance, padding, out) {
+export function findPath(cX, cY, tX, tY, sightDistance, padding, out) {
         //let sightDistance = Math.floor(sd / worldGrid.gridSize) 
         let wx = worldGrid.screenToGridPoint(cX, cY)
         let tx = worldGrid.screenToGridPoint(tX, tY)
@@ -43,20 +32,8 @@ class N0Pathfinder {
         let endX = currentX + limitedVectorX;
         let endY = currentY + limitedVectorY;
         
-        //what happens to the currentX endX, currentY endY when we shift the bounds?
-
-        //currentX is NOT 0, 
-
-        //the bounds are calculated using minmaxes 
-
         let minax = Math.min(currentX,endX); 
         let minay = Math.min(currentY,endY);
-        let maxax = Math.max(currentX,endX); 
-        let maxay = Math.max(currentY,endY);
-        // this forms the boundingbox, also notes the positions of each position
-
-        //pull the bounding box to the minimum
-        //pull the currents and ends with the same value
 
         let currentoX = currentX- minax;
         let currentoY = currentY -minay; 
@@ -66,23 +43,48 @@ class N0Pathfinder {
         var a = worldGrid.gridBounds(currentX,currentY,endX,endY,pad);
         var ar = a.toRect();
         
-        console.log({cfasy: {currentX,currentY,endX,endY,limitedVectorX,limitedVectorY,pad}, a,ar})
-
         let gridArray = [];
-        for (let y = ar.y; y <= ar.h+1; y++) {
-            gridArray[y] = []
-            for (let x = ar.x; x <= ar.w+1; x++) {
-                let tile = worldGrid.tiles.get(`${x}, ${y}`);
+        for (let y = ar.y; y <= ar.h; y++) {
+            gridArray[y] = [];
+            for (let x = ar.x; x <= ar.w; x++) {
+                let tile = worldGrid.tiles.get(`${worldGrid.x+minax+x-pad}, ${worldGrid.y+minay+y-pad}`);
                 gridArray[y][x] = (tile&&tile.pathDifficulty) || 0
             }
         }
-        let ezstar = this.stars(gridArray);
+        let ss= 2;
+        let graphics = p.createGraphics((ar.w+1)*ss, (ar.h+1)*ss);
+        for (let y = 0; y <= ar.h; y++) {
+           for (let x = 0; x <= ar.w; x++) {
+               let value = gridArray[y][x];
+               graphics.noStroke();
+               graphics.fill(lerp(0,255,inverseLerp(0, 8, value))); // Adjust these values as needed
+               graphics.rect(x*ss, y*ss, 1*ss, 1*ss);
+               graphics.fill(222,121,121)
+               graphics.rect((currentoX +pad)*ss, (currentoY +pad)*ss, 1*ss,1*ss);
+               graphics.rect((endoX +pad)*ss, (endoY + pad)*ss, 1*ss,1*ss);
+           }
+        }       
 
+
+        let ezstar = stars(gridArray);
         ezstar(currentoX +pad, currentoY +pad, endoX +pad, endoY + pad, (path) => {
             if (path !== null) {
-                var points = path.map(p => worldGrid.gridToScreenPoint(a.minX+p.x, a.minY+p.y))
+                graphics.fill(255);
+                graphics.stroke(255);
+                graphics.strokeWeight(1)
+                for (let i = 0; i < path.length - 1; i++) {
+                    graphics.line(path[i].x*2, path[i].y*2, path[i + 1].x*2, path[i + 1].y*2);
+                }
+                //draw path to graphics buffer
+
+                var points = path.map(p => {
+                    let world = worldGrid.gridToScreenPoint(a.minX+p.x, a.minY+p.y)
+                    return {x:world.x+worldGrid.halfTileSize, y:world.y+worldGrid.halfTileSize}
+                })
+                //points[points.length-1] = {x:tX, y:tY}
                 out({
                     points,
+                    graphics,
                     index: 0,
                     get currentPoint() {
                         return this.points[this.index];
@@ -120,10 +122,7 @@ class N0Pathfinder {
         })
 
     }
-
-
-
-    stars(grid) {
+    function stars(grid) {
         let astar = new star.js();
         astar.setGrid(grid);
         astar.setAcceptableTiles([0,1,2,3,4,5,6,7]);
@@ -141,32 +140,3 @@ class N0Pathfinder {
             astar.calculate();
         }
     }
-
-
-    draw() {
-        p.fill(255)
-        let x = 16;
-        
-        p.fill(166, 111, 111);
-        p.ellipse(this.x, this.y, 8)
-        p.fill(111, 166, 111);
-        p.ellipse(this.tzx, this.tzy, 8)
-
-        p.fill(255);
-        let i = 64, o = 64;
-        let a = 64+32, b = 64+32;
-
-        [i,o,a,b] = [a,b,i,o];
-
-        p.ellipse(i,o, 8);
-        p.ellipse(a,b, 4);
-        var bounds = worldGrid.gridBounds(i,o,a,b,8);
-        p.ellipse(bounds.minX, bounds.minY, 12)
-        p.ellipse(bounds.maxX, bounds.minY, 6)
-        p.ellipse(bounds.maxX, bounds.maxY, 4)
-        p.ellipse(bounds.minX, bounds.maxY, 6)
-        p2.variableLine(i,o,a,b, 12, 4);
-        //p2.variableLine(128,128,128,256, 16, 0);
-    }
-}
-export var n0Pathfinder = new N0Pathfinder();

@@ -23,6 +23,7 @@ export class Biome {
     }
     copy(name, color) {
         let biome = new Biome(name||this.name, color||this.color);
+        biome.difficulty = this.difficulty;
         if (this.factors != null)
             biome.factors = this.factors.slice();
         if (this.tags != null) 

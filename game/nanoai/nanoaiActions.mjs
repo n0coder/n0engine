@@ -1,47 +1,48 @@
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { inverseLerp } from "../../engine/n0math/ranges.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { Mommyai, Puff } from "./mommyai.mjs";
-import { n0Pathfinder } from "./research/research.mjs";
+import { findPath } from "./research/n0Pathfinder.mjs";
 
 export const nanoaiActions = new Map([
     ["walk", {
         args: [],
         path: null,
         work: function (nano) {
-            if (!this.path)
-                n0Pathfinder.findPath(nano.x, nano.y, this.args[0],this.args[1], 32, 4, (path)=> {
+            var vx = this.args[0]-nano.x;
+            var vy = this.args[1]-nano.y;
+            var mag = Math.sqrt((vx *vx)+(vy*vy))
+            if (mag <= worldGrid.gridSize*1.5) {
+                nano.vx = 0;
+                nano.vy = 0;
+                return false;
+            }
+            
+            if (!this.path) 
+                findPath(nano.x, nano.y, this.args[0],this.args[1], 32, 4, (path)=> {
                 this.path = path;
-                console.log(path);
            });
-           if (this.path)  {
-
-               p.fill(255); 
-                let path = this.path.points.slice();
-                let x = 25;
-                for (let i = 0; i < path.length - 1; i++) {
-                    p2.variableLine(path[i].x, path[i].y, path[i + 1].x, path[i + 1].y, inverseLerp(path.length, 0, i) * x, inverseLerp(path.length, 0, (i + 1)) * x);
-                }
-
-                if (!walkLegacy(nano, this.path.currentPoint.x, this.path.currentPoint.y, 1)) {
-                    if (!this.path.isFinalPoint)
-                        this.path.next();
-                    else {
-                        nano.vx = 0;
-                        nano.vy = 0;
-                        return false;
-                    }    
-                }
-
-                
-           // p2.variableLine(this.path.points[0].x, this.path.points[0].y,this.path.points[this.path.points.length-1].x, this.path.points[this.path.points.length-1].y,16, 8)
-
-           
-        }
-           return true; //walkLegacy(nano, this.args[0],this.args[1], 5) //this kinda sucks 
-        },
+           if (this.path) {
+                p.fill(255); 
+                p.image( this.path.graphics, nano.x, nano.y)
+                if (!this.path.currentPoint) console.error("the point went null?", this.path, mag);
+            p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2 )
+            let ped = this.path.currentPointDistance(nano.x, nano.y);
+            if (ped < worldGrid.gridSize/2) {
+                if(!this.path.isFinalPoint) {
+                    this.path.next();
+                    }
+                else this.path=null;
+            }
+            if (this.path)
+            walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
+            }
+           return true; 
+        
+    },
         clone: function(...args) {
             return handleClone(this, ...args)
         }
@@ -58,13 +59,44 @@ export const nanoaiActions = new Map([
     }],
     ["follow", {
         args: [],
+        targetX:null, targetY:null, path:null,
         work: function (nano) {
-            var nano2x = this.args[0];
-            var nanowok = !isNaN(this.args[1]) ? this.args[1] : 5
-            if (nano2x) {
-                return walkLegacy(nano, nano2x.x,nano2x.y, nanowok)
+            var vx = this.args[0].x-nano.x;
+            var vy = this.args[0].y-nano.y;
+            var mag = Math.sqrt((vx *vx)+(vy*vy))
+            if (mag <= worldGrid.gridSize ) {
+                nano.vx = 0;
+                nano.vy = 0;
+                return false;
             }
-            return false
+
+            var vtx= this.args[0].x - this.targetX;
+            var vty= this.args[0].y - this.targetY;
+            var tmag = Math.sqrt((vtx *vtx)+(vty*vty))
+            if (!this.path) //if target moves a whole tile we retarget the new tile lol 
+                findPath(nano.x, nano.y, this.args[0].x,this.args[0].y, 32, 4, (path)=> {
+                this.targetX = this.args[0].x
+                this.targetY = this.args[0].y
+                this.path = path;
+           });
+           else {
+            p.fill(255); 
+
+            p.image( this.path.graphics, nano.x, nano.y)
+            p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2 )
+            let ped = this.path.currentPointDistance(nano.x, nano.y);
+            if (ped < worldGrid.gridSize/2) {
+                if(!this.path.isFinalPoint) {
+                    this.path.next();
+                    }
+                else {
+                    this.path=null;
+                    }
+            }
+            if (this.path)
+            walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
+            }
+            return true
         },
         //clone before setting the variable
         clone: function(...args) {
@@ -182,12 +214,7 @@ export function handleClone(obj,...args) {
 }
 
 
-
-export function walk(nano, x,y,magn) {
-   
-}
-
-export function walkLegacy(nano, x,y, magn = 1) {
+export function walk(nano, x,y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))

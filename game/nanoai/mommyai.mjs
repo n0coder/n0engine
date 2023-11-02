@@ -5,7 +5,6 @@ import { p } from "../../engine/core/p5engine.mjs";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
-import { walk } from "./nanoaiActions.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
 import { Poser } from "./poser.mjs";
 export class Puff {

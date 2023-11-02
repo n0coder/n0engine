@@ -23,7 +23,7 @@ export class BiomeFunctionCollapse {
         for (const [k, v] of worldFactors) {
             v.init(createNoise2D(this.alea));
         }
-        this.tiles = new Map()
+        //this.tiles = new Map()
         this.i = 0;
         this.o = 0;
         this.ready = false;
@@ -50,14 +50,15 @@ export class BiomeFunctionCollapse {
 
         for (let i = 0; i < w; i++) {
             for (let o = 0; o < h; o++) {
-                var tile = this.tiles.get(`${x+i}, ${y+o}`) 
+                var tile = worldGrid.tiles.get(`${x+i}, ${y+o}`) 
                 if (tile) continue;
 
                 var biome = getBiome(x+i,y+o)
                 biome.x = x+i, biome.y = y+o;
+                biome.pathDifficulty = biome.biome.difficulty; //can't walk through an 8
                 if (this.useNfc)
                     tile = this.nfc.collapseBiomeTile(x+i,y+o, biome);
-                this.tiles.set(`${x+i}, ${y+o}`, tile || biome) 
+                    worldGrid.tiles.set(`${x+i}, ${y+o}`, tile || biome) 
             }
         }
         if (this.useNfc)
@@ -118,8 +119,8 @@ export class BiomeFunctionCollapse {
     draw() {
         if (!this.ready) return;
         //testing entire board shifts
-        var x = -100;
-        var y = 500;
+        var x = worldGrid.x;
+        var y = worldGrid.y;
         
         var c = worldGrid.chunkSize*2; //grid space
         this.genChunk((this.i*(c*2))+x,(this.o*c)+y,c*2,c)
@@ -146,7 +147,7 @@ export class BiomeFunctionCollapse {
                 ); 
 
                 else {
-                    var biome = this.tiles.get(`${x+i}, ${y+o}`)
+                    var biome = worldGrid.tiles.get(`${x+i}, ${y+o}`)
                 if (biome&&biome.biome) {
                     p.fill(biome.biome.color)
                     p.rect(v.x, v.y, v.w, v.h)
