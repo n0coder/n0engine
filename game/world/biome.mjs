@@ -5,7 +5,7 @@ export function mapDeep(arr, mapFn) {
 export const biomeFactorMap = new Map()
 export function addBiomeFactors(map, factor) {
     var ranges = map.exportRanges(factor)
-    ranges.forEach(r=>{
+    ranges.forEach(r => {
         var [tag, fact, min, max] = r;
         var obj = { factor: fact, min: min, max: max }
         biomeFactorMap.set(tag, obj)
@@ -16,17 +16,17 @@ export function addBiomeFactors(map, factor) {
 export class Biome {
     constructor(name, color, tags, tiles) {
         this.name = name
-        this.color = color || [255, 0, 255]; 
-        this.tags = tags; 
-        this.factors = (tags!=null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
+        this.color = color || [255, 0, 255];
+        this.tags = tags;
+        this.factors = (tags != null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
         this.tiles = tiles || []
     }
     copy(name, color) {
-        let biome = new Biome(name||this.name, color||this.color);
+        let biome = new Biome(name || this.name, color || this.color);
         biome.difficulty = this.difficulty;
         if (this.factors != null)
             biome.factors = this.factors.slice();
-        if (this.tags != null) 
+        if (this.tags != null)
             biome.tags = this.tags.slice();
         return biome;
     }

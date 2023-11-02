@@ -14,44 +14,44 @@ export class n0FunctionCollapse {
     blocks(size = 5, w, h, rules) {
         for (let i = 0; i <= w; i += size - 1) {
             for (let o = 0; o <= h; o += size - 1) {
-                this.block(i, o, size,w,h, rules)
+                this.block(i, o, size, w, h, rules)
             }
         }
 
     }
-    blocksBiome(x,y, w, h, size) { 
+    blocksBiome(x, y, w, h, size) {
         for (let i = 0; i <= w; i++) {
-        for (let o = 0; o <= h; o++) {
-            this.block(x+i, y+o, w,h)
+            for (let o = 0; o <= h; o++) {
+                this.block(x + i, y + o, w, h)
+            }
         }
     }
-    }
-    block(i, o, w,h) {
+    block(i, o, w, h) {
         let good = true;
         let broken = [];
 
-        
+
         for (let x = -1; x < 1; x++) {
-            let ix = i+x;
-            if (ix > i+w) break;
+            let ix = i + x;
+            if (ix > i + w) break;
             for (let y = -1; y < 1; y++) {
-                let oy = o+y;
-                if (oy> o+h) break;
+                let oy = o + y;
+                if (oy > o + h) break;
                 let k = `${ix}, ${oy}`;
 
                 var iv = n0grid.get(k)
-                
+
                 if (iv) {
-                    if (iv.tile.option == null)   {
+                    if (iv.tile.option == null) {
                         let biomes = []
-                        var uiv = n0grid.get(`${ix}, ${oy-1}`)
-                        if (uiv&& uiv.tile.option && uiv.biome) biomes.push(uiv.biome.biome.name)
-                        var riv = n0grid.get(`${ix+1}, ${oy}`)
-                        if (riv&& riv.tile.option&& riv.biome)  biomes.push(riv.biome.biome.name)
-                        var div = n0grid.get(`${ix}, ${oy+1}`)
-                        if (div&& div.tile.option&& div.biome)  biomes.push(div.biome.biome.name)
-                        var liv = n0grid.get(`${ix-1}, ${oy}`)
-                        if (liv&& liv.tile.option&& liv.biome) biomes.push(liv.biome.biome.name)
+                        var uiv = n0grid.get(`${ix}, ${oy - 1}`)
+                        if (uiv && uiv.tile.option && uiv.biome) biomes.push(uiv.biome.biome.name)
+                        var riv = n0grid.get(`${ix + 1}, ${oy}`)
+                        if (riv && riv.tile.option && riv.biome) biomes.push(riv.biome.biome.name)
+                        var div = n0grid.get(`${ix}, ${oy + 1}`)
+                        if (div && div.tile.option && div.biome) biomes.push(div.biome.biome.name)
+                        var liv = n0grid.get(`${ix - 1}, ${oy}`)
+                        if (liv && liv.tile.option && liv.biome) biomes.push(liv.biome.biome.name)
                         biomes = [...new Set(biomes)];
                         biomes.sort();
                         var combinations = [];
@@ -60,10 +60,10 @@ export class n0FunctionCollapse {
                                 combinations.push(biomes[i] + "+" + biomes[j]);
                             }
                         }
-                        var rules = combinations.map(c=> n0jointtiles.get(c)) 
+                        var rules = combinations.map(c => n0jointtiles.get(c))
                         rules = rules.flat(3);
                         iv.tile = new Cell(rules)
-                        broken.push([ix,oy]);
+                        broken.push([ix, oy]);
                     }
                 }
             }
@@ -85,27 +85,27 @@ export class n0FunctionCollapse {
             if (!visited.get(`${a[0]}, ${a[1]}`)) {
 
                 let t = 0;
-            var co = this.collapseTile(a[0], a[1]);
-            if (co) {
-                if (!co.tile) {
-                    console.log(a) 
+                var co = this.collapseTile(a[0], a[1]);
+                if (co) {
+                    if (!co.tile) {
+                        console.log(a)
+                    }
+                    if (!co.later) {
+                        later.shift();
+                        continue;
+                    }
                 }
-                if (!co.later) {
-                    later.shift();
-                    continue;
-                }
-            } 
-            let o = co.later;
-            visited.set(`${a[0]}, ${a[1]}`, true);
+                let o = co.later;
+                visited.set(`${a[0]}, ${a[1]}`, true);
 
                 for (const point of o) {
                     if (visited.get(`${point[0]}, ${point[1]}`)) continue;
                     later.push(point);
                 }
-            later.shift();
+                later.shift();
             } else later.shift();
         } while (later.length > 0);
-        
+
     }
     collapseBiomeTile(x, y, biome) {
         let tile = n0grid.get(`${x}, ${y}`)
@@ -116,14 +116,14 @@ export class n0FunctionCollapse {
 
         var rules = biome.biome.tiles
         if (rules != null) {
-        if (!tile) {
-            tile = {tile: new Cell(rules), biome}
-            n0grid.set(`${x}, ${y}`, tile)
-        }
+            if (!tile) {
+                tile = { tile: new Cell(rules), biome }
+                n0grid.set(`${x}, ${y}`, tile)
+            }
         }
 
         if (tile.tile.option) return { later, tile };
-        biome.tile = tile; 
+        biome.tile = tile;
         var myOptions = tile.tile.options.slice();
 
 
@@ -138,20 +138,20 @@ export class n0FunctionCollapse {
                 sum = lerp(-1, 1, sum)
                 valid.set(t.factor, valid.get(t.factor) || (sum > t.min && sum < t.max))
             }
-            for (var [k,v] of valid) {
+            for (var [k, v] of valid) {
                 if (!v) {
-                   var i = myOptions.indexOf(o);
-                   myOptions.splice(i, 1)
-                } 
+                    var i = myOptions.indexOf(o);
+                    myOptions.splice(i, 1)
+                }
             }
         }
 
         let later = []
-        checkDir(x, y - 1, (a, b) =>a.isUp(b))
+        checkDir(x, y - 1, (a, b) => a.isUp(b))
         checkDir(x + 1, y, (a, b) => a.isRight(b))
         checkDir(x, y + 1, (a, b) => a.isDown(b))
         checkDir(x - 1, y, (a, b) => a.isLeft(b))
-        var myOptionvs = myOptions.slice().map(o=>{
+        var myOptionvs = myOptions.slice().map(o => {
             var tvt = n0tiles.get(o);
             if (!tvt) return null;
             let multiple = 1;
@@ -161,11 +161,11 @@ export class n0FunctionCollapse {
                 var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
                 multiple *= lerp(-t.value, t.value, bias)
             }
-            return { option:o, bias:multiple }
+            return { option: o, bias: multiple }
         })
-        
+
         tile.tile.option = this.weightedRandom(myOptionvs);
-        
+
         return { later, tile };
         function checkDir(x, y, conditionFunc) {
             var b = n0grid.get(`${x}, ${y}`)?.tile;
@@ -175,7 +175,7 @@ export class n0FunctionCollapse {
                 myOptions = myOptions.filter(a => {
                     if (a == null) return false;
                     var at = n0tiles.get(a);
-                    if (at != null && bt !=null)
+                    if (at != null && bt != null)
                         return conditionFunc(at, bt)
                 });
                 return bt
@@ -187,23 +187,23 @@ export class n0FunctionCollapse {
     collapseTile(x, y, rules) {
         let tile = n0grid.get(`${x}, ${y}`)
         if (rules != null) //if we pipe in rules we make new tile
-        if (!tile) {
-            tile = {tile: new Cell(rules)}
-            n0grid.set(`${x}, ${y}`, tile)
-        }
+            if (!tile) {
+                tile = { tile: new Cell(rules) }
+                n0grid.set(`${x}, ${y}`, tile)
+            }
         if (!tile) return null;
         var myOptions = tile.tile.options.slice();
         if (tile.tile.option) return tile;
-        
-        
-        
-        let later = []
-        let upoption = checkDir(x, y - 1, (a, b) =>a.isUp(b))
-        let rightoption =checkDir(x + 1, y, (a, b) => a.isRight(b))
-        let downoption =checkDir(x, y + 1, (a, b) => a.isDown(b))
-        let leftoption =checkDir(x - 1, y, (a, b) => a.isLeft(b))
 
-        var myOptionvs = myOptions.slice().map(o=>{
+
+
+        let later = []
+        let upoption = checkDir(x, y - 1, (a, b) => a.isUp(b))
+        let rightoption = checkDir(x + 1, y, (a, b) => a.isRight(b))
+        let downoption = checkDir(x, y + 1, (a, b) => a.isDown(b))
+        let leftoption = checkDir(x - 1, y, (a, b) => a.isLeft(b))
+
+        var myOptionvs = myOptions.slice().map(o => {
             var tvt = n0tiles.get(o);
             let multiple = 1;
             if (!tvt) return null //{ option:o, bias }
@@ -212,52 +212,52 @@ export class n0FunctionCollapse {
                 var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
                 multiple *= lerp(-t.value, t.value, bias)
             }
-            return { option:o, bias }
+            return { option: o, bias }
         })
 
         tile.tile.option = this.weightedRandom(myOptionvs);
         if (tile.tile.option == null) {
             let sides = []
             let count = 0
-        
+
             if (upoption) {
                 sides.push(upoption.down)
                 count++
             } else {
                 sides.push(["?,?,?"])
             }
-        
+
             if (rightoption) {
                 sides.push(rightoption.down)
                 count++
             } else {
                 sides.push(["?,?,?"])
             }
-        
+
             if (downoption) {
                 sides.push(downoption.down)
                 count++
             } else {
                 sides.push(["?,?,?"])
             }
-        
+
             if (leftoption) {
                 sides.push(leftoption.down)
                 count++
             } else {
                 sides.push(["?,?,?"])
             }
-        
+
             if (count > 3) {
                 var tzis = [
-                    upoption?.down[0],upoption?.down[1],upoption?.down[2], rightoption?.left[1], rightoption?.left[2],
+                    upoption?.down[0], upoption?.down[1], upoption?.down[2], rightoption?.left[1], rightoption?.left[2],
                     downoption?.up[0], downoption?.up[0], leftoption?.right[1]
                 ]
-        
-                document.an0FailedTiles.push({tzis, sides})
+
+                document.an0FailedTiles.push({ tzis, sides })
             }
         }
-        
+
         return { later, tile };
         function checkDir(x, y, conditionFunc) {
             var b = n0grid.get(`${x}, ${y}`)?.tile;
@@ -267,7 +267,7 @@ export class n0FunctionCollapse {
                 myOptions = myOptions.filter(a => {
                     if (a == null) return false;
                     var at = n0tiles.get(a);
-                    if (at != null && bt !=null)
+                    if (at != null && bt != null)
                         return conditionFunc(at, bt)
                 });
                 return bt
@@ -285,30 +285,30 @@ export class n0FunctionCollapse {
         }
 
         let cell = n0grid.get(index);
-if (cell) {
-    var img = null;
-    if (typeof cell.tile.option === 'string') {
-        img = n0tiles.get(cell.tile.option).img;
-    }
-    if (img && drawImg) {
-        drawImg(cell, img);
-    } else {
-        var color = cell?.biome?.biome?.color;
-        if (color && drawColor) {
-            drawColor(cell, color);
+        if (cell) {
+            var img = null;
+            if (typeof cell.tile.option === 'string') {
+                img = n0tiles.get(cell.tile.option).img;
+            }
+            if (img && drawImg) {
+                drawImg(cell, img);
+            } else {
+                var color = cell?.biome?.biome?.color;
+                if (color && drawColor) {
+                    drawColor(cell, color);
+                }
+            }
         }
-    }
-}
 
     }
     weightedRandom(items) {
         items = items.filter(a => a != null && n0tiles.get(a.option) != null)
-        
-        var totalWeight = items.reduce((total, item) => total + (n0tiles.get(item.option).weight+(item.bias||0) || 1), 0);
+
+        var totalWeight = items.reduce((total, item) => total + (n0tiles.get(item.option).weight + (item.bias || 0) || 1), 0);
         var random = this.alea() * totalWeight;
         var cumulativeWeight = 0;
         for (var i = 0; i < items.length; i++) {
-            cumulativeWeight += n0tiles.get(items[i].option).weight+(items[i].bias||0) || 1;
+            cumulativeWeight += n0tiles.get(items[i].option).weight + (items[i].bias || 0) || 1;
             if (random < cumulativeWeight) {
                 return items[i].option;
             }

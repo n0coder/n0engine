@@ -15,12 +15,12 @@ class Bone {
 
 export class Poser {
     constructor() {
-        this.root = new Bone('root',0,0, 10, 0, null);
-        this.pelvis = new Bone('pelvis', 0,0,10, 0, this.root);
-        this.leftLeg = new Bone('leftLeg',0,0, 20, 0,this.pelvis);
-        this.rightLeg = new Bone('rightLeg', 0,0,20,0, this.pelvis);
-        this.leftFoot = new Bone('leftFoot', 0,0,10, 0,this.leftLeg);
-        this.rightFoot = new Bone('rightFoot',0,0, 10, 0,this.rightLeg);
+        this.root = new Bone('root', 0, 0, 10, 0, null);
+        this.pelvis = new Bone('pelvis', 0, 0, 10, 0, this.root);
+        this.leftLeg = new Bone('leftLeg', 0, 0, 20, 0, this.pelvis);
+        this.rightLeg = new Bone('rightLeg', 0, 0, 20, 0, this.pelvis);
+        this.leftFoot = new Bone('leftFoot', 0, 0, 10, 0, this.leftLeg);
+        this.rightFoot = new Bone('rightFoot', 0, 0, 10, 0, this.rightLeg);
     }
     draw() {
 

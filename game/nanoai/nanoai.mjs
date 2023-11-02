@@ -23,14 +23,14 @@ export class Nanoai {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
-        this.speed = 48*2;        
+        this.speed = 48 * 2;
         loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
-        this.inventory = new NanoInventory(3, [[-7,-10], [7,-10], [0, -20]]);
+        this.inventory = new NanoInventory(3, [[-7, -10], [7, -10], [0, -20]]);
         this.setActive = setActive;
         this.setActive(true)
-        this.renderOrder =1;
-        this.working =false
+        this.renderOrder = 1;
+        this.working = false
         this.frame = 0, this.t = 0;
     }
     //keeping track of an unknown x and y center is easier with this calculation function
@@ -54,31 +54,31 @@ export class Nanoai {
     }
 
     draw() {
-        //if (this.working) 
-        this.brain.work(this);
+        if (this.working)
+            this.brain.work(this);
 
-        if (!this.cimg) 
-        this.cimg = this.img;
+        if (!this.cimg)
+            this.cimg = this.img;
 
-        if (this.vy > 0.1) 
+        if (this.vy > 0.1)
             this.cimg = getAnimation("nano", "walkDown", ticks)
         else if (this.vy < -0.1) {
             this.cimg = getAnimation("nano", "walkUp", ticks)
         } else if (this.vx > 0.1) {
             this.cimg = getAnimation("nano", "walkRight", ticks)
-        }if (this.vx < -0.1) {
+        } if (this.vx < -0.1) {
             this.cimg = getAnimation("nano", "walkLeft", ticks)
         }
-        
-        if (this.cimg) { 
+
+        if (this.cimg) {
             p.image(this.cimg, this.centerX, this.centerY);
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
 
         //if (!this.working) return;
-        
-        
+
+
         this.inventory.draw(this);
     }
 

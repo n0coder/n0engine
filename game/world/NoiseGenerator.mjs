@@ -35,12 +35,12 @@ export class NoiseGenerator {
                 this.mapper = createCubicInterpolator(this.map);
             }
         }
-        this.pointCache = new Map() 
+        this.pointCache = new Map()
         this.inited = false;
     }
 
     init(noise2d) {
-        
+
         if (this.inited) return; //we set up our properties
 
         this.id = noiseCount++;
@@ -94,7 +94,7 @@ export class NoiseGenerator {
     //(if we get the same input multiple times from the same generator)
     //we can skip generation, just return what we already calculated
     //this would optimize the way we reuse the same generator
-    
+
     getValue(x, y) {
         var value = this.pointCache.get(`${x}, ${y}`) //take from cache
         if (value) return value;
@@ -111,12 +111,12 @@ export class NoiseGenerator {
 
         if (this.mapper) {
             var sim = inverseLerp(minm, maxm, sum); //shift into 0 to 1 space
-            sum = clamp(this.mapSpace[0],this.mapSpace[1], this.mapper(sim));
+            sum = clamp(this.mapSpace[0], this.mapSpace[1], this.mapper(sim));
             minm = this.mapSpace[0]
             maxm = this.mapSpace[1]
-            }
-        
-            //sum = lerp(minm, maxm, sim);
+        }
+
+        //sum = lerp(minm, maxm, sim);
 
         ({ sum, minm, maxm } = this.doMultiply(x, y, sum, minm, maxm));
         ({ sum, minm, maxm } = this.doAdd(x, y, sum, minm, maxm));
@@ -131,9 +131,9 @@ export class NoiseGenerator {
                 ({ sum, minm, maxm } = this.classicBlend(x, y, sum, minm, maxm, blendWeight));
             } else {
                 let { ominm, omaxm, osum } = this.newBlend(minm, maxm, sum, x, y, blendPower, blendWeight);
-                sum=osum
-                minm=ominm
-                maxm =omaxm
+                sum = osum
+                minm = ominm
+                maxm = omaxm
             }
         }
         value = { sum, minm, maxm }
@@ -141,7 +141,7 @@ export class NoiseGenerator {
         return value
     }
 
-    newBlend( minm, maxm, sum, x, y, blendPower, blendWeight) {
+    newBlend(minm, maxm, sum, x, y, blendPower, blendWeight) {
         var sim = inverseLerp(minm, maxm, sum);
         var { sums, nvu } = this.blendSumMinMax(x, y, sim, blendPower);
 
@@ -150,7 +150,7 @@ export class NoiseGenerator {
         let [min, max] = sums.reduce(([prevMin, prevMax], curr) => [Math.min(prevMin, curr), Math.max(prevMax, curr)], [Infinity, -Infinity]);
         minm = lerp(minm, min, blendWeight);
         maxm = lerp(maxm, max, blendWeight);
-        return {  ominm:minm, omaxm:maxm, osum:sum };
+        return { ominm: minm, omaxm: maxm, osum: sum };
     }
 
     blendSumMinMax(x, y, sim, blendPower) {
@@ -196,13 +196,13 @@ export class NoiseGenerator {
     //should i pow in abs?
     //math.pow(math.abs(sim))
     doPow(x, y, minm, maxm, sum) {
-        if (minm>sum) console.log("sum is lower than minm", {sum, minm})
+        if (minm > sum) console.log("sum is lower than minm", { sum, minm })
         var sim = inverseLerp(minm, maxm, sum);
 
         // console.log([1,minm, sum, maxm])
 
         var exponent = this.toValue(this.power, x, y);
-//world low blend
+        //world low blend
         var osim = Math.pow(sim, exponent);
 
         sum = lerp(minm, maxm, osim); //LOL

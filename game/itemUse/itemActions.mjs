@@ -1,5 +1,5 @@
 export const itemActions = new Map();
-itemActions.getset= function(actions) {
+itemActions.getset = function (actions) {
     let v = this.get(actions);
     if (!v) {
         v = new Map()
@@ -8,7 +8,7 @@ itemActions.getset= function(actions) {
     return v;
 }
 export const workProfile = new Map();
-export function useItems (nanoai, origin, actions) {
+export function useItems(nanoai, origin, actions) {
 
     var nanosItems = workProfile.get(nanoai);
     if (nanosItems) {
@@ -36,15 +36,15 @@ export function useItems (nanoai, origin, actions) {
             var action = actionSet.get(item.constructor.name)
             if (action) {
                 var obj = {
-                    isDone: false, 
-                    done:function() {
+                    isDone: false,
+                    done: function () {
                         this.isDone = true
-                    } 
+                    }
                 }
                 action(nanoai, item, origin, obj);
                 nanosItems.set(item.constructor.name, obj);
             }
         }
-        return true 
+        return true
     }
 }

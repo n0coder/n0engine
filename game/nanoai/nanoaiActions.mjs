@@ -12,38 +12,38 @@ export const nanoaiActions = new Map([
         args: [],
         path: null,
         work: function (nano) {
-            var vx = this.args[0]-nano.x;
-            var vy = this.args[1]-nano.y;
-            var mag = Math.sqrt((vx *vx)+(vy*vy))
-            if (mag <= worldGrid.gridSize*1.5) {
+            var vx = this.args[0] - nano.x;
+            var vy = this.args[1] - nano.y;
+            var mag = Math.sqrt((vx * vx) + (vy * vy))
+            if (mag <= worldGrid.gridSize * 1.5) {
                 nano.vx = 0;
                 nano.vy = 0;
                 return false;
             }
-            
-            if (!this.path) 
-                findPath(nano.x, nano.y, this.args[0],this.args[1], 32, 4, (path)=> {
-                this.path = path;
-           });
-           if (this.path) {
-                p.fill(255); 
-                p.image( this.path.graphics, nano.x, nano.y)
+
+            if (!this.path)
+                findPath(nano.x, nano.y, this.args[0], this.args[1], worldGrid.gridSize * 4, 4, (path) => {
+                    this.path = path;
+                });
+            if (this.path) {
+                p.fill(255);
+                p.image(this.path.graphics, nano.x, nano.y)
                 if (!this.path.currentPoint) console.error("the point went null?", this.path, mag);
-            p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2 )
-            let ped = this.path.currentPointDistance(nano.x, nano.y);
-            if (ped < worldGrid.gridSize/2) {
-                if(!this.path.isFinalPoint) {
-                    this.path.next();
+                p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2)
+                let ped = this.path.currentPointDistance(nano.x, nano.y);
+                if (ped < worldGrid.gridSize / 2) {
+                    if (!this.path.isFinalPoint) {
+                        this.path.next();
                     }
-                else this.path=null;
+                    else this.path = null;
+                }
+                if (this.path)
+                    walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
             }
-            if (this.path)
-            walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
-            }
-           return true; 
-        
-    },
-        clone: function(...args) {
+            return true;
+
+        },
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
@@ -51,102 +51,102 @@ export const nanoaiActions = new Map([
         args: [],
         work: function (nano) {
             console.log(this);
-           return false
+            return false
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
     ["follow", {
         args: [],
-        targetX:null, targetY:null, path:null,
+        targetX: null, targetY: null, path: null,
         work: function (nano) {
-            var vx = this.args[0].x-nano.x;
-            var vy = this.args[0].y-nano.y;
-            var mag = Math.sqrt((vx *vx)+(vy*vy))
-            if (mag <= worldGrid.gridSize ) {
+            var vx = this.args[0].x - nano.x;
+            var vy = this.args[0].y - nano.y;
+            var mag = Math.sqrt((vx * vx) + (vy * vy))
+            if (mag <= worldGrid.gridSize) {
                 nano.vx = 0;
                 nano.vy = 0;
                 return false;
             }
 
-            var vtx= this.args[0].x - this.targetX;
-            var vty= this.args[0].y - this.targetY;
-            var tmag = Math.sqrt((vtx *vtx)+(vty*vty))
+            var vtx = this.args[0].x - this.targetX;
+            var vty = this.args[0].y - this.targetY;
+            var tmag = Math.sqrt((vtx * vtx) + (vty * vty))
             if (!this.path) //if target moves a whole tile we retarget the new tile lol 
-                findPath(nano.x, nano.y, this.args[0].x,this.args[0].y, 32, 4, (path)=> {
-                this.targetX = this.args[0].x
-                this.targetY = this.args[0].y
-                this.path = path;
-           });
-           else {
-            p.fill(255); 
+                findPath(nano.x, nano.y, this.args[0].x, this.args[0].y, 32, 4, (path) => {
+                    this.targetX = this.args[0].x
+                    this.targetY = this.args[0].y
+                    this.path = path;
+                });
+            else {
+                p.fill(255);
 
-            p.image( this.path.graphics, nano.x, nano.y)
-            p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2 )
-            let ped = this.path.currentPointDistance(nano.x, nano.y);
-            if (ped < worldGrid.gridSize/2) {
-                if(!this.path.isFinalPoint) {
-                    this.path.next();
+                p.image(this.path.graphics, nano.x, nano.y)
+                p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2)
+                let ped = this.path.currentPointDistance(nano.x, nano.y);
+                if (ped < worldGrid.gridSize / 2) {
+                    if (!this.path.isFinalPoint) {
+                        this.path.next();
                     }
-                else {
-                    this.path=null;
+                    else {
+                        this.path = null;
                     }
-            }
-            if (this.path)
-            walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
+                }
+                if (this.path)
+                    walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
             }
             return true
         },
         //clone before setting the variable
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
-    ["pickup", { 
+    ["pickup", {
         args: [],
-        before: ["follow"], 
+        before: ["follow"],
         work: function (nano) {
             return !nano.inventory.add(this.args[0], this.args[1])
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
-    ["equip", { 
+    ["equip", {
         args: [],
         work: function (nano) {
             return !nano.inventory.equip(this.args[0])
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
-    ["harvest", { 
+    ["harvest", {
         args: [],
-        before: ["follow"], 
+        before: ["follow"],
         work: function (nano) {
-            if (this.args[0]&&this.args[0].harvest) 
+            if (this.args[0] && this.args[0].harvest)
                 return this.args[0].harvest(nano);
             return false
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
-    ["use", { 
-        args: [], 
+    ["use", {
+        args: [],
         work: function (nano) {
             if (this.args[0].use) {
                 var action = this.args[0].use(nano);
                 return action
             }
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
-    ["plant", { 
+    ["plant", {
         args: [],
         before: ["follow"],
         work: function (nano) {
@@ -156,65 +156,65 @@ export const nanoaiActions = new Map([
                 return wait
             }
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
-    }], 
-    ["transform", { 
+    }],
+    ["transform", {
         args: [],
         work: function (nano) {
 
             var nano2 = nano.inventory.hasItem("Nanoai")
             if (nano2) {
-            var cloudium = nano.inventory.hasItems("Circle", 2)
-            if (cloudium) {
-                var cloudium2 = nano2.inventory.hasItems("Circle", 2)
-                if (cloudium2) {
-                    this.puff = new Puff(nano.x,nano.y,10,60,16, ()=> {
-                    nano.mommy = new Mommyai(nano.name, nano.x, nano.y);
-                    nano.mommy.nano = nano;
-                    nano.mommy.nano2 = nano2;
-                    nano.inventory.transfer(nano.mommy.inventory)
-                    nano2.inventory.transfer(nano.mommy.inventory)
-                    nano.mommy.inventory.remove(nano)
-                    nano.mommy.inventory.remove(nano2)
-                    nano.setActive(false)
-                    nano2.setActive(false)
-                    nano.mommy.inventory.refresh();
-                    })
-                }
-                else console.log("held nanoai is not holding cloudium")
-            } else console.log("not holding cloudium")
+                var cloudium = nano.inventory.hasItems("Circle", 2)
+                if (cloudium) {
+                    var cloudium2 = nano2.inventory.hasItems("Circle", 2)
+                    if (cloudium2) {
+                        this.puff = new Puff(nano.x, nano.y, 10, 60, 16, () => {
+                            nano.mommy = new Mommyai(nano.name, nano.x, nano.y);
+                            nano.mommy.nano = nano;
+                            nano.mommy.nano2 = nano2;
+                            nano.inventory.transfer(nano.mommy.inventory)
+                            nano2.inventory.transfer(nano.mommy.inventory)
+                            nano.mommy.inventory.remove(nano)
+                            nano.mommy.inventory.remove(nano2)
+                            nano.setActive(false)
+                            nano2.setActive(false)
+                            nano.mommy.inventory.refresh();
+                        })
+                    }
+                    else console.log("held nanoai is not holding cloudium")
+                } else console.log("not holding cloudium")
             } else console.log("not holding nanoai")
             return false
         },
-        clone: function(...args) {
+        clone: function (...args) {
             return handleClone(this, ...args)
         }
     }]
 ])
 
-export function handleClone(obj,...args) {
+export function handleClone(obj, ...args) {
     //clone the object deeply
     let clone = atomicClone(obj);
     //drop in args
-    clone.args  = [...args];
+    clone.args = [...args];
     //collect prerequisite actions
     let action = [];
-    if (clone.before != undefined) { 
+    if (clone.before != undefined) {
         for (let i = 0; i < clone.before.length; i++) {
-            var beforeAction = handleClone(nanoaiActions.get(clone.before[i]),...args);
+            var beforeAction = handleClone(nanoaiActions.get(clone.before[i]), ...args);
             action.push(...beforeAction)
         }
     };
     //push the current clone afterwards
-    action.push(clone) 
+    action.push(clone)
     //send in prerequisite actions and current action
     return action;
 }
 
 
-export function walk(nano, x,y, magn = 1) {
+export function walk(nano, x, y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))
@@ -224,13 +224,13 @@ export function walk(nano, x,y, magn = 1) {
     vy /= mag;
     if (mag > magn) {
         nano.vx = vx;
-        nano.vy= vy;
+        nano.vy = vy;
     } else {
         nano.vx = 0;
-        nano.vy= 0;
+        nano.vy = 0;
     }
-    nano.x += vx * deltaTime*nano.speed;
-    nano.y += vy * deltaTime*nano.speed;
+    nano.x += vx * deltaTime * nano.speed;
+    nano.y += vy * deltaTime * nano.speed;
 
     return mag > magn;
 }
