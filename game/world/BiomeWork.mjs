@@ -46,7 +46,7 @@ river.add("otheriver", 3.5) //bigest part i thought
 addBiomeFactors(river, "rivers");
 
 var sugar = new RangeMap(0, 1)
-sugar.add("purebitter").add("bitter").add("bitteredge", .1).add("plain", .8)
+sugar.add("purebitter").add("bitter").add("bitteredge", .1).add("plain", 1.8)
 sugar.add("sweetedge", .1).add("sweet").add("puresweet");
 addBiomeFactors(sugar, "sugar");
 
@@ -57,21 +57,32 @@ addBiomeFactors(fantasy, "fantasy");
 
 export var biomes = []
 
+let lut = {"deepWater": [46, 81, 170]}
+
+
+
+var fan = new Biome("fantasy", [255, 255, 255], ["fantasy"])
+//biomes.unshift(fan)
+var fabn = new Biome("fabntasy", [0, 0, 0], ["plain"])
+biomes.unshift(fabn)
+
 var deepwatera = new Biome("deepwater", [46, 81, 170], ["deep"])
+deepwatera.difficulty = 5;
 biomes.push(deepwatera)
-biomes.unshift(deepwatera.copy("bitterdeepwater", [30, 54, 84]).addFactors([["bitteredge"], ["bitter", "fantasy"]]))
-biomes.unshift(deepwatera.copy("sweetdeepwater", [48, 170, 179]).addFactors([["sweetedge"], ["sweet", "fantasy"]]))
-biomes.unshift(deepwatera.copy("puresweetdeepwater", [137, 159, 209]).addFactor("puresweet").addFactor("fantasy"))
+
+biomes.unshift(deepwatera.copy("bitterdeepwater", [20, 44, 64]).addFactors([["bitteredge"], ["fantasy","bitter"]]))
+biomes.unshift(deepwatera.copy("sweetdeepwater", [48, 170, 179]).addFactors([["sweetedge"], ["fantasy","sweet"]]))
+biomes.unshift(deepwatera.copy("puresweetdeepwater", [255, 159, 209]).addFactors(["puresweet"]))//.addFactor("puresweet"))
 
 var icydeepwater = new Biome("icydeepwater", [88, 134, 219], ["deep", "frozen"]) //make sweet and bitter ice
 biomes.unshift(icydeepwater)
 
-var watera = new Biome("water", [60, 147, 171], [["low"]])
+var watera = new Biome("water", [60, 147, 171], ["low"])
 watera.difficulty = 4;
 biomes.unshift(watera)
-biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactors([["bitteredge"], ["bitter", "fantasy"]]))
-biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactors([["sweetedge"], ["sweet", "fantasy"]]))
-biomes.unshift(watera.copy("puresweetwater", [169, 235, 210]).addFactor("puresweet").addFactor("fantasy"))
+biomes.unshift(watera.copy("bitterwater", [30, 54, 84]).addFactors([["bitteredge"], ["fantasy","bitter"]]))
+biomes.unshift(watera.copy("sweetwater", [60, 191, 171]).addFactors([["sweetedge"], ["fantasy","sweet"]]))
+biomes.unshift(watera.copy("puresweetwater", [169, 235, 210]).addFactor("puresweet"))
 var icywater = new Biome("icywater", [117, 191, 222], ["low", "frozen"]) //make sweet and bitter ice/
 biomes.unshift(icywater)
 
@@ -119,9 +130,9 @@ biomes.unshift(riverborder)
 
 var not = new Biome("river", [60, 147, 171], ["river", [surface], ["border"]])
 biomes.unshift(not)
-biomes.unshift(not.copy("bitterriverwater", [30, 54, 84]).addFactors([["bitteredge"], ["bitter", "fantasy"]]))
-biomes.unshift(not.copy("sweetriverwater", [60, 191, 171]).addFactors([["sweetedge"], ["sweet", "fantasy"]]))
-biomes.unshift(not.copy("puresweetriverwater", [169, 235, 210]).addFactor("puresweet").addFactor("fantasy"))
+biomes.unshift(new Biome("bitterriverwater", [30, 54, 84], ["river", [surface,["bitteredge"], ["fantasy","bitter"]], ["border",["bitteredge"], ["fantasy","bitter"]]]))//.addFactors([["bitteredge"], ["fantasy","bitter"]]))
+biomes.unshift(new Biome("sweetriverwater", [60, 191, 171], ["river", [surface,["bitteredge"], ["fantasy","bitter"]], ["border",["bitteredge"], ["fantasy","bitter"]]]))//.addFactors([["sweetedge"], ["fantasy","sweet"]]))
+biomes.unshift(new Biome("puresweetriverwater", [169, 235, 210], ["river", [surface,["bitteredge"], ["fantasy","bitter"]], ["border",["bitteredge"], ["fantasy","bitter"]]]))//.addFactor("puresweet"))
 
 
 
@@ -134,10 +145,6 @@ var icymountaina = new Biome("icymountain", [163, 200, 222], ["high", ["cold"], 
 var mountainTipa = new Biome("mountaintip", [200, 200, 210], ["cloud"])
 biomes.unshift(icymountaina, mountaina, mountainTipa);
 
-var fan = new Biome("fantasy", [255, 255, 255], ["fantasy"])
-//biomes.unshift(fan)
-var fabn = new Biome("fabntasy", [0, 0, 0], ["plain"])
-//biomes.unshift(fabn)
 // function to map the objects in the biome array to a true or false value based on the ruleset
 function mapBiome(biome, soku) {
     return biome.map(item => {

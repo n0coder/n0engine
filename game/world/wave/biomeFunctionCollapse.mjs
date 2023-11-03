@@ -27,6 +27,7 @@ export class BiomeFunctionCollapse {
         this.i = 0;
         this.o = 0;
         this.ready = false;
+        this.read = false;
         this.useNfc = false;
 
         if (this.useNfc) {
@@ -55,7 +56,7 @@ export class BiomeFunctionCollapse {
 
                 var biome = getBiome(x + i, y + o)
                 biome.x = x + i, biome.y = y + o;
-                biome.pathDifficulty = biome.biome.difficulty; //can't walk through an 8
+                biome.pathDifficulty = biome?.biome != null ? biome?.biome?.difficulty : 9; //can't walk through an 8
                 if (this.useNfc)
                     tile = this.nfc.collapseBiomeTile(x + i, y + o, biome);
                 worldGrid.tiles.set(`${x + i}, ${y + o}`, tile || biome)
@@ -149,7 +150,7 @@ export class BiomeFunctionCollapse {
                 else {
                     var biome = worldGrid.tiles.get(`${x + i}, ${y + o}`)
                     if (biome && biome.biome) {
-                        if (biome.read)
+                        if (biome.read && this.read)
                             p.fill(readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255)
                         else 
                             p.fill(biome.biome.color)
@@ -162,6 +163,6 @@ export class BiomeFunctionCollapse {
     }
 
     doubleClicked() {
-        //this.ready = true
+        this.read = !this.read
     }
 }
