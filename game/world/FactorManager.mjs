@@ -1,7 +1,7 @@
 import { RangeMap } from "../../engine/collections/RangeMap.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { blend, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
-import { getABiome } from "./BiomeWork.mjs";
+import { getABiome, getreABiome } from "./BiomeWork.mjs";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
 export const worldFactors = new Map();
@@ -44,7 +44,7 @@ sugarColors.add([248, 247, 249], .2)
 export var read = "sugar", readRaw = false;
 export var minmax = []
 export function getBiome(x, y) {
-    var biomae = getABiome(x + offsetX, y + offsetY)
+    var biomae = getreABiome(x + offsetX, y + offsetY)
     biomae.x = x + offsetX;
     biomae.y = y + offsetY;
     var factor = biomae.genCache.get(read);
@@ -129,7 +129,9 @@ worldFactors.set("humidity", humidity)
 
 var fantasy = new NoiseGenerator({
     scale: scale * 1200, octaves: 4, persistance: .5, lacunarity: 1.5, offsetY: 6472, offsetX: -4343,
-});
+    mapSpace: [0, 1], map: [
+        { "c": 0.05, "y": 0, "p": 2 }, { "c": 0.5, "y": 0.9, "p": 3 }, { "c": .95, "y": 1, "p": 2 }], blend: [-1,1] //bitter zone, original mix, sugar zone
+    });
 worldFactors.set("fantasy", fantasy);
 
 var triverWsforks2 = new NoiseGenerator({ scale: scale * 250, octaves: 5, persistance: .5, lacunarity: 1.3, offset: 0, offsetX: 53, offsetY: 3222, amp: 2 })

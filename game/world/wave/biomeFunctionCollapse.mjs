@@ -56,7 +56,7 @@ export class BiomeFunctionCollapse {
 
                 var biome = getBiome(x + i, y + o)
                 biome.x = x + i, biome.y = y + o;
-                biome.pathDifficulty = biome?.biome != null ? biome?.biome?.difficulty : 9; //can't walk through an 8
+                biome.pathDifficulty = biome?.biome != null ? biome?.biome?.getDifficulty(biome) : 9; //can't walk through an 8
                 if (this.useNfc)
                     tile = this.nfc.collapseBiomeTile(x + i, y + o, biome);
                 worldGrid.tiles.set(`${x + i}, ${y + o}`, tile || biome)
@@ -87,6 +87,8 @@ export class BiomeFunctionCollapse {
 
         return { genCache, biome: biomex.length > 0 ? biomex[0] : null };
     }
+
+    
     mapBiome(biome, soku) {
         return biome.map(item => {
             if (Array.isArray(item)) {
@@ -152,9 +154,11 @@ export class BiomeFunctionCollapse {
                     if (biome && biome.biome) {
                         if (biome.read && this.read)
                             p.fill(readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255)
-                        else 
-                            p.fill(biome.biome.color)
-                        
+                        else {
+                            let colora = biome.biome.colorsugar(biome);
+                            if (colora)
+                            p.fill(colora)
+                        }
                         p.rect(v.x, v.y, v.w, v.h)
                     }
                 }
