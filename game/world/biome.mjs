@@ -1,5 +1,6 @@
 import { p } from "../../engine/core/p5engine.mjs";
-import { cubicBlendW, inverseLerp } from "../../engine/n0math/ranges.mjs";
+import { cubicBlendW, inverseLerp, posterize } from "../../engine/n0math/ranges.mjs";
+import { luts } from "./BiomeWork.mjs";
 
 export function mapDeep(arr, mapFn) {
     return arr.map(item => Array.isArray(item) ? mapDeep(item, mapFn) : mapFn(item));
@@ -18,23 +19,24 @@ export function addBiomeFactors(map, factor) {
 export class Biome {
     constructor(name, color, tags, tiles) {
         this.name = name
-        this.bitter = Array.isArray(color[0]) ? color[0]: null;
-        this.plain = Array.isArray(color[1]) ? color[1]: null;
-        this.sugar = Array.isArray(color[2]) ? color[2]: null;
+        this.bitter = luts[0][name] || [255,0,255]
+        this.plain = luts[1][name]|| [255,0,255]
+        this.sugar = luts[2][name]|| [255,0,255]
+        this.sugarLevel = color;
+        this.difficulty = 1;
         this.color = color;
         this.tags = tags;
         this.factors = (tags != null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
         this.tiles = tiles || []
     }
     colorsugar (biome){
-        var gc = biome.genCache.get("sugar");
-        
-        let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
         if (!this.bitter || !this.plain || !this.sugar) {
-        
             return this.color;
-
         }
+        var gc = biome.sugar;
+        let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
+        //isu = posterize(isu, 5)
+
         let r = cubicBlendW([this.bitter[0], this.plain[0], this.sugar[0]], isu, 2)
         let g = cubicBlendW([this.bitter[1], this.plain[1], this.sugar[1]], isu, 2)
         let b = cubicBlendW([this.bitter[2], this.plain[2], this.sugar[2]], isu, 2)

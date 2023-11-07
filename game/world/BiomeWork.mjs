@@ -46,7 +46,7 @@ river.add("otheriver", 3.5) //bigest part i thought
 addBiomeFactors(river, "rivers");
 
 var sugar = new RangeMap(0, 1)
-sugar.add("purebitter").add("bitter").add("plain",2).add("sweet").add("puresweet");
+sugar.add("purebitter").add("bitter").add("plain",4).add("sweet").add("puresweet");
 addBiomeFactors(sugar, "sugar");
 
 var fantasy = new RangeMap(0, 1);
@@ -76,7 +76,7 @@ let originallut = {
 let newlut = {
     "deepwater": [48, 81, 138], "bitterdeepwater": [32, 43, 54], "sweetdeepwater": [38,134, 163],
     "water": [68, 122, 156], "bitterwater": [43, 53,70], "sugarwater": [60, 191, 171],
-    "beach": [163, 147, 129], "bitterbeach": [79,79,76], "sweetbeach": [255,225, 202],
+    "beach": [198, 176, 143], "bitterbeach": [79,79,76], "sweetbeach": [255,225, 202],
     "dirt": [147, 111, 102], "bitterdirt": [77,65,68], "sweetdirt": [246, 182,190],
     "plains": [157, 199, 104], "bitterplains": [111,114,99], "sweetplains": [161,252,172],
     "savannah": [161, 126,104], "bittersavannah": [80,70,62], "sweetsavannah": [213,173, 131],
@@ -87,36 +87,79 @@ let newlut = {
     "darkforest": [64, 126, 53], "bitterdarkforest": [36, 44, 38], "sweetdarkforest": [87,194,102]
 }
 
-let lut =newlut;
-var deepwatera = new Biome("deepwater", [lut["bitterdeepwater"],lut["deepwater"],lut["sweetdeepwater"]], ["deep"])
-deepwatera.difficulty = 5;
-biomes.unshift(deepwatera)
-
+let sweetlut = {
+    "deepwater": [38, 134, 163],
+    "water": [11, 180, 176],
+    "beach": [236, 217, 196],
+    "dirt": [246, 182,190],
+    "plains": [140,230,182], 
+    "savannah": [213,173, 131], 
+    "forest": [117,196,145],
+    "taiga": [250, 218, 156], 
+    "jungle": [48,219,120],
+    "flowerforest":[128,217,191],
+    "darkforest": [87,194,102], 
+    }
+let bitterlut = {
+    "deepwater": [32, 43, 54], 
+    "water": [43, 53,70],
+    "beach": [79,79,76],
+    "dirt":[77,65,68] ,
+    "plains": [111,114,99] ,
+    "savannah": [80,70,62],
+    "forest":  [101,105,98],
+    "taiga": [92,88,83],
+    "jungle": [48,51,44],
+    "flowerforest": [100,113,105],
+    "darkforest": [36, 44, 38],
+}
+let newlutalt = {
+    "deepwater": [48, 81, 138],
+    "water": [68, 122, 156],
+    "beach": [163, 147, 129], 
+    "dirt": [147, 111, 102],
+    "plains": [157, 199, 104],
+    "savannah": [161, 126,104],
+    "forest": [131, 165, 108], 
+    "taiga": [192, 172, 118],
+    "jungle": [81, 169, 66],
+    "flowerforest": [155, 186, 141], 
+    "darkforest": [64, 126, 53],
+}
+export let luts = {
+    0: bitterlut, 1: newlutalt, 2:sweetlut
+}
 let sweet = [ "sweet"];
 let puresweet = [ "puresweet"];
 let bitter = ["bitter"]
 let purebitter = [ "purebitter"]
+let lut =newlutalt;
+var deepwatera = new Biome("deepwater", 1,  ["deep"])
+deepwatera.difficulty = 5;
+biomes.unshift(deepwatera)
+biomes.unshift(deepwatera.copy("bitterdeepwater", 0).addFactors ([bitter]))
+biomes.unshift(deepwatera.copy("sweetdeepwater", 2).addFactors ([sweet]))
 
 
-var icydeepwater = new Biome("icydeepwater", [88, 134, 219], ["deep", "frozen"]) //make sweet and bitter ice
+var icydeepwater = new Biome("icydeepwater", 0, ["deep", "frozen"]) //make sweet and bitter ice
 //biomes.unshift(icydeepwater)
 
-var watera = new Biome("water", [lut["bitterwater"],lut["water"],lut["sweetwater"]], ["low"])
+var watera = new Biome("water", 0, ["low"])
 watera.difficulty = 4;
 biomes.unshift(watera)
-var icywater = new Biome("icywater", [117, 191, 222], ["low", "frozen"]) //make sweet and bitter ice/
+var icywater = new Biome("icywater", 0, ["low", "frozen"]) //make sweet and bitter ice/
 biomes.unshift(icywater)
 
-var beacha = new Biome("beach", [lut["bitterbeach"],lut["beach"],lut["sweetbeach"]], ["border"])
-var icyBeacha = new Biome("icybeach", [211, 226, 209], ["border", "frozen"])
+var beacha = new Biome("beach", 0, ["border"])
+var icyBeacha = new Biome("icybeach", 0, ["border", "frozen"])
 biomes.unshift(beacha)
 biomes.unshift(icyBeacha);
 
-var dirt = new Biome("dirt", [lut["bitterdirt"],lut["dirt"],lut["sweetdirt"]], [surface])
+var dirt = new Biome("dirt", 0, [surface])
 biomes.push(dirt);
-var snowyPlainsa = new Biome("snowyPlains", [197, 245, 230], [surface, "frozen", ["dry"], ["arid"]])
-var snowyTundraa = new Biome("snowyTundra", [192, 219, 245], [surface, "frozen", "moderate"])
-var snowyTaigaa = new Biome("snowyTaiga", [198, 239, 246], [surface, "frozen", "moist"])
+var snowyPlainsa = new Biome("snowyPlains", 0, [surface, "frozen", ["dry"], ["arid"]])
+var snowyTundraa = new Biome("snowyTundra", 0, [surface, "frozen", "moderate"])
+var snowyTaigaa = new Biome("snowyTaiga", 0, [surface, "frozen", "moist"])
 biomes.unshift(snowyPlainsa, snowyTundraa, snowyTaigaa);
 
 
@@ -129,27 +172,27 @@ var grassy = [
     "dirtGrass15", "dirtGrass16", "dirtGrass17"
 ]
 //["c0","c1","c2","c3","c4","c5","c6","c7","c8","c9","c10","c11","c12","c13","c14","c15","c16","c17","c18","c19","c20","c21","c22","c23","c24","c25","c26","c27","c28","c29","c30","c31","c32","c33"]
-var plainsa = new Biome("plains", [lut["bitterplains"],lut["plains"],lut["sweetplains"]], [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"], ["moderate"]]], [...grassy])
-var savannaha = new Biome("savannah", [lut["bittersavannah"],lut["savannah"],lut["sweetsavannah"]], [surface, "warm", ["arid"], ["dry"]], [...grassy])
+var plainsa = new Biome("plains", 0, [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"], ["moderate"]]], [...grassy])
+var savannaha = new Biome("savannah", 0, [surface, "warm", ["arid"], ["dry"]], [...grassy])
 biomes.unshift(plainsa, savannaha);
 
-var taigaa = new Biome("taiga", [lut["bittertaiga"],lut["taiga"],lut["sweettaiga"]], [surface, ["frozen", "wet"], ["cold", ["wet"], ["moist"]]], [...grassy])
-var foresta = new Biome("forest", [lut["bitterforest"],lut["forest"],lut["sweetforest"]], [surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]], [...grassy])
-var junglea = new Biome("jungle", [lut["bitterjungle"],lut["jungle"],lut["sweetjungle"]], [surface, "warm", ["wet"], ["moist"]], [...grassy])
-var flowerforesta = new Biome("flowerforest", [lut["bitterflowerforest"],lut["flowerforest"],lut["sweetflowerforest"]], [surface, "neutral", "arid"], [...grassy])
-var darkforesta = new Biome("darkforest", [lut["bitterdarkforest"],lut["darkforest"],lut["sweetdarkforest"]], [surface, "neutral", "wet"], [...grassy])
+var taigaa = new Biome("taiga", 0, [surface, ["frozen", "wet"], ["cold", ["wet"], ["moist"]]], [...grassy])
+var foresta = new Biome("forest", 0, [surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]], [...grassy])
+var junglea = new Biome("jungle", 0, [surface, "warm", ["wet"], ["moist"]], [...grassy])
+var flowerforesta = new Biome("flowerforest", 0, [surface, "neutral", "arid"], [...grassy])
+var darkforesta = new Biome("darkforest", 0, [surface, "neutral", "wet"], [...grassy])
 biomes.unshift(taigaa, foresta, junglea, flowerforesta, darkforesta);
 
 
-var deepsand = new Biome("deepsand", [185, 166, 135], ["deep", "hot"])
-let lowsand = new Biome("lowsand", [204, 193, 143], ["low", "hot"])
-var deserta = new Biome("desert", [lut["bitterbeach"],lut["beach"],lut["sweetbeach"]], [surface, "hot"])
+var deepsand = new Biome("deepsand", 0, ["deep", "hot"])
+let lowsand = new Biome("lowsand", 0, ["low", "hot"])
+var deserta = new Biome("desert", 0, [surface, "hot"])
 biomes.unshift(deepsand, lowsand, deserta);
 
-var riverborder = new Biome("riverborder", [lut["bitterbeach"],lut["beach"],lut["sweetbeach"]], ["riverborder", [["humid"], ["wet"]], [surface], ["border"]])
+var riverborder = new Biome("riverborder", 0, ["riverborder", [["humid"], ["wet"]], [surface], ["border"]])
 biomes.unshift(riverborder)
 
-var not = new Biome("river", [lut["bitterwater"],lut["water"],lut["sweetwater"]], ["river", [surface], ["border"]])
+var not = new Biome("river", 0, ["river", [surface], ["border"]])
 biomes.unshift(not)
 
 
@@ -157,9 +200,9 @@ biomes.unshift(not)
 //var widerivera =new Biome("wideriver", [0,0 ,0],["wideriver"])
 //biomes.unshift(widerivera)
 //var rivera =new Biome("river", [0, 0,255],["river"])
-var mountaina = new Biome("mountain", [160, 160, 170], ["high"])
-var icymountaina = new Biome("icymountain", [163, 200, 222], ["high", ["cold"], ["frozen"]])
-var mountainTipa = new Biome("mountaintip", [200, 200, 210], ["cloud"])
+var mountaina = new Biome("mountain", 0, ["high"])
+var icymountaina = new Biome("icymountain", 0, ["high", ["cold"], ["frozen"]])
+var mountainTipa = new Biome("mountaintip", 0, ["cloud"])
 biomes.unshift(icymountaina, mountaina, mountainTipa);
 /*
 biomes.unshift(

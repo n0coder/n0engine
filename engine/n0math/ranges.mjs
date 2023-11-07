@@ -4,6 +4,12 @@ export function inverseLerp(a, b, t) {
 export function lerp(a, b, t) {
     return a + (b - a) * t;
 }
+export function posterize(value, levels) {
+    if (value == 0) return 0;
+    let level = Math.round(value * levels) / levels;
+    return level / value;
+ }
+ 
 export function remap(a, b, a2, b2, t) {
     return ((t - a) / (b - a)) * (b2 - a2) + a2;
 }
