@@ -57,8 +57,9 @@ export class BiomeFunctionCollapse {
                 var biome = getBiome(x + i, y + o)
                 biome.x = x + i, biome.y = y + o;
                 biome.pathDifficulty = biome?.biome != null ? biome?.biome?.getDifficulty(biome) : 9; //can't walk through an 8
+                
                 biome.sugar = {
-                    minm: -1, maxm: 1, sum: biome.biome.sugarLevel
+                    minm: 0, maxm: 2, sum: biome.biome.sugarLevel
                 }
                 if (this.useNfc)
                     tile = this.nfc.collapseBiomeTile(x + i, y + o, biome);

@@ -20,7 +20,7 @@ let naovi = null;
 
 let x = 20
 let y = 4;
-
+/*
 for (let i = 0; i <= 5; i++) {
     new Wall(x+i, y+4)
     new Wall(x+i, y-1);
@@ -30,3 +30,4 @@ for (let i = 0; i < 3; i++) {
     new Wall(x, y+i)
     new Wall(x+5, y+i);
 }
+*/

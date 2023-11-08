@@ -15,19 +15,27 @@ export function addBiomeFactors(map, factor) {
         biomeFactorMap.set(tag, obj)
     })
 }
-
+document.lutMissingMap = new Map()
 export class Biome {
-    constructor(name, color, tags, tiles) {
+    constructor(name, colorName, color, tags, tiles) {
         this.name = name
-        this.bitter = luts[0][name] || [255,0,255]
-        this.plain = luts[1][name]|| [255,0,255]
-        this.sugar = luts[2][name]|| [255,0,255]
+        this.colorName = colorName;
+        if (!luts[0][colorName]) 
+            document.lutMissingMap.set(`0, ${colorName}`, true);
+           if (!luts[1][colorName]) 
+           document.lutMissingMap.set(`1, ${colorName}`, true);
+           if (!luts[2][colorName]) 
+           document.lutMissingMap.set(`2, ${colorName}`, true);
+        this.bitter = luts[0][colorName] || [255,0,255]
+        this.plain = luts[1][colorName]|| [255,0,255]
+        this.sugar = luts[2][colorName]|| [255,0,255]
         this.sugarLevel = color;
         this.difficulty = 1;
-        this.color = color;
+        this.color = luts[1][colorName];
         this.tags = tags;
         this.factors = (tags != null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
         this.tiles = tiles || []
+        
     }
     colorsugar (biome){
         if (!this.bitter || !this.plain || !this.sugar) {
@@ -49,7 +57,9 @@ export class Biome {
         return difi - this.dificulty;
     }
     copy(name, color) {
-        let biome = new Biome(name || this.name, color || this.color);
+        let biome = new Biome(this.name, this.colorName, color );
+        biome.name = name || this.name;
+        biome.colorName = this.colorName;
         biome.difficulty = this.difficulty;
         if (this.factors != null)
             biome.factors = this.factors.slice();

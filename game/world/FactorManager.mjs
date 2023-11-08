@@ -61,6 +61,7 @@ var vvscale = 1
 
 
 
+
 var scale = vvscale * .75
 
 var rscale = 50;
@@ -134,11 +135,11 @@ var fantasy = new NoiseGenerator({
     });
 worldFactors.set("fantasy", fantasy);
 
-var triverWsforks2 = new NoiseGenerator({ scale: scale * 250, octaves: 5, persistance: .5, lacunarity: 1.3, offset: 0, offsetX: 53, offsetY: 3222, amp: 2 })
-var triverWsforks = new NoiseGenerator({ scale: scale * 250, abs: true, octaves: 5, persistance: .5, offset: 0, lacunarity: 1.75, offsetY: triverWsforks2, offsetX: 1553, amp: 1 })
-var sugar = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
-var sugarO = new NoiseGenerator({scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222  });
-var bitter = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
+var triverWsforks2 = new NoiseGenerator({ scale: scale * 550, octaves: 3, persistance: .5, lacunarity: 1.3, offset: 0, offsetX: 53, offsetY: 3222, amp: 2 })
+var triverWsforks = new NoiseGenerator({ scale: scale * 550, abs: true, octaves: 3, persistance: .5, offset: 0, lacunarity: 1.75, offsetY: triverWsforks2, offsetX: 1553, amp: 1 })
+var sugar = new NoiseGenerator({ scale: scale * 550, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
+var sugarO = new NoiseGenerator({scale: scale * 550, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222  });
+var bitter = new NoiseGenerator({ scale: scale * 550, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
 var sugarZone = new NoiseGenerator({ scale: scale * 800, octaves: 3, persistance: .45, lacunarity: 2, offsetY: -3632 ,
     mapSpace: [0, 1], map: [
         { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 }, { "c": 0.3, "y": .1, "p": 2 }, { "c": 0.5, "y": .5, "p": 3 }, { "c": 0.7, "y": 0.9, "p": 2 }, { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [bitter, sugarO, sugar] //bitter zone, original mix, sugar zone

@@ -46,7 +46,7 @@ river.add("otheriver", 3.5) //bigest part i thought
 addBiomeFactors(river, "rivers");
 
 var sugar = new RangeMap(0, 1)
-sugar.add("purebitter").add("bitter").add("plain",4).add("sweet").add("puresweet");
+sugar.add("bitter",2).add("plain",1).add("sweet",2)
 addBiomeFactors(sugar, "sugar");
 
 var fantasy = new RangeMap(0, 1);
@@ -87,82 +87,104 @@ let newlut = {
     "darkforest": [64, 126, 53], "bitterdarkforest": [36, 44, 38], "sweetdarkforest": [87,194,102]
 }
 
+let sharedlut = {
+    "bittersand": [79,79,76], "sand":[163, 147, 129], "sweetsand": [236, 217, 196],
+    "bitterwater": [43, 53,70], "water": [68, 122, 156], "sweetwater": [11, 180, 176]
+}
+
 let sweetlut = {
     "deepwater": [38, 134, 163],
-    "water": [11, 180, 176],
-    "beach": [236, 217, 196],
+    "icydeepwater": [140, 191, 250],
+    "water": sharedlut["sweetwater"],
+    "icywater": [126,215,251],
+    "river": sharedlut["sweetwater"],
+    "beach": sharedlut["sweetsand"],
+    "icybeach": [245,235,252],
+    "desert": sharedlut["sweetsand"],
+    "lowsand": [193,134,80],
+    "deepsand": [105,75,58],
+    "riverborder": sharedlut["sweetsand"] ,
     "dirt": [246, 182,190],
     "plains": [140,230,182], 
+    "tundra": [239,245,255],
+    "snowyplains": [194,242,251],
     "savannah": [213,173, 131], 
     "forest": [117,196,145],
     "taiga": [250, 218, 156], 
+    "snowytaiga": [252, 235, 250], 
     "jungle": [48,219,120],
     "flowerforest":[128,217,191],
     "darkforest": [87,194,102], 
+    "mountain": [209,209,234],
+    "icymountain": [231,231,254],
+    "mountaintip": [210,228,248],
+    "test": [255,255,255]
     }
-let bitterlut = {
-    "deepwater": [32, 43, 54], 
-    "water": [43, 53,70],
-    "beach": [79,79,76],
-    "dirt":[77,65,68] ,
-    "plains": [111,114,99] ,
-    "savannah": [80,70,62],
-    "forest":  [101,105,98],
-    "taiga": [92,88,83],
-    "jungle": [48,51,44],
-    "flowerforest": [100,113,105],
-    "darkforest": [36, 44, 38],
-}
-let newlutalt = {
+let neutrallut = {
     "deepwater": [48, 81, 138],
-    "water": [68, 122, 156],
-    "beach": [163, 147, 129], 
+    "icydeepwater": [145, 163, 249],
+    "water": sharedlut["water"],
+    "icywater":[156,185,250], 
+    "river": sharedlut["water"],
+    "beach":sharedlut["sand"], 
+    "icybeach": [206,198,248],
+    "desert":sharedlut["sand"], 
+    "lowsand": [133,92,52],
+    "deepsand": [72,51,37],
+    "riverborder":sharedlut["sand"], 
     "dirt": [147, 111, 102],
     "plains": [157, 199, 104],
+    "tundra": [222,236,254],
+    "snowyplains": [203,225,247],
     "savannah": [161, 126,104],
     "forest": [131, 165, 108], 
     "taiga": [192, 172, 118],
+    "snowytaiga": [222, 211, 247], 
     "jungle": [81, 169, 66],
     "flowerforest": [155, 186, 141], 
     "darkforest": [64, 126, 53],
+    "mountain": [160,160,170],
+    "icymountain": [205,205,250],
+    "mountaintip": [163,200,222],
+    "test": [151,151,151]
+}
+let bitterlut = {
+    "deepwater": [32, 43, 54], 
+    "icydeepwater": [126,131,176],
+    "water": sharedlut["bitterwater"],
+    "icywater":[143,148,211], 
+    "river": sharedlut["bitterwater"],
+    "beach": sharedlut["bittersand"], 
+    "icybeach": [162,162,245],
+    "desert": sharedlut["bittersand"], 
+    "lowsand": [65,49,30],
+    "deepsand": [35,27,21],
+    "riverborder": sharedlut["bittersand"], 
+    "dirt":[77,65,68] ,
+    "plains": [111,114,99] ,
+    "tundra": [172,180,220],
+    "snowyplains": [179,180,233],
+    "savannah": [80,70,62],
+    "forest":  [101,105,98],
+    "taiga": [92,88,83],
+    "snowytaiga": [169,167,246],
+    "jungle": [48,51,44],
+    "flowerforest": [100,113,105],
+    "darkforest": [36, 44, 38],
+    "mountain": [81,81,87],
+    "icymountain": [163,163,246],
+    "mountaintip": [82,103,115],
+    "test": [80,80,80]
 }
 export let luts = {
-    0: bitterlut, 1: newlutalt, 2:sweetlut
+    0: bitterlut, 1: neutrallut, 2:sweetlut
 }
-let sweet = [ "sweet"];
+console.log(luts);
+let sweet = ["sweet"];
 let puresweet = [ "puresweet"];
 let bitter = ["bitter"]
 let purebitter = [ "purebitter"]
-let lut =newlutalt;
-var deepwatera = new Biome("deepwater", 1,  ["deep"])
-deepwatera.difficulty = 5;
-biomes.unshift(deepwatera)
-biomes.unshift(deepwatera.copy("bitterdeepwater", 0).addFactors ([bitter]))
-biomes.unshift(deepwatera.copy("sweetdeepwater", 2).addFactors ([sweet]))
-
-
-var icydeepwater = new Biome("icydeepwater", 0, ["deep", "frozen"]) //make sweet and bitter ice
-//biomes.unshift(icydeepwater)
-
-var watera = new Biome("water", 0, ["low"])
-watera.difficulty = 4;
-biomes.unshift(watera)
-var icywater = new Biome("icywater", 0, ["low", "frozen"]) //make sweet and bitter ice/
-biomes.unshift(icywater)
-
-var beacha = new Biome("beach", 0, ["border"])
-var icyBeacha = new Biome("icybeach", 0, ["border", "frozen"])
-biomes.unshift(beacha)
-biomes.unshift(icyBeacha);
-
-var dirt = new Biome("dirt", 0, [surface])
-biomes.push(dirt);
-var snowyPlainsa = new Biome("snowyPlains", 0, [surface, "frozen", ["dry"], ["arid"]])
-var snowyTundraa = new Biome("snowyTundra", 0, [surface, "frozen", "moderate"])
-var snowyTaigaa = new Biome("snowyTaiga", 0, [surface, "frozen", "moist"])
-biomes.unshift(snowyPlainsa, snowyTundraa, snowyTaigaa);
-
-
+let lut =neutrallut;
 
 var grassy = [
     "grass0", "grass1", "grass2", "dirt0", "dirt1", "dirt2",
@@ -171,48 +193,221 @@ var grassy = [
     "dirtGrass10", "dirtGrass11", "dirtGrass12", "dirtGrass13", "dirtGrass14",
     "dirtGrass15", "dirtGrass16", "dirtGrass17"
 ]
-//["c0","c1","c2","c3","c4","c5","c6","c7","c8","c9","c10","c11","c12","c13","c14","c15","c16","c17","c18","c19","c20","c21","c22","c23","c24","c25","c26","c27","c28","c29","c30","c31","c32","c33"]
-var plainsa = new Biome("plains", 0, [surface, ["cold", ["dry"], ["arid"], ["moderate"]], ["neutral", ["dry"], ["moderate"]]], [...grassy])
-var savannaha = new Biome("savannah", 0, [surface, "warm", ["arid"], ["dry"]], [...grassy])
-biomes.unshift(plainsa, savannaha);
 
-var taigaa = new Biome("taiga", 0, [surface, ["frozen", "wet"], ["cold", ["wet"], ["moist"]]], [...grassy])
-var foresta = new Biome("forest", 0, [surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]], [...grassy])
-var junglea = new Biome("jungle", 0, [surface, "warm", ["wet"], ["moist"]], [...grassy])
-var flowerforesta = new Biome("flowerforest", 0, [surface, "neutral", "arid"], [...grassy])
-var darkforesta = new Biome("darkforest", 0, [surface, "neutral", "wet"], [...grassy])
-biomes.unshift(taigaa, foresta, junglea, flowerforesta, darkforesta);
+function formBiome(o) { //this is baking sugar into the generation... not ideal but it's ok.
+    let plain = new Biome(o.name, o.name, 1, o.plaintags, o.tiles);
+    plain.difficulty = o.difficulty;
+    biomes.unshift(plain)
+    let sweet = new Biome("sweet"+o.name, o.name, 2, o.sweettags, o.tiles);
+    sweet.difficulty = o.difficulty;
+    biomes.unshift(sweet)
+    let bitter = new Biome("bitter"+o.name, o.name, 0, o.bittertags, o.tiles);
+    bitter.difficulty = o.difficulty;
+    biomes.unshift(bitter)
+}
+
+formBiome({
+    name: "deepwater",
+    plaintags: ["deep"], tiles: [],
+    sweettags: ["deep", "sweet"],
+    bittertags: ["deep", "bitter"],
+    difficulty: 5
+})
+formBiome({
+    name: "icydeepwater",
+    plaintags: ["deep", "frozen"], tiles: [],
+    sweettags: ["deep", "frozen", "sweet"],
+    bittertags: ["deep", "frozen", "bitter"],
+    difficulty: 6 
+})
+
+formBiome({
+    name: "water",
+    plaintags: ["low"], tiles: [],
+    sweettags: ["low", "sweet"],
+    bittertags: ["low", "bitter"],
+    difficulty: 4
+})
+formBiome({
+    name: "icywater",
+    plaintags: ["low", "frozen"], tiles: [],
+    sweettags: ["low", "frozen", "sweet"],
+    bittertags: ["low", "frozen", "bitter"],
+    difficulty: 5 
+})
+formBiome({
+    name: "beach",
+    plaintags: ["border"], tiles: ["dirt0", "dirt1", "dirt2"],
+    sweettags: ["border", "sweet"],
+    bittertags: ["border", "bitter"],
+    difficulty: 1
+})
+formBiome({
+    name: "icybeach",
+    plaintags: ["border", "frozen"], tiles: ["dirt0", "dirt1", "dirt2"],
+    sweettags: ["border", "frozen", "sweet"],
+    bittertags: ["border", "frozen", "bitter"],
+    difficulty: 2
+})
+formBiome({
+    name: "dirt",
+    plaintags: [surface], tiles: ["dirt0", "dirt1", "dirt2"],
+    sweettags: [surface, "sweet"],
+    bittertags: [surface, "bitter"],
+    difficulty: 1
+})
 
 
-var deepsand = new Biome("deepsand", 0, ["deep", "hot"])
-let lowsand = new Biome("lowsand", 0, ["low", "hot"])
-var deserta = new Biome("desert", 0, [surface, "hot"])
-biomes.unshift(deepsand, lowsand, deserta);
+let plains = [surface, ["dry"]];
+formBiome({
+    name: "plains",
+    plaintags: [...plains,["arid"],["moderate"]], tiles: [...grassy],
+    sweettags: [...plains, ["arid"],["moderate"], "sweet"],
+    bittertags: [...plains,["arid"],["moderate"], "bitter"],
+    difficulty: 1
+})
+let snowplains = [...plains, ["moderate"], "frozen"];
+formBiome({
+    name: "snowyplains",
+    plaintags: [...snowplains], tiles: [...grassy],
+    sweettags: [...snowplains, "sweet"],
+    bittertags: [...snowplains, "bitter"],
+    difficulty: 1
+})
+let tundra = [surface, "frozen", "moderate"]
+formBiome({
+    name: "tundra",
+    plaintags: [...tundra], tiles: [],
+    sweettags: [...tundra, "sweet"],
+    bittertags: [...tundra, "bitter"],
+    difficulty: 1
+})
 
-var riverborder = new Biome("riverborder", 0, ["riverborder", [["humid"], ["wet"]], [surface], ["border"]])
-biomes.unshift(riverborder)
+let taiga = [surface, ["frozen", "wet"], ["cold", ["wet"], ["moist"]]]
+formBiome({
+    name: "taiga",
+    plaintags: [...taiga], tiles: [...grassy],
+    sweettags: [...taiga, "sweet"],
+    bittertags: [...taiga, "bitter"],
+    difficulty: 1
+})
 
-var not = new Biome("river", 0, ["river", [surface], ["border"]])
-biomes.unshift(not)
+let snowytaiga = [surface, "frozen", "moist"]
+formBiome({
+    name: "snowytaiga",
+    plaintags: [...snowytaiga], tiles: [...grassy],
+    sweettags: [...snowytaiga, "sweet"],
+    bittertags: [...snowytaiga, "bitter"],
+    difficulty: 2
+})
+let savannah =[surface, "warm", ["arid"], ["dry"]]
+formBiome({
+    name: "savannah",
+    plaintags: [...savannah], tiles: [...grassy],
+    sweettags: [...savannah, "sweet"],
+    bittertags: [...savannah, "bitter"],
+    difficulty: 1
+})
+let forest = [surface, ["cold", "moderate"], ["neutral", "moist"], ["warm", "moderate"]];
+formBiome({
+    name: "forest",
+    plaintags: [...forest], tiles: [...grassy],
+    sweettags: [...forest, "sweet"],
+    bittertags: [...forest, "bitter"],
+    difficulty: 1
+})
+let jungle = [surface, "warm", ["wet"], ["moist"]];
+formBiome({
+    name: "jungle",
+    plaintags: [...jungle], tiles: [...grassy],
+    sweettags: [...jungle, "sweet"],
+    bittertags: [...jungle, "bitter"],
+    difficulty: 1
+})
+let flowerforest = [surface, "neutral", "arid"];
+formBiome({
+    name: "flowerforest",
+    plaintags: [...flowerforest], tiles: [...grassy],
+    sweettags: [...flowerforest, "sweet"],
+    bittertags: [...flowerforest, "bitter"],
+    difficulty: 1
+})
+let darkforest = [surface, "neutral", "wet"];
+formBiome({
+    name: "darkforest",
+    plaintags: [...darkforest], tiles: [...grassy],
+    sweettags: [...darkforest, "sweet"],
+    bittertags: [...darkforest, "bitter"],
+    difficulty: 1
+})
 
+let desert = [surface, "hot"];
+formBiome({
+    name: "desert",
+    plaintags: [...desert], tiles: ["dirt0", "dirt1", "dirt2"],
+    sweettags: [...desert, "sweet"],
+    bittertags: [...desert, "bitter"],
+    difficulty: 1
+})
+let lowsand = ["low", "hot"];
+formBiome({
+    name: "lowsand",
+    plaintags: [...lowsand], tiles: ["dirt0", "dirt1", "dirt2"],
+    sweettags: [...lowsand, "sweet"],
+    bittertags: [...lowsand, "bitter"],
+    difficulty: 2
+})
+let deepsand = ["deep", "hot"];
+formBiome({
+    name: "deepsand",
+    plaintags: [...deepsand], tiles: ["dirt0", "dirt1", "dirt2"],
+    sweettags: [...deepsand, "sweet"],
+    bittertags: [...deepsand, "bitter"],
+    difficulty: 3
+})
 
-//biomes.unshift(not)
-//var widerivera =new Biome("wideriver", [0,0 ,0],["wideriver"])
-//biomes.unshift(widerivera)
-//var rivera =new Biome("river", [0, 0,255],["river"])
-var mountaina = new Biome("mountain", 0, ["high"])
-var icymountaina = new Biome("icymountain", 0, ["high", ["cold"], ["frozen"]])
-var mountainTipa = new Biome("mountaintip", 0, ["cloud"])
-biomes.unshift(icymountaina, mountaina, mountainTipa);
-/*
-biomes.unshift(
-    //new Biome("bitedge", [255,0,111], ["bitter", "fantasy"]),
-    //new Biome("swtedge", [0,0,255], ["sweet", "fantasy"]),
-    new Biome("puswtedge", [176,172,255], ["puresweet", "fantasy"]),
-    new Biome("pubtedge", [0,0,0], ["purebitter", "fantasy"])
-)
-*/
-// function to map the objects in the biome array to a true or false value based on the ruleset
+let riverborder = ["riverborder", [["humid"], ["wet"]], [surface], ["border"]];
+formBiome({
+    name: "riverborder",
+    plaintags: [...riverborder], tiles: [],
+    sweettags: [...riverborder, "sweet"],
+    bittertags: [...riverborder, "bitter"],
+    difficulty: 3
+})
+let rivera = ["river", [surface], ["border"]]
+formBiome({
+    name: "river",
+    plaintags: [...rivera], tiles: [],
+    sweettags: [...rivera, "sweet"],
+    bittertags: [...rivera, "bitter"],
+    difficulty: 3
+})
+
+let mountain = ["high"];
+formBiome({
+    name: "mountain",
+    plaintags: [...mountain], tiles: [],
+    sweettags: [...mountain, "sweet"],
+    bittertags: [...mountain, "bitter"],
+    difficulty: 3
+})
+let icymountain = ["high", ["cold"], ["frozen"]]
+formBiome({
+    name: "icymountain",
+    plaintags: [...icymountain], tiles: [],
+    sweettags: [...icymountain, "sweet"],
+    bittertags: [...icymountain, "bitter"],
+    difficulty: 3
+})
+let mountaintip = ["cloud"]
+formBiome({
+    name: "mountaintip",
+    plaintags: [...mountaintip], tiles: [],
+    sweettags: [...mountaintip, "sweet"],
+    bittertags: [...mountaintip, "bitter"],
+    difficulty: 3
+})
+
 function mapBiome(biome, soku) {
     return biome.map(item => {
         if (Array.isArray(item)) {
