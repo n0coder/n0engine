@@ -14,8 +14,8 @@ export class BiomeFunctionCollapse {
         this.setActive = setActive;
         this.setActive(true)
         this.renderOrder = -5;
-        this.w = 28 * 2;
-        this.h = 16 * 2;
+        this.w = 28 * 4;
+        this.h = 18 * 4;
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
         this.blocks = null
@@ -55,12 +55,16 @@ export class BiomeFunctionCollapse {
                 if (tile) continue;
 
                 var biome = getBiome(x + i, y + o)
+                if (biome.biome === null) {
+                    worldGrid.tiles.set(`${x + i}, ${y + o}`, null)
+                    continue
+                }
                 biome.x = x + i, biome.y = y + o;
+                biome.sugar = {
+                    minm: 0, maxm: 2, sum: biome.biome.sugarLevel 
+                }
                 biome.pathDifficulty = biome?.biome != null ? biome?.biome?.getDifficulty(biome) : 9; //can't walk through an 8
                 
-                biome.sugar = {
-                    minm: 0, maxm: 2, sum: biome.biome.sugarLevel
-                }
                 if (this.useNfc)
                     tile = this.nfc.collapseBiomeTile(x + i, y + o, biome);
                 worldGrid.tiles.set(`${x + i}, ${y + o}`, tile || biome)
@@ -130,13 +134,13 @@ export class BiomeFunctionCollapse {
         var y = worldGrid.y;
 
         var c = worldGrid.chunkSize * 2; //grid space
-        this.genChunk((this.i * (c * 2)) + x, (this.o * c) + y, c * 2, c)
+        this.genChunk( (this.i * (c * 2)) + x, (this.o * c) + y, c * 2, c)
 
         this.i++;
-        if (this.i >= 2) {
+        if (this.i >= 3) {
             this.o++
             this.i = 0;
-            if (this.o >= 2) {
+            if (this.o >= 3) {
                 this.o = 0
             }
         }

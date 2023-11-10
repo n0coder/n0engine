@@ -6,6 +6,11 @@ export class WorldGrid {
         this.y = 230;
         this.tiles = new Map();
     }
+
+    getTile(x,y) {
+        return this.tiles.get(`${this.x+x}, ${this.y+y}`)
+    }
+
     get halfTileSize() {
         return this.gridSize / 2
     }

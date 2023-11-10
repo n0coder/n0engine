@@ -51,6 +51,7 @@ export function findPath(cX, cY, tX, tY, sightDistance, padding, out) {
             gridArray[y][x] = (tile && tile.pathDifficulty) || 0
         }
     }
+    console.log(gridArray)
     let ss = 2;
     let graphics = p.createGraphics((ar.w + 1) * ss, (ar.h + 1) * ss);
     for (let y = 0; y <= ar.h; y++) {

@@ -51,10 +51,10 @@ export class Biome {
         return [r,g,b]
     }
     getDifficulty (biome) {
-        var gc = biome.genCache.get("sugar");
+        var gc = biome.sugar;
         let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
         let difi = Math.round(cubicBlendW([1, 0, -1], isu, 2))
-        return difi - this.dificulty;
+        return this.difficulty+difi;
     }
     copy(name, color) {
         let biome = new Biome(this.name, this.colorName, color );

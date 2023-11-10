@@ -18,6 +18,7 @@ export class Wall{
     
     draw() {
         var a = worldGrid.gridToScreenBounds(this.x, this.y, 1,1)
+        p.fill(255)
         p.rect(a.x1, a.y1, a.x2, a.y2);
     }
 }
