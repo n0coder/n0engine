@@ -48,10 +48,9 @@ export function findPath(cX, cY, tX, tY, sightDistance, padding, out) {
         gridArray[y] = [];
         for (let x = ar.x; x <= ar.w; x++) {
             let tile = worldGrid.tiles.get(`${worldGrid.x + minax + x - pad}, ${worldGrid.y + minay + y - pad}`);
-            gridArray[y][x] = (tile && tile.pathDifficulty) || 0
+            gridArray[y][x] = (tile && tile.pathDifficulty) || 7
         }
     }
-    console.log(gridArray)
     let ss = 2;
     let graphics = p.createGraphics((ar.w + 1) * ss, (ar.h + 1) * ss);
     for (let y = 0; y <= ar.h; y++) {

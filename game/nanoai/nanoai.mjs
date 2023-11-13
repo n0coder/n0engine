@@ -1,4 +1,4 @@
-import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { deltaTime, ticks } from "../../engine/core/Time/n0Time.mjs";
 import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";

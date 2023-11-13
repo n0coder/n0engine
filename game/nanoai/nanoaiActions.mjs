@@ -12,37 +12,27 @@ export const nanoaiActions = new Map([
         args: [],
         path: null,
         work: function (nano) {
-            var vx = this.args[0] - nano.x;
-            var vy = this.args[1] - nano.y;
-            var mag = Math.sqrt((vx * vx) + (vy * vy))
-            if (mag <= worldGrid.gridSize * 1.5) {
-                nano.vx = 0;
-                nano.vy = 0;
-                return false;
-            }
-
-            if (!this.path)
-                findPath(nano.x, nano.y, this.args[0], this.args[1], worldGrid.gridSize * 4, 7, (path) => {
-                    this.path = path;
-                });
-            if (this.path) {
-                p.fill(255);
-                p.image(this.path.graphics, nano.x, nano.y)
-                if (!this.path.currentPoint) console.error("the point went null?", this.path, mag);
-                p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2)
-                let ped = this.path.currentPointDistance(nano.x, nano.y);
-                if (ped < worldGrid.gridSize / 2) {
-                    if (!this.path.isFinalPoint) {
-                        this.path.next();
-                    }
-                    else this.path = null;
-                }
-                if (this.path)
-                    walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
-            }
-            return true;
-
+            return walkObj(this, nano);
         },
+        clone: function (...args) {
+            return handleClone(this, ...args)
+        }
+    }],
+    ["hungry", {
+        args: [], target: null, path: null,
+        work: function(nano) { //one issue later on could be to prioritize getting out of the bitter biome over finding food (while regular nano)
+            if (nano.sugar < 0) { //debt is hunger
+                //do we have food? (does radio friend channel have any food on offer?) //friendly hungry
+                //check inventory for food, eat food if found
+                //check radio for food, get food location, take food and eat it (friendly means we have the keys)
+                //check radio for lover, ping lover to ask if they have enough energy for a kiss for backup energy
+                //set up a ping for notifying the radio that it should be searching for food 
+                //(to tell all friends who have the energy to search, to find food)
+                
+                //no (or bitter nano)? look for food elsewhere //unfriendly hungry
+                
+            }
+        }, 
         clone: function (...args) {
             return handleClone(this, ...args)
         }
@@ -60,49 +50,15 @@ export const nanoaiActions = new Map([
     ["follow", {
         args: [],
         targetX: null, targetY: null, path: null,
-        work: function (nano) {
-            var vx = this.args[0].x - nano.x;
-            var vy = this.args[0].y - nano.y;
-            var mag = Math.sqrt((vx * vx) + (vy * vy))
-            if (mag <= worldGrid.gridSize) {
-                nano.vx = 0;
-                nano.vy = 0;
-                return false;
-            }
-
-            var vtx = this.args[0].x - this.targetX;
-            var vty = this.args[0].y - this.targetY;
-            var tmag = Math.sqrt((vtx * vtx) + (vty * vty))
-            if (!this.path) //if target moves a whole tile we retarget the new tile lol 
-                findPath(nano.x, nano.y, this.args[0].x, this.args[0].y, 32, 4, (path) => {
-                    this.targetX = this.args[0].x
-                    this.targetY = this.args[0].y
-                    this.path = path;
-                });
-            else {
-                p.fill(255);
-
-                p.image(this.path.graphics, nano.x, nano.y)
-                p2.variableLine(nano.x, nano.y, this.path.currentPoint.x, this.path.currentPoint.y, 8, 2)
-                let ped = this.path.currentPointDistance(nano.x, nano.y);
-                if (ped < worldGrid.gridSize / 2) {
-                    if (!this.path.isFinalPoint) {
-                        this.path.next();
-                    }
-                    else {
-                        this.path = null;
-                    }
-                }
-                if (this.path)
-                    walk(nano, this.path.currentPoint.x, this.path.currentPoint.y, 2)
-            }
-            return true
+        work: function(nano) { 
+            return followObj(this, nano)
         },
         //clone before setting the variable
         clone: function (...args) {
             return handleClone(this, ...args)
         }
     }],
+    
     ["pickup", {
         args: [],
         before: ["follow"],
@@ -213,6 +169,78 @@ export function handleClone(obj, ...args) {
     return action;
 }
 
+export function walkObj(obj, nano) {
+    var vx = obj.args[0] - nano.x;
+    var vy = obj.args[1] - nano.y;
+    var mag = Math.sqrt((vx * vx) + (vy * vy))
+    if (mag <= worldGrid.gridSize * .5) {
+        nano.vx = 0;
+        nano.vy = 0;
+        return false;
+    }
+
+    if (!obj.path)
+        findPath(nano.x, nano.y, obj.args[0], obj.args[1], worldGrid.gridSize * 4, 7, (path) => {
+            obj.path = path;
+        });
+    if (obj.path) {
+        p.fill(255);
+        p.image(obj.path.graphics, nano.x, nano.y)
+        if (!obj.path.currentPoint) console.error("the point went null?", obj.path, mag);
+        p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
+        let ped = obj.path.currentPointDistance(nano.x, nano.y);
+        if (ped < worldGrid.gridSize / 2) {
+            if (!obj.path.isFinalPoint) {
+                obj.path.next();
+            }
+            else obj.path = null;
+        }
+        let speed = nano.speed * inverseLerp(8, 0, /* the difficulty value we calculated for this spot... */ ) 
+        if (obj.path)
+            walk(nano, obj.path.currentPoint.x, obj.path.currentPoint.y, 2, speed)
+    }
+    return true;
+
+}
+
+export function followObj (obj, nano) {
+    var vx = obj.args[0].x - nano.x;
+    var vy = obj.args[0].y - nano.y;
+    var mag = Math.sqrt((vx * vx) + (vy * vy))
+    if (mag <= worldGrid.gridSize) {
+        nano.vx = 0;
+        nano.vy = 0;
+        return false;
+    }
+
+    var vtx = obj.args[0].x - obj.targetX;
+    var vty = obj.args[0].y - obj.targetY;
+    var tmag = Math.sqrt((vtx * vtx) + (vty * vty))
+    if (!obj.path) //if target moves a whole tile we retarget the new tile lol 
+        findPath(nano.x, nano.y, obj.args[0].x, obj.args[0].y, 32, 4, (path) => {
+            obj.targetX = obj.args[0].x
+            obj.targetY = obj.args[0].y
+            obj.path = path;
+        });
+    else {
+        p.fill(255);
+
+        p.image(obj.path.graphics, nano.x, nano.y)
+        p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
+        let ped = obj.path.currentPointDistance(nano.x, nano.y);
+        if (ped < worldGrid.gridSize / 2) {
+            if (!obj.path.isFinalPoint) {
+                obj.path.next();
+            }
+            else {
+                obj.path = null;
+            }
+        }
+        if (obj.path)
+            walk(nano, obj.path.currentPoint.x, obj.path.currentPoint.y, 2)
+    }
+    return true
+}
 
 export function walk(nano, x, y, magn = 1) {
     var vx = x - nano.x;
