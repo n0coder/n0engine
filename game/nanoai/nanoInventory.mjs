@@ -44,6 +44,7 @@ export class NanoInventory {
             if (this.list.length < this.slots) {
                 item.renderOrder = 2
                 var o = this.list.push(item); //1
+                if (item.held != null) item.held = true;
                 this.refresh()
                 return o > 0;
             }
@@ -92,6 +93,7 @@ export class NanoInventory {
             var o = this.list.splice(i, 1);
             this.refresh()
             item.setActive(true);
+            if (item.held != null && item.held) item.held = false; 
             item.renderOrder = 0
             return o;
         } else {

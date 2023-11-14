@@ -32,27 +32,6 @@ not only are there item storage related needs, but also action needs. one nanoai
 i think it would be a cool idea to have the nanoais praying or crusing the gods when they're forced to do something they dislike. like one ai may hate paperwork, and if they are assigned paperwork they start to get angry and they storm out of the workplace. they'll get depressed and pray to the gods that they are given some job that they don't hate
 
 
-## phindai's summary of item
-
-Imagine an AI entity, called a nanoai, that has a favorite item, such as cloudium or money. This preference drives their behavior:
-
-1. They are more likely to choose jobs that involve their favorite item. If a nanoai likes cloudium, they might work more with cloudium-related tasks.
-
-2. They will try to maximize the amount of their favorite item they can hold. They might pick up storage bags and fill them with their preferred item, or even upgrade their storage capacity if they can afford it.
-
-3. Their emotional state is tied to their ability to access their favorite item. They will become unhappy if they can't get the item they want.
-
-4. They express their favorite activities and thoughts through actions and "emotion bubbles." For example, a nanoai that likes money might have a thought bubble appear with a bag of money or a coin.
-
-5. They can earn titles based on their behaviors. For example, a nanoai that gathers a lot of money might be given the title "money bags."
-
-6. They have preferences not just for items, but also for activities. Some nanoais might like to carry heavy things, give away money, receive money, or craft items. They might even specialize in crafting specific items if they have the materials.
-
-7. They have emotional reactions to tasks they don't enjoy. For example, if a nanoai dislikes paperwork and is assigned a paperwork task, they might get angry, leave the workplace, and pray for a better job.
-
-This concept allows for a wide variety of behaviors and interactions among the nanoais, making their world dynamic and interesting
-
-
 ### n0
 there's tiny girl robots called nanoais in my farming game
 they have radios that tell them when it's time to do work on something

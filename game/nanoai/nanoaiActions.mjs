@@ -2,7 +2,7 @@ import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { inverseLerp } from "../../engine/n0math/ranges.mjs";
+import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { Mommyai, Puff } from "./mommyai.mjs";
 import { findPath } from "./research/n0Pathfinder.mjs";
@@ -22,6 +22,8 @@ export const nanoaiActions = new Map([
         args: [], target: null, path: null,
         work: function(nano) { //one issue later on could be to prioritize getting out of the bitter biome over finding food (while regular nano)
             if (nano.sugar < 0) { //debt is hunger
+
+                let food = nano.inventory.hasItem("food") //food tag
                 //do we have food? (does radio friend channel have any food on offer?) //friendly hungry
                 //check inventory for food, eat food if found
                 //check radio for food, get food location, take food and eat it (friendly means we have the keys)
@@ -173,21 +175,21 @@ export function walkObj(obj, nano) {
     var vx = obj.args[0] - nano.x;
     var vy = obj.args[1] - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))
-    if (mag <= worldGrid.gridSize * .5) {
+    if (mag <= worldGrid.gridSize * 1) {
         nano.vx = 0;
         nano.vy = 0;
         return false;
     }
 
-    if (!obj.path)
+    if (!obj.path || obj.path.points.length ==0)
         findPath(nano.x, nano.y, obj.args[0], obj.args[1], worldGrid.gridSize * 4, 7, (path) => {
             obj.path = path;
         });
-    if (obj.path) {
+    if (obj.path && obj.path.points.length >0) {
         p.fill(255);
-        p.image(obj.path.graphics, nano.x, nano.y)
+        //p.image(obj.path.graphics, nano.x, nano.y)
         if (!obj.path.currentPoint) console.error("the point went null?", obj.path, mag);
-        p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
+        //p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
         let ped = obj.path.currentPointDistance(nano.x, nano.y);
         if (ped < worldGrid.gridSize / 2) {
             if (!obj.path.isFinalPoint) {
@@ -225,8 +227,8 @@ export function followObj (obj, nano) {
     else {
         p.fill(255);
 
-        p.image(obj.path.graphics, nano.x, nano.y)
-        p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
+        // p.image(obj.path.graphics, nano.x, nano.y)
+        //p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
         let ped = obj.path.currentPointDistance(nano.x, nano.y);
         if (ped < worldGrid.gridSize / 2) {
             if (!obj.path.isFinalPoint) {
@@ -257,8 +259,15 @@ export function walk(nano, x, y, magn = 1) {
         nano.vx = 0;
         nano.vy = 0;
     }
-    nano.x += vx * deltaTime * nano.speed;
-    nano.y += vy * deltaTime * nano.speed;
+    var pos = worldGrid.screenToGridPoint(nano.x, nano.y)
+    let tile = worldGrid.getTile(pos.x, pos.y);
+    let speed = (tile && tile.pathDifficulty) || 7
+    var sod = inverseLerp(8,4, speed)
+    sod = clamp(0, 1, sod);
+    sod = lerp(.5, 1, sod);
+    p.text(`${sod}`, nano.x, nano.y);
+    nano.x += vx * deltaTime * nano.speed*sod;
+    nano.y += vy * deltaTime * nano.speed*sod;
 
     return mag > magn;
 }

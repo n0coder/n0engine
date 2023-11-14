@@ -2,7 +2,7 @@ import { Highgrass } from "./world/props/highgrass.mjs";
 import { Wall } from "./world/props/wall.mjs";
 import {Nanoai} from "./nanoai/nanoai.mjs"
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
-
+import {Circle} from "./farm/circle.mjs"
 //attack action, pathfind to a target only if hungry
 //defend action, defend an item or a path...
 
@@ -16,6 +16,10 @@ let osif = [
     [1,0,1,1,1,0,1],
     [1,0,1,1,1,0,1],
     [1,0,0,0,0,0,1],
+    [1,1,1,0,1,1,1],
+    [1,1,1,0,1,1,1],
+    [1,1,1,0,1,1,1],
+    [1,1,1,0,1,1,1],
     [1,1,1,1,1,1,1]
 ]
 for (let o = 0; o < osif.length; o++) {
@@ -27,6 +31,11 @@ for (let o = 0; o < osif.length; o++) {
         }
     }
 }
-let nano = new Nanoai("nano",26.5*worldGrid.gridSize,11*worldGrid.gridSize)
-nano.brain.do("walk", 28*worldGrid.gridSize,14*worldGrid.gridSize)
+let nano = new Nanoai("nano",26.5*worldGrid.gridSize,8*worldGrid.gridSize)
+//
+
+let circle = new Circle(28*worldGrid.gridSize,18*worldGrid.gridSize, 8,8)
+nano.brain.do("hungry");
+//nano.brain.do("pickup", circle);
+//nano.brain.do("walk", 26.5*worldGrid.gridSize,8*worldGrid.gridSize)
 //new Wall(28, 14)
