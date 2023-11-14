@@ -11,7 +11,7 @@ export class Highgrass {
         this.pathDifficulty = 1; 
         this.setActive = setActive;
         this.setActive(true)
-        this.renderOrder =0;
+        this.renderOrder =-3;
 
     } 
 

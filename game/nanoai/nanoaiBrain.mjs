@@ -50,7 +50,6 @@ export class NanoaiBrain {
       active: function (nano) {
 
         if (nano.brain.currentActivity) {
-
           var ou = nano.brain.currentActivity.work(nano);
           if (!ou) {
             nano.brain.done(nano)
@@ -62,6 +61,7 @@ export class NanoaiBrain {
       }
     };
   }
+  
   //easy logging to tell when we try to do something we did not define
   do(task, ...params) {
     var action = nanoaiActions.get(task);
@@ -72,6 +72,18 @@ export class NanoaiBrain {
       console.error(`there is no action for ${task}`)
     }
   }
+  doNow(task, ...params) {
+    var action = nanoaiActions.get(task);
+    if (action) {
+        var t = action.clone(...params)
+        this.queue.unshift(t); // Add the new task to the front of the queue
+        this.currentActivity = null; // Set the new task as the current activity
+        this.state = "idle"
+    } else {
+        console.error(`there is no action for ${task}`)
+    }
+ }
+ 
   doLater(task, condition, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
@@ -83,15 +95,15 @@ export class NanoaiBrain {
       console.error(`there is no action for ${task}`)
     }
   }
-  active(nano) {
-    nano.brain.state = "active";
-  }
-
   done(nano) {
     nano.brain.state = "idle"
     nano.brain.currentQueue.shift();
     nano.brain.currentActivity = null;
   }
+  active(nano) {
+    nano.brain.state = "active";
+  }
+
   idle(nano) {
     nano.brain.state = "idle"
   }

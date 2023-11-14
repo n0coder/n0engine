@@ -1,10 +1,15 @@
-export class NanoInventory {
-    constructor(slots, offsets) {
-        this.slots = slots;
+import { Inventory } from "../shared/Inventory.mjs";
+//i generally hate inheritance, but in this case i really needed it
+export class NanoInventory extends Inventory {
+    constructor(slots, offsets=[]) {
+        super(slots);
         this.offsets = offsets;
-        this.list = [];
     }
 
+    isPhysical(item) {
+        let index = this.list.indexOf(item);
+        return index >= 0 && index < this.offsets.length
+    }
     equip(item) {
         //console.log(item)
         if (this.list.includes(item)) {
@@ -28,77 +33,29 @@ export class NanoInventory {
             return false
         }
     }
-    transfer(inventory) {
-        var all = this.list.splice(0)
-        inventory.transferRecieve(all)
-    }
-    transferRecieve(all) {
-        all.forEach(i => this.add(i));
-    }
     add(item) { //0
-        if (this.list.includes(item)) {
-            return false;
-        } else {
-
-            //console.log("item added")
-            if (this.list.length < this.slots) {
-                item.renderOrder = 2
-                var o = this.list.push(item); //1
-                if (item.held != null) item.held = true;
-                this.refresh()
-                return o > 0;
-            }
-            return false;
-        }
-    }
-    isOpen() {
-        return this.list.length < this.slots
-    }
-
-    isPhysical(item) {
-        let index = this.list.indexOf(item);
-        return index >= 0 && index < this.offsets.length
-    }
-    has(item) {
-        let index = this.list.indexOf(item);
-        console.log(index);
-        return index >= 0
-    }
-    hasItem(kind) {
-        for (let index = 0; index < this.list.length; index++) {
-            const element = this.list[index];
-            if (element && element.constructor.name === kind) {
-                return element;
-            }
-        }
-        return null;
-    }
-
-    hasItems(kind, count) {
-        let i = []
-        for (let index = 0; index < this.list.length; index++) {
-            const element = this.list[index];
-            if (element && element.constructor.name === kind) {
-                i.push(element)
-                if (i.length >= count) {
-                    return i;
-                }
-            }
-        }
-        return null;
-    }
-    remove(item) {
-        if (this.list.includes(item)) {
-            var i = this.list.indexOf(item);
-            var o = this.list.splice(i, 1);
+        return super.add(item, ()=>{
+            item.renderOrder = 2
+            if (item.held != null) item.held = true;
             this.refresh()
-            item.setActive(true);
-            if (item.held != null && item.held) item.held = false; 
-            item.renderOrder = 0
-            return o;
-        } else {
-            return false;
-        }
+        })
+    }
+       
+    drop(item) {
+return super.remove(item, ()=>{
+    item.setActive(true);
+    if (item.held != null && item.held) item.held = false; 
+    item.renderOrder = 0
+    this.refresh()
+})
+    }
+
+    remove(item) {
+        item.setActive(false);
+        var removed = super.remove(item, ()=> {
+            this.refresh()
+        })
+        return removed;
     }
     //update position of visible items
     draw(nano) {

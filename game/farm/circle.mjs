@@ -12,14 +12,22 @@ export class Circle{
         this.offsetX = worldGrid.halfTileSize;
         this.offsetY = worldGrid.halfTileSize;
         this.held = false;
+        this.kind = "food"
         this.s = s;
+        this.sugar = 1;
         this.ms = ms;
         this.setActive = setActive;
         this.setActive(true);
+        this.eaten = false; 
+        this.renderOrder = 1;
     }
     draw() {
         let x = this.x + (this.held ? 0 : this.offsetX);
         let y = this.y +(this.held ? 0 : this.offsetY);
         p.ellipse(x, y, this.s, this.s);
+    }
+    onEat(nano) {
+        console.log("i aten", nano, this)
+        this.eaten = true;
     }
 }

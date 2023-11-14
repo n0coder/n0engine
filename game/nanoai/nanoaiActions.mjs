@@ -3,6 +3,7 @@ import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { n0radio } from "../radio/n0radio.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { Mommyai, Puff } from "./mommyai.mjs";
 import { findPath } from "./research/n0Pathfinder.mjs";
@@ -18,12 +19,40 @@ export const nanoaiActions = new Map([
             return handleClone(this, ...args)
         }
     }],
+    ["eat", {
+        args: [],work: function(nano) { 
+               if (nano.inventory.has(this.args[0])) {
+                if (this.args[0].eaten) console.log("eatened alreaddy")
+                this.args[0]?.onEat?.(nano)
+                nano.sugar += this.args[0].sugar      
+                nano.inventory.remove(this.args[0]);  
+               }
+            
+            return false;
+        },
+        clone: function (...args) {
+            return handleClone(this, ...args)
+        }
+    }],
     ["hungry", {
         args: [], target: null, path: null,
         work: function(nano) { //one issue later on could be to prioritize getting out of the bitter biome over finding food (while regular nano)
-            if (nano.sugar < 0) { //debt is hunger
+            if (nano.sugar <= 0) { //debt is hunger
+                
+                //let food = nano.inventory.hasItem("food", "kind") //food tag, 
+                let food = nano.inventory.hasItem("food", "kind");
+                if (food) {
+                    nano.brain.doNow("eat", food)
+                    return true; //exit here, but don't remove this action
+                }
 
-                let food = nano.inventory.hasItem("food") //food tag
+                //we need to model the radio system
+                
+                food = n0radio.findItem("food", "kind",nano) //n0radio.channel.items.hasItem("food", "kind")
+                if (food) {
+                    nano.brain.doNow("pickup", food) //interrupt the current cycle to walk to and pick up food
+                    return true; //exit here, but don't remove this action
+                }
                 //do we have food? (does radio friend channel have any food on offer?) //friendly hungry
                 //check inventory for food, eat food if found
                 //check radio for food, get food location, take food and eat it (friendly means we have the keys)
@@ -33,7 +62,12 @@ export const nanoaiActions = new Map([
                 
                 //no (or bitter nano)? look for food elsewhere //unfriendly hungry
                 
+            } else {
+                console.log(nano)
+                return false; //no longer hungry
             }
+
+            return true;
         }, 
         clone: function (...args) {
             return handleClone(this, ...args)
