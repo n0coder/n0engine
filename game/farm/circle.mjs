@@ -18,8 +18,8 @@ export class Circle{
         this.ms = ms;
         this.setActive = setActive;
         this.setActive(true);
-        this.eaten = false; 
         this.renderOrder = 1;
+        this.eaten = false; 
     }
     draw() {
         let x = this.x + (this.held ? 0 : this.offsetX);

@@ -18,7 +18,7 @@ export class NanoInventory extends Inventory {
             return this.list.unshift(item); //add item to beginning
         } else {
             if (this.list.length < this.slots) {
-                item.renderOrder = 2
+                item.renderOrder = 3
                 return this.list.unshift(item);
             }
             return false;
@@ -35,7 +35,7 @@ export class NanoInventory extends Inventory {
     }
     add(item) { //0
         return super.add(item, ()=>{
-            item.renderOrder = 2
+            item.renderOrder = 3
             if (item.held != null) item.held = true;
             this.refresh()
         })

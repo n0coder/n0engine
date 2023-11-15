@@ -50,11 +50,9 @@ export class Inventory {
        }
        
     remove(item, onRemoved) {
-        console.log(this.list)
         if (this.list.includes(item)) {
             var i = this.list.indexOf(item);
             var o = this.list.splice(i, 1);
-            console.log(this.list)
             onRemoved?.()
             return o;
         } else {

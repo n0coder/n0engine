@@ -48,7 +48,7 @@ export const nanoaiActions = new Map([
 
                 //we need to model the radio system
                 
-                food = n0radio.findItem("food", "kind",nano) //n0radio.channel.items.hasItem("food", "kind")
+                food = n0radio.findClaimItem("food", "kind",nano) //n0radio.channel.items.hasItem("food", "kind")
                 if (food) {
                     nano.brain.doNow("pickup", food) //interrupt the current cycle to walk to and pick up food
                     return true; //exit here, but don't remove this action
@@ -63,7 +63,7 @@ export const nanoaiActions = new Map([
                 //no (or bitter nano)? look for food elsewhere //unfriendly hungry
                 
             } else {
-                console.log(nano)
+                console.log("no longer hungry?!", nano)
                 return false; //no longer hungry
             }
 
@@ -243,7 +243,7 @@ export function followObj (obj, nano) {
     var vx = obj.args[0].x - nano.x;
     var vy = obj.args[0].y - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))
-    if (mag <= worldGrid.gridSize) {
+    if (mag <= worldGrid.gridSize*1.5) {
         nano.vx = 0;
         nano.vy = 0;
         return false;
@@ -252,17 +252,19 @@ export function followObj (obj, nano) {
     var vtx = obj.args[0].x - obj.targetX;
     var vty = obj.args[0].y - obj.targetY;
     var tmag = Math.sqrt((vtx * vtx) + (vty * vty))
-    if (!obj.path) //if target moves a whole tile we retarget the new tile lol 
+    
+    if (!obj.path|| obj.path.points.length ==0) //if target moves a whole tile we retarget the new tile lol 
         findPath(nano.x, nano.y, obj.args[0].x, obj.args[0].y, 32, 4, (path) => {
             obj.targetX = obj.args[0].x
             obj.targetY = obj.args[0].y
             obj.path = path;
         });
-    else {
+    else if (obj.path.points.length >0) {
         p.fill(255);
 
         // p.image(obj.path.graphics, nano.x, nano.y)
         //p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
+       
         let ped = obj.path.currentPointDistance(nano.x, nano.y);
         if (ped < worldGrid.gridSize / 2) {
             if (!obj.path.isFinalPoint) {
@@ -272,6 +274,7 @@ export function followObj (obj, nano) {
                 obj.path = null;
             }
         }
+
         if (obj.path)
             walk(nano, obj.path.currentPoint.x, obj.path.currentPoint.y, 2)
     }

@@ -24,14 +24,14 @@ export class Nanoai {
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
         this.speed = 48 * 2;
-        this.sugar = -5;
+        this.sugar = -20;
         loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(3, [[-7, -10], [7, -10], [0, -20]]);
         this.setActive = setActive;
         this.setActive(true)
-        this.renderOrder = 1;
-        this.working = true
+        this.renderOrder = 2;
+        this.working = false
         this.frame = 0, this.t = 0;
     }
     //keeping track of an unknown x and y center is easier with this calculation function
@@ -57,7 +57,7 @@ export class Nanoai {
     draw() {
         if (this.working)
             this.brain.work(this);
-
+        p.text(`${this.sugar <= 0? "hungry": ""}  ${this.sugar}`, this.x+10, this.y-16);
         if (!this.cimg)
             this.cimg = this.img;
 

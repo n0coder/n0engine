@@ -12,6 +12,8 @@ class P5engine {
       };
   
       p.setup = function()  {
+          window.p5.disableFriendlyErrors = true;
+
           document.getElementById('loading').style.display = 'none';
           p.createCanvas(gameW, gameH).parent("sketch-holder");
           cosmicEntityManager.invoke("setup");

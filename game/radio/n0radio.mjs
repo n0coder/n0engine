@@ -16,12 +16,12 @@ export class Channel {
 class Radio {
     constructor () {
         this.channels = new Map([
-            ["general", new Channel()],
-            ["jobs", new Channel()],
             ["personal", new Map()],
-            ["friends", new Map()],
             ["lover", new Map()],
-            ["team", new Map()]
+            ["team", new Map()],
+            ["friends", new Map()],
+            ["general", new Channel()],
+            ["jobs", new Channel()]
         ])
         this.channel = {
             items: new Inventory(),
@@ -82,10 +82,3 @@ class Radio {
     }
 }
 export let n0radio = new Radio();
-//n0radio.channel.items.add(new Circle(28*worldGrid.gridSize,18*worldGrid.gridSize, 8,8)) //
-n0radio.postItem("general", new Circle(28*worldGrid.gridSize,18*worldGrid.gridSize, 8,8))/*
-n0radio.postItem("friends",new Circle(28*worldGrid.gridSize,17*worldGrid.gridSize, 8,8), "key")
-
-n0radio.postItem("general", new Circle(28*worldGrid.gridSize,16*worldGrid.gridSize, 8,8))
-n0radio.postItem("friends",new Circle(28*worldGrid.gridSize,15*worldGrid.gridSize, 8,8), "key")
-*/
