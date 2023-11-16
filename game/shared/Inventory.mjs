@@ -29,7 +29,6 @@ export class Inventory {
 
     has(item) {
         let index = this.list.indexOf(item);
-        console.log(index);
         return index >= 0
     }
 

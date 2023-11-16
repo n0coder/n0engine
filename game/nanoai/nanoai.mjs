@@ -24,7 +24,8 @@ export class Nanoai {
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
         this.speed = 48 * 2;
-        this.sugar = -20;
+        this.sugar = -4;
+        this.lover = null;
         loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(3, [[-7, -10], [7, -10], [0, -20]]);

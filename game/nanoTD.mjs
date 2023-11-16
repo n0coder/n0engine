@@ -33,28 +33,43 @@ for (let o = 0; o < osif.length; o++) {
         }
     }
 }
-let nano = new Nanoai("nano",26.5*worldGrid.gridSize,8*worldGrid.gridSize)
-//
+let nano = new Nanoai("n0",28.5*worldGrid.gridSize,8*worldGrid.gridSize)
+let nano4 = new Nanoai("n0",29.5*worldGrid.gridSize,8*worldGrid.gridSize)
+let nano2 = new Nanoai("nano",21.5*worldGrid.gridSize,8*worldGrid.gridSize)
+let nano3 = new Nanoai("nano",23.5*worldGrid.gridSize,8*worldGrid.gridSize)
+n0radio.addFriend(nano, nano2);
+n0radio.addFriend(nano, nano3);
+n0radio.addFriend(nano2, nano3);
+
+nano.lover = nano4;
+nano4.lover = nano;
 
 nano.brain.do("hungry");
-nano.brain.do("walk", 30.5*worldGrid.gridSize,8*worldGrid.gridSize)
-//new Wall(28, 14)
+nano2.brain.do("hungry");
+nano3.brain.do("hungry");
+nano4.brain.do("hungry");
+nano.brain.do("walk", 28.5*worldGrid.gridSize,8*worldGrid.gridSize)
+nano4.brain.do("walk", 29.5*worldGrid.gridSize,8*worldGrid.gridSize);
+nano2.brain.do("walk", 21.5*worldGrid.gridSize,8*worldGrid.gridSize);
+nano3.brain.do("walk", 23.5*worldGrid.gridSize,8*worldGrid.gridSize);
 
+//new Wall(28, 14)
+let dist = 4;
 function posta (ia, oa, channel, color) {
 let pad = 4;
-new SquareName(channel, (ia*worldGrid.gridSize)-pad, (oa*worldGrid.gridSize)-pad, (worldGrid.gridSize*2)+pad*2,(worldGrid.gridSize*2)+pad*2, color)
-for (let o = 0; o < 2; o++) {
-    for (let i = 0; i < 2; i++) {
+new SquareName(channel, (ia*worldGrid.gridSize)-pad, (oa*worldGrid.gridSize)-pad, (worldGrid.gridSize*dist)+pad*2,(worldGrid.gridSize*dist)+pad*2, color)
+for (let o = 0; o < dist; o++) {
+    for (let i = 0; i < dist; i++) {
         n0radio.postItem(channel,new Circle((ia+i)*worldGrid.gridSize,(oa+o)*worldGrid.gridSize, 8,8), nano)
     }
 }
 
 }
 
-posta(2,2, "personal",[111,111,255])
-posta(6,2, "friends",[111,222,111])
-posta(10,2, "lover",[222,111,111])
-posta(10,6, "general",[111,111,111])
-posta(10,10, "jobs",[222,222,111])
+//posta(2,(dist), "personal",[111,111,255])
+posta(2,(dist*2.5), "friends",[111,222,111])
+posta(2,(dist*4), "lover",[222,111,111])
+//posta(2,(dist*5.5), "general",[111,111,111])
+//posta(2,(dist*7), "jobs",[222,222,111])
 
-n0radio.postItem("jobs",new Circle((12)*worldGrid.gridSize,(12)*worldGrid.gridSize, 8,8), nano)
+//n0radio.postItem("jobs",new Circle((12)*worldGrid.gridSize,(12)*worldGrid.gridSize, 8,8), nano)

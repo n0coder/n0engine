@@ -27,7 +27,6 @@ export class Circle{
         p.ellipse(x, y, this.s, this.s);
     }
     onEat(nano) {
-        console.log("i aten", nano, this)
         this.eaten = true;
     }
 }
