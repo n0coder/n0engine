@@ -24,6 +24,7 @@ export class Circle{
     draw() {
         let x = this.x + (this.held ? 0 : this.offsetX);
         let y = this.y +(this.held ? 0 : this.offsetY);
+        p.fill(255)
         p.ellipse(x, y, this.s, this.s);
     }
     onEat(nano) {

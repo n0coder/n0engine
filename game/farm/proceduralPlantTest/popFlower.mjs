@@ -1,28 +1,52 @@
+import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
 import { p } from "../../../engine/core/p5engine.mjs";
 import { Offseter } from "../../../engine/n0math/offseter.mjs";
-import { inverseLerp, remap } from "../../../engine/n0math/ranges.mjs";
+import { inverseLerp, lerp, remap } from "../../../engine/n0math/ranges.mjs";
 import { perpandicular } from "../../../engine/n0math/vectorMath.mjs";
 
 
 //plans to make the little red part of the flower pop off as a sweet fruit
 export class PopFlower {
-    constructor() {
-        this.rx = 1+Math.random()
-        this.ry = 1+Math.random()
-        this.s = .5*(1+Math.random())
+    constructor(x,y,size=1, length=48,count=4,currentCount=4, growSpeed=.125 ) {
+        this.rx = 1//+Math.random()
+        this.ry = 1//+Math.random()
+        this.size = .5*size//.5*(1+Math.random())
         this.angle = 14;
         this.pieceAngleOffset = .3
-        this.length =48
+        this.len =length
         this.lineSegments = 3;
         this.t = 0;
-        this.count = 1+Math.floor(Math.random() * 6)
-        this.pos = new Offseter(164,128)
+        this.count = count //1+Math.floor(Math.random() * 6)
+        this.currentCount = currentCount;
+        this.pos = new Offseter(x,y)
         this.color = [255, 180, 180]
         this.lineColor = [185, 190, 140]
         this.highlight = [-11, 46, 36]
+        this.growaSpeed = growSpeed
+        this.growth = 0
+        this.setActive = setActive;
+        this.setActive(true)
+        this.renderOrder = 1;
     }
+    get length() {
+        return this.len * inverseLerp(0,this.count, this.currentCount)
+    }
+    get s() {
+        return this.size * inverseLerp(0,this.count, this.growth);
+    }
+    get growSpeed() {
+return this.growaSpeed * (this.count);
+    } 
     draw() {
+        let ga = this.currentCount+(this.growSpeed*deltaTime);
+        if (ga < this.count)
+            this.currentCount= (ga)
+
+        ga = this.growth+(this.growSpeed*deltaTime);
+        if (ga < this.count)
+            this.growth= (ga)
+
         this.t += deltaTime;
         var angle = (Math.cos(5*this.t))
         var vsv = this.pos.rotate(0, -this.length*this.s, this.angle*angle)
@@ -48,9 +72,11 @@ export class PopFlower {
         var [r,g,b] = this.color
         var [hr, hg, hb]= this.highlight
         p.fill([r, g, b])
-        this.popFlower(pluses,  vlength, hlength, cx, distance, cy);
+        this.popFlower(pluses,  vlength*1.25, hlength, cx, distance, cy, this.currentCount);
+
+        let seta = inverseLerp(0,this.count, this.currentCount)
         p.fill([r-(hr*3), g-(hg*2), b-hb])
-        this.popFlower(pluses,  vlength, hlength-10, cx, distance*.25, cy);
+        this.popFlower(pluses,  vlength, hlength-10, cx, distance*.25, cy, this.count);
 
 
     }
@@ -66,21 +92,32 @@ export class PopFlower {
           p.line(headX,headY, baseX,baseY);
           p.pop();
       }
-    popFlower(pluses, vlength, hlength, cx, distance, cy) {
+    popFlower(pluses, vlength, hlength, cx, distance, cy,count) {
 
         var radians = (Math.PI*2)/pluses;
         p.beginShape();
         for (let i = 0; i < pluses; i++) {
+            let cc = (count);
+
+            //lerp(0, vlength, count%1) //usuing the 0.x, t
+            let alength = null;
+            if (i == Math.floor(cc)) 
+                alength = lerp(0, vlength, cc%1)
+             else if (i>cc-1)           
+                alength = 0
+            else 
+                alength = vlength;
+            //alength =(i>cc) ? 0 : vlength;
             let x = Math.sin(i * radians + this.t * .2);
             let y = Math.cos(i * radians + this.t * .2);
             //x and y are vectors
             var perp = perpandicular(x, y);
 
-            var upx1 = (x * vlength);
-            var upy1 = (y * vlength);
+            var upx1 = (x * alength);
+            var upy1 = (y * alength);
 
-            var downx2 = (-x * vlength);
-            var downy2 = (-y * vlength);
+            var downx2 = (-x * alength);
+            var downy2 = (-y * alength);
 
             var rightx3 = (perp.x * hlength);
             var righty3 = (perp.y * hlength);

@@ -35,6 +35,7 @@ export class Nanoai {
         this.working = false
         this.frame = 0, this.t = 0;
     }
+    
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
         if (this.img)

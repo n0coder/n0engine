@@ -1,6 +1,6 @@
 //forced canvas size, kept since p5.js's width and height variables are window based
-export const gameH = window.innerHeight;
-export const gameW = window.innerWidth// gameH//*1.77777;
+export const gameH = 512//window.innerHeight;
+export const gameW = 512//window.innerWidth// gameH//*1.77777;
 
 //global scene variables
 export const backgroundColor = [33,33,33];

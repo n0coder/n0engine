@@ -131,6 +131,8 @@ export class TerrainGenerator {
             var [r, g, b] = [0, 0, 0];
 
             if (biome) {
+                //biome.genCache.get("elevation");
+
                 if (biome.read) {
                     var rd = readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255;
                     [r, g, b] = [rd, rd, rd];

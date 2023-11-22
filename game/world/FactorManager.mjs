@@ -55,7 +55,7 @@ export function getBiome(x, y) {
     //console.log(factor);
     return biomae
 }
-export var offsetX = 111, offsetY = -240
+export var offsetX = 111, offsetY = 0
 export const one = false; //to display only one pixel (helpful for debugging)
 var vvscale = 1
 
@@ -100,13 +100,13 @@ var justTips = new NoiseGenerator({ scale: scale * 25, lowClip: 0, power: 3, hig
 var elevation3 = new NoiseGenerator({ scale: scale * 50, octaves: 1, persistance: .5, lacunarity: 1, offset: -1, offsetX: 3253, offsetY: 3222, amp: 3 })
 var elevation2 = new NoiseGenerator({ scale: scale * 15, octaves: 2, persistance: .5, lacunarity: 1.4, offsetX: 253, offsetY: 222, offset: elevation3, amp: 1 })
 var elevation = new NoiseGenerator({
-    power: squish, blend: [-1, 1], scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 2,
+    power: squish, blend: [-1, 1], scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 2, 
     mapSpace: [0, 1.1], map: [
         { "c": 0, "y": 0.01, "p": 3 }, { "c": .25, "y": 0.01, "p": 1.2 },
         { "c": .3, "y": .4 }, { "c": .41, "y": .4 }, { "c": .45, "y": .7 },
         { "c": .5, "y": .7 }, { "c": .53, "y": .72, "p": 1.8 },
         { "c": .72, "y": .85 }, { "c": .99, "y": .99, "p": 3 }
-    ],
+    ]
 });
 
 worldFactors.set("squish", squish);
@@ -118,7 +118,7 @@ var triverWorks2 = new NoiseGenerator({ power: .7, scale: scale * 550, octaves: 
 var triverWorks = new NoiseGenerator({ scale: scale * 350, abs: true, octaves: 3, persistance: .5, offset: -2, lacunarity: 1.75, offsetX: 1553, add: [triverWorks2], amp: 1 })
 var sprinkle = new NoiseGenerator({ scale: scale * 10, octaves: 6, persistance: .25, lacunarity: 2, offset: 0 });
 var negative = new NoiseGenerator({ scale: scale * 1000, power: 1.25, blend: [.25, 3] });
-var temp = new NoiseGenerator({ scale: scale * 1000, octaves: 3, persistance: .25, add: [[elevation, -.1]], lacunarity: 2, blend: [-1, 1] });
+var temp = new NoiseGenerator({ scale: scale * 1000, octaves: 3, persistance: .25, add: [[elevation, -.3]], lacunarity: 2, blend: [-1, 1] });
 worldFactors.set("temperature", temp)
 
 var triverWforks2 = new NoiseGenerator({ scale: scale * 450, octaves: 1, persistance: .5, lacunarity: 1, offset: 0, offsetX: -3283, offsetY: 3232, amp: 2 })
@@ -140,12 +140,16 @@ var triverWsforks = new NoiseGenerator({ scale: scale * 350, abs: true, octaves:
 var sugar = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
 var sugarO = new NoiseGenerator({scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222  });
 var bitter = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
-
+var sugarzonea = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
+    add: [[elevation, -.2]], mapSpace: [0, 1], map: [
+        { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [sugar, 0 , bitter] //bitter zone, original mix, sugar zone
+    }
+);
 var sugarzone = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
     mapSpace: [0, 1], map: [
         { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [-1, 0 , 1] //bitter zone, original mix, sugar zone
     }
 );
-    
-worldFactors.set("sugar", sugarO)
+//worldFactors.set("elevation", sugarzonea)
+worldFactors.set("sugar", sugarzonea)
 worldFactors.set("sugarzone", sugarzone)
