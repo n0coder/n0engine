@@ -34,6 +34,18 @@ export const nanoaiActions = new Map([
             return handleClone(this, ...args)
         }
     }],
+    ["read", {
+        args: [],
+        work: function(nano) { 
+            console.log(this.args)
+            let a = this.args[0][this.args[1]];
+            this.args[2](a);
+            return false;
+        },
+        clone: function (...args) {
+            return handleClone(this, ...args)
+        }
+    }],
     ["hungry", {
         args: [], target: null, path: null,
         work: function(nano) { //one issue later on could be to prioritize getting out of the bitter biome over finding food (while regular nano)

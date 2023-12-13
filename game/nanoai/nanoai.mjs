@@ -2,6 +2,7 @@ import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mj
 import { deltaTime, ticks } from "../../engine/core/Time/n0Time.mjs";
 import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { createCubicInterpolator, cubicBlendW, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
@@ -78,6 +79,16 @@ export class Nanoai {
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }
+        
+        let radius = 20*(inverseLerp(-1,1,Math.sin(ticks*.1))+.05), sradius = 5;
+        let numCircles = (3*radius)/(sradius*.75);
+        p.text(`${numCircles}`, this.x+10, this.y-36);
+        
+for (let i = 0; i < 2 * p.PI; i += 2 * p.PI / numCircles) {
+  let x = radius * Math.cos(i);
+  let y = radius * Math.sin(i);
+  p.ellipse(this.x+x, this.y+y, 2* sradius);
+}
 
         //if (!this.working) return;
 

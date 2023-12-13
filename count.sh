@@ -11,13 +11,13 @@ cd engine
 while read -r file; do
   lines=$(wc -l < "$file")
   total_lines=$((total_lines + lines))
-  
+  echo "Total lines $file: $lines"
 done < <(find . -type f -name "*.mjs")
 cd ../game
 while read -r file; do
   lines=$(wc -l < "$file")
   total_lines=$((total_lines + lines))
-  
+  echo "Total lines $file: $lines"
 done < <(find . -type f -name "*.mjs")
 
 # Print the total line count

@@ -37,7 +37,7 @@ for (let o = 0; o < osif.length; o++) {
 let pop2 = new PopFlower(6*worldGrid.gridSize,12*worldGrid.gridSize,.5,48,5,5)
 let pop = new PopFlower(3.5*worldGrid.gridSize,12*worldGrid.gridSize,.5,48,3,3)
 let nano = new Nanoai("n0",10*worldGrid.gridSize,5*worldGrid.gridSize)
-let nano4 = new Nanoai("abi",10.5*worldGrid.gridSize,5.5*worldGrid.gridSize)
+let nano4 = new Nanoai("abi",10.5*worldGrid.gridSize,44*worldGrid.gridSize)
 
 
 new Circle(10.5*worldGrid.gridSize,8.5*worldGrid.gridSize, 32,32)

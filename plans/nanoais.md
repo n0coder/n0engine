@@ -31,6 +31,13 @@ not only are there item storage related needs, but also action needs. one nanoai
 
 i think it would be a cool idea to have the nanoais praying or crusing the gods when they're forced to do something they dislike. like one ai may hate paperwork, and if they are assigned paperwork they start to get angry and they storm out of the workplace. they'll get depressed and pray to the gods that they are given some job that they don't hate
 
+## battery systems (energy system)
+a nanoai has a limited supply of energy, which is different from their sugar level
+the nano will need to sleep to regain energy, or refill it using sugar
+so we can put an energy usage points on an activity; to pull out energy as we work
+i could make it part of the update loop for activities... 
+
+
 
 ### n0
 there's tiny girl robots called nanoais in my farming game
