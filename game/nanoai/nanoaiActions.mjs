@@ -15,9 +15,7 @@ export const nanoaiActions = new Map([
         work: function (nano) {
             return walkObj(this, nano);
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["eat", {
         args: [],work: function(nano) { 
@@ -30,9 +28,7 @@ export const nanoaiActions = new Map([
             
             return false;
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["read", {
         args: [],
@@ -42,9 +38,7 @@ export const nanoaiActions = new Map([
             this.args[2](a);
             return false;
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["hungry", {
         args: [], target: null, path: null,
@@ -81,9 +75,7 @@ export const nanoaiActions = new Map([
 
             return true;
         }, 
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["debug", {
         args: [],
@@ -91,9 +83,7 @@ export const nanoaiActions = new Map([
             console.log(this);
             return false
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["follow", {
         args: [],
@@ -102,9 +92,7 @@ export const nanoaiActions = new Map([
             return followObj(this, nano)
         },
         //clone before setting the variable
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     
     ["pickup", {
@@ -113,18 +101,14 @@ export const nanoaiActions = new Map([
         work: function (nano) {
             return !nano.inventory.add(this.args[0], this.args[1])
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["equip", {
         args: [],
         work: function (nano) {
             return !nano.inventory.equip(this.args[0])
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["harvest", {
         args: [],
@@ -134,9 +118,7 @@ export const nanoaiActions = new Map([
                 return this.args[0].harvest(nano);
             return false
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["use", {
         args: [],
@@ -146,9 +128,7 @@ export const nanoaiActions = new Map([
                 return action
             }
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["plant", {
         args: [],
@@ -160,9 +140,7 @@ export const nanoaiActions = new Map([
                 return wait
             }
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }],
     ["transform", {
         args: [],
@@ -192,30 +170,10 @@ export const nanoaiActions = new Map([
             } else console.log("not holding nanoai")
             return false
         },
-        clone: function (...args) {
-            return handleClone(this, ...args)
-        }
+        
     }]
 ])
 
-export function handleClone(obj, ...args) {
-    //clone the object deeply
-    let clone = atomicClone(obj);
-    //drop in args
-    clone.args = [...args];
-    //collect prerequisite actions
-    let action = [];
-    if (clone.before != undefined) {
-        for (let i = 0; i < clone.before.length; i++) {
-            var beforeAction = handleClone(nanoaiActions.get(clone.before[i]), ...args);
-            action.push(...beforeAction)
-        }
-    };
-    //push the current clone afterwards
-    action.push(clone)
-    //send in prerequisite actions and current action
-    return action;
-}
 
 export function walkObj(obj, nano) {
     var vx = obj.args[0] - nano.x;

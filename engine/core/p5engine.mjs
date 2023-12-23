@@ -1,6 +1,7 @@
 import { cosmicEntityManager } from "./CosmicEntity/CosmicEntityManager.mjs";
 import { calculateDeltaTime, deltaTime, previousTime } from "./Time/n0Time.mjs";
 import { backgroundColor, gameH, gameW } from "../n0config.mjs";
+import { } from "./Utilities/MapUtils.mjs"
 class P5engine {
     constructor(){
         this.p = new window.p5(this.p5);

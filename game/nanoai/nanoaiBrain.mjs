@@ -1,3 +1,4 @@
+import { cloneAction } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { nanoaiActions } from "./nanoaiActions.mjs";
 
@@ -66,7 +67,7 @@ export class NanoaiBrain {
   do(task, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
-      var t = action.clone(...params)
+      var t = cloneAction(action, this.before, ...params)
       this.queue.push(t);
     } else {
       console.error(`there is no action for ${task}`)
@@ -75,7 +76,7 @@ export class NanoaiBrain {
   doNow(task, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
-        var t = action.clone(...params)
+        var t = cloneAction(action, this.before, ...params)
         this.queue.unshift(t); // Add the new task to the front of the queue
         this.currentActivity = null; // Set the new task as the current activity
         this.state = "idle"
@@ -87,14 +88,23 @@ export class NanoaiBrain {
   doLater(task, condition, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
-      var t = action.clone(...params)
-
+      var t = cloneAction(action, this.before, ...params)
       t.condition = condition
       this.laterQueue.splice(0, 0, t);
     } else {
       console.error(`there is no action for ${task}`)
     }
   }
+
+  before(clone, actions) {
+    if (clone.before != undefined) {
+      for (let i = 0; i < clone.before.length; i++) {
+          var beforeAction = cloneAction(nanoaiActions.get(clone.before[i]), ...args);
+          actions.push(...beforeAction)
+      }
+  };
+  }
+
   done(nano) {
     nano.brain.state = "idle"
     nano.brain.currentQueue.shift();

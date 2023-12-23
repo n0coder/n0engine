@@ -26,12 +26,112 @@ let job = {
     tasks: []
 }
 
+I was working on fortnite, got 145 levels in 9 days when i figured out that i can use my nanoais actions style to simplify job creation
+i wanted the simplicity of marking a system and having it come up with possible jobs
+
+click crop, click water
+nanoai checks for crop water level, and searches for a water source then the nano can water the crop
+
+n0radio.createJob(crop, "water") //creates a job to water this crop
+n0radio.createJob([crop1, crop2], "water") //creates a job to water both crops
+
+simple work; to create a job object
+
+we can then work from there to build on that system; daily jobs, reoccuring jobs... etc
+
+this would be a simple way to work would it not?
+
+
+in reality i will need to implement a custom requirements system
+to say, if a task requires another task, that task will have to be a secondary stage
+
+what that means is
+
+water crops requires check water level
+so water crops will need the check water level stage before it
+
+stage 1: check water level
+stage 2: water crops
+
+select 5 crops to water, we think in this order
+i need to water crops, which means we need to check water level
+stage 1: [check crop 1 water, check crop 2 water, check crop 3 water, check crop 4 water, check crop 5 water, find water source], 
+stage 2: [water crop 1,water crop 2,water crop 3,water crop 4,water crop 5]
+
+it should be able to evaluate the requirements and form the whole job based on context
 
 
 
 
 
 
+
+
+
+
+
+
+i am planning a system for creating tasks, something simple that can help form jobs easily
+
+say the task is "water", it needs to spawn a prerequisite stage and insert itself into the 2nd stage
+the 1st stage will hold tasks such as find obj waterSource - to find the water source
+and also to check crop water level.
+
+we can imagine a createJob function has simple parameters, 
+n0radio.createJob("water", crops)
+which is responsible for forming each stage, we will work in a while loop until all stages of the job are found
+
+so we would need to be able to create a stage, for the prerequisites, then we check those prerequisites prerequisits.
+as we work, we will need to mark each task with it's inventory indexes
+if a job needs to hold a referense in two stages, we hold it in the job's inventory and a marker in the task and it's prerequisite that it needs...
+
+
+let me explain what i mean
+
+job: {
+    inventory: ["waterSource", "crop1 water level", "crop2 water level"],
+    stages: [
+        { name: "check and find"
+            tasks: [
+                           {    name: "find", kind: "obj", item:"waterSource", index: 0, work(nano,done) {//find water source and set it's variable in the inventory}     } //the find job marks inventory index 0 for it is how we will get the water source reference
+                           {    name: "check", obj:"crop1", property: "waterlevel", index: 1, work(nano, done) { // check crop 1's water level, set it's inventory spot to the value of the crops water level }     }
+                       ]
+        }, 
+        {
+            name: "water",
+            tasks: [
+                            { name: "water", obj: "crop1" }
+                       ]
+        }
+    ]
+}
+
+i think by this point you will understand what i'm attempting
+
+
+
+
+i'm trying to build a system for jobs in my game. as i work to build on the system, more things important keep showing up.
+
+initially i thought maybe i would just build a job system to model the jobs; and i did
+i found that i would need a system which forms jobs based on tasks, and their requirements
+
+say i want to water crops, we need to spawn a stage before the water crops stage to handle the requirements
+
+so
+let task = {
+    name: "water crop", requires: [["find", "waterSource"], ["check", "waterLevel"]]
+}
+this isnt the idea yet... when we spawn the find water source requirement task, we have to mark the water source's spot in the job's inventory in the current task, so we can use the water source in the task... 
+
+the goal is to ultimately figure out if we can water the crops in the first stage, then in the second we water it...
+
+so, maybe the requires should be set up to communicate with the task and it's requirements (the required values?)
+
+so say we want to check water level to see if it's above a threshold, maybe the requirement's 3rd parameter is the threshold?
+
+["check", "waterLevel", 0]... this requires some work on figuring out what i want to do for this
+maybe a condition check as the parameter for the task's requirement, that would make sense would it not
 
 
 

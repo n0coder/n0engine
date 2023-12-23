@@ -1,4 +1,5 @@
 import { Nanoai } from "./nanoai/nanoai.mjs";
+import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
 /*
 let job = {
@@ -90,6 +91,8 @@ let jobu = {
 let n0 = new Nanoai("n0", 200,256); 
 let abi = new Nanoai("abi", 256,256); 
 let o2 = new Nanoai("02", 156,256); 
+
+n0.brain.do("walk", 256, 200)
 //jobu.stages[0].tasks[2].work(nano);
 /*
 let job = {
@@ -188,6 +191,227 @@ let job = {
 }
 */
 
+
+
+/*
+
+   I need to develop the task model
+    we need to be able to communicate requirements, and set up tasks based on them
+    
+    the job will need to have a way to hold important pieces of data
+
+    starting with water crops
+    we insert this as a task it should produce two tasks for the same crop, 
+    but the requires is placed on a stage below the task
+    waterDefinition: {
+        name: "water crop", args: [],
+        requires: "read crop water level"  
+    } 
+  
+
+    stages: [
+        {
+            tasks: [
+                {name: "read crop water level", crop: "crop 0"},
+                {name: "find water source"}
+            ]
+        },
+        {
+            tasks: [
+                {name: water crop, crop: "crop 0"}
+            ]
+        }
+    ]
+    writing this out reveals we can place an item into the job's storage, and read from it
+    so a task may claim items in the storage array
+
+    so how we have a crop property in the object, we could mark a set of items in the array
+
+    so, that's like this, where we add things to the job storage and keep track of the index at that spot when we make the tasks...
+
+    let index = job.storage.length;
+    job.storage.push("crop 0")
+    task.args.push(index)
+    taskRequires.args.push(index)
+
+    this is a simplified idea of what i'm attempting
+
+*/
+let jobTasks = new Map([
+    ["find", function (job, kind, item) {
+        //set up a slot in the job inventory and set a marker to it here
+        let index = job.inventory.length
+        job.inventory.push(null)
+        return {
+            work: function(nano, done) {
+                nano.brain.do("find", kind, item, (out)=> {
+                    //what to do if we find water source
+                    job.inventory[index] = out; //is this right?
+                    done(this); 
+                })
+            },
+            index, 
+            done: false,
+            working: false
+        }
+    }]
+]); 
+let jobou = {inventory:[]}
+let task = jobTasks.get("find")(jobou, "obj", "waterSource");
+task.work(n0, (tak)=>{
+    console.log("we did the work i think")
+})
+
+//this is the old version:
+var findWaterTask = { 
+    name: "find water source",
+    work: function(job, nano, done) {
+        nano.brain.do("find", "obj", "waterSource", (out)=> {
+            job.waterSource = out;
+            done(this); //
+        })
+    },
+    nano: null, //have nano claim this task
+    done: false,
+    working: false
+}
+let workd = findWaterTask.work(jobou, n0, (tak)=>{ //this however does not set up the job for handling the item...
+    console.log("we did the work i think")
+})
+
+
+var checkCropWaterTask = {
+    name: "read crop water level",
+    crop: null,
+    working: false,
+    work: function(job, nano, done) {
+        if (this.working) return true;
+        this.working = true;
+
+        if (this.crop === null) {
+            this.crop = job.crops.find(c => c.waterLevel === null);
+            this.crop.waterLevel = NaN
+        }
+        nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
+            this.crop.waterLevel = out;
+            console.log(this.crop)
+            done(this);
+        });
+    }
+}
+
+var jobTasksa = new Map([
+    ["read", {
+        args: [], job: null,
+        working: false,
+        work: function(job, nano, done) {
+            if (this.working) return true;
+            this.working = true;
+            
+            if (this.crop === null) {
+                this.crop = job.crops.find(c => c.waterLevel === null);
+                this.crop.waterLevel = NaN
+            }
+            nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
+                this.crop.waterLevel = out;
+                console.log(this.crop)
+                done(this);
+            });
+        }
+    }]
+]);
+
+var checkWaterStage = {
+    name: "check crop water level and find water source",
+    workIndex: new Map(), 
+    important: true,
+    work: function(job, nano) {
+        let task = this.workIndex.get(nano);
+        if (task) {
+            task.work(job, nano, (task)=>this.taskComplete(job, this,nano,task));
+            return true;
+        } else {
+            task = this.tasks[0];
+            if (task) {
+                this.tasks.splice(0,1)
+                this.workIndex.set(nano, task);
+                task.work(job, nano, (task)=>this.taskComplete(job, this,nano, task))
+                return true;
+            } 
+        }
+    },
+    taskComplete: (job, stage, nano, task)=> {
+        stage.workIndex.delete(nano); //this remove the worker
+        stage.validateStage(job)
+    },
+    passCondition(job) {
+        let a = job.crops.some(c=>c.waterLevel!=null && c.waterLevel<20);
+          a &&= job.waterSource!=null
+        return a
+    },
+    validateStage(job){
+        console.log(this.tasks, this.workIndex);
+        if (this.tasks.length === 0 && this.workIndex.size === 0) {
+            if (this.passCondition(job)) {
+              return job.stageComplete(this);
+            }  else {
+              return job.stageFailed(this);
+            }
+            }
+    },
+tasks: [
+    {
+        name: "read crop water level",
+        crop: null,
+        working: false,
+        work: function(job, nano, done) {
+            if (this.working) return true;
+            this.working = true;
+ 
+            if (this.crop === null) {
+                this.crop = job.crops.find(c => c.waterLevel === null);
+            }
+            nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
+                this.crop.waterLevel = out;
+                console.log(this.crop)
+                done(this);
+            });
+        }
+    }, //did i just find out that the tasks are 1 to 1 copies of my nano actions functions? yes
+    {
+        name: "read crop water level",
+        crop: null,
+        working: false,
+        work: function(job, nano, done) {
+            if (this.working) return true;
+            this.working = true;
+ 
+            if (this.crop === null) {
+                this.crop = job.crops.find(c => c.waterLevel === null);
+            }
+            nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
+                this.crop.waterLevel = out;
+                console.log(this.crop)
+                done(this);
+            });
+        }
+    },
+    { 
+        name: "find water source",
+        work: function(job, nano, done) {
+            nano.brain.do("find", "obj", "waterSource", (out)=> {
+                job.waterSource = out;
+                done(this); //
+            })
+        },
+        nano: null, //have nano claim this task
+        done: false,
+        working: false
+    }
+ ]
+ 
+}
+
 var job = {
     name: "water crops",
     crops: [{crop:{waterLevel:15}, waterLevel:null},{crop:{waterLevel:12}, waterLevel:null}], waterSource: null,
@@ -209,112 +433,212 @@ var job = {
         else n0radio.jobDone(this);
     },
     stage: 0, stages: [
-        {
-            name: "check crop water level and find water source",
-            workIndex: new Map(), 
-            important: true,
-            work: function(job, nano) {
-                let task = this.workIndex.get(nano);
-                if (task) {
-                    task.work(job, nano, (task)=>this.taskComplete(job, this,nano,task));
-                    return true;
-                } else {
-                    task = this.tasks[0];
-                    if (task) {
-                        this.tasks.splice(0,1)
-                        this.workIndex.set(nano, task);
-                        task.work(job, nano, (task)=>this.taskComplete(job, this,nano, task))
-                        return true;
-                    } 
-                }
-            },
-            taskComplete: (job, stage, nano, task)=> {
-                stage.workIndex.delete(nano); //this remove the worker
-                stage.validateStage(job)
-            },
-            passCondition(job) {
-                let a = job.crops.some(c=>c.waterLevel!=null && c.waterLevel<20);
-                  a &&= job.waterSource!=null
-                return a
-            },
-            validateStage(job){
-                console.log(this.tasks, this.workIndex);
-                if (this.tasks.length === 0 && this.workIndex.size === 0) {
-                    if (this.passCondition(job)) {
-                      return job.stageComplete(this);
-                    }  else {
-                      return job.stageFailed(this);
-                    }
-                    }
-            },
-        tasks: [
-            {
-                name: "read crop water level",
-                crop: null,
-                working: false,
-                work: function(job, nano, done) {
-                    if (this.working) return true;
-                    this.working = true;
-         
-                    if (this.crop === null) {
-                        this.crop = job.crops.find(c => c.waterLevel === null);
-                        this.crop.waterLevel = NaN
-                    }
-                    nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
-                        this.crop.waterLevel = out;
-                        console.log(this.crop)
-                        done(this);
-                    });
-                }
-            },
-            {
-                name: "read crop water level",
-                crop: null,
-                working: false,
-                work: function(job, nano, done) {
-                    if (this.working) return true;
-                    this.working = true;
-         
-                    if (this.crop === null) {
-                        this.crop = job.crops.find(c => c.waterLevel === null);
-                    }
-                    nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
-                        this.crop.waterLevel = out;
-                        console.log(this.crop)
-                        done(this);
-                    });
-                }
-            },
-            { 
-                name: "find water source",
-                work: function(job, nano, done) {
-                    nano.brain.do("find", "obj", "waterSource", (out)=> {
-                        job.waterSource = out;
-                        done(this); //
-                    })
-                },
-                nano: null, //have nano claim this task
-                done: false,
-                working: false
-            }
-         ]
-         
-    }]
+        checkWaterStage
+        ]
 }
 
 job.work(n0);
 job.work(abi);
 job.work(o2);
 
-let average = function(list, predicate) {
-    var total = list.reduce((sum, x)=> sum + predicate(x), 0);
-    return total == 0 ? 0 : total / list.length; 
+
+
+//small experiements
+
+//expirement 1: task stage creation
+//what that means: water crops requires water source and a crop with a specific water level condition to be watered
+let crop = {waterLevel:.5}
+let twask = {
+    name: "water crop", crop,
+    requires: [
+        ["find", "obj", "waterSource"],
+        ["read", crop, "waterLevel"]
+    ]
+} 
+
+
+let joboj = {
+    stages: []
+}
+function taskToStages(task) {
+    let depthStack = [{task: task, depth: 0, base: null}]; 
+    let stages = []
+    let resourceMap = new Map();
+    while(depthStack.length > 0) {
+        let currentTask = depthStack.pop();
+        let base = currentTask.base;
+        let task = currentTask.task;
+        let depth = currentTask.depth;
+        if(task.requires) {
+            for(let i = 0; i < task.requires.length; i++) {
+                //we need to form tasks based on arguments here?
+                let vis = task.requires[i];
+                let isu = nanoaiActions.get(vis[0])
+                console.log(vis[0], isu);
+
+                // at a standstill gotta figure out how to use the task require as a key, 
+                // this is so multiple tasks that require the same item can use the same item...
+
+                depthStack.push({task: task.requires[i], depth: depth + 1, base: task});
+            }
+        }
+
+        if(base) { //if it has a base, the base will need to access it's output
+            let item = resourceMap.getSet(task, {}); 
+            task.item = item;
+            if  (base.items) base.items.push(item);
+            else base.items = [item]; 
+        }
+
+        if(stages[depth]) {
+            stages[depth].push(task);
+        } else {
+            stages[depth] = [task];
+        }
+    }
+    return stages.reverse();
+}
+// notably, there is an issue with this code. it's that we are directly displacing objects
+
+//console.log(taskToStages({name:0}));
+//let otem = taskToStages({name:0, requires: [{name:1}]})
+let vtx = taskToStages(twask)
+console.log(vtx);
+otem[0][0].item.name = "hi"
+
+//console.log(otem[0][0])
+//console.log(otem);
+
+/*
+
+there is a specific kind of problem that i have, object creation
+in the pursuit of creating a job system that builds itself based on the tasks at hand, 
+there is a basic issue that i do understand how to solve
+
+turning something as simple as 
+
+["check", "waterLevel", crop], 
+into an object, which does the work
+{ args: [ crop, "waterLevel", outFunction ], work: function(nano) {
+    //nano will walk to the crop then:    
+    this.args[2](this.args[0][this.args[1])
+    return true; //mark the task completed
+}}
+
+it's easy to do this, i just did it. but, we need to form a key
+
+*/
+
+//we will do a sort of recursion to read requirements into a set of stages
+let objv = {
+    name:0
+}
+let obj3 = {requires: [objv],name:1}
+let ogbj = {name:2}
+let obj2 = {
+    requires: [obj3, ogbj],name:3
 }
 
-let averages = cources.map((course)=>{
-    let students = course.students.filter(
-        (x) => x.color == "red" && x.age < 20
-    )
-    return average(students, (x) => sum + x.gpa)
-}) 
+let anobj = {
+    requires: [obj2], name:4
+}
+let aosn = getStagesIteratively(anobj)
+console.log(aosn)
 
+
+let getwaterlevela = {
+    name: "get water level"
+}
+let getwatersourcea = {
+    name: "get water source"
+}
+
+let watercropa = {
+    name: "water crop", args:[],
+    requires: [getwaterlevela, getwatersourcea]
+}
+//when we spawn the requires, we should place a pointer for the water level in the args, and then a pointer for the water source too
+
+//this should result in a copy of the original tasks, but with additional arguments
+
+let getwaterlevelaa = {
+    name: "get water level", arg: 3 //we chose slot 3 for water level
+}
+let getwatersourceaa = {
+    name: "get water source", arg: 4 //we chose slot 4 for water source
+}
+
+let watercropaa = {
+    name: "water crop", args:[3, 4], //when we spawned the requirements, we also set the args into the current object, allowing them to be used as parameters
+    requires: [getwaterlevela, getwatersourcea],
+    work: function(job) {
+        let waterLevel = job.inventory[args[0]] //this call to args makes sure to pick out the correct index for the task
+        let waterSource = job.inventory[args[1]] 
+
+        //do the work
+    }
+}
+
+
+//the output i want is
+//stage 0: [objv]
+//stage 1: [obj3, ogbj]
+//stage 2: [obj2]
+//stage 3: [anobj]
+
+//in  a sense we're reading the depth of the nesting and storing the items into the approperiate slot in the array?
+
+
+
+
+
+// what i want to do is break it down... 
+
+// job: {stages: [{tasks:[]}]}
+// stages: [{tasks:[]}]
+// tasks: []
+
+// a task has prerequisites
+// task: {name:"water crop", obj: crop, requires: [ ["find", "waterSource"], ["check", "waterlevel", crop]}
+
+// it gets split into it's stages
+// in the stage they are tasks that get spawned
+// the idea is prerequisites are placed on the stage before the task, as a way to queue up the requirements
+// stage 0: [{name: "find waterSource"}, {name: "check crop waterlevel"}] 
+// stage 1: [{name: "water crop"}]
+
+// when this happens it will form connections, so the prerequisite stage's work can be carried into the later stages
+// args: [{item: null}, {item: null}]
+// stage 0: [{name: "find waterSource", index: 0}, {name: "check crop waterlevel", index: 1}]
+// stage 1: [{name: "water crop", indexes: [0, 1]}]
+// this will make it so that the crop has access to it's args in the expected order, so it knows what index to choose
+
+// recap: create a job using a task as the formula to create the job, split the tasks into it's set of stages and tie them together
+
+// initially you may think the args are not usable for more complex techs, 
+// but you must remember we don't have to return a single value, 
+// we can return a whole object of values
+
+// another thing we can note
+// the args hold a list of objects, so we don't need the tasks to hold indexes at all, we could just drop in the objects
+// args: [{item: null}, {item: null}]
+// stage 0: [{name: "find waterSource", output: args[0]}, {name: "check crop waterlevel", output: args[1]}]
+// stage 1: [{name: "water crop", outputs: [args[0], args[1]]}]
+// this way the outputs are directly linked to the objects in the job inventory, so the tasks don't need to know about the job itself...
+
+
+// 2 days later, tasks are actions. 
+// so, we don't need to specifically design the tasks to call actions, 
+// we can just use them as actions, and still call others when needed
+
+
+//the current issue is storage and stage creation right?
+
+let ajobou = {
+    inventory: []
+}
+
+function createJobu() {
+    let job = {inventory: [], stages:[]};
+
+}

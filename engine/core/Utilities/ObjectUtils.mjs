@@ -17,7 +17,14 @@ export function atomicClone(oldObj) {
     }
     return newObj;
 }
-
+export function cloneAction(obj, also, ...args) {
+    let clone = atomicClone(obj);
+    clone.args = [...args];
+    let action = [];
+    also?.(clone, action);
+    action.push(clone);
+    return action;
+  }
 export const imageMap = new Map();
 
 export function loadImg(obj, vari, path) {
