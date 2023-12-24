@@ -10,7 +10,11 @@ export function atomicClone(oldObj) {
             newObj[key] = oldObj[key].slice()
         }
         else if (typeof oldObj[key] === 'object') {
-            newObj[key] = atomicClone(oldObj[key])
+            if (oldObj[key] instanceof Map) 
+                newObj[key] = new Map(oldObj[key]);
+            else
+                newObj[key] = atomicClone(oldObj[key])
+            
         } else {
             newObj[key] = oldObj[key];
         }

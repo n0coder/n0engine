@@ -1,3 +1,4 @@
+import { atomicClone, cloneAction } from "../engine/core/Utilities/ObjectUtils.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
 import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
@@ -238,7 +239,9 @@ let job = {
 
 */
 let jobTasks = new Map([
-    ["find", function (job, kind, item) {
+    ["find", function (job, args) {
+        console.log(args)
+        
         //set up a slot in the job inventory and set a marker to it here
         let index = job.inventory.length
         job.inventory.push(null)
@@ -258,10 +261,11 @@ let jobTasks = new Map([
 ]); 
 let jobou = {inventory:[]}
 let task = jobTasks.get("find")(jobou, "obj", "waterSource");
+/*
 task.work(n0, (tak)=>{
     console.log("we did the work i think")
 })
-
+*/
 //this is the old version:
 var findWaterTask = { 
     name: "find water source",
@@ -275,10 +279,11 @@ var findWaterTask = {
     done: false,
     working: false
 }
+/*
 let workd = findWaterTask.work(jobou, n0, (tak)=>{ //this however does not set up the job for handling the item...
     console.log("we did the work i think")
 })
-
+*/
 
 var checkCropWaterTask = {
     name: "read crop water level",
@@ -321,8 +326,7 @@ var jobTasksa = new Map([
     }]
 ]);
 
-var checkWaterStage = {
-    name: "check crop water level and find water source",
+var stageTemplate = {
     workIndex: new Map(), 
     important: true,
     work: function(job, nano) {
@@ -335,6 +339,7 @@ var checkWaterStage = {
             if (task) {
                 this.tasks.splice(0,1)
                 this.workIndex.set(nano, task);
+                
                 task.work(job, nano, (task)=>this.taskComplete(job, this,nano, task))
                 return true;
             } 
@@ -352,6 +357,7 @@ var checkWaterStage = {
     validateStage(job){
         console.log(this.tasks, this.workIndex);
         if (this.tasks.length === 0 && this.workIndex.size === 0) {
+            console.log("ready to pass to next stage?")
             if (this.passCondition(job)) {
               return job.stageComplete(this);
             }  else {
@@ -359,62 +365,140 @@ var checkWaterStage = {
             }
             }
     },
-tasks: [
-    {
-        name: "read crop water level",
-        crop: null,
-        working: false,
-        work: function(job, nano, done) {
-            if (this.working) return true;
-            this.working = true;
- 
-            if (this.crop === null) {
-                this.crop = job.crops.find(c => c.waterLevel === null);
-            }
-            nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
-                this.crop.waterLevel = out;
-                console.log(this.crop)
-                done(this);
-            });
-        }
-    }, //did i just find out that the tasks are 1 to 1 copies of my nano actions functions? yes
-    {
-        name: "read crop water level",
-        crop: null,
-        working: false,
-        work: function(job, nano, done) {
-            if (this.working) return true;
-            this.working = true;
- 
-            if (this.crop === null) {
-                this.crop = job.crops.find(c => c.waterLevel === null);
-            }
-            nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
-                this.crop.waterLevel = out;
-                console.log(this.crop)
-                done(this);
-            });
-        }
-    },
-    { 
-        name: "find water source",
-        work: function(job, nano, done) {
-            nano.brain.do("find", "obj", "waterSource", (out)=> {
-                job.waterSource = out;
-                done(this); //
-            })
-        },
-        nano: null, //have nano claim this task
-        done: false,
-        working: false
-    }
- ]
+tasks: [ ]
  
 }
 
+
+
+//small experiements
+
+//some key generator for unique dependancies...
+/*
+
+let objectMap = new Map();
+let objectCounter = 0;
+
+
+
+let crop1 = { type: 'crop', id: 1 };
+let crop2 = { type: 'crop', id: 2 };
+
+let template1 = ["find", "object", "waterSource"];
+let template2 = ["check", "waterLevel", crop1];
+let template3 = ["check", "waterLevel", crop2];
+
+console.log(generateKey(template1)); // "findobjectwaterSource"
+console.log(generateKey(template2)); // "checkwaterLevel1"
+console.log(generateKey(template3)); // "checkwaterLevel2"
+
+
+*/
+
+
+
+
+//expirement 1: task stage creation
+//what that means: water crops requires water source and a crop with a specific water level condition to be watered
+
+
+
+let joboj = {
+    stages: []
+}
+function tasksToStages(tasks) {
+let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
+    let stages = []
+    let resourceMap = new Map(), keyMap = new Map(), resourceKeyMap = new Map();
+    while(depthStack.length > 0) {
+        let currentTask = depthStack.pop();
+        let base = currentTask.base;
+        let task = currentTask.task;
+        let depth = currentTask.depth;
+        if(task.requires) {
+            for(let i = 0; i < task.requires.length; i++) {
+                //we need to form tasks based on arguments here?
+                //let isu = nanoaiActions.get(vis[0])
+                let key = generateKey(task.requires[i], keyMap); 
+                
+                let [action, ...argsa] = task.requires[i]; //right here we form a task based on the template
+                //nanoaiActions.get(task);
+                let ss = jobTasksa.get(action)
+
+                let broken = false;
+                if (ss === undefined) {
+                    broken = true;
+                    console.error(`there is no job task called ${action}`)
+                }
+                //ok so we will need a referense towards how we form tasks to begin with.
+                let tasku = cloneAction(ss, null, ...argsa);
+                
+
+                depthStack.push({task: tasku[0], broken, key, depth: depth + 1, base: task});
+            }
+        }
+
+        // since we form the basis of the job tasks below this point, 
+        // we'll use this part to help describe the output
+        let key = currentTask.key;
+         
+        if(base) { //if it has a base, the base will need to access it's output
+            let item = resourceMap.getSet(key, {}); 
+            task.item = item;
+            if  (base.items) base.items.push(item);
+            else base.items = [item]; 
+        }
+        let anya = resourceKeyMap.get(key);
+        
+        if (!key || !anya) {
+            resourceKeyMap.set(key, true);
+
+            
+        if(stages[depth]) {
+            stages[depth].tasks.push(task);
+            if (currentTask.broken)
+            stages[depth].broken = true;
+        } else {
+            let template = atomicClone(stageTemplate);       
+            template.tasks.push(task);  
+            if (currentTask.broken)
+                template.broken = true;   
+            stages[depth] = template
+        }
+        }
+    }
+    return stages.reverse();
+    function generateKey(template, objectMap) {
+        return template.map(item => {
+            if (typeof item === 'object') 
+                return objectMap.getSet(item, objectMap.size + 1);
+            else 
+                return item;        
+        }).join('');
+    }
+}
+let crop = {waterLevel:.5}
+let crop2 = {waterLevel:.5}
+let twask = {
+    name: "water crop", crop,
+    requires: [
+        ["read", crop, "waterLevel"],
+        ["find", "obj", "waterSource"],
+    ]
+} 
+let twask2 = {
+    name: "water crop", crop2,
+    requires: [
+        ["read", crop2, "waterLevel"],
+        ["find", "obj", "waterSource"],
+    ]
+} 
+
+let vtx = tasksToStages([twask, twask2])
+console.log(vtx);
+
 var job = {
     name: "water crops",
-    crops: [{crop:{waterLevel:15}, waterLevel:null},{crop:{waterLevel:12}, waterLevel:null}], waterSource: null,
     
     work: function(nano) {
         let currentStage = this.stages[this.stage];
@@ -432,9 +516,7 @@ var job = {
         if (this.stage+1<this.stages.length) this.nextStage();
         else n0radio.jobDone(this);
     },
-    stage: 0, stages: [
-        checkWaterStage
-        ]
+    stage: 0, stages: vtx
 }
 
 job.work(n0);
@@ -443,68 +525,16 @@ job.work(o2);
 
 
 
-//small experiements
-
-//expirement 1: task stage creation
-//what that means: water crops requires water source and a crop with a specific water level condition to be watered
-let crop = {waterLevel:.5}
-let twask = {
-    name: "water crop", crop,
-    requires: [
-        ["find", "obj", "waterSource"],
-        ["read", crop, "waterLevel"]
-    ]
-} 
 
 
-let joboj = {
-    stages: []
-}
-function taskToStages(task) {
-    let depthStack = [{task: task, depth: 0, base: null}]; 
-    let stages = []
-    let resourceMap = new Map();
-    while(depthStack.length > 0) {
-        let currentTask = depthStack.pop();
-        let base = currentTask.base;
-        let task = currentTask.task;
-        let depth = currentTask.depth;
-        if(task.requires) {
-            for(let i = 0; i < task.requires.length; i++) {
-                //we need to form tasks based on arguments here?
-                let vis = task.requires[i];
-                let isu = nanoaiActions.get(vis[0])
-                console.log(vis[0], isu);
 
-                // at a standstill gotta figure out how to use the task require as a key, 
-                // this is so multiple tasks that require the same item can use the same item...
 
-                depthStack.push({task: task.requires[i], depth: depth + 1, base: task});
-            }
-        }
 
-        if(base) { //if it has a base, the base will need to access it's output
-            let item = resourceMap.getSet(task, {}); 
-            task.item = item;
-            if  (base.items) base.items.push(item);
-            else base.items = [item]; 
-        }
 
-        if(stages[depth]) {
-            stages[depth].push(task);
-        } else {
-            stages[depth] = [task];
-        }
-    }
-    return stages.reverse();
-}
-// notably, there is an issue with this code. it's that we are directly displacing objects
 
-//console.log(taskToStages({name:0}));
-//let otem = taskToStages({name:0, requires: [{name:1}]})
-let vtx = taskToStages(twask)
 console.log(vtx);
-otem[0][0].item.name = "hi"
+
+//otem[0][0].item.name = "hi"
 
 //console.log(otem[0][0])
 //console.log(otem);
