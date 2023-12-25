@@ -304,8 +304,10 @@ var checkCropWaterTask = {
         });
     }
 }
-
-var jobTasksa = new Map([
+//we have a current issue, initial task formation. 
+//for the task needs to share info with it's requirements
+//we could write a closure to set up the initial object
+var jobTasksao = new Map([
     ["read", {
         args: [], job: null,
         working: false,
@@ -326,6 +328,53 @@ var jobTasksa = new Map([
     }]
 ]);
 
+var jobTasksa = new Map([
+
+    ["smile", function(...args) {
+        return {
+            name: "smile",
+            args, working: false, job:null,
+            requires: [["wink", args[0]]],
+            work: function(nano, done) {
+                if (this.working) return true;
+                this.working = true;
+                console.log("smiling", args, this.items);
+                done(this);
+            }
+        }
+    }], ["wink", function(...args) {
+        return {
+            name: "wink",
+            args, working: false, job:null,
+            work: function(nano, done) {
+                if (this.working) return true;
+                this.working = true;
+                this.item.winked = "winked";
+                console.log("winking", args);
+                done(this);
+            }
+        }
+    }],
+    ["read", function(args) {
+        return {args, job: null,
+        working: false,
+        work: function(job, nano, done) {
+            if (this.working) return true;
+            this.working = true;
+            
+            if (this.crop === null) {
+                this.crop = job.crops.find(c => c.waterLevel === null);
+                this.crop.waterLevel = NaN
+            }
+            nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
+                this.crop.waterLevel = out;
+                console.log(this.crop)
+                done(this);
+            });
+        }}
+    }]
+]);
+
 var stageTemplate = {
     workIndex: new Map(), 
     important: true,
@@ -339,8 +388,7 @@ var stageTemplate = {
             if (task) {
                 this.tasks.splice(0,1)
                 this.workIndex.set(nano, task);
-                
-                task.work(job, nano, (task)=>this.taskComplete(job, this,nano, task))
+                task.work(nano, (task)=>this.taskComplete(job, this,nano, task))
                 return true;
             } 
         }
@@ -355,14 +403,11 @@ var stageTemplate = {
         return a
     },
     validateStage(job){
-        console.log(this.tasks, this.workIndex);
         if (this.tasks.length === 0 && this.workIndex.size === 0) {
             console.log("ready to pass to next stage?")
-            if (this.passCondition(job)) {
+            
               return job.stageComplete(this);
-            }  else {
-              return job.stageFailed(this);
-            }
+            
             }
     },
 tasks: [ ]
@@ -421,19 +466,16 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
                 //let isu = nanoaiActions.get(vis[0])
                 let key = generateKey(task.requires[i], keyMap); 
                 
-                let [action, ...argsa] = task.requires[i]; //right here we form a task based on the template
+                let [action, ...argsa] = task.requires[i];
                 //nanoaiActions.get(task);
-                let ss = jobTasksa.get(action)
-
+                let ss = jobTasksa.get(action) 
                 let broken = false;
                 if (ss === undefined) {
                     broken = true;
                     console.error(`there is no job task called ${action}`)
-                }
+                } 
                 //ok so we will need a referense towards how we form tasks to begin with.
-                let tasku = cloneAction(ss, null, ...argsa);
-                
-
+                let tasku = [ss(...argsa)||{}]  // cloneAction(ss, null, ...argsa);
                 depthStack.push({task: tasku[0], broken, key, depth: depth + 1, base: task});
             }
         }
@@ -493,13 +535,11 @@ let twask2 = {
         ["find", "obj", "waterSource"],
     ]
 } 
-
+/*
 let vtx = tasksToStages([twask, twask2])
 console.log(vtx);
-
+*/
 var job = {
-    name: "water crops",
-    
     work: function(nano) {
         let currentStage = this.stages[this.stage];
         currentStage.work(this, nano);
@@ -513,15 +553,22 @@ var job = {
         else n0radio.jobFail(this); 
     },
     nextStage: function() {
-        if (this.stage+1<this.stages.length) this.nextStage();
-        else n0radio.jobDone(this);
+        if (this.stage+1<this.stages.length) {
+            this.stage++;
+            console.log("job: moved to next stage")
+        } 
+        else {
+            //n0radio.jobDone(this);
+            console.log("job: completed")
+        }
     },
-    stage: 0, stages: vtx
+    stage: 0, stages: null
 }
-
+/*
 job.work(n0);
 job.work(abi);
 job.work(o2);
+*/
 
 
 
@@ -531,8 +578,7 @@ job.work(o2);
 
 
 
-
-console.log(vtx);
+//console.log(vtx);
 
 //otem[0][0].item.name = "hi"
 
@@ -572,8 +618,6 @@ let obj2 = {
 let anobj = {
     requires: [obj2], name:4
 }
-let aosn = getStagesIteratively(anobj)
-console.log(aosn)
 
 
 let getwaterlevela = {
@@ -664,11 +708,51 @@ let watercropaa = {
 
 //the current issue is storage and stage creation right?
 
+
+/*
+ok so this is the requires syntax for my tech
+
+requires: [["task", "arg1", "arg2"]]
+this tells the task stage generator that we need to run the task before moving onto the item that requires it
+
+so, say we want to form a syntax for creating jobs, it would be somewhat different
+
+say we want to water multiple crops
+
+job.create("water", [crop1, crop2, crop3])
+we would need to map those crops into water tasks...
+
+function create(task, objs, ...argsa)
+let tasks = objs.map(c=> {
+    let ss = jobTasksa.get(task);
+    return cloneAction(ss, null, c, ...argsa);    
+}
+*/
+
+
+
 let ajobou = {
     inventory: []
 }
 
-function createJobu() {
-    let job = {inventory: [], stages:[]};
+function createJobu(task, objs, ...argsa) {
+    let smile = jobTasksa.get(task);
+    if (smile === undefined) {
+        console.error(`"${task}" is not a job task, can't create job. returning null.`);
+        return null;
+    }
+    let tasks = objs.map(o=>smile(o, ...argsa))
+    let stages = tasksToStages(tasks);
+    let jobu = atomicClone(job); //atomically clone the job template
+    jobu.stages = stages; //insert the job details
+return jobu;
 
 }
+let jobz = createJobu("smile", [":)", ":o", "XD"], "hi");
+console.log(jobz)
+jobz.work(n0); //wink
+jobz.work(n0); //wink
+jobz.work(n0); //wink
+jobz.work(n0); //smile
+jobz.work(n0); //smile
+jobz.work(n0); //smile
