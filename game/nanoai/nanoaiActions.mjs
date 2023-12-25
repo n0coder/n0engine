@@ -89,6 +89,7 @@ export const nanoaiActions = new Map([
         args: [],
         targetX: null, targetY: null, path: null,
         work: function(nano) { 
+            if (this.args[0].x !== undefined && this.args[0].y !== undefined) 
             return followObj(this, nano)
         },
         //clone before setting the variable
@@ -99,6 +100,7 @@ export const nanoaiActions = new Map([
         args: [],
         before: ["follow"],
         work: function (nano) {
+            this.args[2](this.args[0])
             return !nano.inventory.add(this.args[0], this.args[1])
         },
         

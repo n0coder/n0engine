@@ -35,6 +35,7 @@ export class NanoInventory extends Inventory {
     }
     add(item) { //0
         return super.add(item, ()=>{
+            if (item.renderOrder!=undefined)
             item.renderOrder = 3
             if (item.held != null) item.held = true;
             this.refresh()
@@ -45,6 +46,7 @@ export class NanoInventory extends Inventory {
 return super.remove(item, ()=>{
     item.setActive(true);
     if (item.held != null && item.held) item.held = false; 
+    if (item.renderOrder!=undefined)
     item.renderOrder = 0
     this.refresh()
 })
@@ -68,19 +70,23 @@ return super.remove(item, ()=>{
             var slot = this.list[i];
             if (slot === null) continue;
             var offset = this.offsets[i]
+
+            if (slot.x != undefined && slot.y != undefined) {
             //console.log(offset); 
             slot.x = x + offset[0]
             slot.y = y + offset[1]
+            }
+            if (slot.vx != undefined && slot.vy != undefined) {
             slot.vx = -offset[0];
             slot.vy = -offset[1]
-
+            }
         }
     }
     //make items visible when there are positions that are available
     refresh() {
         for (let i = 0; i < this.list.length; i++) {
             if (this.list[i] === null) continue;
-            this.list[i].setActive(i < this.offsets.length)
+            this.list[i]?.setActive?.(i < this.offsets.length)
 
         }
     }

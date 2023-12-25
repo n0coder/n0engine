@@ -25,7 +25,7 @@ export function cloneAction(obj, also, ...args) {
     let clone = atomicClone(obj);
     clone.args = [...args];
     let action = [];
-    also?.(clone, action);
+    also?.(clone, action, args);
     action.push(clone);
     return action;
   }
