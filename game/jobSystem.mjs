@@ -207,7 +207,7 @@ var job = {
     stage: 0, stages: null
 }
 
-function createJobu(task, objs, ...argsa) {
+function createJobu(objs,task, ...argsa) {
     let smile = jobTasksa.get(task);
     if (smile === undefined) {
         console.error(`"${task}" is not a job task, can't create job. returning null.`);
@@ -220,11 +220,89 @@ function createJobu(task, objs, ...argsa) {
 return jobu;
 
 }
-let jobz = createJobu("smile", [":)", circle, "XD"], "hi");
-console.log(jobz)
+let jobz = createJobu([":)", circle, "XD"], "smile", "hi");
+
 jobz.work(n0); //wink
 jobz.work(abi); //wink
 jobz.work(o2); //wink
 jobz.work(o2); //smile
 jobz.work(abi); //smile
 jobz.work(n0); //smile
+
+
+//work on job search system
+
+// for job system to form definitions that the nanos can use 
+// we will need to come up with a way for tasks to describe themselves
+// pretty simple given tasks are driven by keywords 
+
+// "water", plant
+// "find", "obj", "waterSource"
+// "check", plant, "waterlevel" 
+
+// we could have a lookup table for attributes for the nanos to cross referense with
+// we need a way to hold personality traits, skills, opinions and relationships for our nanos
+// nano.personality.skills, nano.skills, nano.brain.skills...
+// nano.opinions, nano.personality.opinions, nano.brain.opinions...
+
+// we could define skills and opinions directly on the nano themselves, or as a profile in the nano radio...
+// most realistically however, it wouldn't make sense to say: n0radio.getNanoPersonality(nano), or n0radio.nanoPersonalities.get(nano)
+// holding specific info about how a nano will percieve the world seems best left on the nano itself
+// idea though, we don't directly define the skills and personalities?
+// nano.personality.get("opinion", "object") //returns info about how the nano feels about an object...
+
+// the more i work on this idea, it reminds me of the system i was gonna make for the rpg game. 
+// a system in which skills are improved based on the underlying traits
+// by throwing a rock we level up throwing, also velocity, strength, and accuracy
+// https://github.com/n0coder/goblins-haven/blob/main/src/Core/Game/Combat/Ability.mjs
+
+// we will form another implementation idea of what may be a very similar system
+
+//pseudonano
+let nanoz =  {
+    mind: {
+        opinion: new Map([
+            ["items", new Map([["sugar", 0]])]
+        ]),
+        relationship: new Map([
+            ["test", 0]
+        ]),
+        skills: new Map([
+            ["harvesting", 0]
+        ])
+    }
+}
+//this code here does not quite match
+//we need to get the opinion of types
+// get the opinion of item sugar, get opinion of activity talking, get opinion of ... etc
+
+// relationship does keep it's normal map style of work
+// skills may stay as a normal map as well 
+// normal as in regular, or plain**
+
+/*
+function calculateNanoScore(nanoai, job) {
+    let score = 0;
+
+    // For each required skill for the job, add the weighted nanoai's skill level to the score.
+    for (let skill of job.skills) {
+        score += nanoai.mind.getSkill(skill) * SKILL_WEIGHT;
+    }
+
+    // For each required item for the job, add the weighted nanoai's opinion of the item to the score.
+    for (let item of job.items) {
+        score += nanoai.mind.getOpinion("items", item) * OPINION_WEIGHT;
+    }
+
+    // Subtract the distance to the job from the score, weighted by a distance factor.
+    let distance = calculateDistance(nanoai.pos, job.pos); // You would need to implement this function.
+    score -= distance * DISTANCE_WEIGHT;
+
+    // For each nano involved in the job, add the weighted nanoai's relationship with that nano to the score.
+    for (let nano of job.nanos) {
+        score += nanoai.mind.relationships.get(nano) * RELATIONSHIP_WEIGHT;
+    }
+
+    return score;
+}
+*/

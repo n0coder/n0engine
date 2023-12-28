@@ -87,25 +87,27 @@ if a job needs to hold a referense in two stages, we hold it in the job's invent
 
 
 let me explain what i mean
-
+```javascript
 job: {
     inventory: ["waterSource", "crop1 water level", "crop2 water level"],
     stages: [
         { name: "check and find"
-            tasks: [
-                           {    name: "find", kind: "obj", item:"waterSource", index: 0, work(nano,done) {//find water source and set it's variable in the inventory}     } //the find job marks inventory index 0 for it is how we will get the water source reference
-                           {    name: "check", obj:"crop1", property: "waterlevel", index: 1, work(nano, done) { // check crop 1's water level, set it's inventory spot to the value of the crops water level }     }
-                       ]
+            tasks:  [
+                {    name: "find", kind: "obj", item:"waterSource", index: 0, work(nano,done) }
+                    //find water source and set it's variable in the inventory}     } //the find job marks inventory index 0 for it is how we will get the water source reference
+                {    name: "check", obj:"crop1", property: "waterlevel", index: 1, work(nano, done) } 
+                    // check crop 1's water level, set it's inventory spot to the value of the crops water level }     }
+                    ]
         }, 
         {
             name: "water",
-            tasks: [
-                            { name: "water", obj: "crop1" }
-                       ]
+            tasks:  [
+                { name: "water", obj: "crop1" }
+                    ]
         }
     ]
 }
-
+```
 i think by this point you will understand what i'm attempting
 
 
@@ -180,3 +182,34 @@ nano.currentJob.getwork(nano)
 job{
   getwork: function (nano) {} //queue a check action, until checks are complete, then queue a normal action. when we queue an action, we remove it from it's list, as to prevent other ais on the same job from claiming the same action... etc...
 }
+
+the job system wouldn't be complete without the concept of job discovery
+say we have a job that works with cotton candy, we need to relay that information to the job system 
+we need to be able to tell a nano what tasks it can perform 
+since the job does not handle the life cycle of it's stages, 
+the stages need to be able to describe what kinds of actions it needs performed
+
+this is so we can cross referense an ai to be able to form a score based on what job/task the nano performs
+what we're doing is trying to advertise the tasks of the job
+
+
+things to keep in mind when selecting a job:
+1. nano's preferenses
+2. nano's skills
+3. the distance from the task site
+4. nano's relationship to others working on the same stage
+
+preferences:
+a nano may like an activity, or they may like a certain item, or work alone
+
+skills:
+a nano may work with farming jobs alot, and so their skills increase as they work
+they are more likely to pick the job that fits their skills best
+
+distance:
+the nano with the lowest distance is scored higher
+
+relationship:
+a nano may want to work with friends, a nano may hate another nano
+a nano will not want to pick a job that has a nano they have a hateful relationship with
+

@@ -51,7 +51,7 @@ export const nanoaiActions = new Map([
                     nano.brain.doNow("eat", food)
                     return true; //exit here, but don't remove this action
                 }
-
+                
                 //we need to model the radio system
                 
                 food = n0radio.findClaimItem("food", "kind",nano) //n0radio.channel.items.hasItem("food", "kind")
