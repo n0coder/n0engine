@@ -7,6 +7,7 @@ import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 
 export class Circle{
     constructor(x=0,y=0, s=15, ms=15) {
+        this.name = "circle"
         this.x = x;
         this.y = y;
         this.offsetX = worldGrid.halfTileSize;

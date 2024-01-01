@@ -1,12 +1,15 @@
+import { setActive } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { atomicClone, cloneAction } from "../engine/core/Utilities/ObjectUtils.mjs";
+import { p } from "../engine/core/p5engine.mjs";
+import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Circle } from "./farm/circle.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
 import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
 
-let n0 = new Nanoai("n0", 200,256); 
-let abi = new Nanoai("abi", 256,256); 
-let o2 = new Nanoai("02", 156,256); 
+let n0 = new Nanoai("n0", 200,-256); 
+let abi = new Nanoai("abi", 256,-256); 
+let o2 = new Nanoai("02", 156,-256); 
 let circle = new Circle(64,256, 8,8);
 
 n0.brain.do("walk", 256, 200)
@@ -41,13 +44,11 @@ var jobTasksa = new Map([
         return {
             name: "hold",
             args, working: false, job:null,
+            interactions: [["walking"],["pickup", "item", args[0]]], 
             work: function(nano, done) {
                 if (this.working) return true;
                 this.working = true;
                 this.item.item = args[0];
-                console.log(`${nano.name} picking up?`, this.item.item);
-
-                console.log(this.item);
                 nano.brain.do("pickup", this.item.item, null, (a)=>{
                     console.log("picked up", a)
                     done(this)
@@ -221,14 +222,15 @@ return jobu;
 
 }
 let jobz = createJobu([":)", circle, "XD"], "smile", "hi");
-
+console.log(jobz)
+/*
 jobz.work(n0); //wink
 jobz.work(abi); //wink
 jobz.work(o2); //wink
 jobz.work(o2); //smile
 jobz.work(abi); //smile
 jobz.work(n0); //smile
-
+*/
 
 //work on job search system
 
@@ -306,3 +308,171 @@ function calculateNanoScore(nanoai, job) {
     return score;
 }
 */
+
+/*
+function calculateNanoScore(nanoai, job) {
+   let score = 0;
+
+   // Calculate the product of the nanoai's skill level and opinion for each required skill and item.
+   for (let skill of job.skills) {
+       score += nanoai.mind.getSkill(skill) * nanoai.mind.getOpinion("items", skill);
+   }
+
+   // Calculate the distance to the job.
+   let distance = calculateDistance(nanoai.pos, job.pos); // You would need to implement this function.
+
+   // Divide the score by the distance, weighted by a distance factor.
+   score /= Math.pow(distance, DISTANCE_FACTOR);
+
+   return score;
+}
+*/
+
+//nanos working on the same group of tasks will gain more skill faster when working with nanos that have a higher skill level
+//finalScore = ((score)^2.4) / distance ^ 1.2
+
+// forming the specifics (dec 29 2023)
+let anano = {
+    name: "a",
+    skills: new Map([
+        ["harvesting", 1],
+        ["reading", 1]
+    ]),
+    opinions: new Map([
+        ["skills", new Map([
+            ["harvesting", 1], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+        ]) ]
+    ]),
+    pos: [5, 2]
+}
+let bnano = {
+    name: "b",
+    skills: new Map([
+        ["harvesting", 1],
+        ["reading", 1]
+    ]),
+    opinions: new Map([
+        ["skills", new Map([
+            ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+        ]) ]
+    ]),
+    pos: [8, 32]
+}
+
+let cnano = {
+    name: "c",
+    skills: new Map([
+        ["harvesting", 1],
+        ["reading", 1]
+    ]),
+    opinions: new Map([
+        ["skills", new Map([
+            ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+        ]) ],
+        ["items", new Map([
+            ["circle", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+        ]) ]
+    ]),
+    pos: [16, 16]
+}
+
+let abnano = {value: 2} //tie the relationships to the same object so they can share info and changes in relationship are read easier 
+let relationships = new Map([
+    [anano, new Map([[bnano, abnano]])], 
+    [bnano, new Map([[anano, abnano]])]
+])
+
+let astage = {
+    workers: [anano, bnano],
+    tasks: [{
+        interactions: [["harvesting", "items", circle]], pos: [0, 0]
+    },{
+        interactions: [["reading", "items", circle]], pos: [8, 0]
+    }]
+}
+
+function createScore (nano, stage) { //scoring based on the tasks in a stage
+    let taskmaps = new Map();
+    let relationshipModifier = 1;
+    //gather the stages workers, excluding ourselves, what is the relationship multiplier value?
+    for (const worker of stage.workers) {
+        let relationshipList = relationships.get(nano);
+        if (relationshipList === undefined) break;
+        let relationship = relationshipList.get(worker);
+
+        //think about it like this, if the relationship key itself isn't set there isn't an object defining the relationship
+        if (relationship) relationshipModifier *= relationship.value;
+        //stage
+    }
+
+    for (let task of stage.tasks) {
+        var vx = nano.pos[0] - task.pos[0];
+        var vy =  nano.pos[1] - task.pos[1];
+        let vis =((vx * vx) + (vy * vy));
+        var mag = Math.sqrt(vis < .1 ? .1 : vis)*.1;
+        let score = 1;
+        score *= relationshipModifier;
+        
+        if (task.interactions)
+        for (const [skill, type, thing] of task.interactions) {
+            
+            let skillo = nano.opinions?.get("skills")?.get(skill) || 1;
+            score *= skillo;
+            let typo = nano.opinions?.get(type)?.get(thing.name) || 1;
+            score *= typo;
+            
+        }
+        let fin = Math.log( Math.pow(score, 2.4) / (Math.pow(mag, 1.2) ));
+
+
+        taskmaps.set(task, fin);
+    }
+return taskmaps ;
+}
+console.log(Math.pow(10, 2.4) / (Math.pow(100, 1.2) ))
+let a =createScore (anano, astage);
+let b =createScore (bnano, astage);
+let c = createScore (cnano, astage);
+console.log ({a,b,c})
+//we should make a visualizer for this tech
+class ScoreVisualizer {
+    constructor() {
+        this.nanos = [
+            {
+                name: "a",
+                skills: new Map([
+                    ["harvesting", 5]
+                ]),
+                pos: [4, 6]
+            }, {
+                name: "b",
+                skills: new Map([
+                    ["harvesting", 22]
+                ]),
+                pos: [8, 32]
+            },
+            {
+                name: "c",
+                skills: new Map([
+                    ["harvesting", 129]
+                ]),
+                pos: [24, 16]
+            }
+        ]
+        this.task = {
+            skill: "harvesting", pos: [8, 8]
+        }
+        this.setActive = setActive;
+        this.setActive(true)
+    }
+    draw() {
+        for (let nano of this.nanos) {
+            let nanoScore = createScore(nano, this.task);
+            p.fill(nanoScore *10);
+            p.ellipse(nano.pos[0]*worldGrid.gridSize, nano.pos[1]*worldGrid.gridSize, nano.skills.get("harvesting"));
+            p.fill(255);
+            p.text(`${nano.name}, ${nanoScore}`, (nano.pos[0]*worldGrid.gridSize)+10, (nano.pos[1]*worldGrid.gridSize)-16);
+        }
+    }
+}
+//et scoreVisualizer = new ScoreVisualizer();
