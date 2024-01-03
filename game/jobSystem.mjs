@@ -21,6 +21,7 @@ var jobTasksa = new Map([
             name: "smile",
             args, working: false, job:null,
             requires: [["hold", args[0]]],
+            interactions: [["smiling"]], 
             work: function(nano, done) {
                 if (this.working) return true;
                 this.working = true;
@@ -32,6 +33,7 @@ var jobTasksa = new Map([
         return {
             name: "wink",
             args, working: false, job:null,
+            interactions: [["winking"]], 
             work: function(nano, done) {
                 if (this.working) return true;
                 this.working = true;
@@ -43,7 +45,7 @@ var jobTasksa = new Map([
     }],["hold", function(...args) {
         return {
             name: "hold",
-            args, working: false, job:null,
+            args, working: false, job:null, pos: [args[0].x, args[0].y], //?
             interactions: [["walking"],["pickup", "item", args[0]]], 
             work: function(nano, done) {
                 if (this.working) return true;
@@ -59,7 +61,7 @@ var jobTasksa = new Map([
         }
     }],
     ["read", function(args) {
-        return {args, job: null,
+        return { args, job: null,
         working: false,
         work: function(job, nano, done) {
             if (this.working) return true;
@@ -333,7 +335,8 @@ function calculateNanoScore(nanoai, job) {
 
 // forming the specifics (dec 29 2023)
 let anano = {
-    name: "a",
+    name: "a", 
+    identity: {
     skills: new Map([
         ["harvesting", 1],
         ["reading", 1]
@@ -343,10 +346,12 @@ let anano = {
             ["harvesting", 1], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
         ]) ]
     ]),
+},
     pos: [5, 2]
 }
 let bnano = {
     name: "b",
+    identity: {
     skills: new Map([
         ["harvesting", 1],
         ["reading", 1]
@@ -356,23 +361,26 @@ let bnano = {
             ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
         ]) ]
     ]),
+},
     pos: [8, 32]
 }
 
 let cnano = {
     name: "c",
-    skills: new Map([
-        ["harvesting", 1],
-        ["reading", 1]
-    ]),
-    opinions: new Map([
-        ["skills", new Map([
-            ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
-        ]) ],
-        ["items", new Map([
-            ["circle", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
-        ]) ]
-    ]),
+    identity: {
+        skills: new Map([
+            ["harvesting", 1],
+            ["reading", 1]
+        ]),
+        opinions: new Map([
+            ["skills", new Map([
+                ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+            ]) ],
+            ["items", new Map([
+                ["circle", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+            ]) ]
+        ]),
+    },    
     pos: [16, 16]
 }
 
@@ -394,8 +402,8 @@ let astage = {
 function createScore (nano, stage) { //scoring based on the tasks in a stage
     let taskmaps = new Map();
     let relationshipModifier = 1;
-    //gather the stages workers, excluding ourselves, what is the relationship multiplier value?
-    for (const worker of stage.workers) {
+    
+    for (const [worker, work] of stage.workIndex) {
         let relationshipList = relationships.get(nano);
         if (relationshipList === undefined) break;
         let relationship = relationshipList.get(worker);
@@ -406,34 +414,76 @@ function createScore (nano, stage) { //scoring based on the tasks in a stage
     }
 
     for (let task of stage.tasks) {
+        let score = 1;
+        score *= relationshipModifier;
+        if (task.interactions)
+        for (const [skill, type, thing] of task.interactions) {
+            let skillb = nano.identity.skills?.get(skill) || 1;
+            let skillo = nano.identity.opinions?.get("skills")?.get(skill) || 1;
+            score *= skillo*skillb; //high skill but low interest in the skill means lower score for skill
+            let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
+            score *= typo;
+        }
+
+        if (!(task.pos[0] && task.pos[1])) {
+            taskmaps.set(task, score); //no distance related calculation needed
+        } else {
         var vx = nano.pos[0] - task.pos[0];
         var vy =  nano.pos[1] - task.pos[1];
         let vis =((vx * vx) + (vy * vy));
         var mag = Math.sqrt(vis < .1 ? .1 : vis)*.1;
-        let score = 1;
-        score *= relationshipModifier;
-        
-        if (task.interactions)
-        for (const [skill, type, thing] of task.interactions) {
-            
-            let skillo = nano.opinions?.get("skills")?.get(skill) || 1;
-            score *= skillo;
-            let typo = nano.opinions?.get(type)?.get(thing.name) || 1;
-            score *= typo;
-            
-        }
-        let fin = Math.log( Math.pow(score, 2.4) / (Math.pow(mag, 1.2) ));
-
-
+        let fin =  Math.pow(score, 2.4) / (Math.pow(mag, 1.2) );
         taskmaps.set(task, fin);
+        }
     }
 return taskmaps ;
 }
-console.log(Math.pow(10, 2.4) / (Math.pow(100, 1.2) ))
-let a =createScore (anano, astage);
-let b =createScore (bnano, astage);
-let c = createScore (cnano, astage);
+
+let stag = jobz.stages[jobz.stage];
+
+console.log( Math.pow(1, 2.4) / (Math.pow(10, 1.2) ))
+let a =createScore (anano, stag);
+let b =createScore (bnano, stag);
+let c = createScore (cnano, stag);
 console.log ({a,b,c})
+
+// we need a dual rating system
+// have a list of nanos, have a map of tasks rated based on the nanos
+
+// if multiple nanos are queuing for the same task we want to rate which nanos can take the task
+// if one nano is queuing for multiple tasks, we want to rate the task
+// basically we want to pick a nano and task, choosing what tasks to give out based on the score...
+// confusing concept to me
+
+/*
+    nano a: 
+        task 1: 1
+        task 2: 1,
+        task 3: .17...
+    nano b:
+        task 1: 2
+        task 2: 1.5
+        task 3: 53
+    nano c: 
+        task 1: .2
+        task 2: .3
+        task 3: 6  
+*/
+
+function selectTask(nano, stag) {
+   let scoredTasks =createScore (nano, stag);
+   let selectedTask = null, highestScore = -1;
+   for (let [task, score] of scoredTasks) {
+    if (score > highestScore) {
+        selectedTask = task; highestScore = score;
+    }
+   }
+   return selectedTask
+}
+console.log (selectTask(anano, stag));
+// take the list of nanos, along with their task ratings and assign the nano a task
+// a nano can not share a task with another*
+
 //we should make a visualizer for this tech
 class ScoreVisualizer {
     constructor() {
