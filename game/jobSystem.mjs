@@ -10,7 +10,6 @@ import { n0radio } from "./radio/n0radio.mjs";
 let n0 = new Nanoai("n0", 200,-256); 
 let abi = new Nanoai("abi", 256,-256); 
 let o2 = new Nanoai("02", 156,-256); 
-let circle = new Circle(64,256, 8,8);
 
 n0.brain.do("walk", 256, 200)
 
@@ -101,11 +100,6 @@ var stageTemplate = {
     taskComplete: (job, stage, nano, task)=> {
         stage.workIndex.delete(nano); //this remove the worker
         stage.validateStage(job)
-    },
-    passCondition(job) {
-        let a = job.crops.some(c=>c.waterLevel!=null && c.waterLevel<20);
-          a &&= job.waterSource!=null
-        return a
     },
     validateStage(job){
         if (this.tasks.length === 0 && this.workIndex.size === 0) {
@@ -223,7 +217,12 @@ function createJobu(objs,task, ...argsa) {
 return jobu;
 
 }
-let jobz = createJobu([":)", circle, "XD"], "smile", "hi");
+
+
+let circle = new Circle(64,256, 8,8);
+let circle2 = new Circle(64,128, 8,8);
+let circle3 = new Circle(128,128, 8,8);
+let jobz = createJobu([circle3, circle, circle2], "smile", "hi");
 console.log(jobz)
 /*
 jobz.work(n0); //wink
@@ -354,11 +353,13 @@ let bnano = {
     identity: {
     skills: new Map([
         ["harvesting", 1],
-        ["reading", 1]
+        ["reading", 1],
+        ["walking", 3]
     ]),
     opinions: new Map([
         ["skills", new Map([
             ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+            ["walking", 1.5]
         ]) ]
     ]),
 },
@@ -370,11 +371,13 @@ let cnano = {
     identity: {
         skills: new Map([
             ["harvesting", 1],
+            ["smiling", 4],
             ["reading", 1]
         ]),
         opinions: new Map([
             ["skills", new Map([
                 ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+                ["smiling", 2],
             ]) ],
             ["items", new Map([
                 ["circle", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
@@ -424,7 +427,6 @@ function createScore (nano, stage) { //scoring based on the tasks in a stage
             let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
             score *= typo;
         }
-
         if (!(task.pos[0] && task.pos[1])) {
             taskmaps.set(task, score); //no distance related calculation needed
         } else {
@@ -484,6 +486,81 @@ console.log (selectTask(anano, stag));
 // take the list of nanos, along with their task ratings and assign the nano a task
 // a nano can not share a task with another*
 
+
+
+
+/*
+imagine a concept
+we have pinging requests to search for something
+we want to have a system which describes which things are searching, a queue of sorts
+but it can't act as a queue.
+the idea is that if the item their searching for is not available we add them to a list, 
+when the item becomes available we give it to the best fitting searcher
+
+say we have a list of searchers
+[n0, n1, n2, n3] 
+say we have a list of items
+[i0, i1, i2, i3]
+
+they will be added to a list when there are no items
+when an item is added we search the list of searchers for the best fit for that item
+
+when a searcher is searching for an item and there is an item we search the items list and pick the best rated item
+otherwise, no item, we add the searcher to the searchers list. so that we can do the reverse check. 
+
+this is so that a nanoai who's waiting will always get the best job based on skill, because we don't want a lower skill nano to get a job that a higher skill nano is a better fit for all because the lower skill nano got there first. does that make sense?
+*/
+function nanoFirstSearch(nanos, items) {
+    let matches = {}; 
+ 
+    for (let nano of nanos) {
+        let scores = items.map(item => ({item, score:nano*item}));
+        for (let {item, score} of scores) {
+            if (!matches[nano] || score > matches[nano].score) {
+                matches[nano] = { item, score };
+            }
+        }
+    }
+    return matches
+ }
+ function itemFirstSearch(nanos, items) {
+    let matches = {}; 
+ 
+    for (let nano of nanos) {
+        let scores = items.map(item => ({item, score:nano*item}));
+        for (let {item, score} of scores) {
+            if (!matches[item] || score > matches[item].score) {
+                matches[item] = { nano, score};
+            }
+        }
+    }
+    return matches
+ }
+
+ let n04 = [5, 23, 13, 1];
+ let i04 = [7, 22,12, 5]; 
+console.log(nanoFirstSearch(n04, i04));
+console.log(itemFirstSearch(n04, i04))
+
+// both algorithms, are the same, 
+// but their keys are different. 
+// we can possibly come up with a way to differentiate key from nano using only the input datatypes
+
+function testSearch(as, bs, scoring) {
+    let matches = {}; 
+ 
+    for (let a of as) {
+        let scores = bs.map(item => ({item, score:scoring(a, item)}));
+        for (let {item: b, score} of scores) {
+            if (!matches[a] || score > matches[a].score) {
+                matches[a] = { nano: b, score };
+            }
+        }
+    }
+    return matches
+ }
+ console.log(testSearch(n04, i04, (n, i)=> n*i));
+ console.log(testSearch(i04, n04, (i, n)=> i*n));
 //we should make a visualizer for this tech
 class ScoreVisualizer {
     constructor() {
