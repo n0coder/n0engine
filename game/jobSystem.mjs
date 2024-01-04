@@ -542,6 +542,7 @@ function nanoFirstSearch(nanos, items) {
 console.log(nanoFirstSearch(n04, i04));
 console.log(itemFirstSearch(n04, i04))
 
+
 // both algorithms, are the same, 
 // but their keys are different. 
 // we can possibly come up with a way to differentiate key from nano using only the input datatypes
@@ -561,6 +562,10 @@ function testSearch(as, bs, scoring) {
  }
  console.log(testSearch(n04, i04, (n, i)=> n*i));
  console.log(testSearch(i04, n04, (i, n)=> i*n));
+
+ //choose opening search based on which group has more members
+//if (n.length > i.length) (n,i) = (i,n); //swap the list so that we firstsearch the more important list (may be inverted needs testing)
+
 //we should make a visualizer for this tech
 class ScoreVisualizer {
     constructor() {
