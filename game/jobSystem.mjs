@@ -402,10 +402,56 @@ let astage = {
     }]
 }
 
+//scoring tasks based on a nano, we need the invert as well
+//going to search this tech to create a way to score individual tasks, i can't use the whole stage as input. 
+//i thought, to get worker relationship info we get that from the stage, right?
+//we can run the relationship modifier as a seperate function
 function createScore (nano, stage) { //scoring based on the tasks in a stage
+    let relationshipModifier = getRelationshipModifer(stage, nano);
+    let taskmaps = rateTasks(stage.tasks, relationshipModifier, nano);
+    console.log(taskmaps)
+    return taskmaps ;
+}
+
+let stag = jobz.stages[jobz.stage];
+
+console.log( Math.pow(1, 2.4) / (Math.pow(10, 1.2) ))
+let a =createScore (anano, stag);
+let b =createScore (bnano, stag);
+let c = createScore (cnano, stag);
+console.log (a)
+
+//so we have this tech, to rate tasks,
+function rateTasks(tasks, relationshipModifier, nano) {
     let taskmaps = new Map();
+    for (let task of tasks) {
+        let score = 1;
+        score *= relationshipModifier;
+        if (task.interactions)
+            for (const [skill, type, thing] of task.interactions) {
+                let skillb = nano.identity.skills?.get(skill) || 1;
+                let skillo = nano.identity.opinions?.get("skills")?.get(skill) || 1;
+                score *= skillo * skillb; //high skill but low interest in the skill means lower score for skill
+                let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
+                score *= typo;
+            }
+        if (!(task.pos[0] && task.pos[1])) {
+            taskmaps.set(task, score); //no distance related calculation needed
+        } else {
+            var vx = nano.pos[0] - task.pos[0];
+            var vy = nano.pos[1] - task.pos[1];
+            let vis = ((vx * vx) + (vy * vy));
+            var mag = Math.sqrt(vis < .1 ? .1 : vis) * .1;
+            let fin = Math.pow(score, 2.4) / (Math.pow(mag, 1.2));
+            taskmaps.set(task, fin);
+        }
+    }
+    return taskmaps;
+}
+//this is how we can get the nanos relationship info
+function getRelationshipModifer(stage, nano) {
     let relationshipModifier = 1;
-    
+
     for (const [worker, work] of stage.workIndex) {
         let relationshipList = relationships.get(nano);
         if (relationshipList === undefined) break;
@@ -415,39 +461,8 @@ function createScore (nano, stage) { //scoring based on the tasks in a stage
         if (relationship) relationshipModifier *= relationship.value;
         //stage
     }
-
-    for (let task of stage.tasks) {
-        let score = 1;
-        score *= relationshipModifier;
-        if (task.interactions)
-        for (const [skill, type, thing] of task.interactions) {
-            let skillb = nano.identity.skills?.get(skill) || 1;
-            let skillo = nano.identity.opinions?.get("skills")?.get(skill) || 1;
-            score *= skillo*skillb; //high skill but low interest in the skill means lower score for skill
-            let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
-            score *= typo;
-        }
-        if (!(task.pos[0] && task.pos[1])) {
-            taskmaps.set(task, score); //no distance related calculation needed
-        } else {
-        var vx = nano.pos[0] - task.pos[0];
-        var vy =  nano.pos[1] - task.pos[1];
-        let vis =((vx * vx) + (vy * vy));
-        var mag = Math.sqrt(vis < .1 ? .1 : vis)*.1;
-        let fin =  Math.pow(score, 2.4) / (Math.pow(mag, 1.2) );
-        taskmaps.set(task, fin);
-        }
-    }
-return taskmaps ;
+    return relationshipModifier;
 }
-
-let stag = jobz.stages[jobz.stage];
-
-console.log( Math.pow(1, 2.4) / (Math.pow(10, 1.2) ))
-let a =createScore (anano, stag);
-let b =createScore (bnano, stag);
-let c = createScore (cnano, stag);
-console.log ({a,b,c})
 
 // we need a dual rating system
 // have a list of nanos, have a map of tasks rated based on the nanos
@@ -538,7 +553,7 @@ function nanoFirstSearch(nanos, items) {
  }
 
  let n04 = [5, 23, 13, 1];
- let i04 = [7, 22,12, 5]; 
+ let i04 = [7, 22, 12]; 
 console.log(nanoFirstSearch(n04, i04));
 console.log(itemFirstSearch(n04, i04))
 
@@ -566,6 +581,69 @@ function testSearch(as, bs, scoring) {
  //choose opening search based on which group has more members
 //if (n.length > i.length) (n,i) = (i,n); //swap the list so that we firstsearch the more important list (may be inverted needs testing)
 
+function bestSearch(as, bs, scoring, fit) {
+    let matches = new Map(); 
+    let conditions =  (score, moreScore) => fit ? fit(score, moreScore) : score > moreScore
+    for (let a of as) {
+        let scores = bs.map(b => ({b, score:scoring(a, b)}));
+        for (let {b, score} of scores) {
+            if (!matches.has(a) || conditions(score, matches.get(a).score) ) {
+                matches.set(a, { b, score });
+            }
+        }
+    }
+
+    for (let [key, value] of matches) {
+       matches.set(key, value.b)
+    }
+    return matches;
+ }
+
+ console.log(bestSearch(n04, i04, (n, i)=> n*i));
+ console.log(bestSearch(i04, n04, (i, n)=> i*n));
+
+let n037 = [35] // we a nano want to search a list of tasks
+let cano = [11,  33, 65]
+console.log(bestSearch(n037, cano, (n, i)=> n*i)); //most score multiplied
+console.log(bestSearch(n037, cano, (n, i)=> Math.abs(i-n), (s,t)=> s < t )); //closest score match
+
+
+//this code takes in a nano, and a stage
+//it scores the nano based on the tasks in the stage. 
+function nanoStageSearch(nano, stage) {
+    let nanos = Array.isArray(nano) ? nano : [nano];
+    
+    if (stage.tasks.length > nanos.length) {
+        console.log("more stages than nanos")
+        //if there are more tasks than nanos, we will search nanos first
+
+
+
+    }
+
+    for (let n of nanos) {
+        let scores = createScore(n, stage); 
+        let bs = bestSearch(nanos,  )
+    }
+
+    let bs = bestSearch(nanos, [0], (n,k)=>{
+        let nanocz = createScore(n, stage); 
+        console.log({n,k})
+    })
+
+
+    console.log(stage.tasks)
+
+    let a =createScore (nano, stage);
+    let tasks = Array.from(a.keys());
+    
+    let auz = bestSearch(tasks, nanos, (n, k) => a.get(n)) //task as key, nano as value
+    
+    console.log(auz)
+    console.log(a);
+}
+nanoStageSearch(anano, stag);
+nanoStageSearch([anano, bnano, cnano], stag)
 //we should make a visualizer for this tech
 class ScoreVisualizer {
     constructor() {
