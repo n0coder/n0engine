@@ -219,7 +219,7 @@ return jobu;
 }
 
 
-let circle = new Circle(64,256, 8,8);
+let circle = new Circle(5,2, 8,8);
 let circle2 = new Circle(64,128, 8,8);
 let circle3 = new Circle(128,128, 8,8);
 let jobz = createJobu([circle3, circle, circle2], "smile", "hi");
@@ -408,7 +408,7 @@ let astage = {
 //we can run the relationship modifier as a seperate function
 function createScore (nano, stage) { //scoring based on the tasks in a stage
     let relationshipModifier = getRelationshipModifer(stage, nano);
-    let taskmaps = rateTasks(stage.tasks, relationshipModifier, nano);
+    let taskmaps = scoreTasks(stage.tasks, relationshipModifier, nano);
     console.log(taskmaps)
     return taskmaps ;
 }
@@ -422,32 +422,39 @@ let c = createScore (cnano, stag);
 console.log (a)
 
 //so we have this tech, to rate tasks,
-function rateTasks(tasks, relationshipModifier, nano) {
+function scoreTasks(tasks, relationshipModifier, nano) {
     let taskmaps = new Map();
     for (let task of tasks) {
-        let score = 1;
-        score *= relationshipModifier;
-        if (task.interactions)
-            for (const [skill, type, thing] of task.interactions) {
-                let skillb = nano.identity.skills?.get(skill) || 1;
-                let skillo = nano.identity.opinions?.get("skills")?.get(skill) || 1;
-                score *= skillo * skillb; //high skill but low interest in the skill means lower score for skill
-                let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
-                score *= typo;
-            }
-        if (!(task.pos[0] && task.pos[1])) {
-            taskmaps.set(task, score); //no distance related calculation needed
-        } else {
-            var vx = nano.pos[0] - task.pos[0];
-            var vy = nano.pos[1] - task.pos[1];
-            let vis = ((vx * vx) + (vy * vy));
-            var mag = Math.sqrt(vis < .1 ? .1 : vis) * .1;
-            let fin = Math.pow(score, 2.4) / (Math.pow(mag, 1.2));
-            taskmaps.set(task, fin);
-        }
+        let score = scoreTask(task, nano, relationshipModifier);
+        taskmaps.set(task, score);
     }
     return taskmaps;
 }
+function scoreTask(task, nano, relationshipModifier = 1) {
+    let score = 1;
+    score *= relationshipModifier;
+
+    if (task.interactions)
+        for (const [skill, type, thing] of task.interactions) {
+            let skillb = nano.identity.skills?.get(skill) || 1;
+            let skillo = nano.identity.opinions?.get("skills")?.get(skill) || 1;
+            score *= skillo * skillb; //high skill but low interest in the skill means lower score for skill
+            let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
+            score *= typo;
+        }
+
+    if (!(task.pos[0] && task.pos[1])) {
+        return score; //no distance related calculation needed
+    } else {
+        var vx = nano.pos[0] - task.pos[0];
+        var vy = nano.pos[1] - task.pos[1];
+        let vis = ((vx * vx) + (vy * vy));
+        var mag = Math.sqrt(vis < .1 ? .1 : vis) * .1;
+        let fin = Math.pow(score, 2.4) / (Math.pow(mag, 1.2));
+        return fin;
+    }
+}
+
 //this is how we can get the nanos relationship info
 function getRelationshipModifer(stage, nano) {
     let relationshipModifier = 1;
@@ -592,7 +599,7 @@ function bestSearch(as, bs, scoring, fit) {
             }
         }
     }
-
+    
     for (let [key, value] of matches) {
        matches.set(key, value.b)
     }
@@ -612,38 +619,32 @@ console.log(bestSearch(n037, cano, (n, i)=> Math.abs(i-n), (s,t)=> s < t )); //c
 //it scores the nano based on the tasks in the stage. 
 function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
-    
+   
     if (stage.tasks.length > nanos.length) {
         console.log("more stages than nanos")
-        //if there are more tasks than nanos, we will search nanos first
-
-
-
+        //return each nano with a task score
+        return bestSearch(nanos, stage.tasks, (n,t)=> {
+            //get nano relationship value for stage here
+            let relationshipModifier = getRelationshipModifer(stage, n)
+            let score = scoreTask(t,n, relationshipModifier)
+            return score
+        })
+    } else {
+        //return each task with a nano score
+        return bestSearch(stage.tasks, nanos, (t,n)=> {
+            //get nano relationship value for stage here
+            let relationshipModifier = getRelationshipModifer(stage, n)
+            let score = scoreTask(t,n, relationshipModifier)
+            return score
+        })
     }
 
-    for (let n of nanos) {
-        let scores = createScore(n, stage); 
-        let bs = bestSearch(nanos,  )
-    }
 
-    let bs = bestSearch(nanos, [0], (n,k)=>{
-        let nanocz = createScore(n, stage); 
-        console.log({n,k})
-    })
-
-
-    console.log(stage.tasks)
-
-    let a =createScore (nano, stage);
-    let tasks = Array.from(a.keys());
-    
-    let auz = bestSearch(tasks, nanos, (n, k) => a.get(n)) //task as key, nano as value
-    
-    console.log(auz)
-    console.log(a);
 }
-nanoStageSearch(anano, stag);
-nanoStageSearch([anano, bnano, cnano], stag)
+let outsa = nanoStageSearch(anano, stag);
+let outsb = nanoStageSearch([anano, bnano, cnano], stag)
+console.log({outsa, outsb})
+
 //we should make a visualizer for this tech
 class ScoreVisualizer {
     constructor() {
