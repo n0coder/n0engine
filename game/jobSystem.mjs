@@ -224,115 +224,7 @@ let circle2 = new Circle(64,128, 8,8);
 let circle3 = new Circle(128,128, 8,8);
 let jobz = createJobu([circle3, circle, circle2], "smile", "hi");
 console.log(jobz)
-/*
-jobz.work(n0); //wink
-jobz.work(abi); //wink
-jobz.work(o2); //wink
-jobz.work(o2); //smile
-jobz.work(abi); //smile
-jobz.work(n0); //smile
-*/
 
-//work on job search system
-
-// for job system to form definitions that the nanos can use 
-// we will need to come up with a way for tasks to describe themselves
-// pretty simple given tasks are driven by keywords 
-
-// "water", plant
-// "find", "obj", "waterSource"
-// "check", plant, "waterlevel" 
-
-// we could have a lookup table for attributes for the nanos to cross referense with
-// we need a way to hold personality traits, skills, opinions and relationships for our nanos
-// nano.personality.skills, nano.skills, nano.brain.skills...
-// nano.opinions, nano.personality.opinions, nano.brain.opinions...
-
-// we could define skills and opinions directly on the nano themselves, or as a profile in the nano radio...
-// most realistically however, it wouldn't make sense to say: n0radio.getNanoPersonality(nano), or n0radio.nanoPersonalities.get(nano)
-// holding specific info about how a nano will percieve the world seems best left on the nano itself
-// idea though, we don't directly define the skills and personalities?
-// nano.personality.get("opinion", "object") //returns info about how the nano feels about an object...
-
-// the more i work on this idea, it reminds me of the system i was gonna make for the rpg game. 
-// a system in which skills are improved based on the underlying traits
-// by throwing a rock we level up throwing, also velocity, strength, and accuracy
-// https://github.com/n0coder/goblins-haven/blob/main/src/Core/Game/Combat/Ability.mjs
-
-// we will form another implementation idea of what may be a very similar system
-
-//pseudonano
-let nanoz =  {
-    mind: {
-        opinion: new Map([
-            ["items", new Map([["sugar", 0]])]
-        ]),
-        relationship: new Map([
-            ["test", 0]
-        ]),
-        skills: new Map([
-            ["harvesting", 0]
-        ])
-    }
-}
-//this code here does not quite match
-//we need to get the opinion of types
-// get the opinion of item sugar, get opinion of activity talking, get opinion of ... etc
-
-// relationship does keep it's normal map style of work
-// skills may stay as a normal map as well 
-// normal as in regular, or plain**
-
-/*
-function calculateNanoScore(nanoai, job) {
-    let score = 0;
-
-    // For each required skill for the job, add the weighted nanoai's skill level to the score.
-    for (let skill of job.skills) {
-        score += nanoai.mind.getSkill(skill) * SKILL_WEIGHT;
-    }
-
-    // For each required item for the job, add the weighted nanoai's opinion of the item to the score.
-    for (let item of job.items) {
-        score += nanoai.mind.getOpinion("items", item) * OPINION_WEIGHT;
-    }
-
-    // Subtract the distance to the job from the score, weighted by a distance factor.
-    let distance = calculateDistance(nanoai.pos, job.pos); // You would need to implement this function.
-    score -= distance * DISTANCE_WEIGHT;
-
-    // For each nano involved in the job, add the weighted nanoai's relationship with that nano to the score.
-    for (let nano of job.nanos) {
-        score += nanoai.mind.relationships.get(nano) * RELATIONSHIP_WEIGHT;
-    }
-
-    return score;
-}
-*/
-
-/*
-function calculateNanoScore(nanoai, job) {
-   let score = 0;
-
-   // Calculate the product of the nanoai's skill level and opinion for each required skill and item.
-   for (let skill of job.skills) {
-       score += nanoai.mind.getSkill(skill) * nanoai.mind.getOpinion("items", skill);
-   }
-
-   // Calculate the distance to the job.
-   let distance = calculateDistance(nanoai.pos, job.pos); // You would need to implement this function.
-
-   // Divide the score by the distance, weighted by a distance factor.
-   score /= Math.pow(distance, DISTANCE_FACTOR);
-
-   return score;
-}
-*/
-
-//nanos working on the same group of tasks will gain more skill faster when working with nanos that have a higher skill level
-//finalScore = ((score)^2.4) / distance ^ 1.2
-
-// forming the specifics (dec 29 2023)
 let anano = {
     name: "a", 
     identity: {
@@ -348,88 +240,7 @@ let anano = {
 },
     pos: [5, 2]
 }
-let bnano = {
-    name: "b",
-    identity: {
-    skills: new Map([
-        ["harvesting", 1],
-        ["reading", 1],
-        ["walking", 3]
-    ]),
-    opinions: new Map([
-        ["skills", new Map([
-            ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
-            ["walking", 1.5]
-        ]) ]
-    ]),
-},
-    pos: [8, 32]
-}
 
-let cnano = {
-    name: "c",
-    identity: {
-        skills: new Map([
-            ["harvesting", 1],
-            ["smiling", 4],
-            ["reading", 1]
-        ]),
-        opinions: new Map([
-            ["skills", new Map([
-                ["harvesting", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
-                ["smiling", 2],
-            ]) ],
-            ["items", new Map([
-                ["circle", 2], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
-            ]) ]
-        ]),
-    },    
-    pos: [16, 16]
-}
-
-let abnano = {value: 2} //tie the relationships to the same object so they can share info and changes in relationship are read easier 
-let relationships = new Map([
-    [anano, new Map([[bnano, abnano]])], 
-    [bnano, new Map([[anano, abnano]])]
-])
-
-let astage = {
-    workers: [anano, bnano],
-    tasks: [{
-        interactions: [["harvesting", "items", circle]], pos: [0, 0]
-    },{
-        interactions: [["reading", "items", circle]], pos: [8, 0]
-    }]
-}
-
-//scoring tasks based on a nano, we need the invert as well
-//going to search this tech to create a way to score individual tasks, i can't use the whole stage as input. 
-//i thought, to get worker relationship info we get that from the stage, right?
-//we can run the relationship modifier as a seperate function
-function createScore (nano, stage) { //scoring based on the tasks in a stage
-    let relationshipModifier = getRelationshipModifer(stage, nano);
-    let taskmaps = scoreTasks(stage.tasks, relationshipModifier, nano);
-    console.log(taskmaps)
-    return taskmaps ;
-}
-
-let stag = jobz.stages[jobz.stage];
-
-console.log( Math.pow(1, 2.4) / (Math.pow(10, 1.2) ))
-let a =createScore (anano, stag);
-let b =createScore (bnano, stag);
-let c = createScore (cnano, stag);
-console.log (a)
-
-//so we have this tech, to rate tasks,
-function scoreTasks(tasks, relationshipModifier, nano) {
-    let taskmaps = new Map();
-    for (let task of tasks) {
-        let score = scoreTask(task, nano, relationshipModifier);
-        taskmaps.set(task, score);
-    }
-    return taskmaps;
-}
 function scoreTask(task, nano, relationshipModifier = 1) {
     let score = 1;
     score *= relationshipModifier;
@@ -471,123 +282,6 @@ function getRelationshipModifer(stage, nano) {
     return relationshipModifier;
 }
 
-// we need a dual rating system
-// have a list of nanos, have a map of tasks rated based on the nanos
-
-// if multiple nanos are queuing for the same task we want to rate which nanos can take the task
-// if one nano is queuing for multiple tasks, we want to rate the task
-// basically we want to pick a nano and task, choosing what tasks to give out based on the score...
-// confusing concept to me
-
-/*
-    nano a: 
-        task 1: 1
-        task 2: 1,
-        task 3: .17...
-    nano b:
-        task 1: 2
-        task 2: 1.5
-        task 3: 53
-    nano c: 
-        task 1: .2
-        task 2: .3
-        task 3: 6  
-*/
-
-function selectTask(nano, stag) {
-   let scoredTasks =createScore (nano, stag);
-   let selectedTask = null, highestScore = -1;
-   for (let [task, score] of scoredTasks) {
-    if (score > highestScore) {
-        selectedTask = task; highestScore = score;
-    }
-   }
-   return selectedTask
-}
-console.log (selectTask(anano, stag));
-// take the list of nanos, along with their task ratings and assign the nano a task
-// a nano can not share a task with another*
-
-
-
-
-/*
-imagine a concept
-we have pinging requests to search for something
-we want to have a system which describes which things are searching, a queue of sorts
-but it can't act as a queue.
-the idea is that if the item their searching for is not available we add them to a list, 
-when the item becomes available we give it to the best fitting searcher
-
-say we have a list of searchers
-[n0, n1, n2, n3] 
-say we have a list of items
-[i0, i1, i2, i3]
-
-they will be added to a list when there are no items
-when an item is added we search the list of searchers for the best fit for that item
-
-when a searcher is searching for an item and there is an item we search the items list and pick the best rated item
-otherwise, no item, we add the searcher to the searchers list. so that we can do the reverse check. 
-
-this is so that a nanoai who's waiting will always get the best job based on skill, because we don't want a lower skill nano to get a job that a higher skill nano is a better fit for all because the lower skill nano got there first. does that make sense?
-*/
-function nanoFirstSearch(nanos, items) {
-    let matches = {}; 
- 
-    for (let nano of nanos) {
-        let scores = items.map(item => ({item, score:nano*item}));
-        for (let {item, score} of scores) {
-            if (!matches[nano] || score > matches[nano].score) {
-                matches[nano] = { item, score };
-            }
-        }
-    }
-    return matches
- }
- function itemFirstSearch(nanos, items) {
-    let matches = {}; 
- 
-    for (let nano of nanos) {
-        let scores = items.map(item => ({item, score:nano*item}));
-        for (let {item, score} of scores) {
-            if (!matches[item] || score > matches[item].score) {
-                matches[item] = { nano, score};
-            }
-        }
-    }
-    return matches
- }
-
- let n04 = [5, 23, 13, 1];
- let i04 = [7, 22, 12]; 
-console.log(nanoFirstSearch(n04, i04));
-console.log(itemFirstSearch(n04, i04))
-
-
-// both algorithms, are the same, 
-// but their keys are different. 
-// we can possibly come up with a way to differentiate key from nano using only the input datatypes
-
-function testSearch(as, bs, scoring) {
-    let matches = {}; 
- 
-    for (let a of as) {
-        let scores = bs.map(item => ({item, score:scoring(a, item)}));
-        for (let {item: b, score} of scores) {
-            if (!matches[a] || score > matches[a].score) {
-                matches[a] = { nano: b, score };
-            }
-        }
-    }
-    return matches
- }
- console.log(testSearch(n04, i04, (n, i)=> n*i));
- console.log(testSearch(i04, n04, (i, n)=> i*n));
-
- //choose opening search based on which group has more members
-//if (n.length > i.length) (n,i) = (i,n); //swap the list so that we firstsearch the more important list (may be inverted needs testing)
-
 function bestSearch(as, bs, scoring, fit) {
     let matches = new Map(); 
     let conditions =  (score, moreScore) => fit ? fit(score, moreScore) : score > moreScore
@@ -606,14 +300,6 @@ function bestSearch(as, bs, scoring, fit) {
     return matches;
  }
 
- console.log(bestSearch(n04, i04, (n, i)=> n*i));
- console.log(bestSearch(i04, n04, (i, n)=> i*n));
-
-let n037 = [35] // we a nano want to search a list of tasks
-let cano = [11,  33, 65]
-console.log(bestSearch(n037, cano, (n, i)=> n*i)); //most score multiplied
-console.log(bestSearch(n037, cano, (n, i)=> Math.abs(i-n), (s,t)=> s < t )); //closest score match
-
 
 //this code takes in a nano, and a stage
 //it scores the nano based on the tasks in the stage. 
@@ -621,7 +307,7 @@ function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
    
     if (stage.tasks.length > nanos.length) {
-        console.log("more stages than nanos")
+        console.log("more tasks than nanos")
         //return each nano with a task score
         return bestSearch(nanos, stage.tasks, (n,t)=> {
             //get nano relationship value for stage here
@@ -641,49 +327,6 @@ function nanoStageSearch(nano, stage) {
 
 
 }
-let outsa = nanoStageSearch(anano, stag);
-let outsb = nanoStageSearch([anano, bnano, cnano], stag)
-console.log({outsa, outsb})
-
-//we should make a visualizer for this tech
-class ScoreVisualizer {
-    constructor() {
-        this.nanos = [
-            {
-                name: "a",
-                skills: new Map([
-                    ["harvesting", 5]
-                ]),
-                pos: [4, 6]
-            }, {
-                name: "b",
-                skills: new Map([
-                    ["harvesting", 22]
-                ]),
-                pos: [8, 32]
-            },
-            {
-                name: "c",
-                skills: new Map([
-                    ["harvesting", 129]
-                ]),
-                pos: [24, 16]
-            }
-        ]
-        this.task = {
-            skill: "harvesting", pos: [8, 8]
-        }
-        this.setActive = setActive;
-        this.setActive(true)
-    }
-    draw() {
-        for (let nano of this.nanos) {
-            let nanoScore = createScore(nano, this.task);
-            p.fill(nanoScore *10);
-            p.ellipse(nano.pos[0]*worldGrid.gridSize, nano.pos[1]*worldGrid.gridSize, nano.skills.get("harvesting"));
-            p.fill(255);
-            p.text(`${nano.name}, ${nanoScore}`, (nano.pos[0]*worldGrid.gridSize)+10, (nano.pos[1]*worldGrid.gridSize)-16);
-        }
-    }
-}
-//et scoreVisualizer = new ScoreVisualizer();
+let outsa = nanoStageSearch(anano, jobz.stages[jobz.stage]);
+console.log(outsa)
+//let outsb = nanoStageSearch([anano, bnano, cnano], stag)
