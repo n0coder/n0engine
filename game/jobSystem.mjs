@@ -88,6 +88,13 @@ var stageTemplate = {
             task.work(job, nano, (task)=>this.taskComplete(job, this,nano,task));
             return true;
         } else {
+            /*
+            // this part of the functionality is depreciated, obsolete
+            // it handles the selection of tasks in this stage
+            // the nanos can't access it by normal means
+            // since we will have a whole selection of jobs in the radio, 
+            // we can't--- i mean it's not like we can fire off a work function on all jobs
+            // so, we have to write this functionality into the radio
             task = this.tasks[0];
             if (task) {
                 this.tasks.splice(0,1)
@@ -95,6 +102,7 @@ var stageTemplate = {
                 task.work(nano, (task)=>this.taskComplete(job, this,nano, task))
                 return true;
             } 
+            */
         }
     },
     taskComplete: (job, stage, nano, task)=> {
@@ -219,11 +227,6 @@ return jobu;
 }
 
 
-let circle = new Circle(5,2, 8,8);
-let circle2 = new Circle(64,128, 8,8);
-let circle3 = new Circle(128,128, 8,8);
-let jobz = createJobu([circle3, circle, circle2], "smile", "hi");
-console.log(jobz)
 
 let anano = {
     name: "a", 
@@ -284,11 +287,10 @@ function getRelationshipModifer(stage, nano) {
 
 function bestSearch(as, bs, scoring, fit) {
     let matches = new Map(); 
-    let conditions =  (score, moreScore) => fit ? fit(score, moreScore) : score > moreScore
     for (let a of as) {
         let scores = bs.map(b => ({b, score:scoring(a, b)}));
         for (let {b, score} of scores) {
-            if (!matches.has(a) || conditions(score, matches.get(a).score) ) {
+            if (!matches.has(a) || (fit?.(score, matches.get(a).score) ?? (score > matches.get(a).score)) ) {
                 matches.set(a, { b, score });
             }
         }
@@ -300,33 +302,29 @@ function bestSearch(as, bs, scoring, fit) {
     return matches;
  }
 
-
+function scoreStageTask(task, nano, stage) {
+    let relationshipModifier = getRelationshipModifer(stage, nano)
+    let score = scoreTask(task,nano, relationshipModifier)
+    return score
+}
 //this code takes in a nano, and a stage
 //it scores the nano based on the tasks in the stage. 
 function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
-   
     if (stage.tasks.length > nanos.length) {
-        console.log("more tasks than nanos")
-        //return each nano with a task score
-        return bestSearch(nanos, stage.tasks, (n,t)=> {
-            //get nano relationship value for stage here
-            let relationshipModifier = getRelationshipModifer(stage, n)
-            let score = scoreTask(t,n, relationshipModifier)
-            return score
-        })
+        return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(n,t,stage))
     } else {
-        //return each task with a nano score
-        return bestSearch(stage.tasks, nanos, (t,n)=> {
-            //get nano relationship value for stage here
-            let relationshipModifier = getRelationshipModifer(stage, n)
-            let score = scoreTask(t,n, relationshipModifier)
-            return score
-        })
+        return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(n,t,stage))
     }
-
-
 }
+
+
+let circle = new Circle(5,2, 8,8);
+let circle2 = new Circle(64,128, 8,8);
+let circle3 = new Circle(128,128, 8,8);
+//use this to create the job
+let jobz = createJobu([circle3, circle, circle2], "smile", "hi"); 
+//use this to pick a task in the job
 let outsa = nanoStageSearch(anano, jobz.stages[jobz.stage]);
 console.log(outsa)
 //let outsb = nanoStageSearch([anano, bnano, cnano], stag)
