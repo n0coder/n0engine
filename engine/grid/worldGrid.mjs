@@ -18,6 +18,9 @@ export class WorldGrid {
     screenToGridPoint(x, y) {
         return { x: Math.floor(x / this.gridSize), y: Math.floor(y / this.gridSize) };
     }
+    screenToGridPointRaw(x, y) {
+        return { x: x / this.gridSize, y: y / this.gridSize };
+    }
     screenToChunkPoint(x, y) {
         return { x: Math.floor(x / (this.gridSize * this.chunkSize)), y: Math.floor(y / (this.gridSize * this.chunkSize)) };
     }

@@ -11,6 +11,7 @@ var jobTasksa = new Map([
             requires: [["hold", args[0]]],
             interactions: [["smiling"]], 
             work: function(nano, done) {
+                console.log(done)
                 if (this.working) return true;
                 this.working = true;
                 console.log(`${nano.name} smiling`, args, this.items);
@@ -23,6 +24,7 @@ var jobTasksa = new Map([
             args, working: false, job:null,
             interactions: [["winking"]], 
             work: function(nano, done) {
+                console.log(done)
                 if (this.working) return true;
                 this.working = true;
                 this.item.winked = "winked";
@@ -36,12 +38,13 @@ var jobTasksa = new Map([
             args, working: false, job:null, pos: [args[0].x, args[0].y], //?
             interactions: [["walking"],["pickup", "item", args[0]]], 
             work: function(nano, done) {
+                console.log(this.args)
                 if (this.working) return true;
                 this.working = true;
-                this.item.item = args[0];
+                this.item.item = this.args[1];
                 nano.brain.do("pickup", this.item.item, null, (a)=>{
-                    console.log("picked up", a)
-                    done(this)
+                    console.log("picked up", a);
+                    this.args[0](this);
                 })
                 
                 //done(this);
@@ -219,7 +222,6 @@ return jobu;
 function scoreTask(task, nano, relationshipModifier = 1) {
     let score = 1;
     score *= relationshipModifier;
-
     if (task.interactions)
         for (const [skill, type, thing] of task.interactions) {
             let skillb = nano.identity.skills?.get(skill) || 1;
@@ -228,13 +230,13 @@ function scoreTask(task, nano, relationshipModifier = 1) {
             let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
             score *= typo;
         }
-
     if (!(task.pos[0] && task.pos[1])) {
         return score; //no distance related calculation needed
     } else {
-        var vx = nano.pos[0] - task.pos[0];
-        var vy = nano.pos[1] - task.pos[1];
-        let vis = ((vx * vx) + (vy * vy));
+        var vx = nano.x - task.pos[0];
+        var vy = nano.y - task.pos[1];
+        let {x,y} =worldGrid.screenToGridPointRaw(vx,vy);
+        let vis = ((x * x) + (y * y));
         var mag = Math.sqrt(vis < .1 ? .1 : vis) * .1;
         let fin = Math.pow(score, 2.4) / (Math.pow(mag, 1.2));
         return fin;
@@ -257,7 +259,7 @@ function getRelationshipModifer(stage, nano) {
     return relationshipModifier;
 }
 
-function bestSearch(as, bs, scoring, fit) {
+export function bestSearch(as, bs, scoring, clean = false, fit) {
     let matches = new Map(); 
     for (let a of as) {
         let scores = bs.map(b => ({b, score:scoring(a, b)}));
@@ -267,15 +269,10 @@ function bestSearch(as, bs, scoring, fit) {
             }
         }
     }
-    /* this is being commented out due to forgetting a step in the job search algorithm
-    // what i mean to say is that, we're not rating the stages in a single job
-    // we're rating the stages of every job, so that a nano can pick the right one
-    // so we need to hold the task score 
-    // so that we can rate the jobs individually without rescoring the same task
+    if (clean)
     for (let [key, value] of matches) {
        matches.set(key, value.b)
     }
-    */
     return matches;
  }
 
@@ -289,8 +286,8 @@ function scoreStageTask(task, nano, stage) {
 export function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
     if (stage.tasks.length > nanos.length) {
-        return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(n,t,stage))
+        return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
     } else {
-        return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(n,t,stage))
+        return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(t, n,stage))
     }
 }

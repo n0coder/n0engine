@@ -30,6 +30,18 @@ export class Nanoai {
         loadImg(this, "img", '../nanoai.png');
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(3, [[-7, -10], [7, -10], [0, -20]]);
+        this.identity = {
+            skills: new Map([
+                ["harvesting", 1],
+                ["reading", 1]
+            ]),
+            opinions: new Map([
+                ["skills", new Map([
+                    ["harvesting", 1], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
+                ]) ]
+            ]),
+        }
+
         this.setActive = setActive;
         this.setActive(true)
         this.renderOrder = 2;

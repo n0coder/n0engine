@@ -84,7 +84,11 @@ export class NanoaiBrain {
         console.error(`there is no action for ${task}`)
     }
  }
- 
+  doTask(task, done) {
+    console.log({task, done}) 
+    task.args.unshift(done);
+    this.queue.push(task)
+  }
   doLater(task, condition, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {

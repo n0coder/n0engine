@@ -3,7 +3,7 @@
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Circle } from "../farm/circle.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
-import { nanoStageSearch } from "./jobSystem.mjs";
+import { bestSearch, nanoStageSearch } from "./jobSystem.mjs";
 
 export class Channel {
     constructor() {
@@ -206,12 +206,12 @@ class Radio {
         }
     }
     findJob(key) {
-        let jobScores = new Map();
+        let jobScores = [];
         function rateJobs(jobs, nano) {
             for (const job of jobs) {
                 let stage = job.stages[job.stage]
                 let best = nanoStageSearch(nano, stage)
-                jobScores.set(job, best)
+                jobScores.push([job, best])
             }
         }
         for (const [ckey, channel] of this.channels) {
@@ -230,10 +230,22 @@ class Radio {
 
             }
         }
+        let job = bestSearch([key], jobScores, (k, j)=> {
+            return j[1].get(key).score
+        }, true).get(key);
+        let stage = job[0].stages[job[0].stage]
+        let task = job[1].get(key).b
 
-        for(const [job, nano] of jobScores) {
-            console.log(job, nano);
-        }
+        let i = stage.tasks.indexOf(task);
+        if (i != -1) {
+            stage.tasks.splice(0,1)
+            stage.workIndex.set(key, task);
+            console.log(key)
+            //give the nano the task...
+            key.brain.doTask(task, (task)=>stage.taskComplete(job, stage,key, task)) // ...
+            
+        } 
+        
     }
 }
 export let n0radio = new Radio();

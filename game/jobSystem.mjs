@@ -14,17 +14,7 @@ n0.brain.do("walk", 256, 200)
 
 let anano = {
     name: "a", 
-    identity: {
-    skills: new Map([
-        ["harvesting", 1],
-        ["reading", 1]
-    ]),
-    opinions: new Map([
-        ["skills", new Map([
-            ["harvesting", 1], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
-        ]) ]
-    ]),
-},
+    
     pos: [5, 2]
 }
 
@@ -51,5 +41,5 @@ n0radio.postJob("jobs", job2)
 //really testing if the job system works all together
 
 //this will search the list of jobs this nano can see in the radio
-n0radio.findJob(anano); 
+n0radio.findJob(n0); 
 
