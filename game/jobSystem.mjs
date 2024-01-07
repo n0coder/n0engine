@@ -41,7 +41,7 @@ let job2 = createJobu([circle4, circle5, circle6], "smile", "hi");
 //really testing if the job system works all together
 
 //this will search the list of jobs this nano can see in the radio
-n0radio.findJob(n0); 
+//n0radio.findJob(n0); 
 
 //ok so now the nanoais are able to search for jobs,
 //i want to make it so that a nanoai doesn't constantly search jobs

@@ -1,5 +1,6 @@
 import { cloneAction } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { n0radio } from "../radio/n0radio.mjs";
 import { nanoaiActions } from "./nanoaiActions.mjs";
 
 export class NanoaiBrain {
@@ -46,7 +47,7 @@ export class NanoaiBrain {
             nano.brain.currentActivity = q;
             nano.brain.active(nano)
           }
-        } else nano.brain.done(nano);
+        } else nano.idle(); // nano.brain.done(nano);
       },
       active: function (nano) {
 

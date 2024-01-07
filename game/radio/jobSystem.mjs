@@ -246,6 +246,8 @@ function scoreTask(task, nano, relationshipModifier = 1) {
 //this is how we can get the nanos relationship info
 function getRelationshipModifer(stage, nano) {
     let relationshipModifier = 1;
+    console.error("we need to get radio friendship level here")
+    let relationships = nano.identity.relationships;
 
     for (const [worker, work] of stage.workIndex) {
         let relationshipList = relationships.get(nano);

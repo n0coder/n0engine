@@ -3,6 +3,7 @@ import { deltaTime, ticks } from "../../engine/core/Time/n0Time.mjs";
 import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { createCubicInterpolator, cubicBlendW, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { n0radio } from "../radio/n0radio.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
@@ -40,6 +41,7 @@ export class Nanoai {
                     ["harvesting", 1], //neutral opinion is .5 (a multiplier, used as a way for a high skilled nano to still avoid jobs with specific likes and dislikes) (0 is a score of 0, 1 is a full score)
                 ]) ]
             ]),
+            relationships: new Map()
         }
 
         this.setActive = setActive;
@@ -63,6 +65,9 @@ export class Nanoai {
     }
 
     idle() {
+
+
+        n0radio.findJob(this);
         //find something to do
         //check battery
         //call radio

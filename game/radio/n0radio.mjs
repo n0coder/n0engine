@@ -101,6 +101,7 @@ class Radio {
             ["jobs", new Channel()]
         ])
         this.friendsList = new Map();
+        this.nanosSearching = new Map();
     }
    addFriend(nano, friend) {
     if (!this.friendsList.has(nano)) {
@@ -206,6 +207,9 @@ class Radio {
         }
     }
     findJob(key) {
+        
+        if (this.nanosSearching.get(key)) return;
+        this.nanosSearching.set(key,1);
         let jobScores = [];
         function rateJobs(jobs, nano) {
             for (const job of jobs) {
@@ -233,12 +237,11 @@ class Radio {
         
         if (jobScores.length === 0) {
 
-            console.log("no jobs right now")
-
+            console.log(key, "no jobs right now")
+          
             return;
         }
 
-        console.log(jobScores)
         let job = bestSearch([key], jobScores, (k, j)=> {
             return j[1].get(key).score
         }, true).get(key);
@@ -253,7 +256,7 @@ class Radio {
             console.log(key)
             //give the nano the task...
             key.brain.doTask(task, (task)=>stage.taskComplete(job, stage,key, task)) // ...
-            
+            this.nanosSearching.delete(key);
         } 
         
     }
