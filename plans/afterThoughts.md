@@ -40,6 +40,7 @@ for example basic activites: (used like this nano.brain.do("walk", 245, 22);)
 ```
 and this is their job: (the job builds a whole plan based on the activity. if the nano wants to do the smile job, they have to first pick up the item that they are told to pick up)
 they are created like this: (createJob([item1, item2], "smile", "any bonus args...")
+```js
 ["smile", function(...args) {
         return {
             name: "smile",
@@ -74,6 +75,7 @@ they are created like this: (createJob([item1, item2], "smile", "any bonus args.
             }
         }
     }],
+```
 since they are made the same way basically, and have the same structure we can pipe it directly into a nano and they'll start working XD
 
 ---
