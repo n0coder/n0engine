@@ -4,8 +4,8 @@ import { p } from "../engine/core/p5engine.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Circle } from "./farm/circle.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
-import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
+import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 
 let n0 = new Nanoai("n0", 200,-256); 
 let abi = new Nanoai("abi", 256,-256); 
@@ -295,10 +295,15 @@ function bestSearch(as, bs, scoring, fit) {
             }
         }
     }
-    
+    /* this is being commented out due to forgetting a step in the job search algorithm
+    // what i mean to say is that, we're not rating the stages in a single job
+    // we're rating the stages of every job, so that a nano can pick the right one
+    // so we need to hold the task score 
+    // so that we can rate the jobs individually without rescoring the same task
     for (let [key, value] of matches) {
        matches.set(key, value.b)
     }
+    */
     return matches;
  }
 
@@ -309,7 +314,7 @@ function scoreStageTask(task, nano, stage) {
 }
 //this code takes in a nano, and a stage
 //it scores the nano based on the tasks in the stage. 
-function nanoStageSearch(nano, stage) {
+export function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
     if (stage.tasks.length > nanos.length) {
         return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(n,t,stage))
@@ -322,8 +327,19 @@ function nanoStageSearch(nano, stage) {
 let circle = new Circle(5,2, 8,8);
 let circle2 = new Circle(64,128, 8,8);
 let circle3 = new Circle(128,128, 8,8);
+
 //use this to create the job
 let jobz = createJobu([circle3, circle, circle2], "smile", "hi"); 
+//drop the job directly into the radio system, globally (no key)
+n0radio.postJob("jobs", jobz) 
+
+//this is a scary part of development
+//really testing if the job system works all together
+
+//this will search the list of jobs this nano can see in the radio
+n0radio.findJob(anano); 
+
+
 //use this to pick a task in the job
 let outsa = nanoStageSearch(anano, jobz.stages[jobz.stage]);
 console.log(outsa)

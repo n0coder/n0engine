@@ -2,6 +2,7 @@
 
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Circle } from "../farm/circle.mjs";
+import { nanoStageSearch } from "../jobSystem.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
 
 export class Channel {
@@ -12,7 +13,7 @@ export class Channel {
         this.objs = []
     }
 }
-
+//this implementation is really annoying and i will remake this because it's so annoying
 let friendChannel = {
     instances: new Map(),
     findItem: function(item, type, key, friends) {
@@ -22,6 +23,14 @@ let friendChannel = {
             if (!instance) continue;
             let itema = instance.items.hasItem(item, type)
             if (itema) return itema; //return if we find item
+        }
+    },
+    getJobs: function(key, friends) {
+        if (friends != null)
+        for(var friend of friends) {
+            let instance = this.instances.get(friend);
+            if (!instance) continue;
+           return instance.jobs; //return if we find item
         }
     },
     findClaimItem: function(item, type, key, friends) {
@@ -48,13 +57,20 @@ let friendChannel = {
 let loverChannel = {
     instances: new Map(),
     findItem: function(item, type, key) {
-        
+            if (!key?.lover) return;
             let instance = this.instances.get(key.lover) || this.instances.get(key);
-            if (!instance) return
+            if (!instance) return;
             let itema = instance.items.hasItem(item, type)
             if (itema) return itema; //return if we find item
         
     },
+    getJobs: function(item, type, key) {
+        if (!key?.lover) return;
+        let instance = this.instances.get(key.lover) || this.instances.get(key);
+        if (!instance) return;
+        return instance.jobs
+    
+},
     findClaimItem: function(item, type, key) {
         let instance =  this.instances.get(key.lover) || this.instances.get(key);
         if (!instance) return
@@ -113,6 +129,8 @@ class Radio {
             }
         }
     }
+    //find claim is the tech that will pick an item and immediately take it off the radio
+    //this makes it so that other ais can't take the item that another ai took
     findClaimItem(item, type, key) {
         for (const [ckey, channel] of this.channels) {
             if (channel.findClaimItem != null) {
@@ -137,22 +155,85 @@ class Radio {
         }
         return null;
       }
-      
-    postItem(channel, item, key) {
+    findCreateChannel(channel, key) {
         let c = this.channels.get(channel);
         if (c) {
-            if (c.postItem) {
-                c.postItem(item, key)
-            } else if (c instanceof Map) {
-                var chan = c.get(key);
+            if (c instanceof Map) {
+                let chan = c.get(key);
                 if (!chan) {
                     chan = new Channel()
                     c.set(key, chan);
                 }
-                chan.items.add(item)
+                return chan;
+            } else {
+                return c;
+            }
+        } else {
+            if (key != null) {
+                c = new Map()
+                this.channels.set(channel, c)
+                let chan = new Channel()
+                c.set(key, chan)
+                return chan;
+            } else {
+                let chan = new Channel()
+                this.channels.set(channel, chan)
+                return chan;
+            }
+        }
+
+    }
+    postItem(channel, item, key) {
+        let c = this.findCreateChannel(channel, key);
+        if (c) {
+            if (c.postItem) {
+                c.postItem(item, key)
             } else {
                 c.items.add(item)
             }
+        }
+    }
+
+    postJob(channel, job, key) {
+        let c = this.findCreateChannel(channel, key);
+        if (c) {
+            //if c is a type with a custom post, we use that version instead of directly pushing to the channel list
+            if (c.postJob) { 
+                c.postJob(job, key)
+            } else {
+                c.jobs.push(job)
+            }
+        }
+    }
+    findJob(key) {
+        let jobScores = new Map();
+        function rateJobs(jobs, nano) {
+            for (const job of jobs) {
+                let stage = job.stages[job.stage]
+                let best = nanoStageSearch(nano, stage)
+                console.log(best);
+                jobScores.set(job, nano)
+            }
+        }
+        for (const [ckey, channel] of this.channels) {
+            if (channel.getJobs) {
+                let jobs = channel.getJobs(key);
+                if (jobs)
+                    rateJobs(jobs, key)
+
+            }else if (channel instanceof Map) {
+                var c = channel.get(key);
+                if (c) 
+                    rateJobs(c.jobs, key)
+                
+            } else {
+                rateJobs(channel.jobs, key)
+
+            }
+        }
+
+        for(const [job, nano] of jobScores) {
+            console.log(job, nano);
         }
     }
 }
