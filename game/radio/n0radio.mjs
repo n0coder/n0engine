@@ -230,9 +230,19 @@ class Radio {
 
             }
         }
+        
+        if (jobScores.length === 0) {
+
+            console.log("no jobs right now")
+
+            return;
+        }
+
+        console.log(jobScores)
         let job = bestSearch([key], jobScores, (k, j)=> {
             return j[1].get(key).score
         }, true).get(key);
+
         let stage = job[0].stages[job[0].stage]
         let task = job[1].get(key).b
 
