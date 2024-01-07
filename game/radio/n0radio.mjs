@@ -2,8 +2,8 @@
 
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Circle } from "../farm/circle.mjs";
-import { nanoStageSearch } from "../jobSystem.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
+import { nanoStageSearch } from "./jobSystem.mjs";
 
 export class Channel {
     constructor() {
@@ -211,8 +211,7 @@ class Radio {
             for (const job of jobs) {
                 let stage = job.stages[job.stage]
                 let best = nanoStageSearch(nano, stage)
-                console.log(best);
-                jobScores.set(job, nano)
+                jobScores.set(job, best)
             }
         }
         for (const [ckey, channel] of this.channels) {
