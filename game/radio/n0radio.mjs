@@ -207,7 +207,9 @@ class Radio {
         }
     }
     findJob(key) {
-        
+        //what would we do if multiple nanos are a key
+        //so we gotta find jobs where both nanos can work together well
+        //say we insert nanoai team, they will queue up for jobs together
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
         let jobScores = [];
