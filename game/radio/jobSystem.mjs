@@ -285,7 +285,7 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
     return matches;
  }
 
-function scoreStageTask(task, nano, stage) {
+export function scoreStageTask(task, nano, stage) {
     let relationshipModifier = getRelationshipModifer(stage, nano)
     let score = scoreTask(task,nano, relationshipModifier)
     return score
@@ -295,10 +295,13 @@ function scoreStageTask(task, nano, stage) {
 export function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
     console.warn("we need to add tech to the bestsearch, to allow it to only give out one of the many tasks")
+
     // in fact, this is a great example of when data structure duplication, can be a good thing
     if (stage.tasks.length > nanos.length) {
+        console.log("more tasks than nanos (this is nano first searching)") 
         return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
     } else {
+        console.log("more nanos than tasks")
         return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(t, n,stage))
     }
 }

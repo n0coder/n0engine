@@ -3,7 +3,7 @@
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Circle } from "../farm/circle.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
-import { bestSearch, nanoStageSearch } from "./jobSystem.mjs";
+import { bestSearch, nanoStageSearch, scoreStageTask } from "./jobSystem.mjs";
 
 export class Channel {
     constructor() {
@@ -184,6 +184,17 @@ class Radio {
         }
 
     }
+    findChannel(channel, key) {
+        let c = this.channels.get(channel);
+        if (c && c instanceof Map) {
+            return c.get(key);
+        } else if (c) {
+            return c;
+        } else {
+            return null; // Return null if the channel doesn't exist
+        }
+     }
+     
     postItem(channel, item, key) {
         let c = this.findCreateChannel(channel, key);
         if (c) {
@@ -209,20 +220,48 @@ class Radio {
         }
     }
     findNano(job, channel, key) {
-        console.log("(job posted): job was posted")
         if (this.nanosSearching.size === 0) return;
-        let nanos = Array.from(this.nanosSearching.keys())
-        console.log("(job posted): there are nanos waiting", nanos)
 
         let stage = job.stages[job.stage]
-        let best = nanoStageSearch(nanos, stage)
-        /*bestSearch(stage.tasks, nanos, (stage, nano)=>{
-            return nanoStageSearch(nano, stage)
-        })*/
-        console.log("(job posted): best scores", best);
+        let nanos = this.nanosInChannel(channel, key)
+        let tasks = stage.tasks;
+        //the idea is that we rank the nanos based on the tasks
+        //highest score nano and task get job
+        
+        //conditional entry, loop until nanos are still searching
+        while (nanos.length > 0 && tasks.length > 0) {
+            let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage));
+
+            let bestScore = -Infinity, bestNano = null;
+            for (let [o, t] of score) {
+                if (bestScore < t.score) {
+                    bestNano = [o, t.b], bestScore = t.score;
+                }
+            }
+            this.assignTask(job, stage, bestNano[0], bestNano[1])
+
+            nanos = this.nanosInChannel(channel, key);
+        }
+        console.log("complete");
+
     }
 
+    nanosInChannel(channel, c) {
+        let nanos = Array.from(this.nanosSearching.keys())
+        return nanos.filter((n) => (this.findChannel(channel, n) === this.findChannel(channel, c)));
+    }
 
+    assignTask(job, stage, task, nano) {
+        console.log({stage, task, nano})
+        let i = stage.tasks.indexOf(task);
+        if (i != -1) {
+            stage.tasks.splice(i,1) //remove from tasks
+            stage.workIndex.set(nano, task);
+            //give the nano the task...
+            nano.brain.doTask(task, (task)=>stage.taskComplete(job, stage,nano, task)) // ...
+            this.nanosSearching.delete(nano); //remove from searching
+        } 
+    }
     findJob(key) {
        
         //what would we do if multiple nanos are a key
@@ -269,16 +308,7 @@ class Radio {
 
         let stage = job[0].stages[job[0].stage]
         let task = job[1].get(key).b
-
-        let i = stage.tasks.indexOf(task);
-        if (i != -1) {
-            stage.tasks.splice(0,1)
-            stage.workIndex.set(key, task);
-            console.log(key)
-            //give the nano the task...
-            key.brain.doTask(task, (task)=>stage.taskComplete(job, stage,key, task)) // ...
-            this.nanosSearching.delete(key);
-        } 
+        this.assignTask(job[0], stage, task, key);
         
     }
 }
