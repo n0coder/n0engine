@@ -67,7 +67,7 @@ export class Nanoai {
     idle() {
 
 
-        n0radio.findJob(this);
+        //n0radio.findJob(this);
         //find something to do
         //check battery
         //call radio

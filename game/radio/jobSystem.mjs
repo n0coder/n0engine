@@ -246,7 +246,7 @@ function scoreTask(task, nano, relationshipModifier = 1) {
 //this is how we can get the nanos relationship info
 function getRelationshipModifer(stage, nano) {
     let relationshipModifier = 1;
-    console.error("we need to get radio friendship level here")
+    console.warn("we need to set up relationships in nano identities here")
     let relationships = nano.identity.relationships;
 
     for (const [worker, work] of stage.workIndex) {
@@ -263,7 +263,14 @@ function getRelationshipModifer(stage, nano) {
 
 export function bestSearch(as, bs, scoring, clean = false, fit) {
     let matches = new Map(); 
+    //i think for us to implement the feature where we give a best rating to multiple nanos, we'd have to run our loop as many times as we have nanos
     for (let a of as) {
+        //we are choosing "the best nano for the job" or "the best task for the job"
+        //but we are still giving each nano a job, but not caring about which job, 
+        //we are assigning multiple nanos to the same job
+
+        //would it be better to run the uniqueification here? 
+        //i'm starting to think we could just implement it in the radio, since we do a similar tech in the nano rates jobs thing
         let scores = bs.map(b => ({b, score:scoring(a, b)}));
         for (let {b, score} of scores) {
             if (!matches.has(a) || (fit?.(score, matches.get(a).score) ?? (score > matches.get(a).score)) ) {
@@ -287,6 +294,8 @@ function scoreStageTask(task, nano, stage) {
 //it scores the nano based on the tasks in the stage. 
 export function nanoStageSearch(nano, stage) {
     let nanos = Array.isArray(nano) ? nano : [nano];
+    console.warn("we need to add tech to the bestsearch, to allow it to only give out one of the many tasks")
+    // in fact, this is a great example of when data structure duplication, can be a good thing
     if (stage.tasks.length > nanos.length) {
         return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
     } else {

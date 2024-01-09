@@ -204,14 +204,33 @@ class Radio {
             } else {
                 c.jobs.push(job)
             }
+            this.findNano(job, channel, key) //we want to tell any nanos currently waiting, that they can start working
+
         }
     }
+    findNano(job, channel, key) {
+        console.log("(job posted): job was posted")
+        if (this.nanosSearching.size === 0) return;
+        let nanos = Array.from(this.nanosSearching.keys())
+        console.log("(job posted): there are nanos waiting", nanos)
+
+        let stage = job.stages[job.stage]
+        let best = nanoStageSearch(nanos, stage)
+        /*bestSearch(stage.tasks, nanos, (stage, nano)=>{
+            return nanoStageSearch(nano, stage)
+        })*/
+        console.log("(job posted): best scores", best);
+    }
+
+
     findJob(key) {
+       
         //what would we do if multiple nanos are a key
         //so we gotta find jobs where both nanos can work together well
         //say we insert nanoai team, they will queue up for jobs together
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
+        console.log("(nano searching): nano is searching")
         let jobScores = [];
         function rateJobs(jobs, nano) {
             for (const job of jobs) {
@@ -239,7 +258,7 @@ class Radio {
         
         if (jobScores.length === 0) {
 
-            console.log(key, "no jobs right now")
+            console.log("(nano searching): no jobs right now", key)
           
             return;
         }
