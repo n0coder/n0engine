@@ -19,7 +19,7 @@ going to add shared n0engine features to the repo
 nanoai techs. attack and defend techs. jobs, and pathfinding.
 possibly emotions.
 
-
+(added myself a webhook to test commit message to discord)
 ## nanoai 
    - nanoai.brain.do("walk", 2,5) //ask the nanoai to walk to position 2, 5
    - actions are queued, actions can have prerequisites
