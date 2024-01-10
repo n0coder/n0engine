@@ -22,4 +22,4 @@ n0radio.postJob("personal", job2, n0);  //the job post will tell the ais to star
 //also, i would like to put a limit on work for a nanoai, alot of work will
 //make them tired, make them hungry, so we'll prioritize tasks which 
 //a nano can confidently perform based on their energy level
-//a
+//ab
