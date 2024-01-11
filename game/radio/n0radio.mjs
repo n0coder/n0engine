@@ -238,6 +238,7 @@ class Radio {
                     bestNano = [o, t.b], bestScore = t.score;
                 }
             }
+            console.log({job, stage, bestNano})
             this.assignTask(job, stage, bestNano[0], bestNano[1])
 
             nanos = this.nanosInChannel(channel, key);
@@ -274,7 +275,9 @@ class Radio {
         function rateJobs(jobs, nano) {
             for (const job of jobs) {
                 let stage = job.stages[job.stage]
-                let best = nanoStageSearch(nano, stage)
+                if (stage.tasks.length === 0) continue; //no tasks in job available? skip
+
+                let best = bestSearch([nano], stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
                 jobScores.push([job, best])
             }
         }
@@ -296,12 +299,9 @@ class Radio {
         }
         
         if (jobScores.length === 0) {
-
             console.log("(nano searching): no jobs right now", key)
-          
             return;
         }
-
         let job = bestSearch([key], jobScores, (k, j)=> {
             return j[1].get(key).score
         }, true).get(key);

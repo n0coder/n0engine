@@ -2,9 +2,10 @@
 
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-var jobTasksa = new Map([
+export var jobTasksa = new Map([
 
     ["smile", function(...args) {
+        console.log(args)
         return {
             name: "smile",
             args, working: false, job:null,
@@ -205,12 +206,13 @@ var job = {
 }
 
 export function createJobu(objs,task, ...argsa) {
-    let smile = jobTasksa.get(task);
-    if (smile === undefined) {
+    if (!Array.isArray(objs)) objs = [objs]; 
+    let action = jobTasksa.get(task);
+    if (action === undefined) {
         console.error(`"${task}" is not a job task, can't create job. returning null.`);
         return null;
     }
-    let tasks = objs.map(o=>smile(o, ...argsa))
+    let tasks = objs.map(o=>action(o, ...argsa))
     let stages = tasksToStages(tasks);
     let jobu = atomicClone(job); //atomically clone the job template
     jobu.stages = stages; //insert the job details
@@ -230,7 +232,8 @@ function scoreTask(task, nano, relationshipModifier = 1) {
             let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
             score *= typo;
         }
-    if (!(task.pos[0] && task.pos[1])) {
+
+    if (task.pos === undefined || !(task.pos[0] && task.pos[1])) {
         return score; //no distance related calculation needed
     } else {
         var vx = nano.x - task.pos[0];
@@ -288,6 +291,7 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
 export function scoreStageTask(task, nano, stage) {
     let relationshipModifier = getRelationshipModifer(stage, nano)
     let score = scoreTask(task,nano, relationshipModifier)
+    console.log(score)
     return score
 }
 //this code takes in a nano, and a stage
