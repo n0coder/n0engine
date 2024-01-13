@@ -13,54 +13,42 @@ export class NanoaiBrain {
     this.stateMachine = {
       idle: function (nano) {
         if (nano.brain.queue.length > 0) {
-          for (let i = 0; i < nano.brain.queue.length; i++) {
-            let q = nano.brain.queue[i];
-            if (Array.isArray(q)) {
-              nano.brain.queue.splice(i, 1, ...q);
-              i += q.length - 1; // Adjust the index to skip the newly inserted elements
-            }
-          }
-          var q = nano.brain.queue[0];
-          nano.brain.currentQueue = nano.brain.queue;
-          nano.brain.currentActivity = q;
-          nano.brain.active(nano)
+          this.processQueue(nano, "queue");
         }
         else if (nano.brain.laterQueue.length > 0) { //this is when i should refactor into a function for shared code
-
-          nano.brain.laterQueue = nano.brain.laterQueue.filter(q => {
+          nano.brain.laterQueue = nano.brain.laterQueue.filter(q => { //AHAHAHAHAHAHAHA it's been months since i said that
             if (Array.isArray(q) || q.condition(...(q.args))) return q
-          }
-          )
-          for (let i = 0; i < nano.brain.laterQueue.length; i++) {
-            let q = nano.brain.laterQueue[i];
-            if (Array.isArray(q)) {
-              let ov = q.map(o => ({ ...o, condition: q.condition }));
-              nano.brain.laterQueue.splice(i, 1, ...ov);
-              i += ov.length - 1; // Adjust the index to skip the newly inserted elements
-            }
-          }
-
-          var q = nano.brain.laterQueue[0];
-          if (q) {
-
-            nano.brain.currentQueue = nano.brain.laterQueue;
-            nano.brain.currentActivity = q;
-            nano.brain.active(nano)
-          }
-        } else nano.idle(); // nano.brain.done(nano);
+          })
+          this.processQueue(nano, "laterQueue");
+        } 
+        else nano.idle(); 
       },
       active: function (nano) {
 
         if (nano.brain.currentActivity) {
           var ou = nano.brain.currentActivity.work(nano);
-          if (!ou) {
-            nano.brain.done(nano)
-          }
+          if (!ou) nano.brain.done(nano)
+          
         } else {
-
           nano.brain.done(nano);
         }
-      }
+      }, 
+      processQueue(nano, queue) {
+        queue = nano.brain[queue];
+        for (let i = 0; i < queue.length; i++) {
+          let q = queue[i];
+          if (Array.isArray(q)) {
+            queue.splice(i, 1, ...q);
+            i += q.length - 1;
+          }
+        }
+        var q = queue[0];
+        if (q) {
+          nano.brain.currentQueue = queue;
+          nano.brain.currentActivity = q;
+          nano.brain.active(nano);
+        }
+       }
     };
   }
   
