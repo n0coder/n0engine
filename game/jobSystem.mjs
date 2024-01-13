@@ -12,7 +12,8 @@ import { worldGrid } from "../engine/grid/worldGrid.mjs";
 
 let n0 = new Nanoai("n0", 200,256); 
 let abi = new Nanoai("abi", 456,500); 
-
+globalThis.n0 = n0;
+globalThis.abi = abi;
 
 
 jobTasksa.set("playtogether",function(...args) { 
@@ -114,19 +115,37 @@ class TicTacToe {
                 this.players = Array.from(this.nanos.keys())
                 this.index = 0,
                 this.state = "reposition";
+
+               
             },
             reposition: () => {
-
                 let a = this.players[0], b = this.players[1];
                 let g = worldGrid.screenToGridPoint(this.x,this.y) 
-                var {x,y,w,h} = worldGrid.gridBoundsScreenSpace(g.x+4, g.y-1, 1,1);
                 var {vx, vy, mag} = normalize(this.x-x, this.y-y)
-                a.brain.doNow("walk", x, y+20);
-                a.brain.doNow("walk", x, y-20);
+
+                let count = 0;
+                let ping = ()=>{
+                    count++;
+                    if (count >= 2) {
+                        this.state = "thinking";
+                        count = 0;
+                    }
+                }
+
+                var {x,y,w,h} = worldGrid.gridBoundsScreenSpace(g.x+4, g.y-1, 1,1);
+                var trap = this.nanos.get(a).trap
+                a.brain.doBefore(trap,"walk", x, y+5)
+                a.brain.doBefore(trap,"look", "down")
+                a.brain.doBefore(trap, "ping", ping)
                 var {x,y,w,h} = worldGrid.gridBoundsScreenSpace(g.x+1, g.y-1, 1,1);
-                b.brain.doNow("walk", x, y+20);
-                b.brain.doNow("walk", x, y-20);
-                this.state = "thinking";
+                var trap = this.nanos.get(b).trap
+                b.brain.doBefore(trap,"walk", x, y+5)
+                b.brain.doBefore(trap,"look", "down")
+                b.brain.doBefore(trap, "ping", ping)
+                this.state = "moving"
+            },
+            moving: () => {
+
             },
             thinking: () => {
                 this.timer += deltaTime; //my 
@@ -186,13 +205,26 @@ class TicTacToe {
 }
 
 let game = new TicTacToe();
+globalThis.game = game;
 cosmicEntityManager.addEntity(game) //this allows the game to use the update loop
-n0.brain.do("walk", 111, 131);//walk to activity
-n0.brain.do("hook", (hook) => { game.addNano(n0, hook) }); //they get locked into the game until it pulls the hook
+
+//n0.brain.do("hook", (hook) => { game.addNano(n0, hook) }); //they get locked into the game until it pulls the hook
+
 n0.brain.do("walk", 151, 111); //walk away from activity
-abi.brain.do("walk", 111,111);
-abi.brain.do("hook", (hook) => { game.addNano(abi, hook) }); //they get locked into the game until it pulls the hook
+n0.brain.do("dance", 151, 111);
+
+n0.brain.doTask({ //the character will walk, dance then say hi
+    work(nano) {
+        console.log("hi");
+    }
+})
+
+//abi.brain.do("hook", (hook) => { game.addNano(abi, hook) }); //they get locked into the game until it pulls the hook
 abi.brain.do("walk", 151, 131); //walk away from activity
+abi.brain.do("dance", 151, 131);
+
+
+
 /*
 //n0.brain.doTask(activityTrap)
 let circle4 = new Circle(7,2, 8,8);

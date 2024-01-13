@@ -10,15 +10,44 @@ import { findPath } from "./research/n0Pathfinder.mjs";
 
 export const nanoaiActions = new Map([
     ["walk", function(...args) { return {
-        args : [],
+        args,
         path: null,
         work: function (nano) {
             return walkObj(this, nano);
         },
         
     }}],
+    ["walkRelative", function(...args) { 
+        
+        return {
+        args,
+        work: function (nano) {
+            if (this.x === undefined || this.y === undefined) {
+                this.x = nano.x+args[0],
+                this.y = nano.y+args[1]
+            }
+
+            walk(nano,this.x,this.y, 0.1 );
+            //nano.brain.doAfter(this, "walk", nano.x+args.)
+        },
+        
+    }}],
+    ["look", function(...args) { return {
+        args, directions: {"down": [0, 1], "up": [0, -1], "left": [-1,0], "right": [1, 0]},
+        path: null,
+        work: function (nano) {
+            if (typeof this.args[0] === 'number') { 
+                nano.vx = this.args[0];
+                nano.vy = this.args[1];
+             } else if (typeof this.args[0] === 'string') { 
+               [nano.vx, nano.vy] = this.directions[this.args];
+             }
+            return false;
+        },
+        
+    }}],
     ["eat",function(...args) { return  {
-        args: [],
+        args,
         work: function(nano) { 
             if (nano.inventory.has(this.args[0])) {
                 if (this.args[0].eaten) console.log("eatened alreaddy")
@@ -32,7 +61,7 @@ export const nanoaiActions = new Map([
         
    }}],
     ["read",function(...args) { return  {
-        args: [],
+        args,
         work: function(nano) { 
             console.log(this.args)
             let a = this.args[0][this.args[1]];
@@ -42,7 +71,7 @@ export const nanoaiActions = new Map([
         
    }}],
     ["hungry",function(...args) { return  {
-        args: [], target: null, path: null,
+        args, target: null, path: null,
         work: function(nano) { //one issue later on could be to prioritize getting out of the bitter biome over finding food (while regular nano)
             if (nano.sugar <= 0) { //debt is hunger
                 
@@ -79,15 +108,22 @@ export const nanoaiActions = new Map([
         
    }}],
     ["debug",function(...args) { return  {
-        args: [],
+        args,
         work: function (nano) {
             console.log(this);
             return false
-        },
-        
-   }}],
+        },        
+   }}],["ping", function(callback) {
+    return {
+        args: [callback],
+        work: function(nano) {
+            this.args[0]();
+            return false;
+        }
+    };
+ }],
     ["follow",function(...args) { return  {
-        args: [],
+        args,
         targetX: null, targetY: null, path: null,
         work: function(nano) { 
             if (this.args[0].x !== undefined && this.args[0].y !== undefined) 
@@ -98,7 +134,7 @@ export const nanoaiActions = new Map([
    }}],
     
     ["pickup", function(...args) { return {
-        args: [],
+        args,
         before: ["follow"],
         work: function (nano) {
             this.args[2](this.args[0])
@@ -107,14 +143,14 @@ export const nanoaiActions = new Map([
         
    }}],
     ["equip", function(...args) { return {
-        args: [],
+        args,
         work: function (nano) {
             return !nano.inventory.equip(this.args[0])
         },
         
    }}],
     ["harvest",function(...args) { return  {
-        args: [],
+        args,
         before: ["follow"],
         work: function (nano) {
             if (this.args[0] && this.args[0].harvest)
@@ -124,7 +160,7 @@ export const nanoaiActions = new Map([
         
    }}],
     ["use",function(obj, ...args) { return  {
-        args: [],
+        args,
         before: ["follow"],
         work: function (nano) {
             if (obj.use) {
@@ -135,7 +171,7 @@ export const nanoaiActions = new Map([
         
    }}],
     ["plant",function(...args) { return  {
-        args: [],
+        args,
         before: ["follow"],
         work: function (nano) {
             var plant = this.args[0].plant;
@@ -148,24 +184,45 @@ export const nanoaiActions = new Map([
    }}],
    ["hook", function(...args) { 
     let traphook = {pull: null};
-    return {
-        args: [], traphook, okok: true, 
+    let trap = {
+        args, okok: true, 
         work: function (nano) { //this is called every frame until we return false
             
             if (!traphook.pull) {
                 traphook.pull = (d) => {
                     this.okok = false;
                 }
-                console.log(traphook);
                 args[0](traphook)
             }
             return this.okok;
         }        
     }
-}]
-   ,
+    //since this task doesn't control itself, we have to pass the task with the hook
+    traphook.trap = trap;
+    return trap
+}],
+    ["dance", function(...args) { 
+        return {
+            args, work: function (nano) {
+                let brain = nano.brain;
+                brain.doAfter(this, "walkRelative", -10, 0)
+                brain.doAfter(this, "walkRelative", 20, 0)
+                brain.doAfter(this, "walkRelative", -10, 0)
+                brain.doAfter(this, "walkRelative", 0, 1)
+                brain.doAfter(this, "walkRelative", 0, 1)
+            }
+        }
+    }],
+    ["wait", function(time) { 
+        return {
+            time, t:0, work: function (nano) {
+                this.t+=deltaTime;
+                return t >= time;
+            }
+        }
+    }],
     ["transform",function(...args) { return  {
-        args: [],
+        args,
         work: function (nano) {
 
             var nano2 = nano.inventory.hasItem("Nanoai")

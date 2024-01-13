@@ -1,4 +1,4 @@
-import { cloneAction } from "../../engine/core/Utilities/ObjectUtils.mjs";
+import { cloneAction as handleBefore } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
 import { nanoaiActions } from "./nanoaiActions.mjs";
@@ -57,7 +57,7 @@ export class NanoaiBrain {
     var action = nanoaiActions.get(task);
     if (action) {
       action = action(...params)//calls the closure
-      var t = cloneAction(action,(a,b,c)=>this.before(a,b,c, this), ...params) //deep copies the object so it can modify any defined data structures
+      var t = handleBefore(action,(a,b,c)=>this.before(a,b,c, this), ...params) //deep copies the object so it can modify any defined data structures
       this.queue.push(t);
     } else {
       console.error(`there is no action for ${task}`)
@@ -67,7 +67,7 @@ export class NanoaiBrain {
     var action = nanoaiActions.get(task);
     if (action) {
         action = action(...params)
-        var t = cloneAction(action,(a,b,c)=>this.before(a,b,c, this), ...params)
+        var t = handleBefore(action,(a,b,c)=>this.before(a,b,c, this), ...params)
         this.queue.unshift(t); // Add the new task to the front of the queue
         this.currentActivity = null; // Set the new task as the current activity
         this.state = "idle"
@@ -75,16 +75,53 @@ export class NanoaiBrain {
         console.error(`there is no action for ${task}`)
     }
  }
+ //
+ doBefore(targetTask, task, ...params) {
+  var index = this.queue.indexOf(targetTask);
+  if (index !== -1) {
+    var action = nanoaiActions.get(task);
+    if (action) {
+      
+      action = action(...params);
+      var t = handleBefore(action, (a, b, c) => this.before(a, b, c, this), ...params);
+      this.queue.splice(index, 0, t);
+
+      //since this happens before the selected activity finishes, we exit the activity
+      this.currentActivity = null;
+      this.state = "idle"
+    } else {
+      console.error(`there is no action for ${task}`);
+    }
+  } else {
+    console.error(targetTask, "task not found in the queue");
+  }
+ }
+ doAfter(targetTask, task, ...params) {
+  var index = this.queue.indexOf(targetTask);
+  if (index !== -1) {
+    var action = nanoaiActions.get(task);
+    if (action) {
+      action = action(...params);
+      var t = handleBefore(action, (a, b, c) => this.before(a, b, c, this), ...params);
+      this.queue.splice(index + 1, 0, t);
+    } else {
+      console.error(`there is no action for ${task}`);
+    }
+  } else {
+    console.error(targetTask, "task not found in the queue");
+  }
+ }
+ 
   doTask(task, done) {
-    console.log({task, done}) 
-    task.args.unshift(done);
+    if (done && task.args)
+      task.args.unshift(done);
     this.queue.push(task)
   }
   doLater(task, condition, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
       action = action(...params)
-      var t = cloneAction(action, (a,b,c)=>this.before(a,b,c, this), ...params)
+      var t = handleBefore(action, (a,b,c)=>this.before(a,b,c, this), ...params)
       t.condition = condition
       this.laterQueue.splice(0, 0, t);
     } else {
@@ -97,7 +134,7 @@ export class NanoaiBrain {
       for (let i = 0; i < clone.before.length; i++) {
         let action = nanoaiActions.get(clone.before[i]);  
         action = action(...args)
-          var beforeAction = cloneAction(action, (a,b,c)=>ths.before(a,b,c, ths), ...args);
+          var beforeAction = handleBefore(action, (a,b,c)=>ths.before(a,b,c, ths), ...args);
           actions.push(...beforeAction)
       }
   };
