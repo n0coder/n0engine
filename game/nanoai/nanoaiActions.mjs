@@ -123,11 +123,12 @@ export const nanoaiActions = new Map([
         },
         
    }}],
-    ["use",function(...args) { return  {
+    ["use",function(obj, ...args) { return  {
         args: [],
+        before: ["follow"],
         work: function (nano) {
-            if (this.args[0].use) {
-                var action = this.args[0].use(nano);
+            if (obj.use) {
+                var action = obj.use(nano, ...args);
                 return action
             }
         },
@@ -146,12 +147,16 @@ export const nanoaiActions = new Map([
         
    }}],
    ["hook", function(...args) { 
-    let traphook ={pull: null};
+    let traphook = {pull: null};
     return {
         args: [], traphook, okok: true, 
         work: function (nano) { //this is called every frame until we return false
+            
             if (!traphook.pull) {
-                traphook.pull = (d) => this.okok = false;
+                traphook.pull = (d) => {
+                    this.okok = false;
+                }
+                console.log(traphook);
                 args[0](traphook)
             }
             return this.okok;
@@ -197,8 +202,8 @@ export function walkObj(obj, nano) {
     var vy = obj.args[1] - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))
     if (mag <= worldGrid.gridSize * 1) {
-        nano.vx = 0;
-        nano.vy = 0;
+        nano.vx = obj.args[2] ?? 0;
+        nano.vy = obj.args[3] ?? 0;
         return false;
     }
 
@@ -267,7 +272,15 @@ export function followObj (obj, nano) {
     }
     return true
 }
+export function normalize(vx, vy) {
+    var mag = Math.sqrt((vx * vx) + (vy * vy))
+    if (mag === 0) {
+        vx /= mag;
+        vy /= mag;
+    }
+    return {vx, vy, mag};
 
+}
 export function walk(nano, x, y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;

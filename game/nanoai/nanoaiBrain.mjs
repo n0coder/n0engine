@@ -95,7 +95,8 @@ export class NanoaiBrain {
   before(clone, actions, args, ths) {
     if (clone.before != undefined) {
       for (let i = 0; i < clone.before.length; i++) {
-        let action = nanoaiActions.get(clone.before[i]);          
+        let action = nanoaiActions.get(clone.before[i]);  
+        action = action(...args)
           var beforeAction = cloneAction(action, (a,b,c)=>ths.before(a,b,c, ths), ...args);
           actions.push(...beforeAction)
       }
