@@ -9,28 +9,29 @@ import { Mommyai, Puff } from "./mommyai.mjs";
 import { findPath } from "./research/n0Pathfinder.mjs";
 
 export const nanoaiActions = new Map([
-    ["walk", {
-        args: [],
+    ["walk", function(...args) { return {
+        args : [],
         path: null,
         work: function (nano) {
             return walkObj(this, nano);
         },
         
-    }],
-    ["eat", {
-        args: [],work: function(nano) { 
-               if (nano.inventory.has(this.args[0])) {
+    }}],
+    ["eat",function(...args) { return  {
+        args: [],
+        work: function(nano) { 
+            if (nano.inventory.has(this.args[0])) {
                 if (this.args[0].eaten) console.log("eatened alreaddy")
                 this.args[0]?.onEat?.(nano)
                 nano.sugar += this.args[0].sugar      
                 nano.inventory.remove(this.args[0]);  
-               }
+            }
             
             return false;
         },
         
-    }],
-    ["read", {
+   }}],
+    ["read",function(...args) { return  {
         args: [],
         work: function(nano) { 
             console.log(this.args)
@@ -39,8 +40,8 @@ export const nanoaiActions = new Map([
             return false;
         },
         
-    }],
-    ["hungry", {
+   }}],
+    ["hungry",function(...args) { return  {
         args: [], target: null, path: null,
         work: function(nano) { //one issue later on could be to prioritize getting out of the bitter biome over finding food (while regular nano)
             if (nano.sugar <= 0) { //debt is hunger
@@ -76,16 +77,16 @@ export const nanoaiActions = new Map([
             return true;
         }, 
         
-    }],
-    ["debug", {
+   }}],
+    ["debug",function(...args) { return  {
         args: [],
         work: function (nano) {
             console.log(this);
             return false
         },
         
-    }],
-    ["follow", {
+   }}],
+    ["follow",function(...args) { return  {
         args: [],
         targetX: null, targetY: null, path: null,
         work: function(nano) { 
@@ -94,9 +95,9 @@ export const nanoaiActions = new Map([
         },
         //clone before setting the variable
         
-    }],
+   }}],
     
-    ["pickup", {
+    ["pickup", function(...args) { return {
         args: [],
         before: ["follow"],
         work: function (nano) {
@@ -104,15 +105,15 @@ export const nanoaiActions = new Map([
             return !nano.inventory.add(this.args[0], this.args[1])
         },
         
-    }],
-    ["equip", {
+   }}],
+    ["equip", function(...args) { return {
         args: [],
         work: function (nano) {
             return !nano.inventory.equip(this.args[0])
         },
         
-    }],
-    ["harvest", {
+   }}],
+    ["harvest",function(...args) { return  {
         args: [],
         before: ["follow"],
         work: function (nano) {
@@ -121,8 +122,8 @@ export const nanoaiActions = new Map([
             return false
         },
         
-    }],
-    ["use", {
+   }}],
+    ["use",function(...args) { return  {
         args: [],
         work: function (nano) {
             if (this.args[0].use) {
@@ -131,8 +132,8 @@ export const nanoaiActions = new Map([
             }
         },
         
-    }],
-    ["plant", {
+   }}],
+    ["plant",function(...args) { return  {
         args: [],
         before: ["follow"],
         work: function (nano) {
@@ -143,8 +144,22 @@ export const nanoaiActions = new Map([
             }
         },
         
-    }],
-    ["transform", {
+   }}],
+   ["hook", function(...args) { 
+    let traphook ={pull: null};
+    return {
+        args: [], traphook, okok: true, 
+        work: function (nano) { //this is called every frame until we return false
+            if (!traphook.pull) {
+                traphook.pull = (d) => this.okok = false;
+                args[0](traphook)
+            }
+            return this.okok;
+        }        
+    }
+}]
+   ,
+    ["transform",function(...args) { return  {
         args: [],
         work: function (nano) {
 
@@ -173,7 +188,7 @@ export const nanoaiActions = new Map([
             return false
         },
         
-    }]
+    }}]
 ])
 
 

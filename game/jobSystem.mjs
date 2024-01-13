@@ -7,6 +7,7 @@ import { createJobu, jobTasksa } from "./radio/jobSystem.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../engine/core/p5engine.mjs";
 import { deltaTime } from "../engine/core/Time/n0Time.mjs";
+import { atomicClone } from "../engine/core/Utilities/ObjectUtils.mjs";
 
 let n0 = new Nanoai("n0", 200,256); 
 let abi = new Nanoai("abi", 456,500); 
@@ -71,51 +72,9 @@ class TicTacToe {
 
 let game = new TicTacToe();
 cosmicEntityManager.addEntity(game) //this allows the game to use the update loop
-
-//this allows the nano to listen to hooks with super easy syntax
-
-//IS THAT A SIGN I SHOULD MOVE MY ACTIONS TO CLOSURES
-//(i need to initialize a traphook directly in the function, so we can guaruntee that the traphook is defined for the other object)
-nanoaiActions.set("hook", { //let traphook ={pull: null};
-    args: [], okok: true,
-    work: function (nano) { //this is called every frame until we return false
-        
-        this.args[0].pull = (d) => {
-            console.log("traphook was pulled", d);
-            this.okok = false;
-        }
-        this.args[1]()
-        return this.okok;
-    }        
-})
-
-nanoaiActions.set("hookc", function(...args) { 
-    let traphook ={pull: null};
-    return {
-        args: [], traphook, okok: true, 
-        work: function (nano) { //this is called every frame until we return false
-            if (!traphook.pull) {
-                traphook.pull = (d) => {
-                    console.log("traphook was pulled", d);
-                    this.okok = false;
-                }
-                args[0](traphook)
-            }
-            return this.okok;
-        }        
-    }
-})
-
-let hook = nanoaiActions.get("hookc")
-console.log(hook((traphook)=> { traphook.pull(); }).work())
-
-
-
 n0.brain.do("walk", 356, 156);//walk to activity
-n0.brain.do("hook", (traphook)=> { game.addNano(n0, traphook) });
+n0.brain.do("hook", (hook) => { game.addNano(n0, hook) }); //they get locked into the game until it pulls the hook
 n0.brain.do("walk", 111, 111); //walk away from activity
-
-
 
 
 //n0.brain.doTask(activityTrap)

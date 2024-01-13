@@ -56,7 +56,8 @@ export class NanoaiBrain {
   do(task, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
-      var t = cloneAction(action,(a,b,c)=>this.before(a,b,c, this), ...params)
+      action = action(...params)//calls the closure
+      var t = cloneAction(action,(a,b,c)=>this.before(a,b,c, this), ...params) //deep copies the object so it can modify any defined data structures
       this.queue.push(t);
     } else {
       console.error(`there is no action for ${task}`)
@@ -65,6 +66,7 @@ export class NanoaiBrain {
   doNow(task, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
+        action = action(...params)
         var t = cloneAction(action,(a,b,c)=>this.before(a,b,c, this), ...params)
         this.queue.unshift(t); // Add the new task to the front of the queue
         this.currentActivity = null; // Set the new task as the current activity
@@ -81,6 +83,7 @@ export class NanoaiBrain {
   doLater(task, condition, ...params) {
     var action = nanoaiActions.get(task);
     if (action) {
+      action = action(...params)
       var t = cloneAction(action, (a,b,c)=>this.before(a,b,c, this), ...params)
       t.condition = condition
       this.laterQueue.splice(0, 0, t);
