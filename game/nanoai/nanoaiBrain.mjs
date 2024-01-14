@@ -52,89 +52,73 @@ export class NanoaiBrain {
     };
   }
   
-  //easy logging to tell when we try to do something we did not define
-  do(task, ...params) {
-    var action = nanoaiActions.get(task);
-    if (action) {
-      action = action(...params)//calls the closure
-      var t = handleBefore(action,(a,b,c)=>this.before(a,b,c, this), ...params) //deep copies the object so it can modify any defined data structures
-      this.queue.push(t);
-      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
-    } else {
-      console.error(`there is no action for ${task}`)
-    }
+  do(task, ...args) {
+      return this.actionBuilder(task, args, (t) => { this.queue.push(t); }); 
   }
-  doNow(task, ...params) {
-    var action = nanoaiActions.get(task);
-    if (action) {
-        action = action(...params)
-        var t = handleBefore(action,(a,b,c)=>this.before(a,b,c, this), ...params)
-        this.queue.unshift(t); // Add the new task to the front of the queue
-        this.currentActivity = null; // Set the new task as the current activity
-        this.state = "idle"
-        return t; //allow for direct access of the action object (helpful for dobefore style inserts)
-    } else {
-        console.error(`there is no action for ${task}`)
-    }
- }
- //
- doBefore(targetTask, task, ...params) {
-  var index = this.queue.indexOf(targetTask);
-  if (index !== -1) {
-    var action = nanoaiActions.get(task);
-    if (action) {
-      
-      action = action(...params);
-      var t = handleBefore(action, (a, b, c) => this.before(a, b, c, this), ...params);
-      this.queue.splice(index, 0, t);
 
-      //since this happens before the selected activity finishes, we exit the activity
-      this.currentActivity = null;
+  doNow(task, ...args) {
+    return this.actionBuilder(task, args, (t) => { 
+      this.queue.unshift(t);
+      this.currentActivity = null; 
       this.state = "idle"
-      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
-    } else {
-      console.error(`there is no action for ${task}`);
-    }
-  } else {
-    console.error(targetTask, "task not found in the queue");
+    });
   }
- }
- doAfter(targetTask, task, ...params) {
-  var index = this.queue.indexOf(targetTask);
-  if (index !== -1) {
-    var action = nanoaiActions.get(task);
-    if (action) {
-      action = action(...params);
-      var t = handleBefore(action, (a, b, c) => this.before(a, b, c, this), ...params);
-      this.queue.splice(index + 1, 0, t);
-      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
-    } else {
-      console.error(`there is no action for ${task}`);
-    }
-  } else {
-    console.error(targetTask, "task not found in the queue");
+  
+
+  doBefore(targetTasks, task, ...args) {
+    return this.doRelative(targetTasks, task, (t, index) => { 
+      console.log(t)
+      this.queue.splice(index, 0, t); 
+      this.currentActivity = null; 
+      this.state = "idle"
+    }, (array)=> array[0], ...args);    
   }
- }
- 
-  doTask(task, done) { 
-    if (done) //changing this will echo errors
-      task.done = done 
-    this.queue.push(task)
-    return task; //
-  }
-  doLater(task, condition, ...params) {
-    var action = nanoaiActions.get(task);
-    if (action) {
-      action = action(...params)
-      var t = handleBefore(action, (a,b,c)=>this.before(a,b,c, this), ...params)
-      t.condition = condition
-      this.laterQueue.splice(0, 0, t);
-      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
-    } else {
-      console.error(`there is no action for ${task}`)
-    }
+  doAfter(targetTasks, task, ...args) {
+    return this.doRelative(targetTasks, task,  (t, index)  => { 
+      console.log(t)
+      this.queue.splice(index+1, 0, t);
+    }, (array)=> array[array.length], ...args);  
   }
 
+
+  doRelative(targetTasks, task, builder, arrayIndex, ...args) {
+    let doR = (targetTask, task, args) => { 
+      var index = this.queue.indexOf(targetTask);
+      if (index !== -1) { 
+        return this.actionBuilder(task, args, (t)=> builder(t, index)); 
+      } else {
+        console.error({targetTask, msg: "task not found in the queue"});
+      }
+    }
+
+    let targetTask = Array.isArray(targetTasks) ? arrayIndex(targetTasks) : targetTasks
+    return doR(targetTask, task, args)
+  }
+  doLater(task, condition, ...args) {
+    return this.actionBuilder(task, args, (t) => { 
+      t.condition = condition; 
+      this.laterQueue.splice(0, 0, t); 
+    }); 
+  }
+
+  actionBuilder(task, args, found) {
+    if (typeof task === 'string') {
+    var action = nanoaiActions.get(task);
+    if (!action) {
+      console.error(`there is no action for ${task}`)
+      return null; // i do hate the "guard clauses" syntax 
+    }
+
+    var task = action(...args)
+    let doBefore = (task,actions,args) => this.before(task,actions, args, this)
+    let o = handleBefore(task, doBefore, ...args); //o is an array (bc of before returning multiple tasks) 
+    found(o);
+    return (o.length === 1) ? o[0] : o
+  } else {
+      if (args[0]) task.done = args[0] 
+    return task;
+  }
+  }
   before(clone, actions, args, ths) {
     if (clone.before != undefined) {
       for (let i = 0; i < clone.before.length; i++) {

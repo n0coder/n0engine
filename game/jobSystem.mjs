@@ -213,7 +213,7 @@ cosmicEntityManager.addEntity(game) //this allows the game to use the update loo
 n0.brain.do("walk", 151, 111); //walk away from activity
 n0.brain.do("dance", 151, 111);
 
-n0.brain.doTask({ //the character will walk, dance then say hi
+n0.brain.do({ //the character will walk, dance then say hi
     work(nano) {
         console.log("hi");
     }
@@ -221,8 +221,14 @@ n0.brain.doTask({ //the character will walk, dance then say hi
 
 //abi.brain.do("hook", (hook) => { game.addNano(abi, hook) }); //they get locked into the game until it pulls the hook
 abi.brain.do("walk", 151, 131); //walk away from activity
-abi.brain.do("dance", 151, 131);
+abi.brain.do("dance2", 151, 131);
 
+abi.brain.do({work() {console.log("doing work"); this.done?.(); return false;  }}, ()=>{console.log("job done")})
+
+let walkMarker = n0.brain.do("walk", 256, 256); 
+console.log(walkMarker);
+let pickupMarker = abi.brain.do("pickup", n0);
+console.log(pickupMarker);
 
 
 /*

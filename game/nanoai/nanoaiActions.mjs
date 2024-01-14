@@ -123,7 +123,7 @@ export const nanoaiActions = new Map([
     };
  }],
     ["follow",function(...args) { return  {
-        args,
+        args, name: "follow",
         targetX: null, targetY: null, path: null,
         work: function(nano) { 
             if (this.args[0].x !== undefined && this.args[0].y !== undefined) 
@@ -134,10 +134,11 @@ export const nanoaiActions = new Map([
    }}],
     
     ["pickup", function(...args) { return {
-        args,
+        args, name: "pickup",
         before: ["follow"],
         work: function (nano) {
-            this.args[2](this.args[0])
+            console.log(args);
+            this.args[2]?.(this.args[0])
             return !nano.inventory.add(this.args[0], this.args[1])
         },
         
@@ -191,8 +192,10 @@ export const nanoaiActions = new Map([
             if (!traphook.pull) {
                 traphook.pull = (d) => {
                     this.okok = false;
+                    args[1]?.(d)
                 }
-                args[0](traphook)
+                console.log(args);
+                args[0](this, traphook)
             }
             return this.okok;
         }        
@@ -207,29 +210,36 @@ export const nanoaiActions = new Map([
                 let brain = nano.brain;
                 let t = .1;
 
+
+                //apparently; this tech only works using the hook...
+                //now i'm extra glad i made it...
+
                 // doAfter has a possible issue, (it posts in reverse order, stack style)
                 // but one thing we should be doing is returning the task from the dos
+                brain.doAfter(this, "hook", (marker, hook) => {
+                    brain.doBefore(marker, "walkRelative", -2, 0) //this do syntax is very expecting is it not...
+                    brain.doBefore(marker, "wait",t) //what i mean to say is it expects the first real arg to be the string task name
+                    brain.doBefore(marker, "walkRelative", 4, 0) //what if i insert an object directly
+                    brain.doBefore(marker, "wait",t) //we could shift the doTask code directly into the function
+                    brain.doBefore(marker, "walkRelative", -2, 0) //but it is a good question of how we can do that
+                    brain.doBefore(marker, "walkRelative", -2, 0)
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "walkRelative", 4, 0)
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "walkRelative", -2, 0)
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "walkRelative", 0, 1)
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "walkRelative", 0, -1)
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "walkRelative", 0, 1)
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "walkRelative", 0, -1)
+                    brain.doBefore(marker, "ping", () => {hook.pull("hi");})
+                }) 
                 
 
-                brain.doAfter(this, "walkRelative", -2, 0)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", 4, 0)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", -2, 0)
-                brain.doAfter(this, "walkRelative", -2, 0)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", 4, 0)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", -2, 0)
                 
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", 0, 1)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", 0, -1)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", 0, 1)
-                brain.doAfter(this, "wait",t)
-                brain.doAfter(this, "walkRelative", 0, -1)
             }
         }
     }],
