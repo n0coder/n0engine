@@ -67,7 +67,7 @@ export class NanoaiBrain {
 
   doBefore(targetTasks, task, ...args) {
     return this.doRelative(targetTasks, task, (t, index) => { 
-      console.log(t)
+      
       this.queue.splice(index, 0, t); 
       this.currentActivity = null; 
       this.state = "idle"
@@ -75,7 +75,7 @@ export class NanoaiBrain {
   }
   doAfter(targetTasks, task, ...args) {
     return this.doRelative(targetTasks, task,  (t, index)  => { 
-      console.log(t)
+     
       this.queue.splice(index+1, 0, t);
     }, (array)=> array[array.length], ...args);  
   }
