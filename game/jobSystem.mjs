@@ -208,10 +208,10 @@ let game = new TicTacToe();
 globalThis.game = game;
 cosmicEntityManager.addEntity(game) //this allows the game to use the update loop
 
-n0.brain.do("hook", (hook) => { game.addNano(n0, hook) }); //they get locked into the game until it pulls the hook
+//n0.brain.do("hook", (hook) => { game.addNano(n0, hook) }); //they get locked into the game until it pulls the hook
 
 n0.brain.do("walk", 151, 111); //walk away from activity
-//n0.brain.do("dance", 151, 111);
+n0.brain.do("dance", 151, 111);
 
 n0.brain.doTask({ //the character will walk, dance then say hi
     work(nano) {
@@ -219,9 +219,9 @@ n0.brain.doTask({ //the character will walk, dance then say hi
     }
 })
 
-abi.brain.do("hook", (hook) => { game.addNano(abi, hook) }); //they get locked into the game until it pulls the hook
+//abi.brain.do("hook", (hook) => { game.addNano(abi, hook) }); //they get locked into the game until it pulls the hook
 abi.brain.do("walk", 151, 131); //walk away from activity
-//abi.brain.do("dance", 151, 131);
+abi.brain.do("dance", 151, 131);
 
 
 

@@ -21,10 +21,10 @@
   "dependencies": {
     "alea": "^1.0.1",
     "easystarjs": "^0.4.4",
-    "eslint": "^8.50.0",
-    "mocha": "^10.2.0",
     "p5": "^1.7.0",
-    "simplex-noise": "^4.0.1",
-    "vite": "^4.4.9"
+    "simplex-noise": "^4.0.1"
+  },
+  "devDependencies": {
+    "vite": "^5.0.11"
   }
 }

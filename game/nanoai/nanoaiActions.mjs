@@ -27,7 +27,7 @@ export const nanoaiActions = new Map([
                 this.y = nano.y+args[1]
             }
 
-            walk(nano,this.x,this.y, 0.1 );
+            return walk(nano,this.x,this.y, 0.5 );
             //nano.brain.doAfter(this, "walk", nano.x+args.)
         },
         
@@ -205,11 +205,31 @@ export const nanoaiActions = new Map([
         return {
             args, work: function (nano) {
                 let brain = nano.brain;
-                brain.doAfter(this, "walkRelative", -10, 0)
-                brain.doAfter(this, "walkRelative", 20, 0)
-                brain.doAfter(this, "walkRelative", -10, 0)
+                let t = .1;
+
+                // doAfter has a possible issue, (it posts in reverse order, stack style)
+                // but one thing we should be doing is returning the task from the dos
+                
+
+                brain.doAfter(this, "walkRelative", -2, 0)
+                brain.doAfter(this, "wait",t)
+                brain.doAfter(this, "walkRelative", 4, 0)
+                brain.doAfter(this, "wait",t)
+                brain.doAfter(this, "walkRelative", -2, 0)
+                brain.doAfter(this, "walkRelative", -2, 0)
+                brain.doAfter(this, "wait",t)
+                brain.doAfter(this, "walkRelative", 4, 0)
+                brain.doAfter(this, "wait",t)
+                brain.doAfter(this, "walkRelative", -2, 0)
+                
+                brain.doAfter(this, "wait",t)
                 brain.doAfter(this, "walkRelative", 0, 1)
+                brain.doAfter(this, "wait",t)
+                brain.doAfter(this, "walkRelative", 0, -1)
+                brain.doAfter(this, "wait",t)
                 brain.doAfter(this, "walkRelative", 0, 1)
+                brain.doAfter(this, "wait",t)
+                brain.doAfter(this, "walkRelative", 0, -1)
             }
         }
     }],
@@ -217,7 +237,7 @@ export const nanoaiActions = new Map([
         return {
             time, t:0, work: function (nano) {
                 this.t+=deltaTime;
-                return t >= time;
+                return this.t <= this.time; //
             }
         }
     }],

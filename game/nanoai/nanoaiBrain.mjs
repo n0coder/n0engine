@@ -59,6 +59,7 @@ export class NanoaiBrain {
       action = action(...params)//calls the closure
       var t = handleBefore(action,(a,b,c)=>this.before(a,b,c, this), ...params) //deep copies the object so it can modify any defined data structures
       this.queue.push(t);
+      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
     } else {
       console.error(`there is no action for ${task}`)
     }
@@ -71,6 +72,7 @@ export class NanoaiBrain {
         this.queue.unshift(t); // Add the new task to the front of the queue
         this.currentActivity = null; // Set the new task as the current activity
         this.state = "idle"
+        return t; //allow for direct access of the action object (helpful for dobefore style inserts)
     } else {
         console.error(`there is no action for ${task}`)
     }
@@ -89,6 +91,7 @@ export class NanoaiBrain {
       //since this happens before the selected activity finishes, we exit the activity
       this.currentActivity = null;
       this.state = "idle"
+      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
     } else {
       console.error(`there is no action for ${task}`);
     }
@@ -104,6 +107,7 @@ export class NanoaiBrain {
       action = action(...params);
       var t = handleBefore(action, (a, b, c) => this.before(a, b, c, this), ...params);
       this.queue.splice(index + 1, 0, t);
+      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
     } else {
       console.error(`there is no action for ${task}`);
     }
@@ -112,10 +116,11 @@ export class NanoaiBrain {
   }
  }
  
-  doTask(task, done) {
-    if (done && task.args)
-      task.args.unshift(done);
+  doTask(task, done) { 
+    if (done) //changing this will echo errors
+      task.done = done 
     this.queue.push(task)
+    return task; //
   }
   doLater(task, condition, ...params) {
     var action = nanoaiActions.get(task);
@@ -124,6 +129,7 @@ export class NanoaiBrain {
       var t = handleBefore(action, (a,b,c)=>this.before(a,b,c, this), ...params)
       t.condition = condition
       this.laterQueue.splice(0, 0, t);
+      return t; //allow for direct access of the action object (helpful for dobefore style inserts)
     } else {
       console.error(`there is no action for ${task}`)
     }
