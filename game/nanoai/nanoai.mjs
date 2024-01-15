@@ -75,7 +75,7 @@ export class Nanoai {
     }
 
     draw() {
-        if (this.working)
+        //if (this.working)
             this.brain.work(this);
         p.text(`${this.sugar <= 0? "hungry": ""}  ${this.sugar}`, this.x+10, this.y-16);
         if (!this.cimg)

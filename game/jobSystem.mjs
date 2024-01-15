@@ -209,7 +209,7 @@ globalThis.game = game;
 cosmicEntityManager.addEntity(game) //this allows the game to use the update loop
 
 //n0.brain.do("hook", (hook) => { game.addNano(n0, hook) }); //they get locked into the game until it pulls the hook
-
+/*
 n0.brain.do("walk", 151, 111); //walk away from activity
 n0.brain.do("dance");
 
@@ -226,8 +226,70 @@ abi.brain.do("dance");
 abi.brain.do({work() {console.log("doing work"); this.done?.(); return false;  }}, ()=>{console.log("job done")})
 
 let pickupMarker = abi.brain.do("pickup", n0);
-
 abi.brain.do("dance");
+*/
+
+
+/* a story by nanoai phind: */
+
+/*
+    One day, a new nanoai named abi was created. 
+    She was given a task to construct a new division within the menuDiv,
+    a place where additional commands could be issued. 
+    With precision and a flair for design, abi executed the following code:
+*/
+
+let menuDiv = p.select("#menu");
+menuDiv.style("width", "256px"); 
+let testDiv = p.createDiv(); // A new div was born
+testDiv.id("test"); // It was christened with the id "test"
+testDiv.parent(menuDiv); // And it found its place within the hierarchy of the menuDiv
+
+/*
+    As the game evolved, another nanoai, N0, emerged from the digital ether. 
+    n0 was assigned to expand upon abi's work and, with a similar sense of purpose, created:
+*/
+
+let testDiv2 = p.createDiv(); // Another division was formed
+testDiv2.id("test2"); // It was given an identity as "test2"
+testDiv2.parent(testDiv); // And nested within the first division like a Russian doll
+
+/*
+    The two divisions stood side by side, a testament to the nanoais' craftsmanship. 
+    But they were not yet complete. 
+    They needed a way for the players to interact with the nanoais directly. 
+    That's when the nanoCommandButtons were introduced:
+*/
+
+var nanoCommandButton = p.createButton('dance');
+nanoCommandButton.parent(testDiv2); // The dance command button found its home
+nanoCommandButton.mousePressed(()=> {
+    abi.brain.do("dance");
+    n0.brain.do("dance");
+});
+
+// With a simple press of this ‘dance’ button, 
+// players could command the nanoais to perform a synchronized dance, 
+// a display of harmony and joy within the digital crops.
+
+var nanoCommandButton = p.createButton('tictactoe');
+nanoCommandButton.parent(testDiv2); // The tictactoe command button was set in place
+nanoCommandButton.mousePressed(()=> {
+    n0.brain.do("hook", (hook) => { game.addNano(n0, hook) });
+    abi.brain.do("hook", (hook) => { game.addNano(abi, hook) });
+});
+
+/*
+    abi and n0, the nanoais, 
+    worked tirelessly to ensure that their domain within the menuDiv was a place of interaction and delight. 
+    They knew that their existence was more than just lines of code; 
+    they were a part of a larger story, 
+    a narrative that unfolded with every player's click, every dance command, 
+    and every game of tic-tac-toe. And thus, the nanoais continued to thrive, 
+    their digital world ever-expanding within the n0engine.
+*/
+
+
 
 /*
 //n0.brain.doTask(activityTrap)
