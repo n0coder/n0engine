@@ -10,21 +10,29 @@ body {
   width: 100%;
   color: white;
   display: flex;
+  height: 100%;
   flex-direction:column;
-  justify-content: center;
   justify-items: center;
   overflow: hidden;
 }
 
 #test2{
   height: 128px;
-  width: 233px;
+  width: auto;
   text-align: center;
   background: #222222;
   border-radius: 10px;
   margin: 10px;
+  display: table;
 }
-
+#test2Title{
+  display: flex;
+width: 207px;
+height: 25px;
+flex-direction: column;
+justify-content: center;
+flex-shrink: 0;
+}
   #game { /*trying to center game on div*/
     display: flex;
     flex-direction: row;
@@ -42,6 +50,47 @@ body {
     height: 512px;
     transition: width 1.5s, height 1.5s;
 }
+#menu Button {
+  margin: 10;
+  border-radius: 5px;
+  width: 90;
+} 
+#menu h3 {
+  display: flex;
+  width: 207px;
+  height: 25px;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+
+
+.button {
+  display: inline-block; 
+  height: 20px;
+  flex-shrink: 0;
+  margin: 10;
+  border-radius: 5px;
+  background: #D9D9D9;
+  width: 90px;
+ 
+}
+
+.button .title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  color: #000;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: 400;  
+  font-size: 15px;
+  font-style: normal;
+  line-height: normal;
+}
+
 body::before {
   content: "";
   position: absolute;

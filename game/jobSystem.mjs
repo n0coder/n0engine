@@ -254,6 +254,10 @@ let testDiv2 = p.createDiv(); // Another division was formed
 testDiv2.id("test2"); // It was given an identity as "test2"
 testDiv2.parent(testDiv); // And nested within the first division like a Russian doll
 
+var nanoCommandHeader = p.createDiv('nanoais');
+nanoCommandHeader.addClass('test2Title');
+nanoCommandHeader.parent(testDiv2);
+
 /*
     The two divisions stood side by side, a testament to the nanoais' craftsmanship. 
     But they were not yet complete. 
@@ -278,6 +282,20 @@ nanoCommandButton.mousePressed(()=> {
     n0.brain.do("hook", (hook) => { game.addNano(n0, hook) });
     abi.brain.do("hook", (hook) => { game.addNano(abi, hook) });
 });
+
+var danceButton = p.createDiv().addClass('button').parent(testDiv2);
+p.createDiv("dance").addClass('title').parent(danceButton);
+danceButton.mousePressed(() => {
+   abi.brain.do("dance");
+   n0.brain.do("dance");
+});
+var tictactoeButton = p.createDiv().addClass('button').parent(testDiv2);
+    p.createDiv("tictactoe").addClass('title').parent(tictactoeButton);
+tictactoeButton.mousePressed(() => {
+   n0.brain.do("hook", (hook) => { game.addNano(n0, hook) });
+   abi.brain.do("hook", (hook) => { game.addNano(abi, hook) });
+});
+
 
 /*
     abi and n0, the nanoais, 
