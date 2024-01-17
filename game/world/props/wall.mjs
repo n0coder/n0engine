@@ -7,7 +7,6 @@ export class Wall{
     constructor(x,y) {
         this.x = x;
         this.y = y;
-        worldGrid.tiles.set(`${worldGrid.x+ this.x}, ${ worldGrid.y+ this.y}`, this);
         this.pathDifficulty = 8; //can't walk through an 8
         this.setActive = setActive;
         this.setActive(true)

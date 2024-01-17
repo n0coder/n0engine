@@ -6,7 +6,9 @@ export class WorldGrid {
         this.y = 230;
         this.tiles = new Map();
     }
-
+    setTile(x,y, obj) {
+        this.tiles.set(`${this.x+ x}, ${ this.y+ y}`, obj);
+    }
     getTile(x,y) {
         return this.tiles.get(`${this.x+x}, ${this.y+y}`)
     }

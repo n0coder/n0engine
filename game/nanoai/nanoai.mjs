@@ -2,6 +2,7 @@ import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mj
 import { deltaTime, ticks } from "../../engine/core/Time/n0Time.mjs";
 import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { createCubicInterpolator, cubicBlendW, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
 import { p2 } from "../visualizers/lineVisualizer.mjs";
@@ -25,7 +26,7 @@ export class Nanoai {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
-        this.speed = 48 * 2;
+        this.speed = 5;
         this.sugar = -4;
         this.lover = null;
         loadImg(this, "img", '../nanoai.png');
@@ -49,24 +50,26 @@ export class Nanoai {
         this.renderOrder = 2;
         this.working = false
         this.frame = 0, this.t = 0;
+        this.dMap= new Map([
+            [[0, -1], "walkUp"],[[0, 1], "walkDown"],[[-1, 0], "walkLeft"],[[1, -1], "walkRight"]
+        ]) 
     }
-    
+    get visualX() {
+        return (this.x*worldGrid.gridSize);
+    }
+    get visualY() {
+        return (this.y*worldGrid.gridSize)
+    }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
-        if (this.img)
-            return this.x - this.img.width / 2;
-        return this.x;
+        return (this.img ? (this.x*worldGrid.gridSize) - this.img.width / 2 : this.x);
     }
 
     get centerY() {
-        if (this.img)
-            return this.y - this.img.height;
-        return this.y;
+        return ((this.img) ? (this.y*worldGrid.gridSize) - this.img.height : this.y);
     }
 
     idle() {
-
-
         //n0radio.findJob(this);
         //find something to do
         //check battery
@@ -75,24 +78,28 @@ export class Nanoai {
     }
 
     draw() {
-        //if (this.working)
+        if (this.working)
             this.brain.work(this);
-        p.text(`${this.sugar <= 0? "hungry": ""}  ${this.sugar}`, this.x+10, this.y-16);
+            
+            let b = [this.vx, this.vy];
+            let bestDir = {dot: -2, dir:"?"};
+            for (let [a, dir] of this.dMap) {
+                let dot = a[0] * b[0] + a[1] * b[1];
+                if (!bestDir || bestDir.dot < dot ) {
+                    bestDir.dot = dot;
+                    bestDir.dir = dir;
+                }
+            }
+
         if (!this.cimg)
             this.cimg = this.img;
 
-        if (this.vy > 0.1)
-            this.cimg = getAnimation("nano", "walkDown", ticks)
-        else if (this.vy < -0.1) {
-            this.cimg = getAnimation("nano", "walkUp", ticks)
-        } else if (this.vx > 0.1) {
-            this.cimg = getAnimation("nano", "walkRight", ticks)
-        } if (this.vx < -0.1) {
-            this.cimg = getAnimation("nano", "walkLeft", ticks)
-        }
-
+            if (!(b[0]===0&&b[1]===0))
+                this.cimg = getAnimation("nano", bestDir.dir, ticks)
+        p.fill(125, 222, 152)
+        p.text(`${this.vx.toFixed(2)}, ${this.vy.toFixed(2)}`, this.visualX+10, this.visualY-16);
         if (this.cimg) {
-            p.image(this.cimg, this.centerX, this.centerY);
+            p.image(this.cimg, this.centerX+worldGrid.halfTileSize, this.centerY+worldGrid.halfTileSize);
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }

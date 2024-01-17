@@ -1,7 +1,6 @@
-import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { useItems } from "../itemUse/itemActions.mjs";
+import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { p } from "../../../engine/core/p5engine.mjs";
+import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 
 export const waterActions = new Map()
 export class Water {
@@ -10,8 +9,7 @@ export class Water {
         this.y = y;
         this.level = level
 
-        var [gx, gy] = worldGrid.screenToWorldPosition(x, y)
-        var rect = worldGrid.getScreenTileRect(gx, gy);
+        var rect = worldGrid.gridBoundsScreenSpace(x, y);
         this.rect = rect
         this.cx = rect.x + (rect.w / 2);
         this.cy = rect.y + (rect.h / 2);
@@ -20,7 +18,6 @@ export class Water {
         this.setActive(true)
     }
     draw() {
-
         var { x, y, w, h } = this.rect;
         p.push()
         p.fill(100, 100, 200)

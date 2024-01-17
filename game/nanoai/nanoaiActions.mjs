@@ -280,106 +280,88 @@ export const nanoaiActions = new Map([
 
 
 export function walkObj(obj, nano) {
-    var vx = obj.args[0] - nano.x;
-    var vy = obj.args[1] - nano.y;
-    var mag = Math.sqrt((vx * vx) + (vy * vy))
-    if (mag <= worldGrid.gridSize * 1) {
+
+    
+    let stopped = (nano) => {
         nano.vx = obj.args[2] ?? 0;
         nano.vy = obj.args[3] ?? 0;
+    }
+    let foundPath = (nano, obj) => {
+        findPath(nano.x, nano.y, obj.args[0], obj.args[1], 32, 7, (path) => {
+        obj.path = path;
+        });
+    }
+    return processWalk(nano, obj, obj.args[0], obj.args[1], stopped,  foundPath, .5);
+    
+
+}
+p.noLoopLoud = function() {
+    p.noLoop(); console.error("the loop was paused");
+}
+
+function processWalk(nano, obj, ox, oy, stopDirection, findaPath, magn = .5) {
+    var vx = ox - nano.x;
+    var vy = oy - nano.y;    
+    var mag = Math.sqrt((vx * vx) + (vy * vy))
+    
+    if (mag <= 1) {
+        stopDirection (nano);
         return false;
     }
-
-    if (!obj.path || obj.path.points.length ==0)
-        findPath(nano.x, nano.y, obj.args[0], obj.args[1], worldGrid.gridSize * 4, 7, (path) => {
-            obj.path = path;
-        });
-    if (obj.path && obj.path.points.length >0) {
-        p.fill(255);
-        //p.image(obj.path.graphics, nano.x, nano.y)
-        if (!obj.path.currentPoint) console.error("the point went null?", obj.path, mag);
-        //p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
-        let ped = obj.path.currentPointDistance(nano.x, nano.y);
-        if (ped < worldGrid.gridSize / 2) {
-            if (!obj.path.isFinalPoint) {
-                obj.path.next();
-            }
-            else obj.path = null;
-        }
-        let speed = nano.speed * inverseLerp(8, 0, /* the difficulty value we calculated for this spot... */ ) 
-        if (obj.path)
-            walk(nano, obj.path.currentPoint.x, obj.path.currentPoint.y, 2, speed)
+    
+    if (!obj.path|| obj.path.points.length ==0) { 
+        findaPath(nano, obj)
+    } 
+    else if (obj.path.points.length >0) {
+        var ped = obj.path.currentPointDistance(nano.x, nano.y);
+        if (ped < magn) {
+            if (!obj.path.isFinalPoint) 
+                obj.path.next();            
+            else 
+                obj.path = null;
+        } else {    
+            
+            return walk(nano, obj.path.currentPoint.x, obj.path.currentPoint.y, .1)  
+        }      
     }
     return true;
-
 }
 
 export function followObj (obj, nano) {
-    var vx = obj.args[0].x - nano.x;
-    var vy = obj.args[0].y - nano.y;
-    var mag = Math.sqrt((vx * vx) + (vy * vy))
-    if (mag <= worldGrid.gridSize*1.5) {
+  
+    let stopped = (nano) => {
         nano.vx = 0;
         nano.vy = 0;
-        return false;
     }
-
-    var vtx = obj.args[0].x - obj.targetX;
-    var vty = obj.args[0].y - obj.targetY;
-    var tmag = Math.sqrt((vtx * vtx) + (vty * vty))
-    
-    if (!obj.path|| obj.path.points.length ==0) //if target moves a whole tile we retarget the new tile lol 
+    let foundPath = (nano, obj) => {
         findPath(nano.x, nano.y, obj.args[0].x, obj.args[0].y, 32, 4, (path) => {
             obj.targetX = obj.args[0].x
             obj.targetY = obj.args[0].y
             obj.path = path;
-        });
-    else if (obj.path.points.length >0) {
-        p.fill(255);
-
-        // p.image(obj.path.graphics, nano.x, nano.y)
-        //p2.variableLine(nano.x, nano.y, obj.path.currentPoint.x, obj.path.currentPoint.y, 8, 2)
-       
-        let ped = obj.path.currentPointDistance(nano.x, nano.y);
-        if (ped < worldGrid.gridSize / 2) {
-            if (!obj.path.isFinalPoint) {
-                obj.path.next();
-            }
-            else {
-                obj.path = null;
-            }
-        }
-
-        if (obj.path)
-            walk(nano, obj.path.currentPoint.x, obj.path.currentPoint.y, 2)
+        })        
     }
-    return true
-}
-export function normalize(vx, vy) {
-    var mag = Math.sqrt((vx * vx) + (vy * vy))
-    if (mag === 0) {
-        vx /= mag;
-        vy /= mag;
-    }
-    return {vx, vy, mag};
+    return processWalk(nano, obj,obj.args[0].x, obj.args[0].y, stopped,  foundPath);
 
 }
+console.log(Math.sqrt((1 * 1) + (1 * 1)))
 export function walk(nano, x, y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;
     var mag = Math.sqrt((vx * vx) + (vy * vy))
+    //p.noLoopLoud();
     if (mag < magn) //if we already at point move next lol
         return false;
     vx /= mag;
     vy /= mag;
-    if (mag > magn) {
+    if (mag >= magn) {
         nano.vx = vx;
         nano.vy = vy;
     } else {
         nano.vx = 0;
         nano.vy = 0;
     }
-    var pos = worldGrid.screenToGridPoint(nano.x, nano.y)
-    let tile = worldGrid.getTile(pos.x, pos.y);
+
+    let tile = worldGrid.getTile(nano.x, nano.y);
     let speed = (tile && tile.pathDifficulty) || 7
     var sod = inverseLerp(8,4, speed)
     sod = clamp(0, 1, sod);
@@ -388,5 +370,15 @@ export function walk(nano, x, y, magn = 1) {
     nano.x += vx * deltaTime * nano.speed*sod;
     nano.y += vy * deltaTime * nano.speed*sod;
 
-    return mag > magn;
+    return mag >= magn;
+}
+
+export function normalize(vx, vy) {
+    var mag = Math.sqrt((vx * vx) + (vy * vy))
+    if (mag === 0) {
+        vx /= mag;
+        vy /= mag;
+    }
+    return {vx, vy, mag};
+
 }

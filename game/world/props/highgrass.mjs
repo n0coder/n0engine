@@ -7,12 +7,10 @@ export class Highgrass {
     constructor(x,y) {
         this.x = x;
         this.y = y;
-        worldGrid.tiles.set(`${worldGrid.x+ this.x}, ${ worldGrid.y+ this.y}`, this);
         this.pathDifficulty = 1; 
         this.setActive = setActive;
         this.setActive(true)
         this.renderOrder =-3;
-
     } 
 
     
