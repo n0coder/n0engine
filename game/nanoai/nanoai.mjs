@@ -55,10 +55,10 @@ export class Nanoai {
         ]) 
     }
     get visualX() {
-        return (this.x*worldGrid.gridSize);
+        return (this.x*worldGrid.gridSize)+(this.img ? this.img.width / 2 : 0);
     }
     get visualY() {
-        return (this.y*worldGrid.gridSize)
+        return (this.y*worldGrid.gridSize)-(this.img ? this.img.height/2 : 0)
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
@@ -97,7 +97,7 @@ export class Nanoai {
             if (!(b[0]===0&&b[1]===0))
                 this.cimg = getAnimation("nano", bestDir.dir, ticks)
         p.fill(125, 222, 152)
-        p.text(`${this.vx.toFixed(2)}, ${this.vy.toFixed(2)}`, this.visualX+10, this.visualY-16);
+        p.text(`${this.vx.toFixed(2)}, ${this.vy.toFixed(2)}`, this.visualX+10, this.visualY-10);
         if (this.cimg) {
             p.image(this.cimg, this.centerX+worldGrid.halfTileSize, this.centerY+worldGrid.halfTileSize);
         } else {

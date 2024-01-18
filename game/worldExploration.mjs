@@ -13,6 +13,7 @@ globalThis.n0 =n0;
 [[5,5], [6,5], [7,5], [8,5], [9,5]].map(([x,y]) => 
 	worldGrid.setTile(x, y, new Wall(x,y)))
 let water = new Water(7, 7)
+worldGrid.setTile(7, 7, water)
 /*
 n0.brain.do("follow", water)
 n0.brain.do("walk", 15,11);
@@ -21,17 +22,80 @@ n0.brain.do("follow", water)
 
 
 
-nanoaiActions.set("search", function(...args) {
+nanoaiActions.set("search", function(property, radius = 16, fov = 120, out) {
+	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 	return {
-		args, work: function (nano) {
-			p.ellipse(nano.visualX, nano.visualY, 16);
+		iterator: null, results: [], radius, fov: (((2*3.1415926)/360)*fov), work(nano) {
+			if (this.iterator === null) 
+				this.iterator = this.radialArcSearch(property, nano.x, nano.y, nano.vx, nano.vy, this.radius, this.fov)			
+			var info = this.iterator.next(); //we're rolling a form of 
+			if (info.value !== undefined)
+				this.results.push(info.value);
+			if (info.done) out?.(this.results);
 			
-			return true;		   
-		}
+			return !info.done; //false = exit, false = notdone... 
+		}, 
+		radialArcSearch: function*(property, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
+			let queue = [[cx,cy]], visited = new Set()
+
+			while (queue.length > 0) {
+				let [x, y] = queue.shift();
+				let tile = worldGrid.getTile(x, y);
+				if (tile && tile[property] != null) 
+					yield({tile, x,y});				
+				visited.add(`${x}, ${y}`);
+
+				for (let d of directions) {
+					let dx = x + d[0];
+					let dy = y + d[1];					
+					if (!visited.has(`${dx}, ${dy}`) && this.distance(dx, dy, cx, cy) <= radius && !this.isInQueue(queue, dx, dy)) {
+						let xMod = ((vx < 0) ? -1 : 1);
+					  	let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
+					  	if (angleDiff <= fov / 2) 
+							queue.push([dx, dy, dx-cx, dy-cy]);	
+					}
+				}				  
+			}
+		},
+		isInQueue(queue, dx, dy) {
+			return queue.some(([x, y]) => x === dx && y === dy);
+		},
+		normalize(x,y) {
+			var mag = Math.sqrt(x*x+y*y);
+			return [x/mag, y/mag, mag];
+		  },
+		  
+		  dotProduct(vec1, vec2) {
+			return vec1[0]*vec2[0] + vec1[1]*vec2[1];
+		  },
+		 distance(x1, y1, x2, y2) {
+			let dx = x2 - x1;
+			let dy = y2 - y1;
+			return Math.sqrt(dx * dx + dy * dy);
+		 }
+
 	}
 })
+let onFound = (results)=> {
+	console.log(results); 
+	if (results.length > 0) {
+		var {x,y} = results[0];
+		n0.brain.do("debugLine", x*worldGrid.gridSize,y*worldGrid.gridSize, );
+		n0.brain.do("dance2");
+		n0.brain.do("walk", x, y)
+		n0.brain.do("spin", 3, 6,.15)
+		console.log("lining")
+	}
+}
 
-console.log(((2*3.1415926)/360)*90)
+n0.brain.do("ping", (n)=>n.vx=-1);
+n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("ping", (n)=>n.vx=1);
+n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("ping", (n)=>{n.vy =-1, n.vx=0});
+n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
+n0.brain.do("search", "waterLevel", 6, 120, onFound)
 export class BFSVisualizer {
 	constructor (nano) {
 		this.cache = new Map();
@@ -78,28 +142,9 @@ export class BFSVisualizer {
 	 }
 	 
 	radiBFS = function* (cx, cy, radius, property) {
-		let queue = [[cx,cy]], visited = new Set(), results=[];
-		let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
-		let angle120 = (((2*3.1415926)/360)*120);
+
 		while (queue.length > 0) {
 			
-			let [x, y] = queue.shift();
-			
-			if (visited.has(`${x}, ${y}`)) {
-				console.log(queue.slice())
-				continue; //we already visited this
-			}
-			else if (!this.cache.get(`${x}, ${y}`))
-				this.cache.set(`${x}, ${y}`, {x,y, color: [69, 69, 150, 177]});
-	 
-			let tile = worldGrid.getTile(x, y);
-			if (tile && tile[property] != null) {
-				// Add result and highlight it
-				results.push({tile, x,y});
-				this.cache.set(`${x}, ${y}`, {x,y, picked: true, color: [69, 255, 69, 100]});
-			}
-	 
-			visited.add(`${x}, ${y}`);
 	 
 			for (let d of directions) {
 				var dx = x + d[0];
@@ -133,19 +178,7 @@ export class BFSVisualizer {
 		 
 		   
 	 }
-		normalize(x,y) {
-		var mag = Math.sqrt(x*x+y*y);
-		return [x/mag, y/mag, mag];
-	  }
-	  
-	  dotProduct(vec1, vec2) {
-		return vec1[0]*vec2[0] + vec1[1]*vec2[1];
-	  }
-	 distance(x1, y1, x2, y2) {
-		let dx = x2 - x1;
-		let dy = y2 - y1;
-		return Math.sqrt(dx * dx + dy * dy);
-	 }
+		
 }
 
 //console.log(([[2,5], [2,2]]).find(a => [2,6]));

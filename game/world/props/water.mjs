@@ -7,7 +7,7 @@ export class Water {
     constructor(x, y, level = 99999) {
         this.x = x;
         this.y = y;
-        this.level = level
+        this.waterLevel = level
 
         var rect = worldGrid.gridBoundsScreenSpace(x, y);
         this.rect = rect

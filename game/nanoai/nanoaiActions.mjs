@@ -112,8 +112,22 @@ export const nanoaiActions = new Map([
         work: function (nano) {
             console.log(this);
             return false
-        },        
-   }}],["ping", function(callback) {
+        },      
+          
+   }}],
+   ["debugLine",function(x,y, time= 1, thickness= 2, color=[255,255,255]) { return  {
+    x,y, time, t:0,
+    work: function (nano) {
+        this.t+=deltaTime;
+        p.push();
+        p.strokeWeight(thickness);
+        if (color) p.stroke(color);
+        p.line(nano.visualX, nano.visualY, x,y);
+        p.pop();
+        return this.t <= this.time
+    },        
+    }}],
+   ["ping", function(callback) {
     return {
         args: [callback],
         work: function(nano) {
@@ -248,7 +262,7 @@ export const nanoaiActions = new Map([
         return {
             args, work: function (nano) {
                 let brain = nano.brain;
-                let t = .5;
+                let t = .1;
 
                 brain.doAfter(this, "hook", (hook) => { hook.pull("XD") }, () => console.log("hook pulled XD"))
 
@@ -280,14 +294,14 @@ export const nanoaiActions = new Map([
                 
             }
         }
-    }],["spin", function(times, speed= 2) { 
+    }],["spin", function(times=1, speed =4, walkspeed= 0) { 
         return {
             time: (3.1415926*2)*times, t:0, work: function (nano) {
                 this.t+=deltaTime*speed;
                 nano.vx = Math.sin(this.t)
                 nano.vy = Math.cos(this.t)
-                nano.x+=nano.vx*.2;
-                nano.y+=nano.vy*.2;
+                nano.x+=nano.vx*walkspeed;
+                nano.y+=nano.vy*walkspeed;
                 return this.t <= this.time; //
             }
         }
