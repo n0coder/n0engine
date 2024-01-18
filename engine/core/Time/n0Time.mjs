@@ -10,7 +10,7 @@ export let ticks = 0;
 export let t=0;
 export function calculateDeltaTime() {
     let currentTime = p.millis();
-    if (p.millis() - t > 100) {
+    if (p.millis() - t > tickSpeed) {
         ticks++;
         t = p.millis();
     }
@@ -18,7 +18,7 @@ export function calculateDeltaTime() {
 
     var dt = (currentTime - previousTime)/1000;
     //testing if deltatime calculation is breaking my game some
-    deltaTime = .025 //= Math.min(dt, maxDeltaTime);
+    deltaTime =  Math.min(dt, maxDeltaTime);
     previousTime = currentTime;
     ingameTime+=deltaTime;
 }

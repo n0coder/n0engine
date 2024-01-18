@@ -117,7 +117,7 @@ export const nanoaiActions = new Map([
     return {
         args: [callback],
         work: function(nano) {
-            this.args[0]();
+            this.args[0](nano);
             return false;
         }
     };
@@ -202,6 +202,12 @@ export const nanoaiActions = new Map([
     //since this task doesn't control itself, we have to pass the task with the hook
     traphook.trap = trap;
     return trap
+}],["pull", function(hook) { 
+    return {
+        work: function (nano) {
+            hook.pull("hi");
+        }        
+    }
 }],
     ["dance", function(...args) { 
         return {
@@ -212,29 +218,77 @@ export const nanoaiActions = new Map([
                 brain.doAfter(this, "hook", (hook) => { hook.pull("XD") }, () => console.log("hook pulled XD"))
 
                 brain.doAfter(this, "hook", (hook, marker) => {
-                    brain.doBefore(marker, "walkRelative", -2, 0) 
+                    brain.doBefore(marker, "walkRelative", -1, 0) 
                     brain.doBefore(marker, "wait",t) 
-                    brain.doBefore(marker, "walkRelative", 4, 0) 
+                    brain.doBefore(marker, "walkRelative", 2, 0) 
                     brain.doBefore(marker, "wait",t) 
-                    brain.doBefore(marker, "walkRelative", -2, 0) 
-                    brain.doBefore(marker, "walkRelative", -2, 0)
+                    brain.doBefore(marker, "walkRelative", -1, 0) 
+                    brain.doBefore(marker, "walkRelative", -1, 0)
                     brain.doBefore(marker, "wait",t)
-                    brain.doBefore(marker, "walkRelative", 4, 0)
+                    brain.doBefore(marker, "walkRelative", 2, 0)
                     brain.doBefore(marker, "wait",t)
-                    brain.doBefore(marker, "walkRelative", -2, 0)
+                    brain.doBefore(marker, "walkRelative", -1, 0)
                     brain.doBefore(marker, "wait",t)
-                    brain.doBefore(marker, "walkRelative", 0, 1)
+                    brain.doBefore(marker, "walkRelative", 0, .51)
                     brain.doBefore(marker, "wait",t)
-                    brain.doBefore(marker, "walkRelative", 0, -1)
+                    brain.doBefore(marker, "walkRelative", 0, - .51)
                     brain.doBefore(marker, "wait",t)
-                    brain.doBefore(marker, "walkRelative", 0, 1)
+                    brain.doBefore(marker, "walkRelative", 0,  .51)
                     brain.doBefore(marker, "wait",t)
-                    brain.doBefore(marker, "walkRelative", 0, -1)
+                    brain.doBefore(marker, "walkRelative", 0, - .51)
+                    brain.doBefore(marker, "pull", hook)
+                }) 
+                
+
+                
+            }
+        }
+    }], 
+    ["dance2", function(...args) { 
+        return {
+            args, work: function (nano) {
+                let brain = nano.brain;
+                let t = .5;
+
+                brain.doAfter(this, "hook", (hook) => { hook.pull("XD") }, () => console.log("hook pulled XD"))
+
+                brain.doAfter(this, "hook", (hook, marker) => {
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vy = 0; nano.vx = -1 });                    
+                    brain.doBefore(marker, "wait",t*2) 
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vx = 1 });
+                    brain.doBefore(marker, "wait",t) 
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vx = -1 }); 
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vx = 1 });
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vx = -1 }); 
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vx = 0; nano.vy = 1 });
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vy = -1 });
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vy = 1 });
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vy = -1 });
+                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "ping", (nano)=> { nano.vy = 1 });
+                    brain.doBefore(marker, "wait",t)
                     brain.doBefore(marker, "ping", () => {hook.pull("hi");})
                 }) 
                 
 
                 
+            }
+        }
+    }],["spin", function(times, speed= 2) { 
+        return {
+            time: (3.1415926*2)*times, t:0, work: function (nano) {
+                this.t+=deltaTime*speed;
+                nano.vx = Math.sin(this.t)
+                nano.vy = Math.cos(this.t)
+                nano.x+=nano.vx*.2;
+                nano.y+=nano.vy*.2;
+                return this.t <= this.time; //
             }
         }
     }],
@@ -292,8 +346,6 @@ export function walkObj(obj, nano) {
         });
     }
     return processWalk(nano, obj, obj.args[0], obj.args[1], stopped,  foundPath, .5);
-    
-
 }
 p.noLoopLoud = function() {
     p.noLoop(); console.error("the loop was paused");
