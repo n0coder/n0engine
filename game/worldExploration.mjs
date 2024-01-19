@@ -2,6 +2,8 @@ import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityMan
 import { ticks } from "../engine/core/Time/n0Time.mjs";
 import { p } from "../engine/core/p5engine.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { gameH, gameW } from "../engine/n0config.mjs";
+import { inverseLerp, lerp } from "../engine/n0math/ranges.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
 import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { findPath } from "./nanoai/research/n0Pathfinder.mjs";
@@ -96,91 +98,38 @@ n0.brain.do("ping", (n)=>{n.vy =-1, n.vx=0});
 n0.brain.do("search", "waterLevel", 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
 n0.brain.do("search", "waterLevel", 6, 120, onFound)
-export class BFSVisualizer {
+export class Visualizer {
 	constructor (nano) {
-		this.cache = new Map();
-		this.gen = this.radiBFS(8,8, 8, "pathDifficulty");
-		this.squareSize = 8
-		this.cycle;
-		this.nano = nano;
+		this.gridSize = worldGrid.gridSize;
+		this.radi = 8
+		this.t = 0;
+		this.renderOrder = -5;
 	}
 	draw() {
-		if (!this.cycle?.done) {
-			this.cycle = this.gen.next();
-			}
-		for (const [key, {x,y,color}] of this.cache) {
-			p.push();
-			p.fill(color);
-			p.rect(x*this.squareSize,y*this.squareSize,this.squareSize, this.squareSize);
-			p.pop();
-		}		
-		this.drawRadialCone(p, [this.nano.visualX, this.nano.visualY],this.nano, 16*8, ((2*3.1415926)/360)*90, this.squareSize)
+		let ivn = inverseLerp(-1, 1, p.sin(ticks*.1));
+		let grai = this.gridSize*this.radi*ivn
+		let x = this.gridSize*8, y = this.gridSize*8
+  for(let i = 0; i <= gameW; i+= this.gridSize) {
+    for(let o = 0; o <= gameH; o+= this.gridSize) {
+      let vx = i-x;
+      let vy = o-y;
+	  let lak = i  % (worldGrid.chunkSize * worldGrid.gridSize);
+	  let laky = o  % (worldGrid.chunkSize * worldGrid.gridSize);
+      
+        p.fill(255,111,111)
+        p.ellipse(i,o, this.gridSize*lerp(.3, .1, ivn));
+       
+	   if ((Math.sqrt(vx*vx + vy*vy) < grai) && (lak ==0 && laky == 0)) {
+        p.fill(111,255,111)
+        p.ellipse(i,o, this.gridSize*lerp(.0, .3, ivn));
+      }
+    }
+  }
+  p.fill(111,255,111, lerp(111, 22, ivn))
+  p.ellipse(x, y, grai*2);
 	}
-	drawRadialCone(p, center, nano, radius, fov, sqSize) {
-		const halfFOV = fov / 2;
-		const numSquares = Math.ceil(radius / sqSize);
-		let angle90 = (((2*3.1415926)/360)*120);
-		let dir = [nano.vx, nano.vy];
-		for (let i = -numSquares; i <= numSquares; i++) {
-			for (let o = -numSquares; o <= numSquares; o++) {
-				const dist = Math.sqrt(i * i + o * o);
-				if (dist > numSquares) continue;
-				
-				let nano = this.nano;
-				let mod = (nano.vx < 0) ? -1 : 1; 				
-				let look_angle = Math.atan2(nano.vy, nano.vx*mod)
-				let pixel_angle = Math.atan2(o, i*mod);
-				if (Math.abs(pixel_angle - look_angle) > angle90/2) continue;
-				
-				
-
-				const x = center[0] + i * sqSize;
-				const y = center[1] + o * sqSize;
-				p.rect(x, y, sqSize, sqSize);
-			}
-		}
-	 }
-	 
-	radiBFS = function* (cx, cy, radius, property) {
-
-		while (queue.length > 0) {
-			
-	 
-			for (let d of directions) {
-				var dx = x + d[0];
-				var dy = y + d[1];
-				var notVisited = !(visited.has(`${dx}, ${dy}`))
-				var inRange = this.distance(dx, dy, cx, cy) <= radius;
-				var inQueue = isInQueue(queue, dx, dy);
-
-				let cvx = cx-dx; 
-				let cvy = cy-dy;
-				let nano = this.nano;
-				let mod = (nano.vx < 0) ? -1 : 1; 				
-				let look_angle = Math.atan2(nano.vy, nano.vx*mod)
-				let pixel_angle = Math.atan2(cvx, cvy*mod);
-				let condition = Math.abs(pixel_angle - look_angle) > angle120/2;
-				if (condition) continue;
-
-				if (notVisited && inRange && !inQueue) {
-					// Add to queue and draw it
-					queue.push([dx, dy, cvx, cvy]);
-					if (!this.cache.get(`${x}, ${y}`))
-						this.cache.set(`${x}, ${y}`,{x,y, color: [155, 155, 180, 177]});
-				}
-			}
-	 		// Yield control back to caller
-	 		yield;
-		}
-		function isInQueue(queue, dx, dy) {
-			return queue.some(([x, y]) => x === dx && y === dy);
-		 }
-		 
-		   
-	 }
-		
 }
 
 //console.log(([[2,5], [2,2]]).find(a => [2,6]));
-//let bfs = new BFSVisualizer(n0);
-//cosmicEntityManager.addEntity(bfs);
+let bfs = new Visualizer(n0);
+cosmicEntityManager.addEntity(bfs);
