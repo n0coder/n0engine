@@ -10,8 +10,8 @@ import { deltaTime } from "../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
 
-let n0 = new Nanoai("n0", 200,256); 
-let abi = new Nanoai("abi", 222,256); 
+let n0 = new Nanoai("n0", 4,4); 
+let abi = new Nanoai("abi", 4,6); 
 globalThis.n0 = n0;
 globalThis.abi = abi;
 
@@ -95,7 +95,7 @@ class TicTacToe {
         this.nanos = new Map(), this.timer = 0, this.thinkTime = 1;
         this.players, this.index = 0;
         this.state = "start";
-        this.x = 111, this.y = 111;
+        this.x = 8, this.y = 8;
         this.pieceTemplate = {use(pick, placed){placed(); this.pick=pick;}}
         this.board= [null,null,null,null,null,null,null,null,null].map((n,i)=>{
             let x = Math.floor(i / 3), y = i % 3;
