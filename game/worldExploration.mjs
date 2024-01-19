@@ -22,14 +22,53 @@ n0.brain.do("walk", 15,11);
 n0.brain.do("follow", water)
 */
 
+function* edgeCast(radius) {
+	let startQueue = [], offsets = [], visited = new Set();
+	for(let i = -radius; i <= radius; i++) {
+		for(let o = -radius; o <= radius; o++) {
+			if (Math.sqrt(i*i + o*o) < radius) {
+				startQueue.push([i,o]);
+				visited.add(`${i}, ${o}`);
+			}
+		}
+	}
+ 
+	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+	for (let [i,o] of startQueue) {
+		for(let [a,b] of directions) {
+			let x = i+a, y = o+b;
+			if (!visited.has(`${x}, ${y}`)) {
+				yield [x, y];
+				visited.add(`${x}, ${y}`);
+			}
+		}
+	}
+ }
+ 
+
+function* bfx(start, getNeighbors, matchCondition) {
+    let queue = [start], visited = new set()
+    while (queue.length > 0){
+        let point = queue.shift()
+        if (matchCondition?.(point)) //but this is similar to yielding... OH BUT NOT USED IN THE SAME PLACE
+        	yield point;
+        visited.add(`${point.x}, ${point.y}`);
+
+		for (let neighbor of getNeighbors(point, visited)) {
+			//if neighbor is not visited, is not already in the queue, and has neighbors
+			if (this.distance(start.x, start.y, neighbor.x, neighbor.y) < 2) //some reason to exit the algorithm
+				queue.push(neighbor)
+		}
+    }
+}
 
 
-nanoaiActions.set("search", function(property, radius = 16, fov = 120, out) {
+nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 	return {
 		iterator: null, results: [], radius, fov: (((2*3.1415926)/360)*fov), work(nano) {
 			if (this.iterator === null) 
-				this.iterator = this.radialArcSearch(property, nano.x, nano.y, nano.vx, nano.vy, this.radius, this.fov)			
+				this.iterator = this.radialArcSearch(condition, nano.x, nano.y, nano.vx, nano.vy, this.radius, this.fov)			
 			var info = this.iterator.next(); //we're rolling a form of 
 			if (info.value !== undefined)
 				this.results.push(info.value);
@@ -37,20 +76,19 @@ nanoaiActions.set("search", function(property, radius = 16, fov = 120, out) {
 			
 			return !info.done; //false = exit, false = notdone... 
 		}, 
-		radialArcSearch: function*(property, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
+
+		radialArcSearch: function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
 			let queue = [[cx,cy]], visited = new Set()
 
 			while (queue.length > 0) {
 				let [x, y] = queue.shift();
 				let tile = worldGrid.getTile(x, y);
-				if (tile && tile[property] != null) 
+				if (condition?.(tile)) 
 					yield({tile, x,y});				
 				visited.add(`${x}, ${y}`);
 
-				for (let d of directions) {
-					let dx = x + d[0];
-					let dy = y + d[1];					
-					if (!visited.has(`${dx}, ${dy}`) && this.distance(dx, dy, cx, cy) <= radius && !this.isInQueue(queue, dx, dy)) {
+				for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
+					if (this.distance(dx, dy, cx, cy) <= radius) {
 						let xMod = ((vx < 0) ? -1 : 1);
 					  	let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
 					  	if (angleDiff <= fov / 2) 
@@ -58,9 +96,17 @@ nanoaiActions.set("search", function(property, radius = 16, fov = 120, out) {
 					}
 				}				  
 			}
-		},
-		isInQueue(queue, dx, dy) {
-			return queue.some(([x, y]) => x === dx && y === dy);
+			function* getNeighbors(a, b, visited, queue) { 
+				let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+				for(var [i, o] of directions) {
+					let x = i+a, y = b+o;
+					if (!visited.has(`${x}, ${y}`) && !isInQueue(queue, x, y)) //we can handle preventing if a neighbor is already visited here
+						yield [x, y]
+				}
+			}
+			function isInQueue(queue, dx, dy) {
+				return queue.some(([x, y]) => x === dx && y === dy);
+			}
 		},
 		normalize(x,y) {
 			var mag = Math.sqrt(x*x+y*y);
@@ -89,15 +135,16 @@ let onFound = (results)=> {
 		console.log("lining")
 	}
 }
+let search = (tile) => (tile && tile["waterLevel"] != null)
 
 n0.brain.do("ping", (n)=>n.vx=-1);
-n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>n.vx=1);
-n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =-1, n.vx=0});
-n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
-n0.brain.do("search", "waterLevel", 6, 120, onFound)
+n0.brain.do("search", search, 6, 120, onFound)
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
@@ -119,7 +166,7 @@ export class Visualizer {
         p.fill(255,111,111)
         p.ellipse(i,o, this.gridSize*lerp(.3, .1, ivn));
        
-	   if ((Math.sqrt(vx*vx + vy*vy) < grai) && (lak ==0 && laky == 0)) {
+	  if ((Math.sqrt(vx*vx + vy*vy) < grai) && (lak ==0 && laky == 0)) {
         p.fill(111,255,111)
         p.ellipse(i,o, this.gridSize*lerp(.0, .3, ivn));
       }
@@ -133,3 +180,8 @@ export class Visualizer {
 //console.log(([[2,5], [2,2]]).find(a => [2,6]));
 let bfs = new Visualizer(n0);
 cosmicEntityManager.addEntity(bfs);
+
+
+
+
+
