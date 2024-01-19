@@ -184,4 +184,100 @@ cosmicEntityManager.addEntity(bfs);
 
 
 
+let radialArcSearch = function*(condition, visited, x,y, vx, vy, radius, fov) {
+	let queue = [[x, y]]
+	while (queue.length > 0) {
+		let [nx, ny] = queue.shift();
+		let tile = worldGrid.getTile(nx, ny);
+		if (condition?.(tile)) 
+			yield tile
+		visited.add(`${nx}, ${ny}`);
+		for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
+			if (distance(dx, dy, x, y) <= radius) {
+				let xMod = ((vx < 0) ? -1 : 1);
+				let angleDiff = Math.abs(Math.atan2( dy-y, (dx-x)*xMod) - Math.atan2(vy, vx * xMod ));
+				if (angleDiff <= fov / 2) 
+					queue.push([dx, dy, dx-x, dy- y]);	
+			}
+		}	
 
+	}
+
+	function* getNeighbors(a, b, visited, queue) { 
+		let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]
+		for(var [i, o] of directions) {
+			let x = i+a, y = b+o;
+			if (!visited.has(`${x}, ${y}`) && !isInQueue(queue, x, y)) //we can handle preventing if a neighbor is already visited here
+				yield [x, y]
+		}
+	}
+	function isInQueue(queue, dx, dy) {
+		return queue.some(([x, y]) => x === dx && y === dy);
+	}
+	function distance(x1, y1, x2, y2) {
+		let dx = x2 - x1;
+		let dy = y2 - y1;
+		return Math.sqrt(dx * dx + dy * dy);
+	 }
+
+}
+
+//coming up with a search space tech
+
+// *search*, *rotate 90*, *search*, *rotate 90*, *search*, *rotate 90*, *search*, *rotate 90*,
+// still nothing? 
+// try the ringcast on chunks to find a chunk outside the radius
+// walk to the chunk and try again
+// either limit this to a further radius, or until the nano gets tired
+// even better, mark the state of the search for later so the nano can start the search from their pre existing knowledge
+// what if we mark unexplored chunks in their group radio channel and have them randomly select one when starting to search again?
+// logically the world won't change on it's own, so you can reasonably expect a continuation tech to work like this
+
+
+function searchSpace(nano, condition, radius, fov) {
+	let visited = new Set(), chunksVisited = new Set(), results = [];
+	let radialArc = radialArcSearch(condition, visited, nano.x, nano.y, nano.vx, nano.vy, radius, fov);
+	let result = radialArc.next()
+	if (result.value !== undefined) {
+		results.push(result.value);
+	} 
+	//no items found, the search completes, but we have not found anything
+	if (result.done && result.value === undefined && results.length === 0) {
+		//
+	}
+	console.log()
+	// we will need two systems (3?)
+	// radial bfs
+	// rotate 4 times to the right
+    // ringCast bfs
+
+	// do radial bfs, if nothing is found, ringcast to find a new chunk
+	
+
+}
+searchSpace(n0, search, 6, 120);
+
+
+
+
+let radialArcBFS = function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
+	let queue = [[cx,cy]], visited = new Set()
+
+	while (queue.length > 0) {
+		let [x, y] = queue.shift();
+		let tile = worldGrid.getTile(x, y);
+		if (condition?.(tile)) 
+			yield({tile, x,y});				
+		visited.add(`${x}, ${y}`);
+
+		for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
+			if (this.distance(dx, dy, cx, cy) <= radius) {
+				let xMod = ((vx < 0) ? -1 : 1);
+				  let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
+				  if (angleDiff <= fov / 2) 
+					queue.push([dx, dy, dx-cx, dy-cy]);	
+			}
+		}				  
+	}
+	
+}
