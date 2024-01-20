@@ -14,16 +14,23 @@ export class Camera {
     }
     follow(o) { 
         this.target = o;
-        this.x =gameW/2- o.x*this.s;
-        this.y =gameH/2- o.y*this.s;
+        this.x=this.ox; this.y = this.oy;
+    }
+    get ox() {
+        let x = this.target?.visualX ?? 0
+        return gameW/2 - x;
+    }
+    get oy() {
+        let y = this.target?.visualY ?? 0
+        return gameH/2 - y
     }
     draw() {
         p.ellipse(gameW/2, gameH/2, 3, 3)
         //update
         //this is an issue, the smooth movement is annoying
         //maybe i should do what phind said and just lerp
-        var tx = gameW/2-((this.target.x))*this.s
-        var ty = gameH/2-((this.target.y))*this.s;
+        var tx = this.ox
+        var ty = this.oy;
         var vx = tx-this.x;
         var vy = ty-this.y;
         //if the target is out of screen radius we just tp camera to target

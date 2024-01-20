@@ -73,28 +73,7 @@ so i wrote a bfs circle edge system
 instead of starting at a single point in BFS
 we will gather all points on the edge of a radius 
 ```javascript
-let radius = 3, startQueue= [], offsets=[], visited = new Set();
-for(let i = -radius; i <= radius; i++) {
-    for(let o = -radius; o <= radius; o++) {
-        if (Math.sqrt(i*i + o*o) < grai) {
-            startQueue.push([i,o])
-            visited.add(`${i}, ${o}`); //mark this as visited, since we only care about their neighbors and not themselves
-        }
-    }
-}
-//now we start the bfs on this radius
-//now we gather queue items from the current items in the queue, 
-//we only want the next, layer, this is not a recursive check, no need to while loop here
-let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
-for (let [i,o] of startQueue) {
-   for(let [a,b] of directions) {
-       let x = i+a, y = o+b;
-       if (!visited.has(`${x}, ${y}`)) {
-           yield [x, y];
-           visited.add(`${x}, ${y}`);
-       }
-   }
-}
+
 ```
 
 generator functions (in javascript) are useful for creating iterators, for iterating over a set of data

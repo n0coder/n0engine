@@ -23,7 +23,7 @@ gameScreenMode.get("square")(512)
 
 //global scene variables
 export const backgroundColor = [33,33,33];
-export const defaultScale = 4;
+export const defaultScale = 2;
 
 
 //this is a quirk of the original implementation of the engine

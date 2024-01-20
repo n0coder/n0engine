@@ -9,8 +9,9 @@ import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { findPath } from "./nanoai/research/n0Pathfinder.mjs";
 import { Wall } from "./world/props/wall.mjs";
 import { Water } from "./world/props/water.mjs";
-
-let n0 = new Nanoai("n0", 7, 3);
+import { startGlobalEntities } from "../engine/core/globalEntities.mjs"
+import { camera } from "../engine/core/Camera/camera.mjs";
+let n0 = new Nanoai("n0", 12, 12);
 globalThis.n0 =n0;
 [[5,5], [6,5], [7,5], [8,5], [9,5]].map(([x,y]) => 
 	worldGrid.setTile(x, y, new Wall(x,y)))
@@ -134,17 +135,68 @@ n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
 n0.brain.do("search", search, 6, 120, onFound)
 */
+
+
+let radialArcBFS = function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
+	let queue = [[cx,cy]], visited = new Set()
+
+	while (queue.length > 0) {
+		let [x, y] = queue.shift();
+		let tile = worldGrid.getTile(x, y);
+		if (condition?.(tile)) 
+			yield({tile, x,y});				
+		visited.add(`${x}, ${y}`);
+
+		for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
+			if (this.distance(dx, dy, cx, cy) <= radius) {
+				let xMod = ((vx < 0) ? -1 : 1);
+				  let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
+				  if (angleDiff <= fov / 2) 
+					queue.push([dx, dy, dx-cx, dy-cy]);	
+			}
+		}				  
+	}
+	
+}
+
+let ringCast = function*(radius = 3, chunkSize, visited) {
+	if ( visited === undefined ) visited = new Set(); //allow a shared visited tech
+	
+	let startQueue= [];
+for(let i = -radius-chunkSize; i <= radius+chunkSize; i+=chunkSize) {
+    for(let o = -radius-chunkSize; o <=radius+chunkSize; o+=chunkSize) {
+        if (Math.sqrt((i*i + o*o)) < radius/2) {
+            if (visited.has(`${i}, ${o}`)) continue;
+			visited.add(`${i}, ${o}`); //mark this as visited, since we only care about their neighbors and not themselves
+            startQueue.push([i, o])
+			//yield [i, o];
+        }
+    }
+}
+
+let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+for (let [i,o] of startQueue) {
+   for(let [a,b] of directions) {
+       let x = i+(a*chunkSize), y = o+(b*chunkSize);
+       if (!visited.has(`${x}, ${y}`)) {
+           yield [x, y];
+           visited.add(`${x}, ${y}`);
+       }
+   }
+}
+}
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
-		this.radi = 8
+		this.radi = 10
 		this.t = 0;
 		this.renderOrder = -5;
+		this.nano = nano;
 	}
 	draw() {
-		let ivn = inverseLerp(-1, 1, p.sin(ticks*.1));
+		let ivn = 1//inverseLerp(-1, 1, p.sin(ticks*.1));
 		let grai = this.gridSize*this.radi*ivn
-		let x = this.gridSize*8, y = this.gridSize*8
+		let x = this.gridSize*this.nano.x, y = this.gridSize*this.nano.y
   for(let i = 0; i <= gameW; i+= this.gridSize) {
     for(let o = 0; o <= gameH; o+= this.gridSize) {
       let vx = i-x;
@@ -161,8 +213,14 @@ export class Visualizer {
       }
     }
   }
+  
   p.fill(111,255,111, lerp(111, 22, ivn))
   p.ellipse(x, y, grai*2);
+  p.noStroke();
+  for(let [a,b] of ringCast((Math.round((this.radi*ivn)/2)*4), worldGrid.chunkSize)) {
+	p.fill(111,111,255, 200)
+	p.ellipse(x+(this.gridSize*a),(this.gridSize*b)+y, 8);
+  }
 	}
 }
 
@@ -170,8 +228,8 @@ export class Visualizer {
 let bfs = new Visualizer(n0);
 cosmicEntityManager.addEntity(bfs);
 
-
-
+let o =[0, 1,2,3,4,5,6,7,8,9,10].map(i => (Math.round((i)/2)*2))
+console.log(o);
 
 let radialArcSearch = function*(condition, visited, x,y, vx, vy, radius, fov) {
 	let queue = [[x, y]]
@@ -224,18 +282,20 @@ let radialArcSearch = function*(condition, visited, x,y, vx, vy, radius, fov) {
 
 nanoaiActions.set("radialSearch", function (onFound) {
 	return {
-		moveNext: false, generator: null, next: null,
+		moveNext: null, generator: null, next: null,
 		work() {
 			if (this.generator === null) this.generator = this.rotate();
-			n0.brain.do("dance2"); //next frame do a dance
+			//n0.brain.do("dance2"); //next frame do a dance
 			this.next = this.generator.next() //describing what happens next frame 
 			let waitAFrame= (( this.moveNext===null || this.moveNext === true) && (this.next != null && !this.next.done) );
+			console.log({mn: this.moveNext, n:this.next, waitAFrame})
 			return waitAFrame; //true = keep going (this is like a really sophisticated do while system)
 		}, id: 0,
 		rotate: function*() {
 			for (let direction of ["left", "up", "right","down"]) { //each direction, we hook into an activity that turns the nano to this direction, searches then pulls hook
-				n0.brain.doBefore(this, "hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
+				n0.brain.do("hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
 					n0.brain.doBefore(marker, "look", direction) //before we can exit the hook... we look down, search
+					console.log(search, onFound);
 					n0.brain.doBefore(marker,"search", search, 6, 120, onFound)
 					n0.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
 					n0.brain.doBefore(marker,"ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
@@ -304,26 +364,3 @@ function searchSpace(nano, condition, radius, fov) {
 searchSpace(n0, search, 6, 120);
 
 
-
-
-let radialArcBFS = function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
-	let queue = [[cx,cy]], visited = new Set()
-
-	while (queue.length > 0) {
-		let [x, y] = queue.shift();
-		let tile = worldGrid.getTile(x, y);
-		if (condition?.(tile)) 
-			yield({tile, x,y});				
-		visited.add(`${x}, ${y}`);
-
-		for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
-			if (this.distance(dx, dy, cx, cy) <= radius) {
-				let xMod = ((vx < 0) ? -1 : 1);
-				  let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
-				  if (angleDiff <= fov / 2) 
-					queue.push([dx, dy, dx-cx, dy-cy]);	
-			}
-		}				  
-	}
-	
-}
