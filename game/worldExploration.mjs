@@ -66,7 +66,8 @@ function* bfx(start, getNeighbors, matchCondition) {
 nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 	return {
-		iterator: null, results: [], radius, fov: (((2*3.1415926)/360)*fov), work(nano) {
+		iterator: null, results: [], radius, fov: (((2*3.1415926)/360)*fov), 
+		work(nano) {
 			if (this.iterator === null) 
 				this.iterator = this.radialArcSearch(condition, nano.x, nano.y, nano.vx, nano.vy, this.radius, this.fov)			
 			var info = this.iterator.next(); //we're rolling a form of 
@@ -76,7 +77,6 @@ nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 			
 			return !info.done; //false = exit, false = notdone... 
 		}, 
-
 		radialArcSearch: function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
 			let queue = [[cx,cy]], visited = new Set()
 
@@ -124,19 +124,7 @@ nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 
 	}
 })
-let onFound = (results)=> {
-	console.log(results); 
-	if (results.length > 0) {
-		var {x,y} = results[0];
-		n0.brain.do("debugLine", x*worldGrid.gridSize,y*worldGrid.gridSize, );
-		n0.brain.do("dance2");
-		n0.brain.do("walk", x, y)
-		n0.brain.do("spin", 3, 6,.15)
-		console.log("lining")
-	}
-}
-let search = (tile) => (tile && tile["waterLevel"] != null)
-
+/*
 n0.brain.do("ping", (n)=>n.vx=-1);
 n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>n.vx=1);
@@ -145,6 +133,7 @@ n0.brain.do("ping", (n)=>{n.vy =-1, n.vx=0});
 n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
 n0.brain.do("search", search, 6, 120, onFound)
+*/
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
@@ -233,9 +222,66 @@ let radialArcSearch = function*(condition, visited, x,y, vx, vy, radius, fov) {
 // what if we mark unexplored chunks in their group radio channel and have them randomly select one when starting to search again?
 // logically the world won't change on it's own, so you can reasonably expect a continuation tech to work like this
 
+nanoaiActions.set("radialSearch", function (onFound) {
+	return {
+		moveNext: false, generator: null, next: null,
+		work() {
+			if (this.generator === null) this.generator = this.rotate();
+			n0.brain.do("dance2"); //next frame do a dance
+			this.next = this.generator.next() //describing what happens next frame 
+			let waitAFrame= (( this.moveNext===null || this.moveNext === true) && (this.next != null && !this.next.done) );
+			return waitAFrame; //true = keep going (this is like a really sophisticated do while system)
+		}, id: 0,
+		rotate: function*() {
+			for (let direction of ["left", "up", "right","down"]) { //each direction, we hook into an activity that turns the nano to this direction, searches then pulls hook
+				n0.brain.doBefore(this, "hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
+					n0.brain.doBefore(marker, "look", direction) //before we can exit the hook... we look down, search
+					n0.brain.doBefore(marker,"search", search, 6, 120, onFound)
+					n0.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
+					n0.brain.doBefore(marker,"ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
+				}) 
+				yield; //we yield to say we can do another round
+			}
+		}
+
+	}
+}) 
+
+n0.brain.do("radialSearch", (results)=> {
+	console.log(results); 					
+});
+let search = (tile) => (tile && tile["waterLevel"] != null);
 
 function searchSpace(nano, condition, radius, fov) {
 	let visited = new Set(), chunksVisited = new Set(), results = [];
+	/* what if nanoais... did the logic... */
+// ? /*i'ma leave this active as it will cause logs to appear in the console*/
+	//n0.brain.do("turn", "left") 
+	
+	//not going to make a "do" but not if "do"
+	//logically unsound
+	//we could do something else
+	let found = false;
+	
+	
+
+	/*
+		what if we do some form of generator state machine
+		simpler way to write all this
+		{
+		    state: 'wait',
+		    "wait": ()=> {},
+		    "radialBFS": ()=> {},
+		    "ringChunkSearch": ()=> {}
+		}
+	*/
+
+	// ## IMPORTANT INFO: /* in order for the tech to work properly we should turn this into a generator function */
+	/* the reason generator functions are so useful here, is that without them we can not prevent the function from finishing without it */
+
+    //like yeah, we could write this tech without it, but it's probably clearer if we can yield any time we hit an important point
+	//imagine yielding to pause execution while the nano does work, we also need to take state machine techs into account...
+
 	let radialArc = radialArcSearch(condition, visited, nano.x, nano.y, nano.vx, nano.vy, radius, fov);
 	let result = radialArc.next()
 	if (result.value !== undefined) {
