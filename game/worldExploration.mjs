@@ -11,6 +11,7 @@ import { Wall } from "./world/props/wall.mjs";
 import { Water } from "./world/props/water.mjs";
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs"
 import { camera } from "../engine/core/Camera/camera.mjs";
+import Alea from "alea";
 let n0 = new Nanoai("n0", 12, 12);
 globalThis.n0 =n0;
 [[5,5], [6,5], [7,5], [8,5], [9,5]].map(([x,y]) => 
@@ -57,52 +58,51 @@ n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
 n0.brain.do("search", search, 6, 120, onFound)
 */
-
-
-
+console.log(Math.PI)
+console.log(Math.PI/Math.SQRT2)
+console.log(Math.sqrt(2.25))
+console.log(Math.sqrt(2.221))
+console.log(Math.sqrt(2)*(3.1415926 / 2))
+console.log(3.1415926 / 2)
+console.log((3.1415926 / 2)*(3.1415926 / 2))
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
-		this.radi = 10
+		this.radi = 15
 		this.t = 0;
 		this.renderOrder = -5;
 		this.nano = nano;
+		this.a = Alea("XD")
+		this.ra = this.a.exportState()
 	}
 	draw() {
-		let ivn = 1//inverseLerp(-1, 1, p.sin(ticks*.1));
-		let grai = this.gridSize*this.radi*ivn
-		let x = this.gridSize*this.nano.x, y = this.gridSize*this.nano.y
-  for(let i = 0; i <= gameW; i+= this.gridSize) {
-    for(let o = 0; o <= gameH; o+= this.gridSize) {
-      let vx = i-x;
-      let vy = o-y;
-	  let lak = i  % (worldGrid.chunkSize * worldGrid.gridSize);
-	  let laky = o  % (worldGrid.chunkSize * worldGrid.gridSize);
-      
-        p.fill(255,111,111)
-        p.ellipse(i,o, this.gridSize*lerp(.3, .1, ivn));
-       
-	  if ((Math.sqrt(vx*vx + vy*vy) < grai) && (lak ==0 && laky == 0)) {
-        p.fill(111,255,111)
-        p.ellipse(i,o, this.gridSize*lerp(.0, .3, ivn));
-      }
-    }
-  }
-  
-  p.fill(111,255,111, lerp(111, 22, ivn))
-  p.ellipse(x, y, grai*2);
-  p.noStroke();
-  for(let [a,b] of ringCast((Math.round((this.radi*ivn)/2)*4), worldGrid.chunkSize)) {
-	p.fill(111,111,255, 200)
-	p.ellipse(x+(this.gridSize*a),(this.gridSize*b)+y, 8);
-  }
+		let sm = inverseLerp(-1,1, Math.sin(ticks*.1));
+		this.a.importState(this.ra) 
+		this.drawGrid(p, this.a, this.radi, lerp(1, this.radi*2.25, sm));		
 	}
+	drawGrid(p, a, spacing = 2, dotSize = 1) {
+    // Calculate the total number of dots in the width and height
+
+    // Iterate over each dot
+    for (let i = 0; i <= gameW; i+= spacing) {
+		for (let o = 0; o <= gameH; o += spacing) {
+			
+            // Calculate the x and y coordinates of the dot
+            const x = i+(1*a.next()*spacing);
+            const y = o+(1*a.next()*spacing);
+
+            // Draw the dot
+            p.ellipse(x, y, dotSize, dotSize);
+        }
+    }
 }
-/*
+
+}
+
 //console.log(([[2,5], [2,2]]).find(a => [2,6]));
 let bfs = new Visualizer(n0);
 cosmicEntityManager.addEntity(bfs);
-*/
+
 let o =[0, 1,2,3,4,5,6,7,8,9,10].map(i => (Math.round((i)/2)*2))
 console.log(o);
 
@@ -162,8 +162,6 @@ nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 				let [x, y] = queue.shift();
 				let tile = worldGrid.getTile(x, y);
 
-				if ( x > water.x-2 && x < water.x+2 )
-				if ( y > water.y-2 && y < water.y+2 )
 				if (condition?.(tile, x, y, cx, cy)) 
 					yield({tile, x,y});				
 				visited.add(`${x}, ${y}`);
@@ -208,20 +206,20 @@ nanoaiActions.set("radialSearch", function (search, onFound) {
 	return {
 		moveNext: null, generator: null, next: null,
 		work(nano) {
-			if (this.generator === null) this.generator = this.rotate();
+			if (this.generator === null) this.generator = this.rotate(nano);
 			//n0.brain.do("dance2"); //next frame do a dance
 			this.next = this.generator.next() //describing what happens next frame 
 			let waitAFrame= (( this.moveNext===null || this.moveNext === true) && (this.next != null && !this.next.done) );
 			console.log({mn: this.moveNext, n:this.next, waitAFrame})
 			return waitAFrame; //true = keep going (this is like a really sophisticated do while system)
 		}, id: 0,
-		rotate: function*() {
+		rotate: function*(nano) {
 			for (let direction of ["left", "up", "right","down"]) { //each direction, we hook into an activity that turns the nano to this direction, searches then pulls hook
-				n0.brain.doBefore(this, "hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
-					n0.brain.doBefore(marker, "look", direction) //before we can exit the hook... we look down, search
-					n0.brain.doBefore(marker, "search", search, 9, n0.fov, onFound)
-					n0.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
-					n0.brain.doBefore(marker, "ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
+				nano.brain.doBefore(this, "hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
+					nano.brain.doBefore(marker, "look", direction) //before we can exit the hook... we look down, search
+					nano.brain.doBefore(marker, "search", search, nano.sightRadius, nano.fov, onFound)
+					nano.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
+					nano.brain.doBefore(marker, "ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
 				}) 
 				yield; //we yield to say we can do another round
 			}
@@ -229,12 +227,14 @@ nanoaiActions.set("radialSearch", function (search, onFound) {
 
 	}
 }) 
+console.log(Math.sqrt(2)*2)
+console.log(Math.sqrt(1))
 nanoaiActions.set("exploreSearch", function (onFound) {
 	return {
-		ring: null, next: null, visited: new Set(), radi: 2,
+		ring: null, next: null, visited: new Set(), 
 		work(nano) {
 			let origin = worldGrid.gridToChunkPoint(nano.x, nano.y);
-			if (this.ring === null) this.ring = this.ringCast((Math.round((this.radi)/2)*4), worldGrid.chunkSize, this.visited)
+			if (this.ring === null) this.ring = this.ringCast((Math.round((nano.sightRadius)/2)*4), worldGrid.chunkSize, this.visited)
 			this.next = this.ring.next() //describing what happens next frame 
 			let pos = this.next?.value
 			if (pos !== undefined && !this.next.done) {
@@ -274,8 +274,8 @@ nanoaiActions.set("exploreSearch", function (onFound) {
 	}
 })
 //n0.brain.do("walk", 0, 0)			
-n0.brain.do("exploreSearch")
-n0.brain.do("walk", 7, 4)
+//n0.brain.do("exploreSearch")
+n0.brain.do("walk", 7+8, 7)
 n0.brain.do("hook", (hook, marker) => {
 	let x = n0.x, y = n0.y, tx = 7, ty = 7, vx = n0.vx, vy = n0.vy, fov = n0.fov; 
 	
@@ -293,11 +293,9 @@ n0.brain.do("hook", (hook, marker) => {
 	n0.brain.doBefore(marker, "pull", hook)
 })
 
-let search = (...args) => {
-	console.log(args)
-	let tile = args[0]
-	return (tile && tile["waterLevel"] !== undefined
-	)
+let search = (tile) => {
+	
+	return (tile && tile["waterLevel"] !== undefined)
 };
 //search = () => true;
 /*
