@@ -91,18 +91,6 @@ let loverChannel = {
     }
 }
 class Radio {
-    constructor () {
-        this.channels = new Map([
-            ["personal", new Map()],
-            ["lover", loverChannel],
-            ["team", new Map()],
-            ["friends", friendChannel],
-            ["general", new Channel()],
-            ["jobs", new Channel()]
-        ])
-        this.friendsList = new Map();
-        this.nanosSearching = new Map();
-    }
    addFriend(nano, friend) {
     if (!this.friendsList.has(nano)) {
         this.friendsList.set(nano, new Set([nano]));

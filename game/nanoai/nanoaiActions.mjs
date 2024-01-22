@@ -359,18 +359,20 @@ export function walkObj(obj, nano) {
         obj.path = path;
         });
     }
-    return processWalk(nano, obj, obj.args[0], obj.args[1], stopped,  foundPath, .5);
+    return processWalk(nano, obj, obj.args[0], obj.args[1], stopped,  foundPath, .75);
 }
 p.noLoopLoud = function() {
     p.noLoop(); console.error("the loop was paused");
 }
 
 function processWalk(nano, obj, ox, oy, stopDirection, findaPath, magn = .5) {
+    p.ellipse(ox*worldGrid.gridSize, oy*worldGrid.gridSize, 4)
+
     var vx = ox - nano.x;
     var vy = oy - nano.y;    
     var mag = Math.sqrt((vx * vx) + (vy * vy))
     
-    if (mag <= 1) {
+    if (mag <= 1.25) {
         stopDirection (nano);
         return false;
     }
@@ -394,7 +396,7 @@ function processWalk(nano, obj, ox, oy, stopDirection, findaPath, magn = .5) {
 }
 
 export function followObj (obj, nano) {
-  
+    
     let stopped = (nano) => {
         nano.vx = 0;
         nano.vy = 0;
@@ -432,7 +434,8 @@ export function walk(nano, x, y, magn = 1) {
     var sod = inverseLerp(8,4, speed)
     sod = clamp(0, 1, sod);
     sod = lerp(.5, 1, sod);
-    p.text(`${sod}`, nano.x, nano.y);
+    
+    p.text(`${sod}`, nano.visualX, nano.visualY);
     nano.x += vx * deltaTime * nano.speed*sod;
     nano.y += vy * deltaTime * nano.speed*sod;
 

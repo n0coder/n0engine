@@ -55,7 +55,7 @@ export function findPath(cX, cY, tX, tY, sightDistance, padding, out) {
                 return { x: a.minX + p.x , y: a.minY + p.y }
             })
 
-            console.log({cX,cY,tX,tY, path, points});
+           
             out({
                 points, index: 0,
                 get currentPoint() {

@@ -62,7 +62,37 @@ function* bfx(start, getNeighbors, matchCondition) {
 		}
     }
 }
+function dotFov(x, y, tx, ty, vx, vy, fov) {
+    // Calculate the vector from your position to the target
+    var dx = tx - x;
+    var dy = ty - y;
 
+    // Normalize the direction vector
+    var mag = Math.sqrt(dx * dx + dy * dy);
+    var nx = dx / mag;
+    var ny = dy / mag;
+
+    // Calculate the dot product
+    var dotProduct = nx * vx + ny * vy;
+    
+    // invert the dot, and drop it directly into the expected angle
+    var inverseDot = inverseLerp(-1, 1, dotProduct)
+    var angle = lerp(360, 0, inverseDot)
+   
+    //just like that simple use
+    return angle <= fov;
+}
+
+function arcFov(cx, cy, dx, dy, vx, vy, fov) {
+	let xMod = ((vx < 0) ? -1 : 1);
+	let yMod = ((vy < 0) ? -1 : 1);
+	let neighborDir = Math.atan2( (dy-cy)*yMod, (dx-cx)*xMod)
+	let nanodir = Math.atan2(vy * yMod, vx * xMod);
+	let angleDiff = Math.abs(neighborDir - nanodir);
+    return (angleDiff <= fov / 2)
+}
+let ai = 6.36324534;
+let ao = 5;
 
 nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
@@ -79,21 +109,21 @@ nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 			return !info.done; //false = exit, false = notdone... 
 		}, 
 		radialArcSearch: function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
-			let queue = [[cx,cy]], visited = new Set()
+			let queue = [[Math.round(cx), Math.round(cy)]], visited = new Set()
 
 			while (queue.length > 0) {
 				let [x, y] = queue.shift();
 				let tile = worldGrid.getTile(x, y);
+
+				if ( x > water.x-2 && x < water.x+2 )
+				if ( y > water.y-2 && y < water.y+2 )
 				if (condition?.(tile)) 
 					yield({tile, x,y});				
 				visited.add(`${x}, ${y}`);
 
 				for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
-					if (this.distance(dx, dy, cx, cy) <= radius) {
-						let xMod = ((vx < 0) ? -1 : 1);
-					  	let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
-					  	if (angleDiff <= fov / 2) 
-							queue.push([dx, dy, dx-cx, dy-cy]);	
+					if ( dotFov(cx,cy, dx,dy, vx, vy, fov) && this.distance(dx, dy, cx, cy) <= radius) {
+						queue.push([dx, dy]);	
 					}
 				}				  
 			}
@@ -125,6 +155,7 @@ nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 
 	}
 })
+
 /*
 n0.brain.do("ping", (n)=>n.vx=-1);
 n0.brain.do("search", search, 6, 120, onFound)
@@ -137,54 +168,7 @@ n0.brain.do("search", search, 6, 120, onFound)
 */
 
 
-let radialArcBFS = function*(condition, cx, cy, vx, vy, radius, fov) { //we iterate through the results we find
-	let queue = [[cx,cy]], visited = new Set()
 
-	while (queue.length > 0) {
-		let [x, y] = queue.shift();
-		let tile = worldGrid.getTile(x, y);
-		if (condition?.(tile)) 
-			yield({tile, x,y});				
-		visited.add(`${x}, ${y}`);
-
-		for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
-			if (this.distance(dx, dy, cx, cy) <= radius) {
-				let xMod = ((vx < 0) ? -1 : 1);
-				  let angleDiff = Math.abs(Math.atan2( dy-cy, (dx-cx)*xMod) - Math.atan2(vy, vx * xMod ));
-				  if (angleDiff <= fov / 2) 
-					queue.push([dx, dy, dx-cx, dy-cy]);	
-			}
-		}				  
-	}
-	
-}
-
-let ringCast = function*(radius = 3, chunkSize, visited) {
-	if ( visited === undefined ) visited = new Set(); //allow a shared visited tech
-	
-	let startQueue= [];
-for(let i = -radius-chunkSize; i <= radius+chunkSize; i+=chunkSize) {
-    for(let o = -radius-chunkSize; o <=radius+chunkSize; o+=chunkSize) {
-        if (Math.sqrt((i*i + o*o)) < radius/2) {
-            if (visited.has(`${i}, ${o}`)) continue;
-			visited.add(`${i}, ${o}`); //mark this as visited, since we only care about their neighbors and not themselves
-            startQueue.push([i, o])
-			//yield [i, o];
-        }
-    }
-}
-
-let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
-for (let [i,o] of startQueue) {
-   for(let [a,b] of directions) {
-       let x = i+(a*chunkSize), y = o+(b*chunkSize);
-       if (!visited.has(`${x}, ${y}`)) {
-           yield [x, y];
-           visited.add(`${x}, ${y}`);
-       }
-   }
-}
-}
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
@@ -223,51 +207,14 @@ export class Visualizer {
   }
 	}
 }
-
+/*
 //console.log(([[2,5], [2,2]]).find(a => [2,6]));
 let bfs = new Visualizer(n0);
 cosmicEntityManager.addEntity(bfs);
-
+*/
 let o =[0, 1,2,3,4,5,6,7,8,9,10].map(i => (Math.round((i)/2)*2))
 console.log(o);
 
-let radialArcSearch = function*(condition, visited, x,y, vx, vy, radius, fov) {
-	let queue = [[x, y]]
-	while (queue.length > 0) {
-		let [nx, ny] = queue.shift();
-		let tile = worldGrid.getTile(nx, ny);
-		if (condition?.(tile)) 
-			yield tile
-		visited.add(`${nx}, ${ny}`);
-		for (let [dx, dy] of getNeighbors(x, y, visited, queue)) {				
-			if (distance(dx, dy, x, y) <= radius) {
-				let xMod = ((vx < 0) ? -1 : 1);
-				let angleDiff = Math.abs(Math.atan2( dy-y, (dx-x)*xMod) - Math.atan2(vy, vx * xMod ));
-				if (angleDiff <= fov / 2) 
-					queue.push([dx, dy, dx-x, dy- y]);	
-			}
-		}	
-
-	}
-
-	function* getNeighbors(a, b, visited, queue) { 
-		let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]]
-		for(var [i, o] of directions) {
-			let x = i+a, y = b+o;
-			if (!visited.has(`${x}, ${y}`) && !isInQueue(queue, x, y)) //we can handle preventing if a neighbor is already visited here
-				yield [x, y]
-		}
-	}
-	function isInQueue(queue, dx, dy) {
-		return queue.some(([x, y]) => x === dx && y === dy);
-	}
-	function distance(x1, y1, x2, y2) {
-		let dx = x2 - x1;
-		let dy = y2 - y1;
-		return Math.sqrt(dx * dx + dy * dy);
-	 }
-
-}
 
 //coming up with a search space tech
 
@@ -280,10 +227,10 @@ let radialArcSearch = function*(condition, visited, x,y, vx, vy, radius, fov) {
 // what if we mark unexplored chunks in their group radio channel and have them randomly select one when starting to search again?
 // logically the world won't change on it's own, so you can reasonably expect a continuation tech to work like this
 
-nanoaiActions.set("radialSearch", function (onFound) {
+nanoaiActions.set("radialSearch", function (search, onFound) {
 	return {
 		moveNext: null, generator: null, next: null,
-		work() {
+		work(nano) {
 			if (this.generator === null) this.generator = this.rotate();
 			//n0.brain.do("dance2"); //next frame do a dance
 			this.next = this.generator.next() //describing what happens next frame 
@@ -293,12 +240,11 @@ nanoaiActions.set("radialSearch", function (onFound) {
 		}, id: 0,
 		rotate: function*() {
 			for (let direction of ["left", "up", "right","down"]) { //each direction, we hook into an activity that turns the nano to this direction, searches then pulls hook
-				n0.brain.do("hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
+				n0.brain.doBefore(this, "hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
 					n0.brain.doBefore(marker, "look", direction) //before we can exit the hook... we look down, search
-					console.log(search, onFound);
-					n0.brain.doBefore(marker,"search", search, 6, 120, onFound)
+					n0.brain.doBefore(marker, "search", search, 4, 360, onFound)
 					n0.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
-					n0.brain.doBefore(marker,"ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
+					n0.brain.doBefore(marker, "ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
 				}) 
 				yield; //we yield to say we can do another round
 			}
@@ -306,12 +252,85 @@ nanoaiActions.set("radialSearch", function (onFound) {
 
 	}
 }) 
+nanoaiActions.set("exploreSearch", function (onFound) {
+	return {
+		ring: null, next: null, visited: new Set(), radi: 2,
+		work(nano) {
+			let origin = worldGrid.gridToChunkPoint(nano.x, nano.y);
+			if (this.ring === null) this.ring = this.ringCast((Math.round((this.radi)/2)*4), worldGrid.chunkSize, this.visited)
+			this.next = this.ring.next() //describing what happens next frame 
+			let pos = this.next?.value
+			if (pos !== undefined && !this.next.done) {
+				//let xy = worldGrid.gridToChunkPoint(pos[0], pos[1]);
+				let xx = worldGrid.chunkToGrid(origin.x + pos[0], origin.y + pos[1])
+				console.log(xx);
+				nano.brain.doBefore(this, "walk", xx.x, xx.y) //the ringcast gives offsets based on origin...
+				nano.brain.doBefore(this, "spin", 1, 10) //this is really cute she walks to a location, twirls then moves onto the next task
+			}
+			let waitAFrame= ( (this.next != null && !this.next.done) );
+			return waitAFrame;
+		},
+		ringCast: function*(radius = 3, chunkSize, visited) {
+			let startQueue= [];
+			if ( visited === undefined ) visited = new Set(); //allow a shared visited tech
+			for(let i = -radius-chunkSize; i <= radius+chunkSize; i+=chunkSize) {
+				for (let o = -radius - chunkSize; o <= radius + chunkSize; o += chunkSize) {
+					if (Math.sqrt((i * i + o * o)) < radius / 2) {
+						if (visited.has(`${i}, ${o}`)) continue;
+						visited.add(`${i}, ${o}`); //mark this as visited, since we only care about their neighbors and not themselves
+						startQueue.push([i, o])
+						//yield [i, o];
+					}
+				}
+			}
+			let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+			for (let [i,o] of startQueue) {
+				for(let [a,b] of directions) {
+					let x = i+(a*chunkSize), y = o+(b*chunkSize);
+					if (!visited.has(`${x}, ${y}`)) {
+						yield [x, y];
+						visited.add(`${x}, ${y}`);
+					}
+				}
+			}
+		}
+	}
+})
+n0.brain.do("walk", 0, 0)			
+//n0.brain.do("exploreSearch")
+n0.brain.do("walk", 7, 4)
+n0.brain.do("hook", (hook, marker) => {
+	let x = n0.x, y = n0.y, tx = 7, ty = 7, vx = n0.vx, vy = n0.vy, fov = n0.fov; 
+	
+	n0.brain.doBefore(marker, "look", "up")
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "wait",.5) 
+	n0.brain.doBefore(marker, "look", "right")
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "wait",.5) 
+	n0.brain.doBefore(marker, "look", "down")
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "wait",.5) 
+	n0.brain.doBefore(marker, "look", "left")
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "pull", hook)
+})
 
-n0.brain.do("radialSearch", (results)=> {
-	console.log(results); 					
+/*
+let search = (tile) => (tile && tile["waterLevel"] !== undefined);
+n0.brain.do( "search", search, 8, 360, (results) => {
+	console.log(results); 
+	if (results.length > 0)
+	n0.brain.do("spin", 10, 12);
+})
+*/
+/*
+n0.brain.do("radialSearch", search, (results) => {
+	console.log(results); 
+	if (results.length > 0)
+	n0.brain.do("spin", 10, 10);
 });
-let search = (tile) => (tile && tile["waterLevel"] != null);
-
+*/
 function searchSpace(nano, condition, radius, fov) {
 	let visited = new Set(), chunksVisited = new Set(), results = [];
 	/* what if nanoais... did the logic... */
@@ -342,16 +361,16 @@ function searchSpace(nano, condition, radius, fov) {
     //like yeah, we could write this tech without it, but it's probably clearer if we can yield any time we hit an important point
 	//imagine yielding to pause execution while the nano does work, we also need to take state machine techs into account...
 
-	let radialArc = radialArcSearch(condition, visited, nano.x, nano.y, nano.vx, nano.vy, radius, fov);
-	let result = radialArc.next()
-	if (result.value !== undefined) {
-		results.push(result.value);
-	} 
+	//let radialArc = radialArcSearch(condition, visited, nano.x, nano.y, nano.vx, nano.vy, radius, fov);
+	//let result = radialArc.next()
+	//if (result.value !== undefined) {
+		//results.push(result.value);
+	//} 
 	//no items found, the search completes, but we have not found anything
-	if (result.done && result.value === undefined && results.length === 0) {
+	//if (result.done && result.value === undefined && results.length === 0) {
 		//
-	}
-	console.log()
+//}
+	//console.log()
 	// we will need two systems (3?)
 	// radial bfs
 	// rotate 4 times to the right
@@ -361,6 +380,6 @@ function searchSpace(nano, condition, radius, fov) {
 	
 
 }
-searchSpace(n0, search, 6, 120);
+//searchSpace(n0, search, 6, 120);
 
 

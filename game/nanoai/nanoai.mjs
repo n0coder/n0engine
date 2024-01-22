@@ -26,6 +26,7 @@ export class Nanoai {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
+        this.fov = 180; //reasonable fov
         this.speed = 5;
         this.sugar = -4;
         this.lover = null;
@@ -76,8 +77,17 @@ export class Nanoai {
         //call radio
         //check feelings (wants to do hobby or chat with friend)?
     }
-
+    
     draw() {
+        let angleRad = Math.atan2(this.vx, this.vy);
+        let fovToRad = (((2*3.1415926)/360)*this.fov);
+        let startAngle = angleRad -fovToRad / 2;
+        let stopAngle = angleRad + fovToRad / 2;
+
+        let a = ((2 * 3.1415926) / 360) * (180 +90);
+        p.fill(255, 255, 255,16)
+        p.arc(this.visualX, this.visualY, worldGrid.gridSize*9*2, worldGrid.gridSize*9*2, a-startAngle, a-stopAngle);
+
         if (this.working)
             this.brain.work(this);
             
