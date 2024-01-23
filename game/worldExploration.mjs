@@ -12,7 +12,7 @@ import { Water } from "./world/props/water.mjs";
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs"
 import { camera } from "../engine/core/Camera/camera.mjs";
 import Alea from "alea";
-let n0 = new Nanoai("n0", 12, 12);
+let n0 = new Nanoai("n0", 16, 16);
 globalThis.n0 =n0;
 [[5,5], [6,5], [7,5], [8,5], [9,5]].map(([x,y]) => 
 	worldGrid.setTile(x, y, new Wall(x,y)))
@@ -65,47 +65,16 @@ console.log(Math.sqrt(2.221))
 console.log(Math.sqrt(2)*(3.1415926 / 2))
 console.log(3.1415926 / 2)
 console.log((3.1415926 / 2)*(3.1415926 / 2))
-export class Visualizer {
-	constructor (nano) {
-		this.gridSize = worldGrid.gridSize;
-		this.radi = 15
-		this.t = 0;
-		this.renderOrder = -5;
-		this.nano = nano;
-		this.a = Alea("XD")
-		this.ra = this.a.exportState()
-	}
-	draw() {
-		let sm = inverseLerp(-1,1, Math.sin(ticks*.1));
-		this.a.importState(this.ra) 
-		this.drawGrid(p, this.a, this.radi, lerp(1, this.radi*2.25, sm));		
-	}
-	drawGrid(p, a, spacing = 2, dotSize = 1) {
-    // Calculate the total number of dots in the width and height
-
-    // Iterate over each dot
-    for (let i = 0; i <= gameW; i+= spacing) {
-		for (let o = 0; o <= gameH; o += spacing) {
-			
-            // Calculate the x and y coordinates of the dot
-            const x = i+(1*a.next()*spacing);
-            const y = o+(1*a.next()*spacing);
-
-            // Draw the dot
-            p.ellipse(x, y, dotSize, dotSize);
-        }
-    }
-}
-
-}
-
-//console.log(([[2,5], [2,2]]).find(a => [2,6]));
-let bfs = new Visualizer(n0);
-cosmicEntityManager.addEntity(bfs);
 
 let o =[0, 1,2,3,4,5,6,7,8,9,10].map(i => (Math.round((i)/2)*2))
 console.log(o);
 
+
+var nano = {
+	face: "XD",
+	say(msg) { console.log(`${this.face}: ${msg}`) }
+}
+nano.say("hi")
 
 //coming up with a search space tech
 
@@ -118,7 +87,45 @@ console.log(o);
 // what if we mark unexplored chunks in their group radio channel and have them randomly select one when starting to search again?
 // logically the world won't change on it's own, so you can reasonably expect a continuation tech to work like this
 
-
+function* ringCast(cx, cy, radius = 3, visited) {
+	//radius should be in grid space
+	let chunkSize = worldGrid.chunkSize;
+	let gridSize = worldGrid.gridSize
+	console.log(chunkSize)
+	radius = (Math.round((radius) / 2) * 4); //delete odd numbers (removes odd even position desync)
+	let startQueue= new Map();
+	if ( visited === undefined ) visited = new Set(); //allow a shared visited tech
+			
+	for (let i = -radius -gridSize; i <= radius+gridSize; i += gridSize) {
+		for (let o = -radius-gridSize; o <= radius+gridSize; o += gridSize) {
+			let x = i + cx, y = o + cy;
+			let xy = worldGrid.gridToChunkPoint(i, o);
+			let usy =[cx + xy.x, cy+ xy.y];
+			let mag = Math.sqrt(i * i + o * o)
+			//var ox = worldGrid.gridToChunkPoint(i, o);
+			if (mag < radius / 2) {
+				if (visited.has(`${usy[0]}, ${usy[1]}`)) continue;
+				visited.add(`${usy[0]}, ${usy[1]}`); //mark this as visited, since we only care about their neighbors and not themselves
+				startQueue.set(`${usy[0]}, ${usy[1]}`, [usy[0], usy[1]])
+				//yield [usy[0],usy[1]];
+			}
+		}
+	}
+	console.log(startQueue)
+	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
+	for (let [oxz, [i,o]] of startQueue) {
+		for(let [a,b] of directions) {
+			let x = i+(a*chunkSize), y = o+(b*chunkSize);
+				if (!visited.has(`${x}, ${y}`)) {
+					yield [x, y];
+					visited.add(`${x}, ${y}`);
+				}
+			}
+		}
+}
+		
+//let ring = [...ringCast(11, 11, 8)]
+//console.log(ring)
 function dotFov(x, y, tx, ty, vx, vy, fov) {
     // Calculate the vector from your position to the target
     var dx = tx - x;
@@ -202,6 +209,7 @@ nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
 
 	}
 })
+
 nanoaiActions.set("radialSearch", function (search, onFound) {
 	return {
 		moveNext: null, generator: null, next: null,
@@ -234,7 +242,7 @@ nanoaiActions.set("exploreSearch", function (onFound) {
 		ring: null, next: null, visited: new Set(), 
 		work(nano) {
 			let origin = worldGrid.gridToChunkPoint(nano.x, nano.y);
-			if (this.ring === null) this.ring = this.ringCast((Math.round((nano.sightRadius)/2)*4), worldGrid.chunkSize, this.visited)
+			if (this.ring === null) this.ring = ringCast(nano.sightRadius, worldGrid.chunkSize, this.visited)
 			this.next = this.ring.next() //describing what happens next frame 
 			let pos = this.next?.value
 			if (pos !== undefined && !this.next.done) {
@@ -246,31 +254,7 @@ nanoaiActions.set("exploreSearch", function (onFound) {
 			}
 			let waitAFrame= ( (this.next != null && !this.next.done) );
 			return waitAFrame;
-		},
-		ringCast: function*(radius = 3, chunkSize, visited) {
-			let startQueue= [];
-			if ( visited === undefined ) visited = new Set(); //allow a shared visited tech
-			for(let i = -radius-chunkSize; i <= radius+chunkSize; i+=chunkSize) {
-				for (let o = -radius - chunkSize; o <= radius + chunkSize; o += chunkSize) {
-					if (Math.sqrt((i * i + o * o)) < radius / 2) {
-						if (visited.has(`${i}, ${o}`)) continue;
-						visited.add(`${i}, ${o}`); //mark this as visited, since we only care about their neighbors and not themselves
-						startQueue.push([i, o])
-						//yield [i, o];
-					}
-				}
-			}
-			let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
-			for (let [i,o] of startQueue) {
-				for(let [a,b] of directions) {
-					let x = i+(a*chunkSize), y = o+(b*chunkSize);
-					if (!visited.has(`${x}, ${y}`)) {
-						yield [x, y];
-						visited.add(`${x}, ${y}`);
-					}
-				}
-			}
-		}
+		}		
 	}
 })
 //n0.brain.do("walk", 0, 0)			
@@ -311,6 +295,79 @@ n0.brain.do("radialSearch", search, (results) => {
 	if (results.length > 0)
 	n0.brain.do("spin", 10, 10);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+export class Visualizer {
+	constructor (nano) {
+		this.gridSize = worldGrid.gridSize;
+		this.radi = worldGrid.gridSize*1.3
+		this.t = 0;
+		this.renderOrder = -5;
+		this.nano = nano, this.nanox = nano.visualX, this.nanoy = nano.visualY;
+		this.a = Alea("XD")
+		this.ra = this.a.exportState()
+		this.visited = new Set();
+		//this.ring = ringCast(3,, this.visited)
+		this.r = [...ringCast(n0.x, n0.y, this.radi * 2.5, this.visited)]
+		console.log(this.r);
+	}
+	draw() {
+		let sm = inverseLerp(-1,1, Math.sin(ticks*.1));
+		this.a.importState(this.ra) 
+		this.drawGrid(p, this.a, worldGrid.gridSize, worldGrid.chunkSize);		
+	}
+	drawGrid(p, a, spacing = 2, chunkSize = 1) {
+		// Calculate the total number of dots in the width and height
+		let v = 2.5;
+		let cs = spacing * chunkSize
+		/*
+    for (let i = 0; i <= gameW; i+= spacing) {
+		for (let o = 0; o <= gameH; o += spacing) {
+			
+            // Calculate the x and y coordinates of the dot
+            const x = Math.floor(i / cs)*cs;
+            const y = Math.floor(o / cs)*cs;
+
+			p.fill(111, 255, 177, 100)
+            // Draw the dot
+			p.ellipse(x, y, spacing * .5);
+			p.push()
+			p.fill(111, 255, 255)
+			p.ellipse(i, o, spacing*.25);
+			p.pop()
+        }
+	}
+		*/
+		p.fill(255, 111, 255,45)
+		p.ellipse(this.nanox, this.nanoy, 2*2.5* this.radi* chunkSize)
+		for (let r of this.r) {
+			p.push()
+			p.fill(255, 111, 255)
+			p.ellipse((r[0]*spacing), (r[1]*spacing), spacing*.4);
+			p.pop()
+	}
+	
+}
+
+}
+console.log((36)/(8*4))
+//console.log(([[2,5], [2,2]]).find(a => [2,6]));
+let bfs = new Visualizer(n0);
+cosmicEntityManager.addEntity(bfs);
+
+
+
 
 function searchSpace(nano, condition, radius, fov) {
 	let visited = new Set(), chunksVisited = new Set(), results = [];

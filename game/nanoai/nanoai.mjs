@@ -85,8 +85,8 @@ export class Nanoai {
         let stopAngle = angleRad + fovToRad / 2;
 
         let a = ((2 * 3.1415926) / 360) * (180 +90);
-        p.fill(255, 255, 255,16)
-        p.arc(this.visualX, this.visualY, worldGrid.gridSize*this.sightRadius*2, worldGrid.gridSize*this.sightRadius*2, a-startAngle, a-stopAngle);
+        //p.fill(255, 255, 255,16)
+        //p.arc(this.visualX, this.visualY, worldGrid.gridSize*this.sightRadius*2, worldGrid.gridSize*this.sightRadius*2, a-startAngle, a-stopAngle);
 
         if (this.working)
             this.brain.work(this);
