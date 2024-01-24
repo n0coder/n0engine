@@ -26,7 +26,7 @@ export class Nanoai {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
-        this.fov = 180, this.sightRadius = 9; //reasonable fov
+        this.fov = 180, this.sightRadius = worldGrid.gridSize*2.5; //reasonable fov
         this.speed = 5;
         this.sugar = -4;
         this.lover = null;

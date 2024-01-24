@@ -86,46 +86,53 @@ nano.say("hi")
 // even better, mark the state of the search for later so the nano can start the search from their pre existing knowledge
 // what if we mark unexplored chunks in their group radio channel and have them randomly select one when starting to search again?
 // logically the world won't change on it's own, so you can reasonably expect a continuation tech to work like this
+console.log(12%4)
+console.log(12 / 4)
+console.log(4/12)
+function* ringCast(cx, cy, radius = 3, visited, onVisited) {
 
-function* ringCast(cx, cy, radius = 3, visited) {
+
 	//radius should be in grid space
 	let chunkSize = worldGrid.chunkSize;
 	let gridSize = worldGrid.gridSize
-	console.log(chunkSize)
+	//radius = gridSize*2.5
+	let c = worldGrid.gridToChunkPoint(cx, cy);
+	let cc = worldGrid.chunkToGrid(c.x, c.y);
+	//var (cx, cy]
+	cx = cc.x, cy = cc.y
 	radius = (Math.round((radius) / 2) * 4); //delete odd numbers (removes odd even position desync)
 	let startQueue= new Map();
 	if ( visited === undefined ) visited = new Set(); //allow a shared visited tech
 			
 	for (let i = -radius -gridSize; i <= radius+gridSize; i += gridSize) {
 		for (let o = -radius-gridSize; o <= radius+gridSize; o += gridSize) {
-			let x = i + cx, y = o + cy;
 			let xy = worldGrid.gridToChunkPoint(i, o);
 			let usy =[cx + xy.x, cy+ xy.y];
+			if (visited.has(`${usy[0]}, ${usy[1]}`)) continue;
+			let x = i + cx, y = o + cy;
 			let mag = Math.sqrt(i * i + o * o)
 			//var ox = worldGrid.gridToChunkPoint(i, o);
 			if (mag < radius / 2) {
-				if (visited.has(`${usy[0]}, ${usy[1]}`)) continue;
+				onVisited?.(usy[0], usy[1]);
 				visited.add(`${usy[0]}, ${usy[1]}`); //mark this as visited, since we only care about their neighbors and not themselves
 				startQueue.set(`${usy[0]}, ${usy[1]}`, [usy[0], usy[1]])
 				//yield [usy[0],usy[1]];
 			}
 		}
 	}
-	console.log(startQueue)
+	//console.log(startQueue)
 	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 	for (let [oxz, [i,o]] of startQueue) {
 		for(let [a,b] of directions) {
 			let x = i+(a*chunkSize), y = o+(b*chunkSize);
 				if (!visited.has(`${x}, ${y}`)) {
 					yield [x, y];
-					visited.add(`${x}, ${y}`);
+					//visited.add(`${x}, ${y}`);
 				}
 			}
 		}
 }
-		
-//let ring = [...ringCast(11, 11, 8)]
-//console.log(ring)
+
 function dotFov(x, y, tx, ty, vx, vy, fov) {
     // Calculate the vector from your position to the target
     var dx = tx - x;
@@ -237,29 +244,11 @@ nanoaiActions.set("radialSearch", function (search, onFound) {
 }) 
 console.log(Math.sqrt(2)*2)
 console.log(Math.sqrt(1))
-nanoaiActions.set("exploreSearch", function (onFound) {
-	return {
-		ring: null, next: null, visited: new Set(), 
-		work(nano) {
-			let origin = worldGrid.gridToChunkPoint(nano.x, nano.y);
-			if (this.ring === null) this.ring = ringCast(nano.sightRadius, worldGrid.chunkSize, this.visited)
-			this.next = this.ring.next() //describing what happens next frame 
-			let pos = this.next?.value
-			if (pos !== undefined && !this.next.done) {
-				//let xy = worldGrid.gridToChunkPoint(pos[0], pos[1]);
-				let xx = worldGrid.chunkToGrid(origin.x + pos[0], origin.y + pos[1])
-				console.log(xx);
-				nano.brain.doBefore(this, "walk", xx.x, xx.y) //the ringcast gives offsets based on origin...
-				nano.brain.doBefore(this, "spin", 1, 10) //this is really cute she walks to a location, twirls then moves onto the next task
-			}
-			let waitAFrame= ( (this.next != null && !this.next.done) );
-			return waitAFrame;
-		}		
-	}
-})
+
 //n0.brain.do("walk", 0, 0)			
 //n0.brain.do("exploreSearch")
-n0.brain.do("walk", 7+8, 7)
+//n0.brain.do("walk", 7 + 8, 7)
+/*
 n0.brain.do("hook", (hook, marker) => {
 	let x = n0.x, y = n0.y, tx = 7, ty = 7, vx = n0.vx, vy = n0.vy, fov = n0.fov; 
 	
@@ -276,7 +265,7 @@ n0.brain.do("hook", (hook, marker) => {
 	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
 	n0.brain.doBefore(marker, "pull", hook)
 })
-
+*/
 let search = (tile) => {
 	
 	return (tile && tile["waterLevel"] !== undefined)
@@ -302,16 +291,46 @@ n0.brain.do("radialSearch", search, (results) => {
 
 
 
+function makeRingCaster() {
+	let points = new Map();
+	return {
+	visited: new Set(), points,
+	[Symbol.iterator]: ()=>points.values(),
+	cast(x, y, radius) {
+		let cast = ringCast(x, y, radius, this.visited, (i, o)=> this.points.delete(`${i}, ${o}`));
+		for (let usy of cast) 
+			this.points.set(`${usy[0]}, ${usy[1]}`, usy);	
+		return this;	
+	},
+	delete(x, y) {
+		this.points.delete(`${x}, ${y}`)
+	}
+	}
+}
+let ringCaster = makeRingCaster();
+
+ringCaster.cast(n0.x, n0.y, n0.sightRadius); //casts a ring around the sight radius
 
 
-
-
-
-
+nanoaiActions.set("exploreSearch", function (onFound) {
+	return {
+		ringCaster: makeRingCaster(),
+		work(nano) {
+			for (let r of ringCaster.cast(nano.x, nano.y, nano.sightRadius)) {
+				console.log(r)
+				
+				nano.brain.doBefore(this, "walk", r[0], r[1]) //the ringcast gives offsets based on origin...
+				nano.brain.doBefore(this, "ping", () => ringCaster.delete(r[0],r[1]))
+				nano.brain.doBefore(this, "spin", 1, 10) //this is really cute she walks to a location, twirls then moves onto the next task
+			}
+		}		
+	}
+})
+n0.brain.do("exploreSearch")
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
-		this.radi = worldGrid.gridSize*1.3
+		this.radi = worldGrid.gridSize
 		this.t = 0;
 		this.renderOrder = -5;
 		this.nano = nano, this.nanox = nano.visualX, this.nanoy = nano.visualY;
@@ -319,8 +338,9 @@ export class Visualizer {
 		this.ra = this.a.exportState()
 		this.visited = new Set();
 		//this.ring = ringCast(3,, this.visited)
-		this.r = [...ringCast(n0.x, n0.y, this.radi * 2.5, this.visited)]
-		console.log(this.r);
+		//ringCaster.cast(n0.x, n0.y, n0.sightRadius)
+		//this.r = [...ringCast(n0.x, n0.y, this.radi * 2.5, this.visited)]
+		//console.log(this.r);
 	}
 	draw() {
 		let sm = inverseLerp(-1,1, Math.sin(ticks*.1));
@@ -351,7 +371,7 @@ export class Visualizer {
 		*/
 		p.fill(255, 111, 255,45)
 		p.ellipse(this.nanox, this.nanoy, 2*2.5* this.radi* chunkSize)
-		for (let r of this.r) {
+		for (let r of ringCaster) {
 			p.push()
 			p.fill(255, 111, 255)
 			p.ellipse((r[0]*spacing), (r[1]*spacing), spacing*.4);
