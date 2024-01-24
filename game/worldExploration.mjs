@@ -309,19 +309,21 @@ function makeRingCaster() {
 }
 let ringCaster = makeRingCaster();
 
-ringCaster.cast(n0.x, n0.y, n0.sightRadius); //casts a ring around the sight radius
+//ringCaster.cast(n0.x, n0.y, n0.sightRadius); //casts a ring around the sight radius
 
 
 nanoaiActions.set("exploreSearch", function (onFound) {
 	return {
 		ringCaster: makeRingCaster(),
 		work(nano) {
+			
 			for (let r of ringCaster.cast(nano.x, nano.y, nano.sightRadius)) {
-				console.log(r)
-				
-				nano.brain.doBefore(this, "walk", r[0], r[1]) //the ringcast gives offsets based on origin...
-				nano.brain.doBefore(this, "ping", () => ringCaster.delete(r[0],r[1]))
-				nano.brain.doBefore(this, "spin", 1, 10) //this is really cute she walks to a location, twirls then moves onto the next task
+				nano.brain.doAfter(this, "hook", (hook, marker) => { //do before (this) action completes *basically saying no actually i need this to happen right now*
+					nano.brain.doBefore(marker,  "walk", r[0], r[1]) //before we can exit the hook... we look down, search
+					nano.brain.doBefore(marker,"ping", () => ringCaster.delete(r[0],r[1]))
+					nano.brain.doBefore(marker, "spin", 1, 10) //ping that we're ready to move onto the next stage
+					nano.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
+				}) 
 			}
 		}		
 	}
