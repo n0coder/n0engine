@@ -137,10 +137,10 @@ export class BiomeFunctionCollapse {
         this.genChunk( (this.i * (c * 2)) + x, (this.o * c) + y, c * 2, c)
 
         this.i++;
-        if (this.i >= 3) {
+        if (this.i >= 4) {
             this.o++
             this.i = 0;
-            if (this.o >= 3) {
+            if (this.o >= 4) {
                 this.o = 0
             }
         }
