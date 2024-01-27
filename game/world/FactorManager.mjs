@@ -6,7 +6,7 @@ import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
 export const worldFactors = new Map();
 
-export var read = "sugarzone", readRaw = false;
+export var read = "sugarzone", readRaw = true;
 export var minmax = []
 export function getBiome(x, y) {
     var biomae = getreABiome(x + offsetX, y + offsetY)
@@ -90,7 +90,7 @@ var triverWforks2 = new NoiseGenerator({ scale: scale * 450, octaves: 1, persist
 var triverWforks = new NoiseGenerator({ scale: scale * 450, octaves: 1, persistance: .5, offset: 0, lacunarity: 1.75, offsetX: 1653, add: [triverWforks2], amp: 1 })
 
 var sprinkle = new NoiseGenerator({ scale: scale * 150, abs: true, octaves: 1, persistance: .5, offset: 0, lacunarity: 1.75, offsetY: triverWforks, offsetX: 1553, add: [triverWforks2], amp: 1 })
-var humidity = new NoiseGenerator({ scale: scale * 150, octaves: 6, persistance: .5, lacunarity: 2, offsetX: -353, offsetY: 6662, add: [[riverWorksR, -.2], [triverWforks, 7], [sprinkle, 1.2], [elevation, .25]] });
+var humidity = new NoiseGenerator({ scale: scale * 150, octaves: 6, persistance: .5, lacunarity: 2, offsetX: -353, offsetY: 6662, blend: [-1,1], add: [[riverWorksR, -.2], [triverWforks, 7], [sprinkle, 1.2], [elevation, .25]] });
 worldFactors.set("humidity", humidity)
 
 var fantasy = new NoiseGenerator({
@@ -105,6 +105,7 @@ var triverWsforks = new NoiseGenerator({ scale: scale * 350, abs: true, octaves:
 var sugar = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
 var sugarO = new NoiseGenerator({scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222  });
 var bitter = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
+/*
 var sugarzonea = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
     add: [[elevation, -.2]], mapSpace: [0, 1], map: [
         { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [sugar, 0 , bitter] //bitter zone, original mix, sugar zone
@@ -115,6 +116,16 @@ var sugarzone = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistanc
         { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [-1, 0 , 1] //bitter zone, original mix, sugar zone
     }
 );
+*/
+var sugarzonea = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
+    add: [[elevation, -.2]], mapSpace: [0, 1], map: [
+        { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [sugar, bitter] //bitter zone, original mix, sugar zone
+    }
+);
+var sugarzone = new NoiseGenerator({
+    scale: scale * 1300,
+    blend: [0, 1], add: [[temp, 7.5], [humidity, 2], [elevation, -.2], [sugarzonea, 3]]
+});
 //worldFactors.set("elevation", sugarzonea)
 worldFactors.set("sugar", sugarzonea)
 worldFactors.set("sugarzone", sugarzone)

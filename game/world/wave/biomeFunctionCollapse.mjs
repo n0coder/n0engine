@@ -16,6 +16,8 @@ export class BiomeFunctionCollapse {
         this.renderOrder = -5;
         this.w = 30 * 4;
         this.h = 20 * 4;
+        worldGrid.x = -150+(this.w*-0);
+        worldGrid.y =  230;
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
         this.blocks = null
@@ -130,7 +132,7 @@ export class BiomeFunctionCollapse {
     draw() {
         if (!this.ready) return;
         //testing entire board shifts
-        var x = worldGrid.x-(this.w*0);
+        var x = worldGrid.x;
         var y = worldGrid.y;
 
         var c = worldGrid.chunkSize * 2; //grid space
