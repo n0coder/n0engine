@@ -5,7 +5,7 @@ export let gameScreenMode = new Map([
 	["square", (wh) => {
 		gameH = wh, gameW= wh;
 	}],
-	["fullCanvas", (wh) => {
+	["fullCanvas", ( ) => {
 		gameH = window.innerHeight, gameW= window.innerWidth;
 	}],
 	["fullHeight", (wh) => {
@@ -16,7 +16,7 @@ export let gameScreenMode = new Map([
 		gameH = scale, gameW= ratio;
 	}]
 ]);
-gameScreenMode.get("aspectRatio")(16, 9, 512) 
+gameScreenMode.get("fullCanvas")(16, 9, 512) 
 // someone saw my idea and said that my code causes performance issues
 // this ocde is run once, it runs when the player hits a button
 

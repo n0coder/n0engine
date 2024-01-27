@@ -6,13 +6,16 @@ body {
     background-size: cover;
    
 }
+.p5Canvas {
+ max-width: 100vw;
+ max-height: 100vh;
+}
 
 #loading {
   border-radius: 20px;
   width: auto;
   height: 256px
 }
-
 #test {
   width: 100%;
   color: white;

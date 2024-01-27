@@ -6,41 +6,6 @@ import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
 export const worldFactors = new Map();
 
-export const elevationBiomes = new RangeMap(-6.25, 6.25)
-//elevationBiomes.add([r,g,b], weight)
-elevationBiomes.add([11, 1, 150], .15) //deep water
-elevationBiomes.add([50, 50, 200], 1.7) //water
-elevationBiomes.add([170, 170, 125], .015) //beach
-elevationBiomes.add([50, 200, 50], 3) // land
-elevationBiomes.add([150, 200, 150], 1) //mountain
-elevationBiomes.add([150, 150, 150], .2) //mountain tips
-
-// Temperature Colors
-const temperatureColors = new RangeMap(-30, 50); // Assuming temperature range in Celsius
-temperatureColors.add([0, 0, 255], .15); // Very Cold (-30C to -20C)
-temperatureColors.add([0, 255, 255], .15); // Cold (-20C to -10C)
-temperatureColors.add([0, 255, 0], .2); // Cool (-10C to 0C)
-temperatureColors.add([255, 255, 0], .25); // Warm (0C to 20C)
-temperatureColors.add([255, 165, 0], .15); // Hot (20C to 30C)
-temperatureColors.add([255, 0, 0], .1); // Very Hot (30C to 50C)
-
-// Humidity Colors
-const humidityColors = new RangeMap(0, 100); // Assuming humidity percentage
-humidityColors.add([255, 255, 0], .2); // Very Dry (0% to 20%)
-humidityColors.add([205, 133, 63], .2); // Dry (20% to 40%)
-humidityColors.add([34, 139, 34], .2); // Moderate (40% to 60%)
-humidityColors.add([0, 255, 0], .2); // Humid (60% to 80%)
-humidityColors.add([0, 255, 255], .2); // Very Humid (80% to 100%)
-
-var ranges = elevationBiomes.exportRanges()
-const sugarColors = new RangeMap(-1, 1)
-sugarColors.add([20, 17, 21], .2)
-sugarColors.add([92, 81, 103], .2)
-sugarColors.add([89, 165, 177], .2)
-sugarColors.add([117, 250, 177], .2)
-sugarColors.add([248, 247, 249], .2)
-
-
 export var read = "sugarzone", readRaw = false;
 export var minmax = []
 export function getBiome(x, y) {
