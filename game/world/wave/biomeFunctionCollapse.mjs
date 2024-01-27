@@ -5,7 +5,7 @@ import { n0FunctionCollapse } from "./n0FunctionCollapse.mjs";
 import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
 import { getBiome, readRaw, worldFactors } from "../FactorManager.mjs";
-import { inverseLerp } from "../../../engine/n0math/ranges.mjs";
+import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
 
 export class BiomeFunctionCollapse {
@@ -16,7 +16,7 @@ export class BiomeFunctionCollapse {
         this.renderOrder = -5;
         this.w = 30 * 4;
         this.h = 20 * 4;
-        worldGrid.x = -150+(this.w*-0);
+        worldGrid.x = -150+(this.w*-308);
         worldGrid.y =  230;
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
@@ -155,20 +155,38 @@ export class BiomeFunctionCollapse {
                     this.nfc.drawTile(i + x, o + y,
                         (tile, img) => p.image(img, v.x, v.y, v.w, v.h),
                         (tile, color) => {
-                            p.fill(color); p.rect(v.x, v.y, v.w, v.h)
+                            p.fill(color);
+                            p.rect(v.x, v.y, v.w, v.h)
                         }
                     );
 
                 else {
                     var biome = worldGrid.tiles.get(`${x + i}, ${y + o}`)
                     if (biome && biome.biome) {
-                        if (biome.read && this.read)
-                            p.fill(readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255)
-                        else {
+
+                        let e = biome.genCache.get("elevation");
+                        let vinv = inverseLerp(e.minm, e.maxm, e.sum)                        
+                        let voff = lerp(0,10, vinv);
+
+                        let color = null;
+                        
+                        if (biome.read && this.read) {
+                            let c =  readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255
+                            color = [c,c,c]
+                        } else {
                             let colora = biome.biome.colorsugar(biome);
                             if (colora)
-                            p.fill(colora)
+                                color = colora
                         }
+
+                        let r = lerp(color[0]/2, color[0], vinv);
+                        let g = lerp(color[1]/2, color[1], vinv);
+                        let b = lerp(color[0]/2, color[2], vinv );
+                        //console.log({r,g,b})
+                        //p.noLoop();
+                        p.fill(r,g,b);
+
+                        //p.rect(v.x, v.y-(voff*v.h), v.w, (voff*v.h))
                         p.rect(v.x, v.y, v.w, v.h)
                     }
                 }
