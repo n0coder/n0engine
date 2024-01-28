@@ -126,6 +126,6 @@ var sugarzone = new NoiseGenerator({
     scale: scale * 1300,
     blend: [0, 1], add: [[temp, 7.5], [humidity, 2], [elevation, -.2], [sugarzonea, 3]]
 });
-//worldFactors.set("elevation", sugarzonea)
+//worldFactors.set("elevation", sugarzone)
 worldFactors.set("sugar", sugarzonea)
 worldFactors.set("sugarzone", sugarzone)

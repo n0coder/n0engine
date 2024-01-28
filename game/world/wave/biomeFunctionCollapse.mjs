@@ -7,6 +7,7 @@ import { createNoise2D } from "simplex-noise";
 import { getBiome, readRaw, worldFactors } from "../FactorManager.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
+import { ticks } from "../../../engine/core/Time/n0Time.mjs";
 
 export class BiomeFunctionCollapse {
     constructor(nano) {
@@ -16,7 +17,7 @@ export class BiomeFunctionCollapse {
         this.renderOrder = -5;
         this.w = 30 * 4;
         this.h = 20 * 4;
-        worldGrid.x = -150+(this.w*-308);
+        worldGrid.x = -150+(this.w*1004);
         worldGrid.y =  230;
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
@@ -166,7 +167,7 @@ export class BiomeFunctionCollapse {
 
                         let e = biome.genCache.get("elevation");
                         let vinv = inverseLerp(e.minm, e.maxm, e.sum)                        
-                        let voff = lerp(0,10, vinv);
+                        let voff = lerp(worldGrid.gridSize,0, vinv);
 
                         let color = null;
                         
@@ -178,16 +179,18 @@ export class BiomeFunctionCollapse {
                             if (colora)
                                 color = colora
                         }
-
-                        let r = lerp(color[0]/2, color[0], vinv);
-                        let g = lerp(color[1]/2, color[1], vinv);
-                        let b = lerp(color[0]/2, color[2], vinv );
+                        let cinv = Math.pow(vinv, 2)
+                        let r = lerp(color[0]/3, color[0], cinv);
+                        let g = lerp(color[1]/3, color[1], cinv);
+                        let b = lerp(color[0]/3, color[2], cinv );
                         //console.log({r,g,b})
                         //p.noLoop();
-                        p.fill(r,g,b);
-
-                        //p.rect(v.x, v.y-(voff*v.h), v.w, (voff*v.h))
-                        p.rect(v.x, v.y, v.w, v.h)
+                        p.fill(r, g, b);
+                        //p.fill(color);
+                        //let vux = (voff*v.h) //lerp(v.h, (voff*v.h), inverseLerp(-1,1, Math.sin(ticks*.1)))
+                        let vux = v.h;
+                        p.rect(v.x, vux+(v.y-v.h), v.w, vux)
+                        //p.rect(v.x, v.y, v.w, v.h)
                     }
                 }
             }

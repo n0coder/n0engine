@@ -22,7 +22,7 @@ gameScreenMode.get("fullCanvas")(16, 9, 512)
 
 
 //global scene variables
-export const backgroundColor = [33,33,33];
+export const backgroundColor = [33, 33, 33];
 export const defaultScale = 2;
 
 
