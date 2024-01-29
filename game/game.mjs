@@ -15,3 +15,7 @@ var mc = new DebugCursor();
 
 var abi = new Nanoai("abi",14, 12)
 var n0 = new Nanoai("n0", 12,12); 
+
+
+//make decoration tech using n0functioncollapse
+//place water (objects) in water (tiles)

@@ -17,8 +17,8 @@ export class BiomeFunctionCollapse {
         this.renderOrder = -5;
         this.w = 30 * 4;
         this.h = 20 * 4;
-        worldGrid.x = -150+(this.w*1004);
-        worldGrid.y =  230;
+        worldGrid.x = (this.w*20);
+        worldGrid.y = -150+(this.h*1);
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
         this.blocks = null
@@ -180,7 +180,7 @@ export class BiomeFunctionCollapse {
                                 color = colora
                         }
                         let cinv = Math.pow(vinv, 2)
-                        let r = lerp(color[0]/3, color[0], cinv);
+                        let r = lerp((color[0]/3)-10, color[0], cinv);
                         let g = lerp(color[1]/3, color[1], cinv);
                         let b = lerp(color[0]/3, color[2], cinv );
                         //console.log({r,g,b})
