@@ -8,6 +8,7 @@ import { getBiome, readRaw, worldFactors } from "../FactorManager.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
 import { ticks } from "../../../engine/core/Time/n0Time.mjs";
+import { Tile } from "../../../engine/grid/tile.mjs";
 
 export class BiomeFunctionCollapse {
     constructor(nano) {
@@ -49,14 +50,23 @@ export class BiomeFunctionCollapse {
         this.ready = true;
         loaded?.()
     }
-
+buildObject(obj, builders) {
+    for(let builder of builders) {
+        obj = builder(obj);
+    }
+    return obj;
+}
     genChunk(x, y, w, h) {
 
         for (let i = 0; i < w; i++) {
             for (let o = 0; o < h; o++) {
                 var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
                 if (tile) continue;
-
+                /*
+                let tile = new Tile(x + i, y + o)
+                tile.build()
+                this.buildObject(tile, [factorGen])
+                */
                 var biome = getBiome(x + i, y + o)
                 if (biome.biome === null) {
                     worldGrid.tiles.set(`${x + i}, ${y + o}`, null)
@@ -68,9 +78,11 @@ export class BiomeFunctionCollapse {
                 }
                 biome.pathDifficulty = biome?.biome != null ? biome?.biome?.getDifficulty(biome) : 9; //can't walk through an 8
                 
+
                 if (this.useNfc)
                     tile = this.nfc.collapseBiomeTile(x + i, y + o, biome);
                 worldGrid.tiles.set(`${x + i}, ${y + o}`, tile || biome)
+                console.log({ tile, biome })
             }
         }
         if (this.useNfc)
@@ -138,7 +150,7 @@ export class BiomeFunctionCollapse {
 
         var c = worldGrid.chunkSize * 2; //grid space
         this.genChunk( (this.i * (c * 2)) + x, (this.o * c) + y, c * 2, c)
-
+        p.noLoop();
         this.i++;
         if (this.i >= 9) {
             this.o++
