@@ -4,11 +4,12 @@ import { p } from "../../../engine/core/p5engine.mjs";
 import { n0FunctionCollapse } from "./n0FunctionCollapse.mjs";
 import Alea from "alea";
 import { createNoise2D } from "simplex-noise";
-import { getBiome, readRaw, worldFactors } from "../FactorManager.mjs";
+import { buildFactors, getBiome, readRaw, worldFactors } from "../FactorManager.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
 import { ticks } from "../../../engine/core/Time/n0Time.mjs";
 import { Tile } from "../../../engine/grid/tile.mjs";
+import { buildBiome } from "../BiomeWork.mjs";
 
 export class BiomeFunctionCollapse {
     constructor(nano) {
@@ -18,8 +19,8 @@ export class BiomeFunctionCollapse {
         this.renderOrder = -5;
         this.w = 30 * 4;
         this.h = 20 * 4;
-        worldGrid.x = (this.w*20);
-        worldGrid.y = -150+(this.h*1);
+        worldGrid.x = -150+111+(this.w*912);
+        worldGrid.y = -150+(this.h*4429);
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
         this.blocks = null
@@ -62,27 +63,25 @@ buildObject(obj, builders) {
             for (let o = 0; o < h; o++) {
                 var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
                 if (tile) continue;
-                /*
-                let tile = new Tile(x + i, y + o)
-                tile.build()
-                this.buildObject(tile, [factorGen])
-                */
-                var biome = getBiome(x + i, y + o)
-                if (biome.biome === null) {
-                    worldGrid.tiles.set(`${x + i}, ${y + o}`, null)
+                
+                tile = new Tile(x + i, y + o)
+                tile.build([buildFactors, buildBiome])
+                
+                if (tile.biome === null) {
+                    tile.broken = true;
+                    biome.pathDifficulty = 9;
+                    console.log(tile)
                     continue
                 }
-                biome.x = x + i, biome.y = y + o;
-                biome.sugar = {
-                    minm: 0, maxm: 2, sum: biome.biome.sugarLevel 
+                let sugar = tile.genCache.get("sugarzone");
+                tile.sugar =  {
+                    minm: 0, maxm: 2, sum: lerp(0,2, inverseLerp(sugar.minm, sugar.maxm, sugar.sum))  //tile.biome.sugarLevel 
                 }
-                biome.pathDifficulty = biome?.biome != null ? biome?.biome?.getDifficulty(biome) : 9; //can't walk through an 8
-                
+                tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9; //can't walk through an 8               
 
                 if (this.useNfc)
-                    tile = this.nfc.collapseBiomeTile(x + i, y + o, biome);
-                worldGrid.tiles.set(`${x + i}, ${y + o}`, tile || biome)
-                console.log({ tile, biome })
+                    tile = this.nfc.collapseBiomeTile(x + i, y + o, tile);
+                worldGrid.tiles.set(`${x + i}, ${y + o}`, tile)
             }
         }
         if (this.useNfc)
@@ -150,7 +149,7 @@ buildObject(obj, builders) {
 
         var c = worldGrid.chunkSize * 2; //grid space
         this.genChunk( (this.i * (c * 2)) + x, (this.o * c) + y, c * 2, c)
-        p.noLoop();
+        
         this.i++;
         if (this.i >= 9) {
             this.o++

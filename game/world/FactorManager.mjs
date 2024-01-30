@@ -1,10 +1,18 @@
 import { RangeMap } from "../../engine/collections/RangeMap.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { blend, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
-import { getABiome, getreABiome } from "./BiomeWork.mjs";
+import { getABiome } from "./BiomeWork.mjs";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
 
 export const worldFactors = new Map();
+export function buildFactors(tile) {
+    let genCache = new Map();
+    for (const [factorKey, worldFactor] of worldFactors) 
+        genCache.set(factorKey, worldFactor.getValue(tile.x, tile.y));    
+    tile.genCache = genCache;
+    return tile;
+}
+
 
 export var read = "sugarzone", readRaw = true;
 export var minmax = []

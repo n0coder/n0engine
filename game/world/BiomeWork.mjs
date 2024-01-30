@@ -443,20 +443,12 @@ function pop(array) {
     return member && (list || u)
 }
 
-export function getreABiome(vx, vy) {
-    let genCache = new Map();
+export function buildBiome(tile) {
     let biomex = [];
-
-    // Loop over all world factors and store their values in genCache
-    for (const [factorKey, worldFactor] of worldFactors) {
-        let factorValue = worldFactor.getValue(vx, vy);
-        genCache.set(factorKey, factorValue);
-    }
-
     for (const b of biomes) {
         const mappedBiome = mapBiome(b.factors, s => {
             if (s == null) return false;
-            var factor = genCache.get(s.factor)
+            var factor = tile.genCache.get(s.factor)
             if (!factor) {
                 return false;
             }
@@ -465,8 +457,7 @@ export function getreABiome(vx, vy) {
         });
         if (pop(mappedBiome)) biomex.push(b);
     }
-
-    return { genCache, biome: biomex.length > 0 ? biomex[0] : null };
+    tile.biome = biomex.length > 0 ? biomex[0] : null
 }
 export function getABiome(vx, vy) {
     let genCache = new Map();

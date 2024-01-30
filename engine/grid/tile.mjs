@@ -5,12 +5,19 @@ export class Tile {
 	build(chain) {
 		if (Array.isArray(chain)) {
 			for (const tool of chain) {
-				tool.build?.(this)
+				this.toolBuild(tool)
 			}
 		} else {
-			chain.build?.(this)
+			this.toolBuild(chain)
 		}
-	}
+	} 
+	toolBuild(tool) {
+        if (typeof tool === 'function') {
+            tool?.(this)		
+        } else if (typeof tool.build === 'function') {
+            tool?.build?.(this)
+        }
+    }
 }
 let tile = new Tile(4, 5)
 
