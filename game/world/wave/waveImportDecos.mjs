@@ -3,7 +3,7 @@ import { loadImgArray } from "../../../engine/core/Utilities/ObjectUtils.mjs";
 import { Tile } from "./Tile.mjs"
 import { n0jointtiles, n0tiles } from "./n0FunctionCollapse.mjs"
 
-let grassFactors = [{ factor: "temperature", min: -.5, max: .5 }, { factor: "humidity", min: -.18, max: 1 }]
+let grassFactors = [{ factor: "temperature", min: -.56, max: .5 }, { factor: "humidity", min: -.8, max: 1 }]
 //this can't happen under the current load model
 
 function decomposeImage(img) {
@@ -63,6 +63,7 @@ n0loader.startLoading("tiles", (loaded) => {
     //then insert into this
     n0tiles.set('air', new Tile(null, [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2))
     n0tiles.set('grass0', new Tile('assets/grasssprite.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass1', new Tile('assets/grasssprite2.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1, [...grassFactors], [{ factor: "humidity", value: 1 }]))
     //when all sprites are loaded we run this loaded function
     loaded()
 

@@ -1,4 +1,6 @@
 
+import Alea from "alea";
+import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { Cell } from "./Cell.mjs";
 export var n0grid = new Map();
@@ -6,6 +8,19 @@ export var n0tiles = new Map();
 export var n0jointtiles = new Map();
 
 document.an0FailedTiles = [];
+export const n0alea = Alea("n0");
+function weightedRandom(items) {
+        items = items.filter(a => a != null && a.tile != null)
+        var totalWeight = items.reduce((total, item) => total + (item.tile.weight + (item.bias || 0) || 1), 0);
+        var random = n0alea() * totalWeight;
+        var cumulativeWeight = 0;
+        for (var i = 0; i < items.length; i++) {
+            cumulativeWeight += items[i].tile.weight + (items[i].bias || 0) || 1;
+            if (random < cumulativeWeight) {
+                return items[i];
+            }
+        }
+    }
 export class n0FunctionCollapse {
     constructor(alea) {
         this.alea = alea || Math.random
@@ -108,12 +123,59 @@ export class n0FunctionCollapse {
 
     }
     buildn0Collapse(tile) {
-        let rules = tile.biome.tiles
-        //
+        var { x, y } = tile;
+        let rules = tile.biome.tiles.filter(t => n0tiles.get(t))
+        if (rules.length === 0) return;
+
+        if (!tile.n0fc) 
+            tile.n0fc = new Cell(rules)        
+        let n0fc = tile.n0fc;
+        if (n0fc.option) return; 
+        var options = n0fc.options.filter((o) => n0fc.noiseThresholdCondition(tile.genCache, o));
+        
+        let later = []
+        checkDir(x, y - 1, (a, b) => a.isUp(b))
+        checkDir(x + 1, y, (a, b) => a.isRight(b))
+        checkDir(x, y + 1, (a, b) => a.isDown(b))
+        checkDir(x - 1, y, (a, b) => a.isLeft(b))
+        var myOptionvs = options.map(o => {
+            var tvt = n0tiles.get(o);
+            if (!tvt) return null;
+            let multiple = 1;
+            for (var t of tvt.biases) {
+                var factor = tile.genCache.get(t.factor)
+                if (!factor) continue; //if the factor doesn't exist don't use it
+                var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
+                multiple *= lerp(-t.value, t.value, bias)
+            }
+            return { option: o, tile:tvt,  bias: multiple }
+        })
+        let choice = weightedRandom(myOptionvs);
+        n0fc.option = choice.option;
+        n0fc.tile = choice.tile;
+        function checkDir(x, y, conditionFunc) {
+        var b = worldGrid.getTile(x, y)
+            if (b == null) return;
+            if (b.option != null) {
+                var bt = n0tiles.get(b.option);
+                options = options.filter(a => {
+                    if (a == null) return false;
+                    var at = n0tiles.get(a);
+                    if (at != null && bt != null)
+                        return conditionFunc(at, bt)
+                });
+                return bt
+            }
+            else later.push([x, y]);
+            return n0tiles.get(b.option);
+        }
+        
     }
+
+    
     collapseBiomeTile(x, y, biome) {
         console.error("combine n0collapse into the worldgrid tile, cleaner");
-        p.noLoop();
+       
         let tile = n0grid.get(`${x}, ${y}`)
 
         if (biome?.biome == null) {

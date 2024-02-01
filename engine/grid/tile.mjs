@@ -14,7 +14,7 @@ export class Tile {
 	toolBuild(tool) {
         if (typeof tool === 'function') {
             tool?.(this)		
-        } else if (typeof tool.build === 'function') {
+        } else if (tool?.build) {
             tool?.build?.(this)
         }
     }

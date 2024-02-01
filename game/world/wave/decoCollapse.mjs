@@ -28,8 +28,8 @@ export class DecoCollapse {
 		 this.w = 11 * 4, this.h = 11 * 4;
 		 this.i = 0, this.o = 0;
         worldGrid.x = -150+111+(this.w*0);
-        worldGrid.y = 230+(this.h*0);
-		 this.alea = Alea("n0")
+        worldGrid.y = 230+(this.h*125);
+         this.alea = Alea("n0"), this.valea = Alea("n0v");
 		console.error("edit nfc to import any tiles... or make it clearer how to suggest custom tiles")
         this.nfc = new n0FunctionCollapse(Alea("nano"))
         for (const [k, v] of worldFactors) 
@@ -67,11 +67,10 @@ export class DecoCollapse {
                 tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9; //can't walk through an 8               
 
 				if (this.useNfc)
-					tile.build(this.nfc.buildn0Collapse(x + i, y + o, tile))
+					tile.build(this.nfc.buildn0Collapse)
                 worldGrid.tiles.set(`${x + i}, ${y + o}`, tile)
             }
         }
-		
         //if (this.useNfc)            this.nfc.blocksBiome(x, y, w, h, 4)
 		
 	}
@@ -97,19 +96,19 @@ export class DecoCollapse {
         for (let i = 0; i < this.w + 1; i++) {
             for (let o = 0; o < this.h + 1; o++) {
                 var v = worldGrid.gridBoundsScreenSpace(i, o, 1, 1);
-                var biome = worldGrid.tiles.get(`${x + i}, ${y + o}`)
-                if (biome && biome.biome) {
-                        let e = biome.genCache.get("elevation");
-                        let vinv = inverseLerp(e.minm, e.maxm, e.sum)                        
+                var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
+                if (tile && tile.biome) {
+                        let e = tile.genCache.get("elevation");
+                        let vinv = inverseLerp(e.minm, e.maxm, e.sum) -.1                       
                         let voff = lerp(worldGrid.gridSize,0, vinv);
 
                         let color = null;
                         
-                        if (biome.read && this.read) {
-                            let c =  readRaw ? biome.read.sum * 255 : inverseLerp(-1, 1, biome.read.sum) * 255
+                        if (tile.read && this.read) {
+                            let c =  readRaw ? tile.read.sum * 255 : inverseLerp(-1, 1, tile.read.sum) * 255
                             color = [c,c,c]
                         } else {
-                            let colora = biome.biome.colorsugar(biome);
+                            let colora = tile.biome.colorsugar(tile);
                             if (colora)
                                 color = colora
                         }
@@ -125,20 +124,49 @@ export class DecoCollapse {
                         let vux = v.h;
                         p.rect(v.x, vux+(v.y-v.h), v.w, vux)
 					//p.rect(v.x, v.y, v.w, v.h)
-					
-					
+                    //if (tile)
+                    
 
 				}
-				
-				if (this.useNfc)
-                    	this.nfc.drawTile(i + x, o + y,
-                        	(tile, img) =>{ console.log(tile.tile), p.image(tile.img, v.x, v.y, v.w, v.h)},
-                        	(tile, color) => { }
-                    );
-				
 			}
 			
+        }
+        for (let i = 0; i < this.w + 1; i++) {
+            for (let o = 0; o < this.h + 1; o++) {
+                var v = worldGrid.gridBoundsScreenSpace(i, o, 1, 1);
+                var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
+                if (tile && tile.biome) {
+                    let tilenfc = tile.n0fc?.tile
+                    if (tilenfc && tilenfc.img !== undefined) {
+                        
+                        let e = tile.genCache.get("elevation");
+                        let vinv = inverseLerp(e.minm, e.maxm, e.sum)                     
+                        let voff = lerp(worldGrid.gridSize,0, vinv);
+
+                        let color = null;
+                        
+                        if (tile.read && this.read) {
+                            let c =  readRaw ? tile.read.sum * 255 : inverseLerp(-1, 1, tile.read.sum) * 255
+                            color = [c,c,c]
+                        } else {
+                            let colora = tile.biome.colorsugar(tile);
+                            if (colora)
+                                color = colora
+                        }
+                        let cinv = Math.pow(vinv, 2)
+                        let r = lerp((color[0]/3)-10, color[0], cinv);
+                        let g = lerp(color[1]/3, color[1], cinv);
+                        let b = lerp(color[0]/3, color[2], cinv );
+                        p.tint(r,g,b)
+                        p.image(tilenfc.img, v.x-(v.w/2), v.y-v.h,v.w*2, v.h*2)
+                        p.noTint()
+                    }
+                }
             }
+        }
+        /*
+
+        */
         
     }
 }
