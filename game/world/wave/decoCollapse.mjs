@@ -25,10 +25,10 @@ export class DecoCollapse {
         this.setActive = setActive,this.renderOrder = -5;
         this.setActive(true)
 		
-		 this.w = 11 * 4, this.h = 11 * 4;
+		 this.w = 30 * 4, this.h = 20 * 4;
 		 this.i = 0, this.o = 0;
         worldGrid.x = -150+111+(this.w*0);
-        worldGrid.y = 230+(this.h*125);
+        worldGrid.y = 230+(this.h*55);
          this.alea = Alea("n0"), this.valea = Alea("n0v");
 		console.error("edit nfc to import any tiles... or make it clearer how to suggest custom tiles")
         this.nfc = new n0FunctionCollapse(Alea("nano"))
@@ -99,7 +99,7 @@ export class DecoCollapse {
                 var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
                 if (tile && tile.biome) {
                         let e = tile.genCache.get("elevation");
-                        let vinv = inverseLerp(e.minm, e.maxm, e.sum) -.1                       
+                        let vinv = inverseLerp(e.minm, e.maxm, e.sum)                       
                         let voff = lerp(worldGrid.gridSize,0, vinv);
 
                         let color = null;
