@@ -3,6 +3,7 @@ import { BiomeFunctionCollapse } from "./world/wave/biomeFunctionCollapse.mjs"
 import { DebugCursor } from "./world/debugCursor.mjs"
 import {Nanoai} from "./nanoai/nanoai.mjs"
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { DecoCollapse } from "./world/wave/decoCollapse.mjs";
 // we need to form a basic world generation layout for the nanos, something simple and cute
 
 // form based on the nanos size, a realtive difficulty to find water, which will then change based on humidity and temperature
@@ -11,7 +12,7 @@ import { worldGrid } from "../engine/grid/worldGrid.mjs";
 //the world is already really good, we just need to improve the bitter/sugar biome techs
 
 // we also need to test drive searching for water
-var bfc = new BiomeFunctionCollapse()
+var bfc = new DecoCollapse()
 var mc = new DebugCursor();
 
 var abi = new Nanoai("abi",14, 12)

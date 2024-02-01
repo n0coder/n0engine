@@ -50,7 +50,7 @@ export class Mommyai {
         this.x = x
         this.y = y
         this.speed = 48;
-        loadImg(this, "img", '../mommyaiCloudForm.png');
+        loadImg('../mommyaiCloudForm.png', (img) => this.img = img);
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(10, [[-6, -25], [9, -25], [-5, -30], [7, -30], [0, -50]]);
         this.setActive = setActive;

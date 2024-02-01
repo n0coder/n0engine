@@ -191,11 +191,7 @@ let purebitter = [ "purebitter"]
 let lut =neutrallut;
 
 var grassy = [
-    "grass0", "grass1", "grass2", "dirt0", "dirt1", "dirt2",
-    "dirtGrass0", "dirtGrass1", "dirtGrass2", "dirtGrass3", "dirtGrass4",
-    "dirtGrass5", "dirtGrass6", "dirtGrass7", "dirtGrass8", "dirtGrass9",
-    "dirtGrass10", "dirtGrass11", "dirtGrass12", "dirtGrass13", "dirtGrass14",
-    "dirtGrass15", "dirtGrass16", "dirtGrass17"
+    "grass0", "air"
 ]
 
 function formBiome(o) { //this is baking sugar into the generation... not ideal but it's ok.

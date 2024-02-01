@@ -107,7 +107,13 @@ export class n0FunctionCollapse {
         } while (later.length > 0);
 
     }
+    buildn0Collapse(tile) {
+        let rules = tile.biome.tiles
+        //
+    }
     collapseBiomeTile(x, y, biome) {
+        console.error("combine n0collapse into the worldgrid tile, cleaner");
+        p.noLoop();
         let tile = n0grid.get(`${x}, ${y}`)
 
         if (biome?.biome == null) {
