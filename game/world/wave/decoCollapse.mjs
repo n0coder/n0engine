@@ -27,10 +27,9 @@ export class DecoCollapse {
 		
 		 this.w = 30 * 4, this.h = 20 * 4;
 		 this.i = 0, this.o = 0;
-        worldGrid.x = -150+111+(this.w*0);
-        worldGrid.y = 230+(this.h*55);
+        worldGrid.x = -150+111+(this.w*15);
+        worldGrid.y = 230+(this.h*75);
          this.alea = Alea("n0"), this.valea = Alea("n0v");
-		console.error("edit nfc to import any tiles... or make it clearer how to suggest custom tiles")
         this.nfc = new n0FunctionCollapse(Alea("nano"))
         for (const [k, v] of worldFactors) 
 			 v.init(createNoise2D(this.alea));   
@@ -158,16 +157,16 @@ export class DecoCollapse {
                         let r = lerp((color[0]/3)-10, color[0], cinv);
                         let g = lerp(color[1]/3, color[1], cinv);
                         let b = lerp(color[0] / 3, color[2], cinv);
-                        let tr = lerp(255, r, tilenfc.tintOn ? 1 : .75);
-                        let tg = lerp(255, g, tilenfc.tintOn ? 1 : .75);
-                        let tb = lerp(255, b, tilenfc.tintOn ? 1 : .75);
+                        let tr = lerp(255, r, tilenfc.tintOn ? 1 : .5);
+                        let tg = lerp(255, g, tilenfc.tintOn ? 1 : .5);
+                        let tb = lerp(255, b, tilenfc.tintOn ? 1 : .5);
 
                         if (Array.isArray(tilenfc.img)) {
                             for (let isu = 0; isu < tilenfc.img.length; isu++) {
                                 if (tilenfc.img[isu] === undefined) continue;
-                                let rtr = lerp(255, tr, isu===0 ? .8 : .4);
-                                let rtg = lerp(255, tg, isu===0 ? .8 : .4);
-                                let rtb = lerp(255, tb, isu===0 ? .8 : .4);
+                                let rtr = lerp(255, r, isu===0 ? .8 : .4);
+                                let rtg = lerp(255, g, isu===0 ? .8 : .4);
+                                let rtb = lerp(255, b, isu===0 ? .8 : .4);
                                 
                                     p.tint(rtr, rtg, rtb)
                                     p.image(tilenfc.img[isu], v.x - (v.w / 2), v.y - v.h, v.w * 2, v.h * 2)
@@ -176,8 +175,8 @@ export class DecoCollapse {
                             }
                         } else {
                             p.tint(tr, tg, tb)
-                                    p.image(tilenfc.img, v.x - (v.w / 2), v.y - v.h, v.w * 2, v.h * 2)
-                                    p.noTint()
+                            p.image(tilenfc.img, v.x - (v.w / 2), v.y - v.h, v.w * 2, v.h * 2)
+                            p.noTint()
                         }
                     }
                 }
