@@ -2,12 +2,20 @@ import { loadImg } from "../../../engine/core/Utilities/ObjectUtils.mjs";
 import { waves } from "./waveImport.mjs";
 
 export class Tile {
-    constructor(img, edges, weight, thresholds, biases) {
-        if (img)
-        loadImg(img, (i) => this.img = i );
+    constructor(img, edges, weight, thresholds, biases, tintOn = true) {
+        if (Array.isArray(img)) {
+            this.img = [];
+            for (let ix = 0; ix < img.length; ix++) {                
+                loadImg(img[ix], (i) => this.img[ix] = i );
+            }
+        } else if (img) {
+            loadImg(img, (i) => this.img = i );
+        }
+        
         if (Array.isArray(edges))
-        var [up, right, down, left] = edges
+            var [up, right, down, left] = edges
         else waves.get(edges)
+        this.tintOn = tintOn;
         this.up = up;
         this.right = right;
         this.down = down;
