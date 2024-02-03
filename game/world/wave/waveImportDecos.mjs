@@ -58,6 +58,18 @@ n0loader.startLoading("categorization", (loaded) => {
     })
 })
 
+let name = 'deco' //the tag used to gather this item to be used in the biome selector
+let img = 'assets/deco.png' //where the sprite for this deco is
+let edges = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]] //which sides this deco can connect to (need a wider form connector and alternative edges system) 
+let weight = 1; //how likely the deco is to spawn (currently based on total distribution of choices at a sample point; sample points have specific thresholds and biases for world factors)
+let thresholds = [{ factor: "temperature", min: -.56, max: .5 }] //this defines the range of the factor this deco can spawn at (opt in factors, if a factor is not defined it will spawn at the full range of the factor) 
+let biases = [{ factor: "humidity", value: 1 }] //the deco is most likely to spawn at the given position in the factor 
+let tint = true //whether or not the first or only image given as input will be tinted based on the biome map
+let tile = new Tile(img, edges, weight, thresholds, biases, tint);
+n0tiles.set(name, tile); //then we insert the tile
+
+//phind made a good point; the idea of allowing a wildcard id; meaning that it ignores other tiles... in a sense that's how the air tech works. however, this technically isn't air
+
 n0loader.startLoading("tiles", (loaded) => {
     //load the grasssprite
     //then insert into this
