@@ -61,9 +61,10 @@ n0loader.startLoading("categorization", (loaded) => {
 n0loader.startLoading("tiles", (loaded) => {
     //load the grasssprite
     //then insert into this
-    n0tiles.set('air', new Tile('assets/air.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], .015))
-    //n0tiles.set('grass0', new Tile('assets/grasssprite.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
-    //n0tiles.set('grass1', new Tile('assets/grasssprite2.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('air', new Tile('assets/air.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
+    n0tiles.set('air2', new Tile('assets/air2.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
+    n0tiles.set('grass0', new Tile('assets/grasssprite.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass1', new Tile('assets/grasssprite2.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
     n0tiles.set('abi', new Tile('assets/test square.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 5, [...grassFactors], [{ factor: "humidity", value: 1 }], true ))
     //when all sprites are loaded we run this loaded function
     loaded()
