@@ -58,9 +58,14 @@ n0loader.startLoading("categorization", (loaded) => {
     })
 })
 
+
+
 let name = 'deco' //the tag used to gather this item to be used in the biome selector
 let img = 'assets/deco.png' //where the sprite for this deco is
 let edges = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]] //which sides this deco can connect to (need a wider form connector and alternative edges system) 
+let edgeWiderForm = [{ connections: [[0,0,0],[0,1,0]] },{ connections: [[0,0,0],[0,1,0]] },{ connections: [[0,0,0],[0,1,0]] },{ connections: [[0,0,0],[0,1,0]] },]
+
+
 let weight = 1; //how likely the deco is to spawn (currently based on total distribution of choices at a sample point; sample points have specific thresholds and biases for world factors)
 let thresholds = [{ factor: "temperature", min: -.56, max: .5 }] //this defines the range of the factor this deco can spawn at (opt in factors, if a factor is not defined it will spawn at the full range of the factor) 
 let biases = [{ factor: "humidity", value: 1 }] //the deco is most likely to spawn at the given position in the factor 
@@ -73,11 +78,13 @@ n0tiles.set(name, tile); //then we insert the tile
 n0loader.startLoading("tiles", (loaded) => {
     //load the grasssprite
     //then insert into this
-    n0tiles.set('air', new Tile('assets/air.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
-    n0tiles.set('air2', new Tile('assets/air2.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
-    n0tiles.set('grass0', new Tile('assets/grasssprite.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass1', new Tile('assets/grasssprite2.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('abi', new Tile('assets/test square.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 5, [...grassFactors], [{ factor: "humidity", value: 1 }], true ))
+    n0tiles.set('air', new Tile('assets/air0.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
+    n0tiles.set('grass0', new Tile('assets/grass0.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    
+    //n0tiles.set('air2', new Tile('assets/air2.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
+    //n0tiles.set('grass0', new Tile('assets/grasssprite.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    //n0tiles.set('grass1', new Tile('assets/grasssprite2.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    //n0tiles.set('abi', new Tile('assets/test square.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 5, [...grassFactors], [{ factor: "humidity", value: 1 }], true ))
     //when all sprites are loaded we run this loaded function
     loaded()
 
