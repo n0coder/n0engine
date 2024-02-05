@@ -79,14 +79,14 @@ n0loader.startLoading("tiles", (loaded) => {
     //load the grasssprite
     //then insert into this
     //n0tiles.set('air', new Tile(['assets/air.png'], [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 4))
-    //n0tiles.set('vedgamo', new Tile(['assets/gamo/ved.png'], [[0,0,0],[0,0,1],[0,0,1],[0,0,0]], 1))
-    //n0tiles.set('ledgamo', new Tile(['assets/gamo/led.png'], [[0, 0, 0], [0, 0, 0], [1, 0, 0], [0, 0, 1]], 1))
-    //n0tiles.set('nedgamo', new Tile(['assets/gamo/ned.png'], [[0, 0, 1], [1, 0, 0], [0, 0, 0], [0, 0, 0]], 1))
-    //n0tiles.set('redgamo', new Tile(['assets/gamo/red.png'], [[1, 0,0], [0, 0, 0], [0, 0, 0], [1, 0, 0]], 1))
-    n0tiles.set('vedgamo', new Tile(['assets/gamo/vedo.png'], [[0,0,0],[1,1,1],[1,1,1],[0,0,0]], 1))
-    n0tiles.set('ledgamo', new Tile(['assets/gamo/ledo.png'], [[0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1]], 1))
-    n0tiles.set('nedgamo', new Tile(['assets/gamo/nedo.png'], [[1, 1, 1], [1, 1, 1], [0, 0, 0], [0, 0, 0]], 1))
-    n0tiles.set('redgamo', new Tile(['assets/gamo/redo.png'], [[1,1,1], [0, 0, 0], [0, 0, 0], [1, 1, 1]], 1))
+    n0tiles.set('vedgamo', new Tile(['assets/gamo/ved.png'], [[0,0,0],[0,0,1],[0,0,1],[0,0,0]], 1))
+    n0tiles.set('ledgamo', new Tile(['assets/gamo/led.png'], [[0, 0, 0], [0, 0, 0], [1, 0, 0], [0, 0, 1]], 1))
+    n0tiles.set('nedgamo', new Tile(['assets/gamo/ned.png'], [[0, 0, 1], [1, 0, 0], [0, 0, 0], [0, 0, 0]], 1))
+    n0tiles.set('redgamo', new Tile(['assets/gamo/red.png'], [[1, 0,0], [0, 0, 0], [0, 0, 0], [1, 0, 0]], 1))
+    n0tiles.set('vedogamo', new Tile(['assets/gamo/vedo.png'], [[0,0,0],[1,1,1],[1,1,1],[0,0,0]], 1))
+    n0tiles.set('ledogamo', new Tile(['assets/gamo/ledo.png'], [[0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1]], 1))
+    n0tiles.set('nedogamo', new Tile(['assets/gamo/nedo.png'], [[1, 1, 1], [1, 1, 1], [0, 0, 0], [0, 0, 0]], 1))
+    n0tiles.set('redogamo', new Tile(['assets/gamo/redo.png'], [[1,1,1], [0, 0, 0], [0, 0, 0], [1, 1, 1]], 1))
 
 
         let rightdown = n0tiles.get("vedgamo");

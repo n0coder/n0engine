@@ -384,7 +384,7 @@ formBiome({
 let rivera = ["river", surface]
 formBiome({
     name: "river",
-    plaintags: [...rivera], tiles: ["ledgamo", "vedgamo", "redgamo", "nedgamo"],
+    plaintags: [...rivera], tiles: ["ledgamo", "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
     sweettags: [...rivera, ...sweeta],
     bittertags: [...rivera, ...bittera],
     difficulty: 3

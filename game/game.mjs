@@ -36,3 +36,15 @@ n0.brain.do("ping", () => {
 })
 
 //this is a floating read
+
+//i'm going to write another aspect of my noise biome map system. 
+//i need to form transition spaces, 
+//this is to give my wave function collapse system(which acts as a decorator) 
+//a way to change the probablility of a tile given it's relative position on the transition space.
+//the general idea of having transition tiles have high probability half way through the transition, 
+//falling off more towards the biome as it reaches the edge.
+//this is what i call space categorization systems.
+//they're really closely related to space remap systems
+
+//gather the edges of biomes, expand them and them cast a lerp along the space.
+//we will want to control how the lerp casts.
