@@ -25,12 +25,13 @@ export class DecoCollapse {
         this.setActive = setActive,this.renderOrder = -5;
         this.setActive(true)
 		
-		 this.w = 30 * 4, this.h = 20 * 4;
+		 this.w = 11 * 4, this.h = 11 * 4;
 		 this.i = 0, this.o = 0;
         worldGrid.x = -150+111+(this.w*15);
         worldGrid.y = 230+(this.h*75);
          this.alea = Alea("n0"), this.valea = Alea("n0v");
         this.nfc = new n0FunctionCollapse(Alea("nano"))
+         this.nfc.testingCheckdir();
         for (const [k, v] of worldFactors) 
 			 v.init(createNoise2D(this.alea));   
 		 
@@ -112,9 +113,9 @@ export class DecoCollapse {
                                 color = colora
                         }
                         let cinv = Math.pow(vinv, 2)
-                        let r = lerp((color[0]/3)-10, color[0], cinv);
-                        let g = lerp(color[1]/3, color[1], cinv);
-                        let b = lerp(color[0]/3, color[2], cinv );
+                        let r = color[0] // lerp((color[0]/3)-10, color[0], cinv);
+                        let g = color[1] //lerp(color[1]/3, color[1], cinv);
+                        let b = color[2] //lerp(color[2]/3, color[2], cinv );
                         //console.log({r,g,b})
                         //p.noLoop();
                         p.fill(r, g, b);
@@ -154,31 +155,23 @@ export class DecoCollapse {
 
                         
                         let cinv = Math.pow(vinv, 2)
-                        let r = lerp((color[0]/3)-10, color[0], cinv);
-                        let g = lerp(color[1]/3, color[1], cinv);
-                        let b = lerp(color[0] / 3, color[2], cinv);
-                        let tr = lerp(255, r, tilenfc.tintOn ? 1 : .5);
-                        let tg = lerp(255, g, tilenfc.tintOn ? 1 : .5);
-                        let tb = lerp(255, b, tilenfc.tintOn ? 1 : .5);
-
+                        let r = color[0] // lerp((color[0]/3)-10, color[0], cinv);
+                        let g = color[0] //lerp(color[1]/3, color[1], cinv);
+                        let b = color[0] // lerp(color[2] / 3, color[2], cinv);
+                        let end = (255 / 3);
+                       
                         if (Array.isArray(tilenfc.img)) {
                             for (let isu = 0; isu < tilenfc.img.length; isu++) {
-                                if (tilenfc.img[isu] === undefined) continue;
-                                let rtr = lerp(255, r, isu===0 ? .8 : .4);
-                                let rtg = lerp(255, g, isu===0 ? .8 : .4);
-                                let rtb = lerp(255, b, isu===0 ? .8 : .4);
                                 
-                                    p.tint(rtr, rtg, rtb)
-                                    p.image(tilenfc.img[isu], v.x - (v.w / 2), v.y - v.h, v.w * 2, v.h * 2)
-                                    p.noTint()
+                                p.image(tilenfc.img[isu], v.x - (v.w / 2), v.y - v.h, v.w * 2, v.h * 2)
                                
                             }
                         } else {
-                            p.tint(tr, tg, tb)
                             p.image(tilenfc.img, v.x - (v.w / 2), v.y - v.h, v.w * 2, v.h * 2)
-                            p.noTint()
                         }
                     }
+                    p.fill(255)
+                    p.rect(128,128,32,32)
                 }
             }
         }

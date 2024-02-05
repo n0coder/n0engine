@@ -78,8 +78,23 @@ n0tiles.set(name, tile); //then we insert the tile
 n0loader.startLoading("tiles", (loaded) => {
     //load the grasssprite
     //then insert into this
-    n0tiles.set('air', new Tile('assets/air0.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
-    n0tiles.set('grass0', new Tile('assets/grass0.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
+    //n0tiles.set('air', new Tile(['assets/air.png'], [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 4))
+    //n0tiles.set('vedgamo', new Tile(['assets/gamo/ved.png'], [[0,0,0],[0,0,1],[0,0,1],[0,0,0]], 1))
+    //n0tiles.set('ledgamo', new Tile(['assets/gamo/led.png'], [[0, 0, 0], [0, 0, 0], [1, 0, 0], [0, 0, 1]], 1))
+    //n0tiles.set('nedgamo', new Tile(['assets/gamo/ned.png'], [[0, 0, 1], [1, 0, 0], [0, 0, 0], [0, 0, 0]], 1))
+    //n0tiles.set('redgamo', new Tile(['assets/gamo/red.png'], [[1, 0,0], [0, 0, 0], [0, 0, 0], [1, 0, 0]], 1))
+    n0tiles.set('vedgamo', new Tile(['assets/gamo/vedo.png'], [[0,0,0],[1,1,1],[1,1,1],[0,0,0]], 1))
+    n0tiles.set('ledgamo', new Tile(['assets/gamo/ledo.png'], [[0, 0, 0], [0, 0, 0], [1, 1, 1], [1, 1, 1]], 1))
+    n0tiles.set('nedgamo', new Tile(['assets/gamo/nedo.png'], [[1, 1, 1], [1, 1, 1], [0, 0, 0], [0, 0, 0]], 1))
+    n0tiles.set('redgamo', new Tile(['assets/gamo/redo.png'], [[1,1,1], [0, 0, 0], [0, 0, 0], [1, 1, 1]], 1))
+
+
+        let rightdown = n0tiles.get("vedgamo");
+        let leftdown = n0tiles.get("ledgamo");
+        
+        console.log(leftdown, leftdown?.isUp(rightdown))
+
+    //n0tiles.set('grass0', new Tile('assets/grass0.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
     
     //n0tiles.set('air2', new Tile('assets/air2.png', [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 1))
     //n0tiles.set('grass0', new Tile('assets/grasssprite.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))

@@ -269,7 +269,7 @@ formBiome({
 })
 formBiome({
     name: "plains",
-    plaintags: [surface, ["dry"],["arid"],["moderate"]], tiles: [...grassy],
+    plaintags: [surface, ["dry"],["arid"],["moderate"]], tiles: [...grassy, "ledgamo", "vedgamo", "redgamo", "nedgamo"],
     sweettags: [surface, ["dry",...sweeta], ["arid",...sweeta],["moderate",...sweeta]],
     bittertags: [surface,["dry",...bittera],["arid",...bittera],["moderate",...bittera] ],
     difficulty: 1

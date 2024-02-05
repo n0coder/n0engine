@@ -151,11 +151,12 @@ export class n0FunctionCollapse {
             return { option: o, tile:tvt,  bias: multiple }
         })
         let choice = weightedRandom(myOptionvs);
-        n0fc.option = choice.option;
-        n0fc.tile = choice.tile;
+        n0fc.option = choice?.option;
+        n0fc.tile = choice?.tile;
         function checkDir(x, y, conditionFunc) {
-        var b = worldGrid.getTile(x, y)
+            var b = worldGrid.getTile(x, y)
             if (b == null) return;
+
             if (b.option != null) {
                 var bt = n0tiles.get(b.option);
                 options = options.filter(a => {
@@ -170,6 +171,11 @@ export class n0FunctionCollapse {
             return n0tiles.get(b.option);
         }
         
+    }
+
+    testingCheckdir() {
+
+
     }
 
     
