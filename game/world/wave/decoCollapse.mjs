@@ -25,10 +25,10 @@ export class DecoCollapse {
         this.setActive = setActive,this.renderOrder = -5;
         this.setActive(true)
 		
-		 this.w = 11 * 4, this.h = 11 * 4;
+		 this.w = 4 * 4, this.h = 4 * 4;
 		 this.i = 0, this.o = 0;
         worldGrid.x = -150+111+(this.w*15);
-        worldGrid.y = 230+(this.h*75);
+        worldGrid.y = 230+(this.h*285);
          this.alea = Alea("n0"), this.valea = Alea("n0v");
         this.nfc = new n0FunctionCollapse(Alea("nano"))
          this.nfc.testingCheckdir();
@@ -50,9 +50,12 @@ export class DecoCollapse {
 		if (!this.ready) return;
         for (let i = 0; i < w; i++) {
             for (let o = 0; o < h; o++) {
-                var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
-                if (tile) continue;                
-                tile = new Tile(x + i, y + o)
+                var tile = worldGrid.getTile(x+i, y+o)
+                if (tile) continue;     
+                
+                let wx = worldGrid.x, wy = worldGrid.y;
+                tile = new Tile(wx + x + i, wy + y + o)
+                tile.wx = x+i, tile.wy = y+o;
 				tile.build([buildFactors, buildBiome])
                 
                 if (tile.biome === null) {
@@ -66,9 +69,9 @@ export class DecoCollapse {
                 }
                 tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9; //can't walk through an 8               
 
+                worldGrid.setTile(x+i,y+o, tile)
 				if (this.useNfc)
 					tile.build(this.nfc.buildn0Collapse)
-                worldGrid.tiles.set(`${x + i}, ${y + o}`, tile)
             }
         }
         //if (this.useNfc)            this.nfc.blocksBiome(x, y, w, h, 4)
@@ -77,11 +80,8 @@ export class DecoCollapse {
 	draw() {
 		//i need a way to display specifically the nfc output...
 		if (!this.ready) return;
-        var x = worldGrid.x;
-        var y = worldGrid.y;
-
         var c = worldGrid.chunkSize * 2; //grid space
-        this.genChunk( (this.i * (c * 2)) + x, (this.o * c) + y, c * 2, c)
+        this.genChunk( (this.i * (c * 2))  , (this.o * c) , c * 2, c)
         
         this.i++;
         if (this.i >= 9) {
@@ -96,7 +96,7 @@ export class DecoCollapse {
         for (let i = 0; i < this.w + 1; i++) {
             for (let o = 0; o < this.h + 1; o++) {
                 var v = worldGrid.gridBoundsScreenSpace(i, o, 1, 1);
-                var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
+                var tile = worldGrid.getTile(i, o)
                 if (tile && tile.biome) {
                         let e = tile.genCache.get("elevation");
                         let vinv = inverseLerp(e.minm, e.maxm, e.sum)                       
@@ -134,7 +134,7 @@ export class DecoCollapse {
         for (let i = 0; i < this.w + 1; i++) {
             for (let o = 0; o < this.h + 1; o++) {
                 var v = worldGrid.gridBoundsScreenSpace(i, o, 1, 1);
-                var tile = worldGrid.tiles.get(`${x + i}, ${y + o}`)
+                var tile = worldGrid.getTile(i,o)
                 if (tile && tile.biome) {
                     let tilenfc = tile.n0fc?.tile
                     if (tilenfc && tilenfc.img !== undefined) {                        

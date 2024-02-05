@@ -123,7 +123,7 @@ export class n0FunctionCollapse {
 
     }
     buildn0Collapse(tile) {
-        var { x, y } = tile;
+        var x = tile.wx, y = tile.wy
         let rules = tile.biome.tiles.filter(t => n0tiles.get(t))
         if (rules.length === 0) return;
 
@@ -132,12 +132,12 @@ export class n0FunctionCollapse {
         let n0fc = tile.n0fc;
         if (n0fc.option) return; 
         var options = n0fc.options.filter((o) => n0fc.noiseThresholdCondition(tile.genCache, o));
+        options = newCheckDir(x, y - 1, options, (a, b) => a.isUp(b))
+        options = newCheckDir(x + 1, y, options, (a, b) => a.isRight(b))
+        options = newCheckDir(x, y + 1, options, (a, b) => a.isDown(b))
+        options = newCheckDir(x - 1, y, options, (a, b) => a.isLeft(b))
         
         let later = []
-        checkDir(x, y - 1, (a, b) => a.isUp(b))
-        checkDir(x + 1, y, (a, b) => a.isRight(b))
-        checkDir(x, y + 1, (a, b) => a.isDown(b))
-        checkDir(x - 1, y, (a, b) => a.isLeft(b))
         var myOptionvs = options.map(o => {
             var tvt = n0tiles.get(o);
             if (!tvt) return null;
@@ -153,9 +153,22 @@ export class n0FunctionCollapse {
         let choice = weightedRandom(myOptionvs);
         n0fc.option = choice?.option;
         n0fc.tile = choice?.tile;
+        function newCheckDir(x, y, options, conditionFunc) {
+            var b = worldGrid.getTile(x, y)?.n0fc            
+            let option = b?.option;
+            if (option !== undefined) {
+                let tileB = b.tile;
+                return options.filter(a => {
+                    let tileA = n0tiles.get(a);
+                    if (tileA !== undefined) {
+                        return conditionFunc(tileA, tileB)
+                    }
+                })
+            } else return options;
+        }
         function checkDir(x, y, conditionFunc) {
             var b = worldGrid.getTile(x, y)
-            if (b == null) return;
+            if (b == null) return; //early return is jumping the gun a bit huh
 
             if (b.option != null) {
                 var bt = n0tiles.get(b.option);
