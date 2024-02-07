@@ -110,3 +110,30 @@ console.log(calculateWeight(1, .9))
 console.log(calculateWeight(1, 1))
 let poso = 2, pos = 2;
 console.log( )
+
+// on every dimension gather the min maxes of biomes
+// we should expand the minmax into smaller local zone minmaxes
+
+// min - .1, max + .1
+// of every biome, keeping track of overlaps
+// note every overlap, so we can form transition tiles
+
+// we'll shift the probabilities based on the side of the biome
+// all the way in the forest, we have full trees, 
+// all the way in the plains, we have none or few, 
+// for a grass to sand type situation, we do the probability shifting
+// but also make halfway there be full transition tiles.
+
+
+// reminder, this is an 8 or 9 dimensional algorithm, so, 
+// we should not need to worry too much about directional artifacting
+// since we're not only placing the tiles based on it's local position
+// but also it's world factors and probabilities/weights
+
+// probability: a tile's individual chance to be chosen
+// weight: the likelyhood to see a tile given higher (or specific value) factors
+// (i can't tell which, which means we need a weight value modifier)
+// 1 on humidity could be full humidity = full probability...
+// or higher humidity = higher probability
+// but i think i like the idea of distance based
+// 1 on humidity means it's full probability at 1 humidity, lower as it falls off?
