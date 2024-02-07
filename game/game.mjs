@@ -137,3 +137,15 @@ console.log( )
 // or higher humidity = higher probability
 // but i think i like the idea of distance based
 // 1 on humidity means it's full probability at 1 humidity, lower as it falls off?
+
+let cw = calculateWeight;
+
+let hapiness = .2
+let unhappy = cw(-1, hapiness)
+let neutral = cw(0, hapiness)
+let happy = cw(1, hapiness)
+
+console.log([unhappy, neutral, happy])
+
+// this is half of the algorithm, this blends probabilities over a space...
+// the full space... how will we map probabilites to the transition section?
