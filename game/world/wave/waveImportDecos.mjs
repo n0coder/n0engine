@@ -78,7 +78,7 @@ n0tiles.set(name, tile); //then we insert the tile
 n0loader.startLoading("tiles", (loaded) => {
     //load the grasssprite
     //then insert into this
-    //n0tiles.set('air', new Tile(['assets/air.png'], [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 4))
+    n0tiles.set('air', new Tile(['assets/air.png'], [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 4))
     n0tiles.set('vedgamo', new Tile(['assets/gamo/ved.png'], [[0,0,0],[0,0,1],[0,0,1],[0,0,0]], 1))
     n0tiles.set('ledgamo', new Tile(['assets/gamo/led.png'], [[0, 0, 0], [0, 0, 0], [1, 0, 0], [0, 0, 1]], 1))
     n0tiles.set('nedgamo', new Tile(['assets/gamo/ned.png'], [[0, 0, 1], [1, 0, 0], [0, 0, 0], [0, 0, 0]], 1))

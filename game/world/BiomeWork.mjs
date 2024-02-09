@@ -219,7 +219,7 @@ formBiome({
 
 formBiome({
     name: "deepwater",
-    plaintags: ["deep"], tiles: [],
+    plaintags: ["deep"], tiles: ["ledogamo",  "vedogamo", "redogamo", "nedogamo"],
     sweettags: ["deep", ...sweeta],
     bittertags: ["deep", ...bittera],
     difficulty: 5
@@ -233,7 +233,7 @@ formBiome({
 })
 formBiome({
     name: "water",
-    plaintags: ["low"], tiles: [],
+    plaintags: ["low"], tiles: ["ledgamo",  "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
     sweettags: ["low", ...sweeta],
     bittertags: ["low",...bittera],
     difficulty: 4

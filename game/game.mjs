@@ -7,6 +7,7 @@ import { DecoCollapse } from "./world/wave/decoCollapse.mjs";
 import { clamp, inverseLerp, lerp } from "../engine/n0math/ranges.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../engine/core/p5engine.mjs";
+import { gameW } from "../engine/n0config.mjs";
 // we need to form a basic world generation layout for the nanos, something simple and cute
 
 // form based on the nanos size, a realtive difficulty to find water, which will then change based on humidity and temperature
@@ -15,8 +16,8 @@ import { p } from "../engine/core/p5engine.mjs";
 //the world is already really good, we just need to improve the bitter/sugar biome techs
 
 // we also need to test drive searching for water
-//var bfc = new DecoCollapse()
-//var mc = new DebugCursor();
+var bfc = new DecoCollapse()
+var mc = new DebugCursor();
 
 var abi = new Nanoai("abi",14, 12)
 var n0 = new Nanoai("n0", 12,12); 
@@ -71,6 +72,20 @@ let pi = p - len, po = p + len;
 console.log([i, p, o], [i, pi, po, o])
 */
 //cardioid?
+
+
+function calculateWeight(poso, pos, weight = .5) {
+  
+	return (-Math.pow(clamp(0,1, Math.abs(pos-poso)), weight))+1 //we add 1 to the end to pull the flipped value out of the ground
+  }
+
+  let cw = calculateWeight;
+
+  let hapiness = .2
+  let unhappy = cw(-1, hapiness)
+  let neutral = cw(0, hapiness)
+  let happy = cw(1, hapiness)
+  console.log([unhappy, neutral, happy])
 class iopVisualizer {
 	constructor() {
 		this.start = -1, this.end = 1;
@@ -78,6 +93,51 @@ class iopVisualizer {
 		this.length = .1;
 	}
 	draw() {
+		let startX = 0, startY = 0
+		let endX = 30*4, endY = 20*4;
+		for (let x = startX; x < endX; x++) {
+			for (let y = 1*4; y < 2*4; y++) {
+				var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1);
+				var invPos = lerp(-1, 1, inverseLerp(startX, endX, x));
+				let biomi = cw(-1, invPos*10)
+				let biomiR = 255 * biomi
+				let biomiG = 111 * biomi
+				let didi =  cw(0, invPos*10)
+				let didiR = 255 * didi;
+				let didiG = 255 * didi;
+				let midi =  cw(1, invPos*10)
+				let midiR = 111 * midi;
+				let midiG = 255 * midi;
+				p.fill (biomiR+didiR+midiR,biomiG+didiG+midiG,111);
+				p.rect(v.x, v.y, v.w, v.y)
+			}
+			
+		}
+		let size = 8;
+		
+		for (let x = startX; x < endX; x++) {
+			for (let y = 8; y < 12; y++) {
+				var v = worldGrid.gridBoundsScreenSpace(x, y, 1, 1);
+				var invPos = lerp(-1, 1, inverseLerp(startX, endX, x));
+				
+				let biomiR = 255 
+				let biomiG = 111 
+				let didiR = 255 
+				let didiG = 255 
+				let midiR = 111 
+				let midiG = 255 
+
+				let start = -1;
+				let end = 1;
+				let mid = .5
+
+
+				p.fill (biomiR+didiR+midiR,biomiG+didiG+midiG,111);
+				p.rect(v.x, v.y, v.w, v.y)
+			}			
+		}
+		
+
 		let x = 128, y = 64;
 		p.fill(255, 111,111)
 		p.ellipse(x + (this.start * 32), y, 4)
@@ -100,16 +160,6 @@ class iopVisualizer {
 let iop = new iopVisualizer();
 cosmicEntityManager.addEntity(iop);
 
-function calculateWeight(poso, pos, weight = .5) {
-  
-  return (-Math.pow(clamp(0,1, Math.abs(pos-poso)), weight))+1 //we add 1 to the end to pull the flipped value out of the ground
-}
-console.log(calculateWeight(-1, 1))
-console.log(calculateWeight(0, 1))
-console.log(calculateWeight(1, .9))
-console.log(calculateWeight(1, 1))
-let poso = 2, pos = 2;
-console.log( )
 
 // on every dimension gather the min maxes of biomes
 // we should expand the minmax into smaller local zone minmaxes
@@ -138,14 +188,7 @@ console.log( )
 // but i think i like the idea of distance based
 // 1 on humidity means it's full probability at 1 humidity, lower as it falls off?
 
-let cw = calculateWeight;
-
-let hapiness = .2
-let unhappy = cw(-1, hapiness)
-let neutral = cw(0, hapiness)
-let happy = cw(1, hapiness)
-
-console.log([unhappy, neutral, happy])
 
 // this is half of the algorithm, this blends probabilities over a space...
 // the full space... how will we map probabilites to the transition section?
+

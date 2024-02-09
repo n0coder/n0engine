@@ -25,7 +25,7 @@ export class DecoCollapse {
         this.setActive = setActive,this.renderOrder = -5;
         this.setActive(true)
 		
-		 this.w = 4 * 4, this.h = 4 * 4;
+		 this.w = 30 * 4, this.h = 20 * 4;
 		 this.i = 0, this.o = 0;
         worldGrid.x = -150+111+(this.w*15);
         worldGrid.y = 230+(this.h*285);
