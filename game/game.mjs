@@ -192,3 +192,18 @@ cosmicEntityManager.addEntity(iop);
 // this is half of the algorithm, this blends probabilities over a space...
 // the full space... how will we map probabilites to the transition section?
 
+// todo: figure out a visual/data stablization
+// we need the spaces to match the ranges
+// what i mean is to say in a space of 
+
+// -1 to 1, we need to be able to single out -.1 to .1 to use to blend
+let value = 0;
+let outout = 0;
+//(something to note about cw: the value is inverse space )
+// a value of 10 makes the cw work in .1 space. (100 is .01)
+// this is because we're working in whole 1 range, and 1 to 10, is .1 to 1 
+// this is value expansion based forming. how can we learn more about value expansion?
+
+outout += (/* desert * */ cw(-1, value))
+outout += (/* desertPlainsTransition * */ cw(0, value))
+outout += (/* plains * */ cw(1, value));
