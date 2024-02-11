@@ -207,3 +207,10 @@ let outout = 0;
 outout += (/* desert * */ cw(-1, value))
 outout += (/* desertPlainsTransition * */ cw(0, value))
 outout += (/* plains * */ cw(1, value));
+
+//this outout is doing a form of gradient, a form of falloff system for weights
+// it's a blending tech for values that need a way to becomes less rare away from
+// a point or threshold. biomes are a collection of points along 8 dimensiions
+// these dimensions are physical dymensions so there are coordinates in all space
+
+//(i will fully admit that i'm pushing these to get my daily streak to stay while my testing device is not funcitonal)
