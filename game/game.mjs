@@ -214,3 +214,8 @@ outout += (/* plains * */ cw(1, value));
 // these dimensions are physical dymensions so there are coordinates in all space
 
 //(i will fully admit that i'm pushing these to get my daily streak to stay while my testing device is not funcitonal)
+
+// when i figure out how to blend one dimension, i'll blend two dimensions
+// then i will blend all dimensions
+
+//a
