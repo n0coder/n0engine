@@ -218,4 +218,7 @@ outout += (/* plains * */ cw(1, value));
 // when i figure out how to blend one dimension, i'll blend two dimensions
 // then i will blend all dimensions
 
-//a
+// a topic we need to consider is how we can make it consistant
+// to improve working with this kind of space
+// we need a good understanding of how this space works in multiple ways
+// so we can form systems around this issue
