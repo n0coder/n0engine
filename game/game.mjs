@@ -74,12 +74,9 @@ console.log([i, p, o], [i, pi, po, o])
 //cardioid?
 
 
-function calculateWeight(poso, pos, weight = .5) {
-  
+function cw(poso, pos, weight = .5) {
 	return (-Math.pow(clamp(0,1, Math.abs(pos-poso)), weight))+1 //we add 1 to the end to pull the flipped value out of the ground
   }
-
-  let cw = calculateWeight;
 
   let hapiness = .2
   let unhappy = cw(-1, hapiness)
@@ -222,3 +219,23 @@ outout += (/* plains * */ cw(1, value));
 // to improve working with this kind of space
 // we need a good understanding of how this space works in multiple ways
 // so we can form systems around this issue
+
+//on another note, we've made a cool tech that we can use as a proximity sensor
+//how can we use it as proximity detector? how do we cw in multiple dimensions?
+
+
+let dimensions = new Map([["x", 1], ["y", 2]]);
+let valueDimensions = new Map([["x", 1], ["y", 2]]);
+function multiDimensionalCW(dimensions, valueDimensions) {
+	// should it be multiplicative? no
+	//(we should compress the value by number of dimensions)
+	let len = dimensions.size;
+	let val = 0;
+	//one potential issue here is that we are not normalizing the radius of the dims
+	for (const [dim, val] of dimensions) {
+		let valDim = valueDimensions.get(dim) ?? 0
+		val += (cw(val, valDim)/len) 
+	}
+	return val
+}
+let outa = multiDimensionalCW(dimensions, valueDimensions)
