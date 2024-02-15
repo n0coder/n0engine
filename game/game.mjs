@@ -230,11 +230,12 @@ function multiDimensionalCW(dimensions, valueDimensions) {
 	// should it be multiplicative? no
 	//(we should compress the value by number of dimensions)
 	let len = dimensions.size;
-	let val = 0;
+	let val = 1;
 	//one potential issue here is that we are not normalizing the radius of the dims
 	for (const [dim, val] of dimensions) {
-		let valDim = valueDimensions.get(dim) ?? 0
-		val += (cw(val, valDim)/len) 
+		let valDim = valueDimensions.get(dim) 
+		if (valDim !== undefined) //no value, no multiplication
+			val *= (cw(val, valDim)/len) 
 	}
 	return val
 }
@@ -245,7 +246,7 @@ function multiDimensionalW(dimensions, valueDimensions) {
 	let val = 0;
 	//one potential issue here is that we are not normalizing the radius of the dims
 	for (let i = 0; i > len;i++){
-		val += (cw(dimensions[i], valueDimensions[i])/len) 
+		val *= (cw(dimensions[i], valueDimensions[i])) 
 	}
 	return val
 }
@@ -258,4 +259,8 @@ let lav2d = [0, 5]
 // expect .5 output// no we should have 0 as output... which?!
 let out = multiDimensionalW(la2d, lav2d);
 
-// this 
+// thinking of .5 as output comes from the idea of total weighting
+// however, 0 as output would have a different tech
+// think if we are hot, but dry, we won't have wet plants
+// so removing the wet plants from the equation is important
+// now, as i think this way i can't imagine a single reason to do the .5 additive style
