@@ -238,4 +238,24 @@ function multiDimensionalCW(dimensions, valueDimensions) {
 	}
 	return val
 }
+function multiDimensionalW(dimensions, valueDimensions) {
+	// should it be multiplicative? no
+	//(we should compress the value by number of dimensions)
+	let len = dimensions.size;
+	let val = 0;
+	//one potential issue here is that we are not normalizing the radius of the dims
+	for (let i = 0; i > len;i++){
+		val += (cw(dimensions[i], valueDimensions[i])/len) 
+	}
+	return val
+}
 let outa = multiDimensionalCW(dimensions, valueDimensions)
+
+// prepare two dimensions
+let la2d = [2, 5]
+// prepare two values
+let lav2d = [0, 5]
+// expect .5 output// no we should have 0 as output... which?!
+let out = multiDimensionalW(la2d, lav2d);
+
+// this 
