@@ -264,3 +264,7 @@ let out = multiDimensionalW(la2d, lav2d);
 // think if we are hot, but dry, we won't have wet plants
 // so removing the wet plants from the equation is important
 // now, as i think this way i can't imagine a single reason to do the .5 additive style
+
+// what if we pomni xddcc 
+// what if we add nano pomni
+// nano: pomi
