@@ -268,3 +268,8 @@ let out = multiDimensionalW(la2d, lav2d);
 // what if we pomni xddcc 
 // what if we add nano pomni
 // nano: pomi
+
+// so we need to account for the falloff strength
+// |(value + offset) - target| + outerOffset
+// (|(value+offset)|-target + outerOffset)
+// neither of these control falloff...
