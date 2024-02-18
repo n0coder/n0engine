@@ -277,3 +277,10 @@ let out = multiDimensionalW(la2d, lav2d);
 //so imagine this, sweet cologns, perfumes, and even clothes washing stuff
 //like imagine, pancake or vanilla or cinamon flavor soaps and deturgents
 // sweet deoderants... a cool idea...
+
+// n0 abi pomi o2 vampi 
+// play around with spaces, like, line intersections
+
+//like, form two lines along some axis
+//do axis checking to see where along the axis we are
+//we need to convert that space also along falloff space
