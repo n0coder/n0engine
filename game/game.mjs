@@ -273,3 +273,7 @@ let out = multiDimensionalW(la2d, lav2d);
 // |(value + offset) - target| + outerOffset
 // (|(value+offset)|-target + outerOffset)
 // neither of these control falloff...
+
+//so imagine this, sweet cologns, perfumes, and even clothes washing stuff
+//like imagine, pancake or vanilla or cinamon flavor soaps and deturgents
+// sweet deoderants... a cool idea...
