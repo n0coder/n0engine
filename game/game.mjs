@@ -154,8 +154,9 @@ class iopVisualizer {
 		return poso;
 	}
 }
-let iop = new iopVisualizer();
-cosmicEntityManager.addEntity(iop);
+//this was ugly and got in the way, but it's nice to have to test bounds issues in the tecH
+//let iop = new iopVisualizer();
+//cosmicEntityManager.addEntity(iop);
 
 
 // on every dimension gather the min maxes of biomes
@@ -232,7 +233,7 @@ function multiDimensionalCW(dimensions, valueDimensions) {
 	let len = dimensions.size;
 	let val = 1;
 	//one potential issue here is that we are not normalizing the radius of the dims
-	for (const [dim, val] of dimensions) {
+	for (var [dim, val] of dimensions) {
 		let valDim = valueDimensions.get(dim) 
 		if (valDim !== undefined) //no value, no multiplication
 			val *= (cw(val, valDim)/len) 
