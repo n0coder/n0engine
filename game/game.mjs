@@ -233,7 +233,7 @@ function multiDimensionalCW(dimensions, valueDimensions) {
 	let len = dimensions.size;
 	let val = 1;
 	//one potential issue here is that we are not normalizing the radius of the dims
-	for (var [dim, val] of dimensions) {
+	for (let [dim, val] of dimensions) {
 		let valDim = valueDimensions.get(dim) 
 		if (valDim !== undefined) //no value, no multiplication
 			val *= (cw(val, valDim)/len) 
