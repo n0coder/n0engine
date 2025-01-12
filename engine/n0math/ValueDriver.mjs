@@ -1,10 +1,13 @@
-export class ValueDriver {
-  constructor(value) {
+
+class ValueDriver {
+  constructor(value, mode = "added") {
     this.value = value || 0;
   }
 
   getValue(x, y) {
-
+    if (typeof this.value === 'function') {
+        return this.value(x, y)
+    }
     if (typeof this.value === 'number') {
       return this.value;
     } else if (this.value.getValue != null) {
@@ -12,11 +15,13 @@ export class ValueDriver {
     } else if (Array.isArray(value)) {
       var sum = 0;
       this.value.forEach(v => {
-        if (typeof v === 'number') {
-          sum += v;
-        } else if (this.value.getValue) {
-          sum += this.value.getValue(x, y);
-        }
+        let o = 0;
+        if (typeof v === 'number') o = v 
+        else if (this.value.getValue) o = this.value.getValue(x, y);
+        if (mode ==="added") 
+          sum += o;
+        else if (mode === "multiplied")
+          sum *= o;        
       });
       return sum;
     } else {
