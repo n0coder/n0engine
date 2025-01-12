@@ -2,6 +2,7 @@
 class ValueDriver {
   constructor(value, mode = "added") {
     this.value = value || 0;
+    this.mode = mode;
   }
 
   getValue(x, y) {
