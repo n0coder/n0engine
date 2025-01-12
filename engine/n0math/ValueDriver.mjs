@@ -13,12 +13,12 @@ class ValueDriver {
     } else if (this.value.getValue != null) {
       return this.value.getValue(x, y);
     } else if (Array.isArray(value)) {
-      var sum = 0;
+      var sum = (this.mode === "multiplied") ? 1 : 0;
       this.value.forEach(v => {
         let o = 0;
         if (typeof v === 'number') o = v 
-        else if (typeof this.value === 'function') {
-          o = this.value(x, y)
+        else if (typeof v === 'function') {
+          o = v(x, y)
         }
         else if (v.getValue) 
           o = v.getValue(x, y);
