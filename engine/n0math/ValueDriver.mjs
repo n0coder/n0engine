@@ -17,7 +17,11 @@ class ValueDriver {
       this.value.forEach(v => {
         let o = 0;
         if (typeof v === 'number') o = v 
-        else if (this.value.getValue) o = this.value.getValue(x, y);
+        else if (typeof this.value === 'function') {
+          o = this.value(x, y)
+        }
+        else if (v.getValue) 
+          o = v.getValue(x, y);
         if (mode ==="added") 
           sum += o;
         else if (mode === "multiplied")
