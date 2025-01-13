@@ -13,17 +13,17 @@ function inverseLerp(i,o,c) {
   return (c-i)/(o-i)
 }
 // end of temporary code due to testing in p5 online editor
-
-export function falloff(f,a,b, p = 1) {
+//exports commented out to run in p5.js web editor
+/*export*/ function falloff(f,a,b, p = 1) {
   return Math.pow(clamp01((f-Math.abs(b-a))/f), p);
 }
-export function transition (x,  pos, foff, tpower = 0.1, power = 1) {
+/*export*/ function transition (x,  pos, foff, tpower = 0.1, power = 1) {
   let mid = falloff(foff, pos, x, tpower) //transition tiles flat curve at position 64 
   let end = inverseLerp(pos-foff, pos+foff, x) //inverse transition for attributes from first section to third section
-  let over = clamp01(ao); //first to third clamp no exponent
-  end = (pow(clamp01(ao), power));
+  let over = clamp01(end); //first to third clamp no exponent
+  end = (pow(clamp01(end), power));
   let start = inverseLerp(pos+foff, pos-foff, x) //inverse transition for attributes from third section to first section
-  start = (pow(clamp01(ap), power));
+  start = (pow(clamp01(start), power));
  return [start, mid, end, over];
 }
 
