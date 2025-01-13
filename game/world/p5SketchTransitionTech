@@ -1,0 +1,49 @@
+
+// start of temporary code due to testing in p5 online editor //(this is a large p5.js project and this file is functional outside the dev environment)
+function clamp01(a) {
+  if (a < 0) return 0
+  if (a > 1) return 1
+  return a; 
+}
+function lerpi(i,o,c) {
+  return (i*(1-c))+(o*(c))
+}
+
+function inverseLerp(i,o,c) {
+  return (c-i)/(o-i)
+}
+// end of temporary code due to testing in p5 online editor
+
+export function falloff(f,a,b, p = 1) {
+  return Math.pow(clamp01((f-Math.abs(b-a))/f), p);
+}
+export function transition (x,  pos, foff, tpower = 0.1, power = 1) {
+  let mid = falloff(foff, pos, x, tpower) //transition tiles flat curve at position 64 
+  let end = inverseLerp(pos-foff, pos+foff, x) //inverse transition for attributes from first section to third section
+  let over = clamp01(ao); //first to third clamp no exponent
+  end = (pow(clamp01(ao), power));
+  let start = inverseLerp(pos+foff, pos-foff, x) //inverse transition for attributes from third section to first section
+  start = (pow(clamp01(ap), power));
+ return [start, mid, end, over];
+}
+
+//logically instead of combining the techs here with lerps, we would apply the inverses directly to weights, the lerps here are to visualize the line of value. if we multiply ai, ao, or ap by a number the visual will adapt. we're running ai*2 because it exists at the .5 or halfway point of the cubic bezier
+
+
+//temporary p5.js init from the p5.js web editor
+function setup() {
+  createCanvas(400, 400);
+}
+
+function draw() {
+  for (let i = 0; i < 400; i++) {
+    //cubic bezier the tech to show line of value
+    //lerp the values  (this would be done on tile weights, or in this case the raw 01 data) 
+
+    let [start, mid, end, over] = transition(200, i, 100) //
+    let bi = lerpi(start*10, mid*200*2, over) 
+    let bo = lerpi(mid*200*2, end*10, over) 
+    let ci = lerpi(bi, bo, over)
+    ellipse(i, ci, 10)
+  }
+}
