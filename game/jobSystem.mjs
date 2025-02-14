@@ -16,20 +16,33 @@ globalThis.n0 = n0;
 globalThis.abi = abi;
 
 
+jobTasksa.set("play", function(...args) { //this is singleplayer play function practically
+    return {
+        name: "play",
+        args, working: false, job:null,
+        interactions: [["playing"]],
+        requires: [], done: [],
+        work: function(nano, a2) {
+            console.log("hi",this.done)
+            this.done();
+        }
+    }
+})
 jobTasksa.set("playtogether",function(...args) { 
     let game = args[0]    
     let playerCount = game.playerCount ?? args[1];
     if (playerCount === undefined) return null; //null means disolve job (since i didn't make a null check this will cause an error)
     
     let task = {
-        name: "play",
+        name: "playtogether",
         args, working: false, job:null,
-        requires: [],
         interactions: [["playing"]],
-        work: function(nano, done) {
-            console.log("ready to start game?", args)
+        requires: [], //filling with pt
+        work: function(nano, a2) {
+            console.log("hkioiiio",this.done)
+            this.done()
         }
-    } 
+    }
     for (let c = 0; c < playerCount; c++) {
         //one flaw of the job system, copies of a task need to be different from eachother to be considered different
         //(i made it this way, so that multiple tasks requiring a water source wouldn't each need their own water source)
@@ -38,19 +51,19 @@ jobTasksa.set("playtogether",function(...args) {
     return task;
 })
 
-jobTasksa.set("play", function(...args) { //this is singleplayer play function practically
-    return {
-        name: "play",
-        args, working: false, job:null,
-        interactions: [["playing"]],
-        work: function(nano, done) {
-            game.play(nano);
-        }
-    }
-})
 
-//this was an interesting test i don't like it
+//this was an interesting test i don't like it?
 //will have to explore more styles of solving this problem
+
+n0radio.findJob(n0); //naturally this would make them start working if a job is available, but here there's no job just yet
+n0radio.findJob(abi); 
+
+let job2 = createJobu([{
+    play() {console.log("playing")}, playerCount:2
+}], "playtogether", "hi"); 
+n0radio.postJob("general", job2);  //the job post will tell the ais to start working
+
+
 
 let ticStyle = {
     cellSize: 32,
@@ -133,11 +146,16 @@ class TicTacToe {
                 }
 
                 var {x,y,w,h} = worldGrid.gridBoundsScreenSpace(g.x+4, g.y-1, 1,1);
+                x/=worldGrid.gridSize;
+                y/=worldGrid.gridSize;
                 var trap = this.nanos.get(a).trap
-                a.brain.doBefore(trap,"walk", x, y+5)
+                a.brain.doBefore(trap,"walk", x+4, y+5)
+                console.log(g, x,y)
                 a.brain.doBefore(trap,"look", "down")
                 a.brain.doBefore(trap, "ping", ping)
                 var {x,y,w,h} = worldGrid.gridBoundsScreenSpace(g.x+1, g.y-1, 1,1);
+                x/=worldGrid.gridSize;
+                y/=worldGrid.gridSize;
                 var trap = this.nanos.get(b).trap
                 b.brain.doBefore(trap,"walk", x, y+5)
                 b.brain.doBefore(trap,"look", "down")

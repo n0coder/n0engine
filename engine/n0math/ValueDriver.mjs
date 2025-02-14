@@ -1,5 +1,5 @@
 
-class ValueDriver {
+export class ValueDriver {
   constructor(value, mode = "added") {
     this.value = value || 0;
   }

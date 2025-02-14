@@ -204,12 +204,13 @@ class Radio {
                 c.jobs.push(job)
             }
             this.findNano(job, channel, key) //we want to tell any nanos currently waiting, that they can start working
-
         }
+        job.hire = ()=> {this.findNano(job, channel, key)}
     }
+    
     findNano(job, channel, key) {
+        console.log({job, channel, key})
         if (this.nanosSearching.size === 0) return;
-
         let stage = job.stages[job.stage]
         let nanos = this.nanosInChannel(channel, key)
         let tasks = stage.tasks;
@@ -226,38 +227,39 @@ class Radio {
                     bestNano = [o, t.b], bestScore = t.score;
                 }
             }
-            console.log({job, stage, bestNano})
             this.assignTask(job, stage, bestNano[0], bestNano[1])
 
-            nanos = this.nanosInChannel(channel, key);
+            //this.nanosInChannel(channel, key); //idk what this for
         }
         console.log("complete");
 
     }
 
     nanosInChannel(channel, c) {
+        console.log(this.nanosSearching)
         let nanos = Array.from(this.nanosSearching.keys())
         return nanos.filter((n) => (this.findChannel(channel, n) === this.findChannel(channel, c)));
     }
-
     assignTask(job, stage, task, nano) {
         console.log({stage, task, nano})
         let i = stage.tasks.indexOf(task);
         if (i != -1) {
             stage.tasks.splice(i,1) //remove from tasks
             stage.workIndex.set(nano, task);
+            console.log({goal: "giving nano task", nano, task })
             //give the nano the task...
-            nano.brain.doTask(task, (task)=>stage.taskComplete(job, stage,nano, task)) // ...
+            nano.brain.do(task, (task)=>{stage.taskComplete(job, stage,nano, task);console.log("yo")}) // ...
             this.nanosSearching.delete(nano); //remove from searching
         } 
     }
     findJob(key) {
-       
+        console.log(key);
         //what would we do if multiple nanos are a key
         //so we gotta find jobs where both nanos can work together well
         //say we insert nanoai team, they will queue up for jobs together
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
+        console.log(this.nanosSearching)
         console.log("(nano searching): nano is searching")
         let jobScores = [];
         function rateJobs(jobs, nano) {
@@ -269,6 +271,7 @@ class Radio {
                 jobScores.push([job, best])
             }
         }
+        c
         for (const [ckey, channel] of this.channels) {
             if (channel.getJobs) {
                 let jobs = channel.getJobs(key);
@@ -298,6 +301,10 @@ class Radio {
         let task = job[1].get(key).b
         this.assignTask(job[0], stage, task, key);
         
+    }
+    constructor(){
+        this.nanosSearching = new Map();
+        this.channels = new Map();
     }
 }
 export let n0radio = new Radio();

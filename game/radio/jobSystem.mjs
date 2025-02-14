@@ -2,6 +2,7 @@
 
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { n0radio } from "./n0radio.mjs";
 export var jobTasksa = new Map([
 
     ["smile", function(...args) {
@@ -100,6 +101,7 @@ var stageTemplate = {
     },
     taskComplete: (job, stage, nano, task)=> {
         stage.workIndex.delete(nano); //this remove the worker
+        n0radio.nanosSearching.set(nano, 1)
         stage.validateStage(job)
     },
     validateStage(job){
@@ -180,13 +182,17 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
     }
 }
 var job = {
+    hire: null,
     work: function(nano) {
         let currentStage = this.stages[this.stage];
         currentStage.work(this, nano);
     },
     stageComplete: function(stage) {
         //if the stage is complete, move onto the next stage
-        this.nextStage()
+        console.log(stage)
+        this.nextStage();
+        this.hire();
+        //tell radio to hire more
     }, 
     stageFailed: function(stage) {
         if (!stage.important) this.nextStage();
@@ -248,6 +254,7 @@ function scoreTask(task, nano, relationshipModifier = 1) {
 
 //this is how we can get the nanos relationship info
 function getRelationshipModifer(stage, nano) {
+    console.log(nano)
     let relationshipModifier = 1;
     console.warn("we need to set up relationships in nano identities here")
     let relationships = nano.identity.relationships;

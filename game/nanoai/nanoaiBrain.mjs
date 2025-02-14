@@ -116,6 +116,7 @@ export class NanoaiBrain {
     return (o.length === 1) ? o[0] : o
   } else {
       if (args[0]) task.done = args[0] 
+      found(task)
     return task;
   }
   }

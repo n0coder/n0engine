@@ -5,11 +5,11 @@ import { Soil } from "./farm/soil.mjs";
 import { Mommyai } from "./nanoai/mommyai.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs";
-startGlobalEntities(); 
+//startGlobalEntities(); 
 var nano = new Nanoai('n0',104,110);
 var nano2 = new Nanoai('abi',148, 128);
 
-var mommyai = new Mommyai('mommy', 158, 118)
+//var mommyai = new Mommyai('mommy', 158, 118)
 document.nanos = [nano, nano2]
 
 //
@@ -30,7 +30,7 @@ nano.brain.do("walk",128, 68)
 var seed = new Seed (66,0,Circle, 2)
 //nano.brain.do("pickup",seed);
 
-camera.follow(mommyai)
+//camera.follow(mommyai)
 var soil = new Soil(0, 0);
 
 //nano.brain.do("plant", soil, seed)

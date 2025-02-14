@@ -1,5 +1,3 @@
-
-import { BiomeFunctionCollapse } from "./world/wave/biomeFunctionCollapse.mjs"
 import { DebugCursor } from "./world/debugCursor.mjs"
 import {Nanoai} from "./nanoai/nanoai.mjs"
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
@@ -8,6 +6,8 @@ import { clamp, inverseLerp, lerp } from "../engine/n0math/ranges.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../engine/core/p5engine.mjs";
 import { gameW } from "../engine/n0config.mjs";
+import { deltaTime } from "../engine/core/Time/n0Time.mjs";
+import { perpandicular } from "../engine/n0math/vectorMath.mjs";
 // we need to form a basic world generation layout for the nanos, something simple and cute
 
 // form based on the nanos size, a realtive difficulty to find water, which will then change based on humidity and temperature
@@ -16,8 +16,34 @@ import { gameW } from "../engine/n0config.mjs";
 //the world is already really good, we just need to improve the bitter/sugar biome techs
 
 // we also need to test drive searching for water
-var bfc = new DecoCollapse()
-var mc = new DebugCursor();
+//var bfc = new DecoCollapse()
+//var mc = new DebugCursor();
+class Drawing{
+	constructor() {
+		this.x = 200;
+		this.y = 200;
+		this.r = 16;
+		this.t = 0;
+		this.s = 5;
+	}
+	draw() {
+		let s = ((1+Math.sin((this.t*3)+(3.14/4)))/2)
+		var i = Math.sin(this.t)*48*s*this.s
+		var o = Math.cos(this.t)*48*s*this.s;
+		
+		p.ellipse(this.x+i, this.y+o, 25*this.s*s);
+		var [i,o]=[-o,i];
+		p.ellipse(this.x+i, this.y+o, 25*this.s*s)
+		var [i,o]=[-o,i];
+		p.ellipse(this.x+i, this.y+o, 25*this.s*s)
+		var [i,o]=[-o,i];
+		p.ellipse(this.x+i, this.y+o, 25*this.s*s)
+		this.t+=deltaTime;
+	}
+}
+let drawing = new Drawing()
+cosmicEntityManager.addEntity(drawing)
+
 
 var abi = new Nanoai("abi",14, 12)
 var n0 = new Nanoai("n0", 12,12); 

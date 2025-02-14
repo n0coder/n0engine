@@ -12,20 +12,11 @@ export class Soil {
         this.inventory = []
 
         this.maxCount = 2;
-        this.pops = pops
+        this.pops = pops;
         this.setActive = setActive;
         this.setActive(true);
-
-        var [gx, gy] = worldGrid.screenToWorldPosition(x, y)
-        var rect = worldGrid.getScreenTileRect(gx, gy);
-        this.rect = rect
     }
     draw() {
-        var {x,y,w,h} = this.rect;
-        p.fill(160, 130, 130)
-        p.rect(x-(w/2),y-(h/2),w,h);
-        p.fill(255)
-        p.ellipse(this.x, this.y, 5)
         this.inventory.forEach(p=>{
             if (p.s <= p.ms) 
                 p.s += deltaTime*10

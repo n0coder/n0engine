@@ -1,6 +1,6 @@
 //forced canvas size, kept since p5.js's width and height variables are window based
-export let gameH = 512//window.innerHeight;
-export let gameW = 512//window.innerWidth// gameH//*1.77777;
+export let gameH = window.innerHeight;
+export let gameW = window.innerWidth// gameH//*1.77777;
 export let gameScreenMode = new Map([
 	["square", (wh) => {
 		gameH = wh, gameW= wh;
@@ -16,7 +16,8 @@ export let gameScreenMode = new Map([
 		gameH = scale, gameW= ratio;
 	}]
 ]);
-gameScreenMode.get("fullCanvas")(16, 9, 512) 
+
+gameScreenMode.get("square")(512*.8) 
 // someone saw my idea and said that my code causes performance issues
 // this ocde is run once, it runs when the player hits a button
 
