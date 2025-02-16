@@ -1,8 +1,6 @@
-import { RangeMap } from "../../engine/collections/RangeMap.mjs";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { blend, clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
-import { getABiome } from "./BiomeWork.mjs";
+import Alea from "alea";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
+import { createNoise2D } from "simplex-noise";
 
 export const worldFactors = new Map();
 export function buildFactors(tile) {
@@ -30,7 +28,7 @@ export function getBiome(x, y) {
 }
 export var offsetX = 0, offsetY = 0
 export const one = false; //to display only one pixel (helpful for debugging)
-var vvscale = .25*.4
+var vvscale = .15
 
 
 
@@ -137,3 +135,8 @@ var sugarzone = new NoiseGenerator({
 //worldFactors.set("elevation", sugarzone)
 worldFactors.set("sugar", sugarzonea)
 worldFactors.set("sugarzone", sugarzone)
+
+let alea = Alea("n0");
+for (const [k, v] of worldFactors) 
+	v.init(createNoise2D(alea));   
+		 

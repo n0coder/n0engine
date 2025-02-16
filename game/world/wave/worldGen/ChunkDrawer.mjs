@@ -3,20 +3,33 @@ import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp } from "../../../../engine/n0math/ranges.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
-let c = worldGrid.chunkSize *2
+let c = worldGrid.chunkSize, chunks = 10
 export function drawChunks(nano) {
+    for (let xc = -chunks; xc <= chunks; xc++) {
+        for (let yc = -chunks; yc <= chunks; yc++) {
+            let nx = (xc * c) + nano.x, ny = (yc * c) + nano.y
 
-    for (let xc = -c; xc < c; xc++) {
-        for (let yc = -c; yc < c; yc++) {
-            let nx = xc + nano.x, ny = yc + nano.y
-            let { x, y } = worldGrid.screenToGridPoint(nx * worldGrid.gridSize, ny * worldGrid.gridSize)
-
-            genTile(x, y)
-            let tile = worldGrid.getTile(x, y);
+            let dis =  Math.hypot(nano.x - nx, nano.y - ny)<nano.sightRadius
+            if (dis) {
+                let { x, y } = worldGrid.screenToChunkPoint(nx * worldGrid.gridSize, ny * worldGrid.gridSize)
+                drawChunk(x*c, y*c)
+            }
+        }
+    }
+}
+export function drawChunk(x, y) {
+    for (let xc = 0; xc < c; xc++) {
+        for (let yc = 0; yc < c; yc++) {
+            let xx = xc+x, yy = yc+y
+            genTile(xx, yy)
+            let tile = worldGrid.getTile(xx, yy);
             if (tile && tile.biome) {
                 let color = tile.biome.colorsugar(tile)
                 p.fill(color);
-                p.rect(x * worldGrid.gridSize, y * worldGrid.gridSize, worldGrid.gridSize, worldGrid.gridSize)
+                let t = tile.genCache.get("elevation")
+                let z = inverseLerp(t.minm, t.maxm, t.sum)
+                //p.fill(z*255)
+                p.rect(xx * worldGrid.gridSize, yy * worldGrid.gridSize, worldGrid.gridSize, worldGrid.gridSize)
             }
         }
     }

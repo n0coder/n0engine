@@ -1,6 +1,7 @@
 import { deltaTime } from "../Time/n0Time.mjs";
 import { defaultScale, gameH, gameW } from "../../n0config.mjs";
 import { p } from "../p5engine.mjs";
+import { worldGrid } from "../../grid/worldGrid.mjs";
 
 export class Camera {
     constructor (x=0,y=0, s=-1) {
@@ -44,8 +45,9 @@ export class Camera {
             this.y += vy*deltaTime;
         }
         //render
+        //p.scale(this.s);
         p.translate(this.x,this.y)        
-        p.scale(this.s);
+        
         p.ellipse(gameW/2, gameH/2, 3, 3)
     }
 }

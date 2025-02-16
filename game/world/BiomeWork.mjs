@@ -11,14 +11,14 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 //lets split world height into 2 ideas
 //erosion, and 
 var height = new RangeMap(0, 1)
-height.add("deep", .015).add("low", 1).add("border", .015)
-height.add("surface", 5).add("high", 1.3).add("cloud", .1)
-addBiomeFactors(height, "elevation");
+height.add("deep", .15).add("low", .15).add("border", .35)
+height.add("surface", 1).add("high", .1).add("cloud", .1)
+addBiomeFactors(height, "elevation",worldFactors);
 
 var squish = new RangeMap(0, 1);
 squish.add("peaks", .22).add("mountainous", .405).add("hilly", .1525)
 squish.add("rolling", 0.2725).add("folds", .4).add("shattered", .1).add("flat", .55)
-addBiomeFactors(squish, "squish");
+addBiomeFactors(squish, "squish",worldFactors);
 
 //forcing the mid biome gen is, not going to work well.
 
@@ -32,22 +32,22 @@ console.log(pop([true, false]))
 var temp = new RangeMap(0, 1)
 temp.add("frozen", 1).add("cold", 1).add("neutral", 1)
 temp.add("warm", 1).add("hot", 1)
-addBiomeFactors(temp, "temperature");
+addBiomeFactors(temp, "temperature",worldFactors);
 
 var humidity = new RangeMap(0, 1)
 humidity.add("arid").add("dry").add("moderate")
 humidity.add("moist").add("wet");
-addBiomeFactors(humidity, "humidity");
+addBiomeFactors(humidity, "humidity",worldFactors);
 
 var river = new RangeMap(0, 1)
 river.add("river", 1) //the split i thought
 river.add("riverborder", .1) //lowest part of the map i thought
-river.add("otheriver", 3.5) //bigest part i thought
-addBiomeFactors(river, "rivers");
+river.add("otheriver", 7) //bigest part i thought
+addBiomeFactors(river, "rivers",worldFactors);
 
 var sugarzone = new RangeMap(0, 1)
 sugarzone.add("bitterzone",2).add("plainzone",2).add("sweetzone",2)
-addBiomeFactors(sugarzone, "sugarzone");
+addBiomeFactors(sugarzone, "sugarzone",worldFactors);
 var sugar = new RangeMap(0, 1)
 sugar.add("bitter",2).add("plain",1.25).add("sweet",2)
 //addBiomeFactors(sugar, "sugar");
@@ -55,7 +55,7 @@ sugar.add("bitter",2).add("plain",1.25).add("sweet",2)
 
 var fantasy = new RangeMap(0, 1);
 fantasy.add("ordinary").add("fantasy");
-addBiomeFactors(fantasy, "fantasy");
+addBiomeFactors(fantasy, "fantasy",worldFactors);
 
 
 export var biomes = []
@@ -224,6 +224,7 @@ formBiome({
     bittertags: ["deep", ...bittera],
     difficulty: 5
 })
+/*
 formBiome({
     name: "icydeepwater",
     plaintags: ["deep", "frozen"], tiles: [],
@@ -231,6 +232,7 @@ formBiome({
     bittertags: ["deep", "frozen",...bittera],
     difficulty: 6 
 })
+*/
 formBiome({
     name: "water",
     plaintags: ["low"], tiles: ["ledgamo",  "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
@@ -448,7 +450,7 @@ export function buildBiome(tile) {
             if (!factor) {
                 return false;
             }
-            var sum = inverseLerp(factor.minm, factor.maxm, factor.sum)
+            var sum = factor.sum;// inverseLerp(factor.minm, factor.maxm, factor.sum)
             return sum > s.min && sum < s.max;
         });
         if (pop(mappedBiome)) biomex.push(b);

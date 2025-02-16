@@ -22,11 +22,7 @@ export class WorldGenerator {
 		 this.w = 22 * c, this.h = 10 * c;
 		 this.i = 0, this.o = 0;
 
-         this.alea = Alea("n0"), this.valea = Alea("n0v");
-        
-        for (const [k, v] of worldFactors) 
-			 v.init(createNoise2D(this.alea));   
-		 
+         
     }
     init(loaded) {
         loaded?.()

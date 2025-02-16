@@ -7,10 +7,10 @@ export class RangeMap {
     this.array = [];
     this.total = 0;
   }
-  add(biome, weight = 1) {
-    weight |= 1;
+  add(biome, weight=1) {
     this.array.push({ biome, weight });
     this.total += weight;
+    console.log({biome, weight, total: this.total})
     return this;
   }
   remove(biome) {
@@ -22,8 +22,8 @@ export class RangeMap {
     return this;
   }
   exportRanges(title, i, o) {
-    i = i != null ? i : this.i != null ? this.i : 0
-    o = o != null ? o : this.o != null ? this.o : 0
+    //i = i != null ? i : this.i != null ? this.i : 0
+    //o = o != null ? o : this.o != null ? this.o : 0
     const outputRanges = [];
     let accumulatedSize = 0;
     let length = this.array.length;
