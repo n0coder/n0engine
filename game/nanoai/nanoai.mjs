@@ -49,7 +49,7 @@ export class Nanoai {
         this.setActive = setActive;
         this.setActive(true)
         this.renderOrder = 2;
-        this.working = false
+        this.working = true
         this.frame = 0, this.t = 0;
         this.dMap= new Map([
             [[0, -1], "walkUp"],[[0, 1], "walkDown"],[[-1, 0], "walkLeft"],[[1, -1], "walkRight"]

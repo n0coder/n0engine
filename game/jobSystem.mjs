@@ -9,6 +9,7 @@ import { p } from "../engine/core/p5engine.mjs";
 import { deltaTime } from "../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { DebugCursor } from "./world/debugCursor.mjs";
 
 let n0 = new Nanoai("n0", 4,4); 
 let abi = new Nanoai("abi", 4,6); 
