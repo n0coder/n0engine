@@ -30,7 +30,7 @@ export function getBiome(x, y) {
 }
 export var offsetX = 0, offsetY = 0
 export const one = false; //to display only one pixel (helpful for debugging)
-var vvscale = .25*.75
+var vvscale = .25*.4
 
 
 

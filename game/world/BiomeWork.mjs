@@ -12,7 +12,7 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 //erosion, and 
 var height = new RangeMap(0, 1)
 height.add("deep", .015).add("low", 1).add("border", .015)
-height.add("surface", 5).add("high", 1.3).add("cloud", .2)
+height.add("surface", 5).add("high", 1.3).add("cloud", .1)
 addBiomeFactors(height, "elevation");
 
 var squish = new RangeMap(0, 1);
