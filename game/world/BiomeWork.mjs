@@ -11,8 +11,8 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 //lets split world height into 2 ideas
 //erosion, and 
 var height = new RangeMap(0, 1)
-height.add("deep", .15).add("low", 3).add("border", .015)
-height.add("surface", 2).add("high", 1).add("cloud", .2)
+height.add("deep", .015).add("low", 1).add("border", .015)
+height.add("surface", 5).add("high", 1.3).add("cloud", .2)
 addBiomeFactors(height, "elevation");
 
 var squish = new RangeMap(0, 1);

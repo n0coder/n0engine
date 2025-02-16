@@ -17,7 +17,7 @@ export let gameScreenMode = new Map([
 	}]
 ]);
 
-gameScreenMode.get("square")(512) 
+gameScreenMode.get("fullCanvas")(512) 
 // someone saw my idea and said that my code causes performance issues
 // this ocde is run once, it runs when the player hits a button
 

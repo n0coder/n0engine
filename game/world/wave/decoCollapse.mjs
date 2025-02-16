@@ -17,7 +17,7 @@ export class WorldGenerator {
         this.setActive = setActive,this.renderOrder = -5;
         this.setActive(true)
 		
-		 this.w = 8 * c, this.h = 8 * c;
+		 this.w = 22 * c, this.h = 10 * c;
 		 this.i = 0, this.o = 0;
 
          this.alea = Alea("n0"), this.valea = Alea("n0v");
@@ -54,7 +54,7 @@ export class WorldGenerator {
                             let c =  readRaw ? tile.read.sum * 255 : inverseLerp(-1, 1, tile.read.sum) * 255
                             color = [c,c,c]
                         } else {
-                            let colora = tile.biome.color
+                            let colora = tile.biome.colorsugar(tile)
                            
                             if (colora)
                                 color = colora

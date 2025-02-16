@@ -37,11 +37,11 @@ export class Biome {
         this.tiles = tiles || []
         
     }
-    colorsugar (biome){
+    colorsugar (tile){
         if (!this.bitter || !this.plain || !this.sugar) {
             return this.color;
         }
-        var gc = biome.sugar;
+        var gc = tile.sugar;
         let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
         //isu = posterize(isu, 5)
 
@@ -50,8 +50,8 @@ export class Biome {
         let b = cubicBlendW([this.bitter[2], this.plain[2], this.sugar[2]], isu, 2)
         return [r,g,b]
     }
-    getDifficulty (biome) {
-        var gc = biome.sugar;
+    getDifficulty (tile) {
+        var gc = tile.sugar;
         let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
         let difi = Math.round(cubicBlendW([1, 0, -1], isu, 2))
         return this.difficulty+difi;

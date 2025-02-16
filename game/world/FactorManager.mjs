@@ -28,9 +28,9 @@ export function getBiome(x, y) {
     //console.log(factor);
     return biomae
 }
-export var offsetX = 111, offsetY = 0
+export var offsetX = 0, offsetY = 0
 export const one = false; //to display only one pixel (helpful for debugging)
-var vvscale = 1
+var vvscale = .25*.75
 
 
 
