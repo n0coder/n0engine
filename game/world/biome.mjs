@@ -9,13 +9,13 @@ export const biomeFactorMap = new Map()
 export function addBiomeFactors(map, factor, gens) {
     let f = gens.get(factor)
     let gen = f?.getValue(0,0) || 0
-    console.log(factor, gen)
+    
     var ranges = map.exportRanges(factor, gen.minm, gen.maxm)
-    console.log(ranges)
+    
     ranges.forEach(r => {
         var [tag, fact, min, max] = r;
         var obj = { factor: fact, min: min, max: max }
-        console.log(min, max)
+       
         biomeFactorMap.set(tag, obj)
     })
 }

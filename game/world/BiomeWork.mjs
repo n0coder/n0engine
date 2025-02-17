@@ -27,7 +27,7 @@ var midland = ["high", "rolling"]
 var allland = [[["high"], ["cloud"]], [["flat"], ["folds"]]]
 var surface = "surface";// [[inland], [midland], [allland]];
 
-console.log(pop([true, false]))
+//console.log(pop([true, false]))
 
 var temp = new RangeMap(0, 1)
 temp.add("frozen", 1).add("cold", 1).add("neutral", 1)
@@ -183,7 +183,7 @@ let bitterlut = {
 export let luts = {
     0: bitterlut, 1: neutrallut, 2:sweetlut
 }
-console.log(luts);
+//console.log(luts);
 let sweet = ["sweet"];
 let puresweet = [ "puresweet"];
 let bitter = ["bitter"]

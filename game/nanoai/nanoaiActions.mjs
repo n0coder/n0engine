@@ -411,7 +411,7 @@ export function followObj (obj, nano) {
     return processWalk(nano, obj,obj.args[0].x, obj.args[0].y, stopped,  foundPath);
 
 }
-console.log(Math.sqrt((1 * 1) + (1 * 1)))
+//console.log(Math.sqrt((1 * 1) + (1 * 1)))
 export function walk(nano, x, y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;

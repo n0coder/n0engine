@@ -16,12 +16,14 @@ export class DebugCursor{
         this.tile = worldGrid.getTile(isu.x, isu.y);
         
         //p.ellipse(p.mouseX, p.mouseY, 3,3);
-        p.fill(255)
+         p.fill(255)
+        
         p.textSize(16);
         if (this.tile?.biome) {
         p.stroke(this.tile.biome.colorsugar (this.tile))
         p.strokeWeight(5)
-        p.text( this.tile != null ? this.tile.biome.name : ":(", wisu.x1+(wisu.x2*1.5), wisu.y1+wisu.y2);
+        let txt =  (this.tile.layers.length > 0) ? this.tile.layers[this.tile.layers.length-1].name : this.tile.biome.name
+        p.text( this.tile != null ? txt : ":(", wisu.x1+(wisu.x2*1.5), wisu.y1+wisu.y2);
         }
     } 
     mouseClicked() {

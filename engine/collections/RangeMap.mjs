@@ -10,8 +10,7 @@ export class RangeMap {
   add(biome, weight=1) {
     this.array.push({ biome, weight });
     this.total += weight;
-    console.log({biome, weight, total: this.total})
-    return this;
+   return this;
   }
   remove(biome) {
     const index = this.array.findIndex(i => i.biome === biome);

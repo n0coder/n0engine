@@ -1,6 +1,7 @@
 export class Tile {
 	constructor(x,y) {
-		this.x = x, this.y = y;		
+		this.x = x, this.y = y;
+		this.layers = []
 	}
 	build(chain) {
 		if (Array.isArray(chain)) {
@@ -19,15 +20,3 @@ export class Tile {
         }
     }
 }
-let tile = new Tile(4, 5)
-
-let sum = function (a) {
-	return {
-		build(tile) {
-			tile.sx = tile.x + a, 
-			tile.sy = tile.y + a
-		}
-	}
-}
-tile.build([sum(3)])
-console.log(tile)
