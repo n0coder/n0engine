@@ -32,7 +32,7 @@ export class Nanoai {
         this.lover = null;
         loadImg('../nanoai.png', (img) => this.img = img);
         this.brain = new NanoaiBrain(this);
-        this.inventory = new NanoInventory(3, [[-7, -10], [7, -10], [0, -20]]);
+        this.inventory = new NanoInventory(3, [[-0, -0], [1, -0], [0, -20]]);
         this.identity = {
             skills: new Map([
                 ["harvesting", 1],

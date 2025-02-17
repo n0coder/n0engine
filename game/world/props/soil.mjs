@@ -10,6 +10,7 @@ export class Soil{
         this.setActive = setActive;
         this.setActive(true)
         this.tile.layers.push(this);
+        this.crop = null;
     }
 
     get tile() {
@@ -24,6 +25,10 @@ export class Soil{
     }
     harvest(nano) {
 
+    }
+    plant(nano, seed){
+        nano.inventory.remove(seed)
+        this.crop = seed.crop(this.x, this.y)
     }
 }
 

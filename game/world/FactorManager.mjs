@@ -4,6 +4,8 @@ import { createNoise2D } from "simplex-noise";
 
 export const worldFactors = new Map();
 export function buildFactors(tile) {
+    if (tile.genCache) return tile;
+    
     let genCache = new Map();
     for (const [factorKey, worldFactor] of worldFactors) {
         genCache.set(factorKey, worldFactor.getValue(tile.x, tile.y, false));   

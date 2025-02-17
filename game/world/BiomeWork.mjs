@@ -442,6 +442,7 @@ function pop(array) {
 }
 
 export function buildBiome(tile) {
+    if (tile.biome) return tile;
     let biomex = [];
     for (const b of biomes) {
         const mappedBiome = mapBiome(b.factors, s => {

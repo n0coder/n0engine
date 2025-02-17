@@ -151,7 +151,6 @@ export const nanoaiActions = new Map([
         args, name: "pickup",
         before: ["follow"],
         work: function (nano) {
-            console.log(args);
             this.args[2]?.(this.args[0])
             return !nano.inventory.add(this.args[0], this.args[1])
         },
@@ -186,14 +185,19 @@ export const nanoaiActions = new Map([
         
    }}],
     ["plant",function(...args) { return  {
-        args,
-        before: ["follow"],
+        args, hooked: false,
         work: function (nano) {
+            if (!this.hooked) {
+                nano.brain.doNow("follow", args[0])
+                this.hooked=true;
+                return true;
+            }
             var plant = this.args[0].plant;
             if (plant) {
-                var wait = plant(nano, this.args[1]);
+                var wait = this.args[0].plant(nano, this.args[1]);
                 return wait
             }
+            return true
         },
         
    }}],

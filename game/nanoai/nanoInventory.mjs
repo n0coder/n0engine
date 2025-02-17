@@ -1,3 +1,4 @@
+import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
 //i generally hate inheritance, but in this case i really needed it
 export class NanoInventory extends Inventory {
@@ -72,13 +73,13 @@ return super.remove(item, ()=>{
             var offset = this.offsets[i]
 
             if (slot.x != undefined && slot.y != undefined) {
-            //console.log(offset); 
-            slot.x = x + offset[0]
-            slot.y = y + offset[1]
+                //console.log(offset); 
+                slot.x = x + offset[0]
+                slot.y = y + offset[1]
             }
             if (slot.vx != undefined && slot.vy != undefined) {
-            slot.vx = -offset[0];
-            slot.vy = -offset[1]
+                slot.vx = -offset[0];
+                slot.vy = -offset[1]
             }
         }
     }
