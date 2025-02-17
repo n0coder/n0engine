@@ -5,8 +5,10 @@ import { createNoise2D } from "simplex-noise";
 export const worldFactors = new Map();
 export function buildFactors(tile) {
     let genCache = new Map();
-    for (const [factorKey, worldFactor] of worldFactors) 
-        genCache.set(factorKey, worldFactor.getValue(tile.x, tile.y));    
+    for (const [factorKey, worldFactor] of worldFactors) {
+        genCache.set(factorKey, worldFactor.getValue(tile.x, tile.y, false));   
+        worldFactor.clean()
+    }
     tile.genCache = genCache;
     return tile;
 }
@@ -19,11 +21,9 @@ export function getBiome(x, y) {
     biomae.x = x + offsetX;
     biomae.y = y + offsetY;
     var factor = biomae.genCache.get(read);
-    if (factor) {
+    if (factor) 
         biomae.read = factor 
-        minmax = [factor.minm, factor.maxm]
-    }
-    //console.log(factor);
+    
     return biomae
 }
 export var offsetX = 0, offsetY = 0
@@ -137,6 +137,7 @@ worldFactors.set("sugar", sugarzonea)
 worldFactors.set("sugarzone", sugarzone)
 
 let alea = Alea("n0");
-for (const [k, v] of worldFactors) 
-	v.init(createNoise2D(alea));   
+for (const [k, v] of worldFactors)
+	v.init(createNoise2D(alea));  
+
 		 

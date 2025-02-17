@@ -2,7 +2,7 @@ import { Tile } from "../../../../engine/grid/tile.mjs";
 import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { buildBiome } from "../../BiomeWork.mjs";
-import { buildFactors } from "../../FactorManager.mjs";
+import { buildFactors, worldFactors } from "../../FactorManager.mjs";
 
 
 export function addSugar(tile) { //sugar data does not exist, make it using biome date
@@ -12,7 +12,9 @@ export function addSugar(tile) { //sugar data does not exist, make it using biom
         return;
     }
     let sugar = tile.genCache.get("sugarzone");
-    tile.sugar = { minm: 0, maxm: 2, sum: lerp(0, 2, inverseLerp(sugar.minm, sugar.maxm, sugar.sum)) }
+    let facti = worldFactors.get("sugarzone")
+    tile.sugar = { minm: 0, maxm: 2, sum: lerp(0, 2, inverseLerp(facti.mini, facti.maxi, sugar)) }
+    //console.log({sugar, facti, mini:facti.mini, maxi:facti.maxi, tile})
     tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9;
 }
 export function genTile(x, y) {
@@ -27,8 +29,10 @@ export function genTile(x, y) {
         buildBiome,
         addSugar
     ])
+    globalThis.tiles += 1
     worldGrid.setTile(x, y, tile)
 }
+globalThis.tiles = 0;
 export function genChunk(x, y, w, h) {
     for (let i = 0; i < w; i++) {
         for (let o = 0; o < h; o++) {

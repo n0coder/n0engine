@@ -450,7 +450,7 @@ export function buildBiome(tile) {
             if (!factor) {
                 return false;
             }
-            var sum = factor.sum;// inverseLerp(factor.minm, factor.maxm, factor.sum)
+            var sum = factor;// inverseLerp(factor.minm, factor.maxm, factor.sum)
             return sum > s.min && sum < s.max;
         });
         if (pop(mappedBiome)) biomex.push(b);

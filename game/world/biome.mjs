@@ -1,5 +1,6 @@
 import { cubicBlendW, inverseLerp, posterize } from "../../engine/n0math/ranges.mjs";
 import { luts } from "./BiomeWork.mjs";
+import { worldFactors } from "./FactorManager.mjs";
 
 export function mapDeep(arr, mapFn) {
     return arr.map(item => Array.isArray(item) ? mapDeep(item, mapFn) : mapFn(item));
@@ -9,7 +10,6 @@ export const biomeFactorMap = new Map()
 export function addBiomeFactors(map, factor, gens) {
     let f = gens.get(factor)
     let gen = f?.getValue(0,0) || 0
-    
     var ranges = map.exportRanges(factor, gen.minm, gen.maxm)
     
     ranges.forEach(r => {
@@ -47,8 +47,7 @@ export class Biome {
         }
         var gc = tile.sugar;
         let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
-        //isu = posterize(isu, 5)
-
+       
         let r = cubicBlendW([this.bitter[0], this.plain[0], this.sugar[0]], isu, 2)
         let g = cubicBlendW([this.bitter[1], this.plain[1], this.sugar[1]], isu, 2)
         let b = cubicBlendW([this.bitter[2], this.plain[2], this.sugar[2]], isu, 2)

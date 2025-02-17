@@ -3,7 +3,9 @@ export class ValueDriver {
   constructor(value, mode = "added") {
     this.value = value || 0;
   }
-
+  clean() {
+    this.value?.clean?.();
+  }
   getValue(x, y) {
     if (typeof this.value === 'function') {
         return this.value(x, y)

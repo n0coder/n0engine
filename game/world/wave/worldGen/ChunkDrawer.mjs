@@ -26,8 +26,8 @@ export function drawChunk(x, y) {
             if (tile && tile.biome) {
                 let color = tile.biome.colorsugar(tile)
                 p.fill(color);
-                let t = tile.genCache.get("elevation")
-                let z = inverseLerp(t.minm, t.maxm, t.sum)
+                // let t = tile.genCache.get("elevation")
+                // let z = inverseLerp(t.minm, t.maxm, t.sum)
                 //p.fill(z*255)
                 p.rect(xx * worldGrid.gridSize, yy * worldGrid.gridSize, worldGrid.gridSize, worldGrid.gridSize)
             }
