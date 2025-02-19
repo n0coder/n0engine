@@ -1,5 +1,6 @@
 import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../../engine/core/p5engine.mjs";
+import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 
 export class Seed {
@@ -25,12 +26,18 @@ class Crop {
         this.x = x;
         this.y = y;
         this.s = 16;
+        this.growth = 0
 
         this.setActive = setActive;
         this.setActive(true)
     }
+    get heldPos() {
+        return this.held ? 0 : worldGrid.gridSize/2
+    }
     draw(){
         p.fill(255)
-        p.ellipse(this.x*worldGrid.gridSize+ worldGrid.gridSize/2, this.y*worldGrid.gridSize+worldGrid.gridSize/2, this.s)
+        if (this.growth <1)
+        this.growth += deltaTime*.25
+        p.ellipse(this.x*worldGrid.gridSize+this.heldPos, this.y*worldGrid.gridSize+this.heldPos, this.growth*this.s)
     }
 }

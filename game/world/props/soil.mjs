@@ -24,9 +24,11 @@ export class Soil{
         p.rect(x, y, t, t)
     }
     harvest(nano) {
-
+        nano.inventory.add(this.crop)
+        this.crop = null
     }
     plant(nano, seed){
+        seed ||= n0.inventory.hasItem('seed', 'kind')
         nano.inventory.remove(seed)
         this.crop = seed.crop(this.x, this.y)
     }

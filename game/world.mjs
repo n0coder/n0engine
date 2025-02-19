@@ -23,7 +23,7 @@ worldGrid.setTile(25,25, (t) => {
     console.log("tile 25, 25 was spawned", t)
 })
 
-let crops = [];
+let soils = [];
 for (let o = 10; o < 13; o++)
 for (let i = 0; i < 3; i++) {
 
@@ -31,11 +31,22 @@ n0.brain.do("walk", i,  o)
 n0.brain.do("ping", (n)=>{
     let tile = worldGrid.getTile(i,o)
     if (tile&&tile.biome.name === "plains")
-    crops.push (new Soil(i, o))
+        soils.push(new Soil(i, o))
 })
 
 }
 
-n0.brain.do("ping", (n)=>n0.brain.do("plant", crops[0], n0.inventory.hasItem('seed', 'kind')))
-n0.brain.do("ping", (n)=>n0.brain.do("plant", crops[1], n0.inventory.hasItem('seed', 'kind')))
-n0.brain.do("walk", 0,  10)
+n0.brain.do("ping", (n,ping) => { //this appends to the current line of queue in order (these will all run immediately after this ping)
+    n0.brain.doAfter(ping, "hook", (hook, marker) => {
+        n0.brain.doBefore(marker, "plant", soils[0])
+        n0.brain.doBefore(marker, "plant", soils[1])
+        n0.brain.doBefore(marker, "wait", (n, t) => {
+            if (soils[0].crop == undefined) return true;
+            return soils[0].crop.growth < 1
+        })
+        n0.brain.doBefore(marker, "harvest", soils[0])
+        n0.brain.doBefore(marker, "harvest", soils[1])
+        n0.brain.doBefore(marker, "walk", 10, 10)
+        n0.brain.doBefore(marker, "ping", () => { hook.pull("hi"); })
+    })
+})

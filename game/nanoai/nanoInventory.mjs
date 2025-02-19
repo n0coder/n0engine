@@ -38,7 +38,7 @@ export class NanoInventory extends Inventory {
         return super.add(item, ()=>{
             if (item.renderOrder!=undefined)
             item.renderOrder = 3
-            if (item.held != null) item.held = true;
+           item.held = true;
             this.refresh()
         })
     }
@@ -46,7 +46,7 @@ export class NanoInventory extends Inventory {
     drop(item) {
 return super.remove(item, ()=>{
     item.setActive(true);
-    if (item.held != null && item.held) item.held = false; 
+    if (item.held) item.held = false; 
     if (item.renderOrder!=undefined)
     item.renderOrder = 0
     this.refresh()
@@ -54,8 +54,9 @@ return super.remove(item, ()=>{
     }
 
     remove(item) {
-        item.setActive(false);
         var removed = super.remove(item, ()=> {
+            if (item.held) item.held = false; 
+            item.setActive(false);
             this.refresh()
         })
         return removed;

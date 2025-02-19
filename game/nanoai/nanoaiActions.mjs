@@ -129,10 +129,8 @@ export const nanoaiActions = new Map([
     }}],
    ["ping", function(callback) {
     return {
-        args: [callback],
         work: function(nano) {
-            this.args[0](nano);
-            return false;
+            return callback?.(nano, this);
         }
     };
  }],
@@ -237,22 +235,22 @@ export const nanoaiActions = new Map([
 
                 brain.doAfter(this, "hook", (hook, marker) => {
                     brain.doBefore(marker, "walkRelative", -1, 0) 
-                    brain.doBefore(marker, "wait",t) 
+                    brain.doBefore(marker, "waitTime",t) 
                     brain.doBefore(marker, "walkRelative", 2, 0) 
-                    brain.doBefore(marker, "wait",t) 
+                    brain.doBefore(marker, "waitTime",t) 
                     brain.doBefore(marker, "walkRelative", -1, 0) 
                     brain.doBefore(marker, "walkRelative", -1, 0)
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 2, 0)
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", -1, 0)
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 0, .51)
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 0, - .51)
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 0,  .51)
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 0, - .51)
                     brain.doBefore(marker, "pull", hook)
                 }) 
@@ -272,25 +270,25 @@ export const nanoaiActions = new Map([
 
                 brain.doAfter(this, "hook", (hook, marker) => {
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = 0; nano.vx = -1 });                    
-                    brain.doBefore(marker, "wait",t*2) 
+                    brain.doBefore(marker, "waitTime",t*2) 
                     brain.doBefore(marker, "ping", (nano)=> { nano.vx = 1 });
-                    brain.doBefore(marker, "wait",t) 
+                    brain.doBefore(marker, "waitTime",t) 
                     brain.doBefore(marker, "ping", (nano)=> { nano.vx = -1 }); 
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vx = 1 });
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vx = -1 }); 
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vx = 0; nano.vy = 1 });
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = -1 });
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = 1 });
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = -1 });
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = 1 });
-                    brain.doBefore(marker, "wait",t)
+                    brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", () => {hook.pull("hi");})
                 }) 
                 
@@ -310,11 +308,18 @@ export const nanoaiActions = new Map([
             }
         }
     }],
-    ["wait", function(time) { 
+    ["waitTime", function(time) { 
         return {
             time, t:0, work: function (nano) {
                 this.t+=deltaTime;
                 return this.t <= this.time; //
+            }
+        }
+    }],
+    ["wait", function(when) { 
+        return {
+            work: function (nano) {
+                return when?.(nano, this);
             }
         }
     }],
