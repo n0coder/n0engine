@@ -11,7 +11,6 @@ class n0fcEditor {
        this.setActive = setActive, this.renderOrder = -5;
        this.setActive(true)
        this.state = "add"
-
     }
     draw(){
         var {x,y} = worldGrid.screenToGridPoint(p.mouseX, p.mouseY).screen(false)
@@ -54,12 +53,22 @@ class n0fcEditor {
     }
 }
 
-
+function createTile(img){
+    //let input = createInput('number');
+    return {
+        img, sides: [
+            [0, 0, 0], // top
+            [0, 0, 0], // right
+            [0, 0, 0], // bottom
+            [0, 0, 0]  // left
+          ]
+    }
+}
 let fileInput =  p.createFileInput((file)=>{
     if (file.type.startsWith('image')) {
         let imgdom = p.createImg(file.data,'', undefined, (img) => {
             if (img.width > 0 && img.height > 0) {
-                let ti = {img}
+                let ti =createTile(img)
                 let t = {tile:ti, pos:tpos.screen()}
                 worldGrid.setTile(tpos.x, tpos.y, t);
                 tiles.push(ti)
@@ -72,6 +81,7 @@ let fileInput =  p.createFileInput((file)=>{
         imgdom.mousePressed(() => {
             let ti = imgdom.tile
             let t = {tile:ti, pos:tpos.screen()}
+            setTile(t)
             worldGrid.setTile(tpos.x, tpos.y, t);
           });
         leftMenu.add(imgdom)
@@ -80,9 +90,30 @@ let fileInput =  p.createFileInput((file)=>{
     setTile(null);
 });
 fileInput.hide();
+
+let tileUi=null;
 function setTile(t) {
+    if (tile == t) return;
     tile=t
     if (t) { rightMenu.show() } else { rightMenu.hide() }
 
+    tileUi?.remove(); //destroy tileui
+    tileUi = p.createDiv(); //make it again
+    tileUi.id("test2");
+    rightMenu.add(tileUi);
+    console.log(tile)
+    for (const side of tile.tile.sides) {
+        let div = p.createDiv().parent(tileUi)
+        for (const s of side) {
+            p.createInput('number').class("sidebit").parent(div).value(s)
+        }
+        var danceButton = p.createDiv().addClass('buttonbit').parent(div);
+        p.createDiv("dance").addClass('title').parent(danceButton);
+        danceButton.mousePressed(() => {
+            //save side textboxes into arrays
+        })
+    }
+    
+    
 }
 let editor = new n0fcEditor()
