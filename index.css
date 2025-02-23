@@ -54,18 +54,18 @@ flex-shrink: 0;
   #sketch-holder {
     box-shadow: #000000 0px 0px 25px 5px ;
   }
-#menu {  /*we now have the ability to slide open a utility menu*/
+.menu {  /*we now have the ability to slide open a utility menu*/
     width: 0px;
     background-color: #111111;
     height: 512px;
     transition: width 1.5s, height 1.5s;
 }
-#menu Button {
+.menu Button {
   margin: 10;
   border-radius: 5px;
   width: 90;
 } 
-#menu h3 {
+.menu h3 {
   display: flex;
   width: 207px;
   height: 25px;
