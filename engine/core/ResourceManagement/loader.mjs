@@ -20,6 +20,7 @@ export class Loader {
     }
 
     startLoading(key, item, dependencies) {
+        console.log(`loading ${key}`)
         if (dependencies == null) {
             this.loadItem(key, item);
             return false;

@@ -3,7 +3,7 @@ import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp } from "../../../../engine/n0math/ranges.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
-let c = worldGrid.chunkSize, chunks = 10
+let c = worldGrid.chunkSize, chunks = 1
 export function drawChunks(nano) {
     for (let xc = -chunks; xc <= chunks; xc++) {
         for (let yc = -chunks; yc <= chunks; yc++) {
@@ -17,11 +17,18 @@ export function drawChunks(nano) {
         }
     }
 }
+function genTile5(xx, yy) { 
+    genTile(xx, yy)
+    genTile(xx, yy+1)
+    genTile(xx, yy-1)
+    genTile(xx+1, yy)
+    genTile(xx-1, yy)
+}
 export function drawChunk(x, y) {
     for (let xc = 0; xc < c; xc++) {
         for (let yc = 0; yc < c; yc++) {
             let xx = xc+x, yy = yc+y
-            genTile(xx, yy)
+            genTile5(xx, yy)
             let tile = worldGrid.getTile(xx, yy);
             if (tile && tile.biome) {
                 let color = tile.biome.colorsugar(tile)

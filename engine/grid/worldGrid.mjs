@@ -18,7 +18,21 @@ export class WorldGrid {
     }
 
     screenToGridPoint(x, y) {
-        return { x: Math.floor(x / this.gridSize), y: Math.floor(y / this.gridSize) };
+        return {
+            x: Math.floor(x / this.gridSize),
+            y: Math.floor(y / this.gridSize),
+            screen(centered) {
+                return worldGrid.scaleGrid(this.x,this.y, centered)
+            }
+        };
+    }
+    scaleGrid(x, y, centered) {
+        x *=worldGrid.gridSize
+        x += centered ? (worldGrid.gridSize / 2) : 0
+        y *= worldGrid.gridSize
+        y += centered ? (worldGrid.gridSize / 2) : 0
+
+        return { x, y }
     }
     screenToGridPointRaw(x, y) {
         return { x: x / this.gridSize, y: y / this.gridSize };

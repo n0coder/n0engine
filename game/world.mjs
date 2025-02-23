@@ -10,6 +10,7 @@ worldGrid.y= 117111
 
 let n0 = new Nanoai("n0",10,10)
 globalThis.n0 = n0;
+
 var seed = new Seed(6,6)
 n0.brain.do("pickup", seed)
 var seed = new Seed(10,6)
@@ -19,9 +20,7 @@ n0.brain.do("spin")
 let bfc = new WorldGenerator(n0)
 let mc = new DebugCursor();
 
-worldGrid.setTile(25,25, (t) => {
-    console.log("tile 25, 25 was spawned", t)
-})
+
 
 let soils = [];
 for (let o = 10; o < 13; o++)

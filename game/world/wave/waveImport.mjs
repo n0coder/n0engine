@@ -1,4 +1,5 @@
 import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
+import { t } from "../../../engine/core/Time/n0Time.mjs";
 import { loadImgArray } from "../../../engine/core/Utilities/ObjectUtils.mjs";
 import { Tile } from "./Tile.mjs"
 import { n0jointtiles, n0tiles } from "./n0FunctionCollapse.mjs"
@@ -90,6 +91,25 @@ n0loader.startLoading("tiles", (loaded) => {
     n0tiles.set('dirt2', new Tile('assets/plains/dirt3.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 1, [], [{ factor: "humidity", value: humidityDirt * 2 }]))
 
 
+    let thresholds = {
+
+    }
+    
+    function addTiles(purple) {
+        for (let i = 0; i < purple.tiles.length; i++) {
+            let tile = purple.tiles[i]
+            n0tiles.set(`${purple.name}${tile.id}`, new Tile(`${purple.path}${tile.id}${purple.fileType}`, tile.sides, tile.weight, tile.thresholds, tile.biases))
+        }
+    }
+    let purple = {
+        name: "purple", path: 'assets/wave/purple/', fileType: ".png",
+        tiles: [{
+            id: 0, sides: [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], weight: 1,
+            thresholds:  [{ factor: "elevation", min: .4, max: .945 }, { factor: "elevation", min: 0, max: .4 }],
+            biases: [{ factor: "elevation", value: 0 }]
+        }]
+    }
+    addTiles(purple)
     n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .945 }, { factor: "elevation", min: 0, max: .4 }]))
     n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }]))
     n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }], [{ factor: "elevation", value: .35 }]))
