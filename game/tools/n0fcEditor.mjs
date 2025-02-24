@@ -100,100 +100,66 @@ function createTile(img){
     //if never been generated, 
     //if neighbor exists import neighbor side, enabling protection
     //otherwise make a new side
+
     //if already generated, import the side
-    //if neighbor exists, check if the side is protected
+    //if neighbor exists, check if the side is protected and on neighbor
     //if not, set the side to the neighbor side
     //if it is, check if the sides matc
     //if it does not, return null
-
-
     
-    if (img?.tile?.sides[0]?.protected) {
-        tile.sides[0] = img.tile.sides[0]
-        if (up) {
-            for (let s = 0; s < tile.sides[0].get().length; s++) {
-                if (tile.sides[0].get()[s] != up.sides[2].get()[s]) {
-                    return null;
-                }
-            }
-        }
-    } else {
-            if (up) {
-                tile.sides[0] = up.sides[2];
-                up.sides[2].protected = true;
-                console.log('up')
+    
+
+    function createSide(dir, sdir, cdir) {
+        console.log(img);
+        if (!img?.sides) {  // Check if img exists and has sides
+            console.log('no sides');
+            if (dir?.sides?.[sdir]) {  // Check if dir and its sides exist
+                console.log('neighbor');
+                protectNeighbor(dir, sdir, cdir);
+                return true;
             } else {
-                let six = img?.tile?.sides[0]
-                tile.sides[0] = six?six :  makeSide2();
-            }
-        }
-    
-        if (img?.tile?.sides[1]?.protected) {
-            tile.sides[1] = img.tile.sides[1]
-            if (right) {
-                for (let s = 0; s < tile.sides[1].get().length; s++) {
-                    if (tile.sides[1].get()[s] != right.sides[3].get()[s]) {
-                        return null;
-                    }
-                }
+                console.log('no neighbor');
+                tile.sides[cdir] = makeSide2();
+                return true;
             }
         } else {
-            if (right) {
-                tile.sides[1] = right.sides[3];
-                right.sides[3].protected = true;
-                console.log('right')
-            } else {
-                let six = img?.tile?.sides[1]
-                tile.sides[1] = six?six: makeSide2();
-            }
-        }
+            tile.sides[cdir] = img.sides[cdir];
+            if (dir?.sides?.[sdir]) {
+                if (dir.sides[sdir].protected) {
+                    const currentSide = tile.sides[cdir].get();
+                    const neighborSide = dir.sides[sdir].get();
 
+                    let noMatch = false;
+                    for (let s = 0; s < currentSide.length; s++) {
+                        if (currentSide[s] !== neighborSide[s]) {
+                            noMatch = true;
+                            continue
+                        }
+                    }
+                    if (noMatch) return null;
+                   return true
+                } else {
+                    protectNeighbor(dir, sdir, cdir);
+                    return true;
+                }
+            }
+            return true;  // Add return for case when there's no neighbor
+        }
+    }
     
-        if (img?.tile?.sides[2]?.protected) {
-            tile.sides[2] = img.tile.sides[2]
-            if (down) {
-                for (let s = 0; s < tile.sides[2].get().length; s++) {
-                    if (tile.sides[2].get()[s] != down.sides[0].get()[s]) {
-                        return null;
-                    }
-                }
-            }
-        } else {
-            if (down) {
-                tile.sides[2] = down.sides[0];
-                down.sides[0].protected = true;
-                console.log('down')
-            } else {
-                let six = img?.tile?.sides[2]
-                tile.sides[2] = six ? six : makeSide2();
-            }
-        }
-        if (img?.tile?.sides[3]?.protected) {
-            tile.sides[3] = img.tile.sides[3]
-            if (left) {
-                for (let s = 0; s < tile.sides[3].get().length; s++) {
-                    if (tile.sides[3].get()[s] != left.sides[1].get()[s]) {
-                        return null;
-                    }
-                }
-            }
-        } else {
-            let six = img?.tile?.sides[3]
-            if (six) {
-                tile.sides[3] = six
-                console.log(six)
-            }
-            if (left) {
-                tile.sides[3] = left.sides[1];
-                tile.sides[3].protected = true;
-                console.log('left')
-            } else {
-               
-                tile.sides[3] = makeSide2();
-            }
-        }
-        img.sides = tile.sides;
-        return tile;
+    function protectNeighbor(dir, sdir, cdir) {
+        console.log("protecting");
+        const six = dir.sides[sdir];
+        tile.sides[cdir] = six;
+        six.protected = true;
+    }
+    if(!createSide(up, 2, 0)) return null;
+    if(!createSide(right, 3, 1)) return null;
+    if(!createSide(down, 0, 2)) return null;
+    if(!createSide(left, 1, 3)) return null;
+    img.sides = tile.sides;
+    console.log(tile)
+    return tile;
     
     function makeSide2() {
         return {
