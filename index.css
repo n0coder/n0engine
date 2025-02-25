@@ -78,6 +78,7 @@ flex-shrink: 0;
 }
 .sidebit {
   width:48px;
+  display: inline-block; 
 }
 .buttonbit {
   display: inline-block; 
@@ -86,7 +87,7 @@ flex-shrink: 0;
   margin: 10;
   border-radius: 5px;
   background: #D9D9D9;
-  width: 48px;
+  width: auto !important;
 }
 
 .button {

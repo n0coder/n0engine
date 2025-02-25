@@ -40,7 +40,7 @@ export function genTile(x, y) {
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
         addSugar, //uss sugar and biome to set basic sugar level    
-        buildn0Collapse
+        //buildn0Collapse
     ])
     globalThis.tiles += 1
     

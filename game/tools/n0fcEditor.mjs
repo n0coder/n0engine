@@ -2,13 +2,14 @@ import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mj
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-
-
+import { worldFactors } from "../world/FactorManager.mjs";
+import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
 
 let tile = null, tpos=null;
 let tiles = [], edges = []
 
 worldGrid.gridSize=32
+
 class n0fcEditor {
     constructor(){
        this.setActive = setActive, this.renderOrder = -5;
@@ -146,7 +147,6 @@ function createTile(img){
     //if it does not, return null
 
     function createSide(dir, sdir, cdir) {
-
         if (!img?.shared) {  // Check if img exists and has sides
             if (dir?.shared.sides?.[sdir]) {  // Check if dir and its sides exist
                 protectNeighbor(dir, sdir, cdir);
@@ -185,6 +185,7 @@ function createTile(img){
         tile.shared.sides[cdir] = six;
         six.protected = true;
     }
+
     if(!createSide(up, 2, 0)) return null;
     if(!createSide(right, 3, 1)) return null;
     if(!createSide(down, 0, 2)) return null;
@@ -226,12 +227,18 @@ fileInput.hide();
 
 let tileUi=null;
 
-
+let divi = p.createDiv().class("factorEditor")
+        leftMenu.add(divi)
+        for (const [factorKey, worldFactor] of worldFactors) {
+            let factorDiv = p.createDiv(factorKey).class("factor").parent(divi)
+        }
 function setTile(t) {
     if (tile == t) return;
     tile=t
+    drawUI(t)
+}
+function drawUI(t) {
     if (t) { rightMenu.show() } else { rightMenu.hide() }
-
     tileUi?.remove(); //destroy tileui
     tileUi = p.createDiv(); //make it again
     tileUi.id("test2");
@@ -241,15 +248,23 @@ function setTile(t) {
     let i = 0
     if (tile.tile.shared.sides) {
         var div = p.createDiv().parent(tileUi)
+        var title = p.createDiv("title").parent(div)
+        p.createSpan("Top").parent(title);
         sideUI(tile.tile.shared.sides[i++], div);
         var div = p.createDiv().parent(tileUi)
+        var title = p.createDiv("title").parent(div) 
+        p.createSpan("Right").parent(title);
         sideUI(tile.tile.shared.sides[i++], div);
         var div = p.createDiv().parent(tileUi)
+        var title = p.createDiv("title").parent(div)
+        p.createSpan("Bottom").parent(title);
         sideUI(tile.tile.shared.sides[i++], div);
         var div = p.createDiv().parent(tileUi)
+        var title = p.createDiv("title").parent(div)
+        p.createSpan("Left").parent(title);
         sideUI(tile.tile.shared.sides[i++], div);
     }
-
+    
     var div = p.createDiv().parent(tileUi)
     let input = p.createInput('number').class("sidebit").parent(div).value(tile.tile.shared.weight);
         input.input(() => {
@@ -258,8 +273,61 @@ function setTile(t) {
             let a = Number.parseFloat(v);
             tile.tile.shared.weight = a;
         });
+
+    biasesUI(tile.tile.shared, tileUi);
+    //thresholdsUI(tile.tile.shared, tileUi);
 }
 let editor = new n0fcEditor()
+
+function biasesUI(tile, div) {
+    let biases = tile.biases;
+    let biasesDiv = p.createDiv().parent(div);
+    for (let i = 0; i < biases.length; i++) {
+        
+        let bias = biases[i];
+        let biasDiv = p.createDiv().parent(biasesDiv);
+        // factor title 
+        //p.createSpan(bias.factor).parent(biasDiv);
+        //select box for world factors
+        let select = p.createSelect().parent(biasDiv).class("buttonbit");
+        for (const [factorKey, worldFactor] of worldFactors) {
+            //exclude factors that are used in biases
+            select.option(factorKey);
+        }
+        select.selected(bias.factor);
+        select.input(() => {
+            bias.factor = select.value();
+        });
+        //input for value
+        let input = p.createInput('number').parent(biasDiv).value(bias.value).class("sidebit");
+        input.input(() => {
+            let v = input.value();
+            if (v.length <= 0) return;
+            let a = Number.parseFloat(v);
+            bias.value = a;
+        });
+        //remove button
+        let removeBias = p.createButton("X").parent(biasDiv).class("buttonbit");
+        removeBias.mousePressed(() => {
+            biases.splice(i, 1);
+            drawUI(tile);
+        });
+    }
+    //add new factor button
+    let addBias = p.createButton("Add Bias").parent(biasesDiv).class("buttonbit");
+    addBias.mousePressed(() => {
+
+        //default to a bias that was not used
+        for (const [factorKey, worldFactor] of worldFactors) {
+            //exclude factors that are used in biases
+            if (biases.find(b => b.factor === factorKey)) continue;
+        biases.push({ factor: factorKey, value: 0 });
+        drawUI(tile);
+        break;
+        }
+    });
+}
+        
 
 function sideUI(side, div, reverse = false) {
     let si = side.get(reverse);
@@ -275,5 +343,7 @@ function sideUI(side, div, reverse = false) {
             si[i] = a;
             side.set(si);
         });
+        
     }
+    
 }
