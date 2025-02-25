@@ -54,6 +54,10 @@ flex-shrink: 0;
   #sketch-holder {
     box-shadow: #000000 0px 0px 25px 5px ;
   }
+  #center-menu {
+    position: absolute;
+    
+  }
 .menu {  /*we now have the ability to slide open a utility menu*/
     width: 0px;
     background-color: #111111;

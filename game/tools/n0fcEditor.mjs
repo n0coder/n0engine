@@ -3,18 +3,23 @@ import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 
+
+
 let tile = null, tpos=null;
 let tiles = [], edges = []
+
 worldGrid.gridSize=32
 class n0fcEditor {
     constructor(){
        this.setActive = setActive, this.renderOrder = -5;
        this.setActive(true)
        this.state = "add"
+       this.scale = 2;
+
     }
     draw(){
-        var {x,y} = worldGrid.screenToGridPoint(p.mouseX, p.mouseY).screen(false)
-        
+        var { x, y } = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
+        p.scale(2)
         for (const [_, {tile, pos}] of worldGrid.tiles) {
             if(tile){
                 p.image(tile.img, pos.x, pos.y)
@@ -47,55 +52,88 @@ class n0fcEditor {
 
             p.strokeWeight(.5)
             p.textAlign(p.CENTER, p.CENTER)
-            p.text(tile.tile.sides[0].get()[0], tile.pos.x + hsize, tile.pos.y - size)
-            p.text(tile.tile.sides[0].get()[1], tile.pos.x + size + hsize, tile.pos.y - size)
-            p.text(tile.tile.sides[0].get()[2], tile.pos.x + size * 2 + hsize, tile.pos.y - size)
-
-            p.text(tile.tile.sides[1].get()[0], tile.pos.x + size * 4, tile.pos.y + hsize)
-            p.text(tile.tile.sides[1].get()[1], tile.pos.x + size * 4, tile.pos.y + size + hsize)
-            p.text(tile.tile.sides[1].get()[2], tile.pos.x + size * 4, tile.pos.y + size * 2 + hsize)
-            let reverse = false
-            p.text(tile.tile.sides[2].get(reverse)[0], tile.pos.x + hsize, tile.pos.y + size * 4)
-            p.text(tile.tile.sides[2].get(reverse)[1], tile.pos.x + size + hsize, tile.pos.y + size * 4)
-            p.text(tile.tile.sides[2].get(reverse)[2], tile.pos.x + size * 2 + hsize, tile.pos.y + size * 4)
-
-            p.text(tile.tile.sides[3].get(reverse)[0], tile.pos.x - size, tile.pos.y + hsize)
-            p.text(tile.tile.sides[3].get(reverse)[1], tile.pos.x - size, tile.pos.y + size + hsize)
-            p.text(tile.tile.sides[3].get(reverse)[2], tile.pos.x - size, tile.pos.y + size * 2 + hsize)
+            
+            var side = tile.tile.shared.sides[0].get()
+            p.text(side[0], tile.pos.x + hsize, tile.pos.y - size)
+            p.text(side[1], tile.pos.x + size + hsize, tile.pos.y - size)
+            p.text(side[2], tile.pos.x + size * 2 + hsize, tile.pos.y - size)
+            var side = tile.tile.shared.sides[1].get()
+            p.text(side[0], tile.pos.x + size * 4, tile.pos.y + hsize)
+            p.text(side[1], tile.pos.x + size * 4, tile.pos.y + size + hsize)
+            p.text(side[2], tile.pos.x + size * 4, tile.pos.y + size * 2 + hsize)
+            var side = tile.tile.shared.sides[2].get()
+            p.text(side[0], tile.pos.x + hsize, tile.pos.y + size * 4)
+            p.text(side[1], tile.pos.x + size + hsize, tile.pos.y + size * 4)
+            p.text(side[2], tile.pos.x + size * 2 + hsize, tile.pos.y + size * 4)
+            var side = tile.tile.shared.sides[3].get()
+            p.text(side[0], tile.pos.x - size, tile.pos.y + hsize)
+            p.text(side[1], tile.pos.x - size, tile.pos.y + size + hsize)
+            p.text(side[2], tile.pos.x - size, tile.pos.y + size * 2 + hsize)
+        
+        
         }
     }
     mousePressed() {
-        let {x,y} = tpos = worldGrid.screenToGridPoint(p.mouseX, p.mouseY)
+        if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
         let wtile = worldGrid.getTile(x,y)
         if(wtile) setTile(wtile);
-
+        }
     }
     doubleClicked(){
-        
-        let {x,y} = tpos = worldGrid.screenToGridPoint(p.mouseX, p.mouseY)
+        if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
 
         let wtile = worldGrid.getTile(x,y)
         if (!wtile) {
             fileInput.elt.click();
+        } else {
+
+            let ts = tiles.map(t => {
+                return t.shared
+            });
+            console.log(ts)
+            let tileJson = JSON.stringify(ts)
+            console.log(tileJson)
+            }
         }
+
     }
 }
 
+function initTile(img) {
+    return {
+        img,
+        shared: {
+        sides: [],
+        weight: img.weight||1, 
+        biases: img.biases||[], 
+        thresholds: img.thresholds||[],
+        }
+    };
+}
+
+function makeSide2() {
+    return {
+        values: [0, 0, 0],
+        protected: false,
+        set(values) {
+            this.values = values;
+        },
+        get() {
+            return this.values;
+        }
+    };
+}
 function createTile(img){
     let up = worldGrid.getTile(tpos.x, tpos.y - 1)?.tile
     let right = worldGrid.getTile(tpos.x + 1, tpos.y)?.tile
     let down = worldGrid.getTile(tpos.x, tpos.y + 1)?.tile
     let left = worldGrid.getTile(tpos.x - 1, tpos.y)?.tile
 
-    //check if the sides are protected
-    //use img.tile.sides to get the sides 
-    //if they are check if tile's neighbor has the same connection
-    //if not, return null
+    let tile = initTile(img)
 
-    let tile = {
-        img,
-        sides: []
-    }
+
 
     //if never been generated, 
     //if neighbor exists import neighbor side, enabling protection
@@ -106,34 +144,29 @@ function createTile(img){
     //if not, set the side to the neighbor side
     //if it is, check if the sides matc
     //if it does not, return null
-    
-    
 
     function createSide(dir, sdir, cdir) {
-        console.log(img);
-        if (!img?.sides) {  // Check if img exists and has sides
-            console.log('no sides');
-            if (dir?.sides?.[sdir]) {  // Check if dir and its sides exist
-                console.log('neighbor');
+
+        if (!img?.shared) {  // Check if img exists and has sides
+            if (dir?.shared.sides?.[sdir]) {  // Check if dir and its sides exist
                 protectNeighbor(dir, sdir, cdir);
                 return true;
             } else {
-                console.log('no neighbor');
-                tile.sides[cdir] = makeSide2();
+                tile.shared.sides[cdir] = makeSide2();
                 return true;
             }
         } else {
-            tile.sides[cdir] = img.sides[cdir];
-            if (dir?.sides?.[sdir]) {
-                if (dir.sides[sdir].protected) {
-                    const currentSide = tile.sides[cdir].get();
-                    const neighborSide = dir.sides[sdir].get();
+            tile.shared = img.shared;
+            if (dir?.shared.sides?.[sdir]) {
+                if (dir.shared.sides[sdir].protected) {
+                    const currentSide = tile.shared.sides[cdir].get();
+                    const neighborSide = dir.shared.sides[sdir].get();
 
                     let noMatch = false;
                     for (let s = 0; s < currentSide.length; s++) {
                         if (currentSide[s] !== neighborSide[s]) {
                             noMatch = true;
-                            continue
+                            break
                         }
                     }
                     if (noMatch) return null;
@@ -148,33 +181,16 @@ function createTile(img){
     }
     
     function protectNeighbor(dir, sdir, cdir) {
-        console.log("protecting");
-        const six = dir.sides[sdir];
-        tile.sides[cdir] = six;
+        const six = dir.shared.sides[sdir];
+        tile.shared.sides[cdir] = six;
         six.protected = true;
     }
     if(!createSide(up, 2, 0)) return null;
     if(!createSide(right, 3, 1)) return null;
     if(!createSide(down, 0, 2)) return null;
     if(!createSide(left, 1, 3)) return null;
-    img.sides = tile.sides;
-    console.log(tile)
+    img.shared = tile.shared;
     return tile;
-    
-    function makeSide2() {
-        return {
-            values: [0, 0, 0],
-            reverseValues: [0, 0, 0],
-            protected: false,
-            set(values) {
-                this.values = values;
-                this.reverseValues = [...values].reverse();
-            },
-            get(reverse) {
-                return reverse ? this.reverseValues : this.values;
-            }
-        };
-    }
 }
 
 let fileInput =  p.createFileInput((file)=>{
@@ -188,7 +204,7 @@ let fileInput =  p.createFileInput((file)=>{
                 }
                 let t = { tile: ti, tpos, pos: tpos.screen() }
                 worldGrid.setTile(tpos.x, tpos.y, t);
-                tiles.push(ti)
+                tiles[tiles.length] = ti
                 setTile(t)
                 imgdom.tile = ti;
             } else {
@@ -209,6 +225,8 @@ let fileInput =  p.createFileInput((file)=>{
 fileInput.hide();
 
 let tileUi=null;
+
+
 function setTile(t) {
     if (tile == t) return;
     tile=t
@@ -218,17 +236,28 @@ function setTile(t) {
     tileUi = p.createDiv(); //make it again
     tileUi.id("test2");
     rightMenu.add(tileUi);
+
+    if (!tile?.tile) return;
     let i = 0
-    if (tile?.tile?.sides) {
+    if (tile.tile.shared.sides) {
         var div = p.createDiv().parent(tileUi)
-        sideUI(tile.tile.sides[i++], div);
+        sideUI(tile.tile.shared.sides[i++], div);
         var div = p.createDiv().parent(tileUi)
-        sideUI(tile.tile.sides[i++], div);
+        sideUI(tile.tile.shared.sides[i++], div);
         var div = p.createDiv().parent(tileUi)
-        sideUI(tile.tile.sides[i++], div);
+        sideUI(tile.tile.shared.sides[i++], div);
         var div = p.createDiv().parent(tileUi)
-        sideUI(tile.tile.sides[i++], div);
+        sideUI(tile.tile.shared.sides[i++], div);
     }
+
+    var div = p.createDiv().parent(tileUi)
+    let input = p.createInput('number').class("sidebit").parent(div).value(tile.tile.shared.weight);
+        input.input(() => {
+            let v = input.value();
+            if (v.length <= 0) return;
+            let a = Number.parseFloat(v);
+            tile.tile.shared.weight = a;
+        });
 }
 let editor = new n0fcEditor()
 
