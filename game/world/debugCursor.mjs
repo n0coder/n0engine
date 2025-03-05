@@ -24,9 +24,14 @@ export class DebugCursor{
         p.strokeWeight(5)
         let txt =  (this.tile.layers.length > 0) ? this.tile.layers[this.tile.layers.length-1].name : this.tile.biome.name
         p.text( this.tile != null ? txt : ":(", wisu.x1+(wisu.x2*1.5), wisu.y1+wisu.y2);
+        
         }
     } 
     mouseClicked() {
-        console.log(this.tile)
+        var isu = worldGrid.screenToGridPoint(p.mouseX, p.mouseY);
+        var wisu = worldGrid.gridToScreenBounds(isu.x, isu.y, 1, 1);
+        //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
+        let tile = worldGrid.getTile(isu.x, isu.y);
+        console.log({tile: tile, isu}, worldGrid.tiles)
     }
 }

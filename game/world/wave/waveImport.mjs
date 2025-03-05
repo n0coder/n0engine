@@ -49,6 +49,7 @@ function decomposeImage(img) {
     return { colors33: a, colors: bz, colorMap }
 }
 export let waves = new Map()
+export function load(){}
 n0loader.startLoading("categorization", (loaded) => {
     loadImgArray("assets/wave/categorization", 33, imgs => {
         for (let a = 0; a < imgs.length; a++) {
@@ -94,7 +95,7 @@ n0loader.startLoading("tiles", (loaded) => {
     let thresholds = {
 
     }
-    
+    /*
     function addTiles(purple) {
         for (let i = 0; i < purple.tiles.length; i++) {
             let tile = purple.tiles[i]
@@ -110,6 +111,7 @@ n0loader.startLoading("tiles", (loaded) => {
         }]
     }
     addTiles(purple)
+    */
     n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .945 }, { factor: "elevation", min: 0, max: .4 }]))
     n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }]))
     n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }], [{ factor: "elevation", value: .35 }]))

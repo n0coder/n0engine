@@ -3,7 +3,7 @@ import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp } from "../../../../engine/n0math/ranges.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
-let c = worldGrid.chunkSize, chunks = 1
+let c = worldGrid.chunkSize, chunks = 8
 export function drawChunks(nano) {
     for (let xc = -chunks; xc <= chunks; xc++) {
         for (let yc = -chunks; yc <= chunks; yc++) {

@@ -18,7 +18,7 @@ export function buildn0Collapse(tile) {
     console.log(tile)      
     let n0fc = tile.n0fc;
     if (n0fc.option) return; 
-    var options = n0fc.options.filter((o) => n0fc.noiseThresholdCondition(tile.genCache, o));
+    var options = [...n0fc.options];
     options = newCheckDir(x, y - 1, options, (a, b) => a.isUp(b))
     options = newCheckDir(x + 1, y, options, (a, b) => a.isRight(b))
     options = newCheckDir(x, y + 1, options, (a, b) => a.isDown(b))
@@ -38,7 +38,9 @@ export function buildn0Collapse(tile) {
         return { option: o, tile:tvt,  bias: multiple }
     })
 
-    
+    myOptionvs = myOptionvs.filter(({ option, tile, bias }) => 
+        n0fc.noiseThresholdCondition(tile.genCache, option, bias)
+    );
 
     let choice = weightedRandom(myOptionvs);
     n0fc.option = choice?.option;

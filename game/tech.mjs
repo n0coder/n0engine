@@ -8,9 +8,9 @@ n0loader.startLoading('world', (done) => {
     .then((script)=>{
         done();
     })
-}, ['assets']);
+}, ['tiles']);
 n0loader.startLoading('assets', (done) => {
-    import("./assets.mjs")
+    import("./world/wave/waveImport.mjs")
     .then((script)=>{
         script.load(done)
     })

@@ -50,6 +50,7 @@ export function genTile(x, y) {
         tile.layers.push(o)
     }
     worldGrid.setTile(x, y, tile)
+    return tile;
 }
 globalThis.tiles = 0;
 export function genChunk(x, y, w, h) {
