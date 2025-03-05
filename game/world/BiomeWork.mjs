@@ -191,9 +191,12 @@ let purebitter = [ "purebitter"]
 let lut =neutrallut;
 
 var grassy = [
-    "grass0", "grass1", "air", "air2", "abi"
+    'dirt0', 'dirt1', 'dirt2'
 ]
-
+for (let aih = 0; aih <= 17; aih++) {
+   //dirtGrass0
+   grassy.push(`dirtGrass${aih}`)
+}
 function formBiome(o) { //this is baking sugar into the generation... not ideal but it's ok.
     let plain = new Biome(o.name, o.name, 1, o.plaintags, o.tiles);
     plain.difficulty = o.difficulty;

@@ -19,10 +19,11 @@ export class Cell {
 
       let valid = tvt.thresholds.map(t => {
           let factor = gencache.get(t.factor);
+          
           if (!factor) return false;
-          let sum = inverseLerp(factor.minm, factor.maxm, factor.sum);
-              sum = lerp(-1, 1, sum);
-                return sum > t.min && sum < t.max;
+          let sum =  factor
+          console.log(sum, t)
+          return sum > t.min && sum < t.max;
       });
 
       return valid.every(v => v);

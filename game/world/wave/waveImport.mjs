@@ -112,12 +112,12 @@ n0loader.startLoading("tiles", (loaded) => {
     }
     addTiles(purple)
     */
-    n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .945 }, { factor: "elevation", min: 0, max: .4 }]))
-    n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }]))
-    n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }], [{ factor: "elevation", value: .35 }]))
-    n0tiles.set('purple3', new Tile('assets/wave/purple/3.png', [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }], [{ factor: "elevation", value: .35 }]))
-    n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }], [{ factor: "elevation", value: .35 }]))
-    n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .4, max: .875 }], [{ factor: "elevation", value: .35 }]))
+    n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .0, max: .945 }, { factor: "elevation", min: 0, max: .4 }]))
+    n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }]))
+    n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
+    n0tiles.set('purple3', new Tile('assets/wave/purple/3.png', [[0, 0, 0], [0, 0, 0], [0, 1, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
+    n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
+    n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
     n0tiles.set('purple6', new Tile('assets/wave/purple/6.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 1))
     n0tiles.set('green0', new Tile('assets/wave/green/0.png', [[2, 2, 2], [2, 3, 2], [2, 2, 2], [2, 3, 2]], 1, [{ factor: "elevation", min: -1, max: -.4 }]))
     n0tiles.set('green1', new Tile('assets/wave/green/1.png', [[2, 3, 2], [2, 2, 2], [2, 3, 2], [2, 2, 2]], 1, [{ factor: "elevation", min: -1, max: -.4 }]))

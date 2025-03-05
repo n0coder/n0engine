@@ -10,23 +10,27 @@ import { DebugCursor } from "../world/debugCursor.mjs";
 export let tile = null, tpos = null;
 export let tiles = [], edges = []
 let mc = new DebugCursor();
-worldGrid.gridSize=32
+worldGrid.gridSize=16
 worldGrid.x= 227210
 worldGrid.y= 117111
 class n0fcEditor {
     constructor(){
        this.setActive = setActive, this.renderOrder = -5;
        this.setActive(true)
-       this.state = "add"
-       this.scale = 1;
+       this.state = "paint"
+       this.scale = 2;
 
     }
     draw(){
         var { x, y } = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
         p.scale(this.scale)
-        for (const [_, {wfc, pos}] of worldGrid.tiles) {
+        for (const [_, {wfc,n0fc, pos}] of worldGrid.tiles) {
             if (wfc) {
                 p.image(wfc.img, pos.x, pos.y)
+            }
+            if (n0fc) {
+                if(n0fc?.tile?.img)
+                p.image(n0fc.tile.img, pos.x, pos.y)
             }
         }
 
@@ -55,6 +59,7 @@ class n0fcEditor {
 
 
         }
+        if (this.state==="add")
         if (tile?.wfc && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
             let size = worldGrid.gridSize / 3, hsize = size / 2, hgrid = worldGrid.gridSize / 2
 
@@ -92,6 +97,12 @@ class n0fcEditor {
             let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
         let wtile = worldGrid.getTile(x,y)
         if(wtile) setTile(wtile);
+
+        if (this.state === "paint"&&tpos) {
+            let ti = genTile(tpos.x, tpos.y)
+            ti.tpos = tpos;
+            ti.pos =tpos.screen();
+        }
         }
     }
     doubleClicked(){
@@ -99,6 +110,7 @@ class n0fcEditor {
             let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
 
         let wtile = worldGrid.getTile(x,y)
+        if(this.state ==="add")
         if (!wtile) {
             placeUpload = true
             fileInput.elt.click();
