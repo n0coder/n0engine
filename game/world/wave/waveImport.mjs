@@ -67,7 +67,7 @@ n0loader.startLoading("tiles", (loaded) => {
     n0tiles.set('grass2', new Tile('assets/plains/grass3.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{ factor: "humidity", value: 1 }]))
 
     let dirtWeight = 1 / 20
-    let humidityDirt = -.5//-((1/20)*50)
+    let humidityDirt = -.2//-((1/20)*50)
     n0tiles.set('dirtGrass0', new Tile('assets/plains/dirtGrass0.png', [[0, 0, 0], [0, 0, 1], [1, 1, 1], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
     n0tiles.set('dirtGrass1', new Tile('assets/plains/dirtGrass1.png', [[1, 1, 1], [1, 0, 0], [0, 0, 0], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
     n0tiles.set('dirtGrass2', new Tile('assets/plains/dirtGrass2.png', [[1, 0, 0], [0, 0, 0], [1, 0, 0], [1, 1, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))

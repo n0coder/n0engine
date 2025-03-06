@@ -13,7 +13,8 @@ export class Cell {
         }
       }
     }
-  noiseThresholdCondition(gencache, o) {
+  noiseThresholdCondition(gencache, o, bias) {
+    if (bias == NaN) bias = 0
       let tvt = n0tiles.get(o);
       if (!tvt) return false;
 
@@ -21,8 +22,7 @@ export class Cell {
           let factor = gencache.get(t.factor);
           
           if (!factor) return false;
-          let sum =  factor
-          console.log(sum, t)
+          let sum =  factor +bias
           return sum > t.min && sum < t.max;
       });
 

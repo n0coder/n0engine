@@ -17,16 +17,16 @@ export function buildn0Collapse(tile) {
     if (rules.length === 0) return;
     
     if (!tile.n0fc) 
-        tile.n0fc = new Cell(rules)  
-    console.log(tile)      
+        tile.n0fc = new Cell(rules)      
     let n0fc = tile.n0fc;
+    n0fc.v = 2; 
     if (n0fc.option) return; 
     var options = [...n0fc.options];
     options = newCheckDir(x, y - 1, options, (a, b) => a.isUp(b))
     options = newCheckDir(x + 1, y, options, (a, b) => a.isRight(b))
     options = newCheckDir(x, y + 1, options, (a, b) => a.isDown(b))
     options = newCheckDir(x - 1, y, options, (a, b) => a.isLeft(b))
-    console.log(options)
+   
     let later = []
     var myOptionvs = options.map(o => {
         var tvt = n0tiles.get(o);
@@ -35,18 +35,19 @@ export function buildn0Collapse(tile) {
         for (var t of tvt.biases) {
             var factor = tile.genCache.get(t.factor)
             if (!factor) continue; //if the factor doesn't exist don't use it
-            var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
-            multiple *= lerp(-t.value, t.value, bias)
+
+            var bias = inverseLerp(-1, 1, t.value)
+            //            var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
+
+            multiple *= bias
+
         }
         return { option: o, bias: multiple }
     })
-    console.log(myOptionvs)
     myOptionvs = myOptionvs.filter(({ option, bias }) => 
         n0fc.noiseThresholdCondition(tile.genCache, option, bias)
     );
-    console.log(myOptionvs)
     let choice = weightedRandom(myOptionvs);
-    console.log(choice)
     n0fc.option = choice;
     n0fc.tile = n0tiles.get(choice);
     function newCheckDir(x, y, options, conditionFunc) {
@@ -62,7 +63,7 @@ export function buildn0Collapse(tile) {
             })
         } else return options;
     }
-    
+
 }
 
 function weightedRandom(items) {

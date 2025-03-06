@@ -32,6 +32,6 @@ export class DebugCursor{
         var wisu = worldGrid.gridToScreenBounds(isu.x, isu.y, 1, 1);
         //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
         let tile = worldGrid.getTile(isu.x, isu.y);
-        console.log({tile: tile, isu}, worldGrid.tiles)
+        //console.log({tile: tile, isu}, worldGrid.tiles)
     }
 }
