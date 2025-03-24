@@ -6,7 +6,6 @@ export class NanoInventory extends Inventory {
         super(slots);
         this.offsets = offsets;
     }
-
     isPhysical(item) {
         let index = this.list.indexOf(item);
         return index >= 0 && index < this.offsets.length
@@ -35,12 +34,15 @@ export class NanoInventory extends Inventory {
         }
     }
     add(item) { //0
-        return super.add(item, ()=>{
+        let a = super.add(item, ()=>{
             if (item.renderOrder!=undefined)
             item.renderOrder = 3
            item.held = true;
             this.refresh()
         })
+        console.log(item, a)
+        
+        return a
     }
        
     drop(item) {

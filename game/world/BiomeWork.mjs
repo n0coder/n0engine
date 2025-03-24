@@ -11,7 +11,7 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 //lets split world height into 2 ideas
 //erosion, and 
 var height = new RangeMap(0, 1)
-height.add("deep", .15).add("low", .15).add("border", .35)
+height.add("deep", .05).add("low", .15).add("border", .35)
 height.add("surface", 1).add("high", .1).add("cloud", .1)
 addBiomeFactors(height, "elevation",worldFactors);
 
@@ -46,11 +46,11 @@ river.add("otheriver", 7) //bigest part i thought
 addBiomeFactors(river, "rivers",worldFactors);
 
 var sugarzone = new RangeMap(0, 1)
-sugarzone.add("bitterzone",2).add("plainzone",2).add("sweetzone",2)
+sugarzone.add("bitterzone",2).add("sweetzone",2)
 addBiomeFactors(sugarzone, "sugarzone",worldFactors);
 var sugar = new RangeMap(0, 1)
-sugar.add("bitter",2).add("plain",1.25).add("sweet",2)
-//addBiomeFactors(sugar, "sugar");
+sugar.add("bitter",2).add("sweet",2)
+addBiomeFactors(sugar, "sugar",worldFactors);
 
 
 var fantasy = new RangeMap(0, 1);
@@ -191,21 +191,26 @@ let purebitter = [ "purebitter"]
 let lut =neutrallut;
 
 var grassy = [
-    'dirt0', 'dirt1', 'dirt2'
+    'dirt0', 'dirt1', 'dirt2', 'grass0', 'grass1', 'grass2', 'grass3', 'grass4', 'grass5', 'grass6', 'grass7', 'grass8'
 ]
 for (let aih = 0; aih <= 17; aih++) {
    //dirtGrass0
    grassy.push(`dirtGrass${aih}`)
 }
 function formBiome(o) { //this is baking sugar into the generation... not ideal but it's ok.
+    
     let plain = new Biome(o.name, o.name, 1, o.plaintags, o.tiles);
     plain.difficulty = o.difficulty;
+    plain.sugara=1;
     biomes.unshift(plain)
+    
     let sweet = new Biome("sweet"+o.name, o.name, 2, o.sweettags, o.tiles);
-    sweet.difficulty = o.difficulty;
+    sweet.difficulty = o.difficulty-1;
+    sweet.sugara =2;
     biomes.unshift(sweet)
     let bitter = new Biome("bitter"+o.name, o.name, 0, o.bittertags, o.tiles);
-    bitter.difficulty = o.difficulty;
+    bitter.difficulty = 3+o.difficulty;
+    bitter.sugara=0
     biomes.unshift(bitter)
 }
 
@@ -254,8 +259,8 @@ formBiome({
 formBiome({
     name: "beach",
     plaintags: ["border"], tiles: ["dirt0", "dirt1", "dirt2"],
-    sweettags: ["border", "sweetzone"],
-    bittertags: ["border", "bitterzone"],
+    sweettags: ["border", ...sweeta],
+    bittertags: ["border", ...bittera],
     difficulty: 1
 })
 formBiome({
@@ -328,7 +333,7 @@ formBiome({
     plaintags: [...forest, [["cold"], ["warm"], "moderate"], ["neutral", "moist"]], tiles: [...grassy],
     sweettags: [...forest, [["cold",...sweeta], ["warm",...sweeta], "moderate"], ["neutral", "moist",...sweeta]],
     bittertags: [...forest, [["cold",...bittera], ["warm",...bittera], "moderate"], ["neutral", "moist",...bittera]],
-    difficulty: 1
+    difficulty: 2
 })
 let jungle = [surface, "warm"];
 formBiome({
@@ -370,6 +375,7 @@ formBiome({
     bittertags: [...lowsand, ...bittera],
     difficulty: 2
 })
+/*
 let deepsand = ["deep", "hot"];
 formBiome({
     name: "deepsand",
@@ -378,7 +384,7 @@ formBiome({
     bittertags: [...deepsand, ...bittera],
     difficulty: 3
 })
-
+*/
 let riverborder = ["riverborder", surface ];
 formBiome({
     name: "riverborder",
@@ -393,7 +399,7 @@ formBiome({
     plaintags: [...rivera], tiles: ["ledgamo", "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
     sweettags: [...rivera, ...sweeta],
     bittertags: [...rivera, ...bittera],
-    difficulty: 3
+    difficulty: 5
 })
 let mountain = ["high"];
 formBiome({
@@ -446,6 +452,9 @@ function pop(array) {
 }
 
 export function buildBiome(tile) {
+    if (tile.tags) return tile;
+    tile.tags = [];
+    
     if (tile.biome) return tile;
     let biomex = [];
     for (const b of biomes) {

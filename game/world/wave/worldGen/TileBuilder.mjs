@@ -12,7 +12,7 @@ export function addSugar(tile) { //sugar data does not exist, make it using biom
 }
     if (tile.biome === null) {
         tile.broken = true;
-        biome.pathDifficulty = 9;
+        tile.pathDifficulty = 9;
         return;
     }
     let sugar = tile.genCache.get("sugarzone");
@@ -40,8 +40,13 @@ export function genTile(x, y) {
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
         addSugar, //uss sugar and biome to set basic sugar level    
-        buildn0Collapse
+        //buildn0Collapse
     ])
+    
+    let t = tile.genCache.get("elevation")
+    let elevation = worldFactors.get("elevation")
+    let zz = inverseLerp(elevation.mini, elevation.maxi, t)
+    tile.z = Math.floor( lerp(0, 32, zz) )
     globalThis.tiles += 1
     
     if (typeof tilet === 'function') {

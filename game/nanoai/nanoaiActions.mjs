@@ -161,13 +161,12 @@ export const nanoaiActions = new Map([
         },
         
    }}],
-    ["harvest",function(...args) { return  {
-        args,
+    ["harvest",function(soil) { return  {
         before: ["follow"],
         work: function (nano) {
-            if (this.args[0] && this.args[0].harvest)
-                return this.args[0].harvest(nano);
-            return false
+            
+            return soil?.harvest?.(nano);
+           
         },
         
    }}],
@@ -182,36 +181,30 @@ export const nanoaiActions = new Map([
         },
         
    }}],
-    ["plant",function(...args) { return  {
-        args, hooked: false,
+    ["plant",function(soil, seeds) { return  {
+        before: ["follow"],
         work: function (nano) {
-            if (!this.hooked) {
-                nano.brain.doNow("follow", args[0])
-                this.hooked=true;
-                return true;
-            }
-            var plant = this.args[0].plant;
-            if (plant) {
-                var wait = this.args[0].plant(nano, this.args[1]);
-                return wait
+            if (soil.plant) {
+                return soil.plant(nano, seeds);
             }
             return true
         },
         
    }}],
-   ["hook", function(...args) { 
+   ["hook", function(init, repeats, done) { 
     let traphook = {pull: null};
     let trap = {
-        args, okok: true, 
+        okok: true, 
         work: function (nano) { //this is called every frame until we return false
-            
             if (!traphook.pull) {
                 traphook.pull = (d) => {
                     this.okok = false;
-                    args[1]?.(d)
+                    done?.(d)
                 }
-                args[0](traphook, this);
+                if (!repeats) init(traphook, this); //only called on init
+
             }
+            if (repeats&&this.okok) init(traphook, this); //called every time this action is touched
             return this.okok;
         }        
     }
@@ -230,8 +223,6 @@ export const nanoaiActions = new Map([
             args, work: function (nano) {
                 let brain = nano.brain;
                 let t = .1;
-
-                brain.doAfter(this, "hook", (hook) => { hook.pull("XD") }, () => console.log("hook pulled XD"))
 
                 brain.doAfter(this, "hook", (hook, marker) => {
                     brain.doBefore(marker, "walkRelative", -1, 0) 
@@ -265,8 +256,6 @@ export const nanoaiActions = new Map([
             args, work: function (nano) {
                 let brain = nano.brain;
                 let t = .1;
-
-                brain.doAfter(this, "hook", (hook) => { hook.pull("XD") }, () => console.log("hook pulled XD"))
 
                 brain.doAfter(this, "hook", (hook, marker) => {
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = 0; nano.vx = -1 });                    
@@ -439,15 +428,15 @@ export function walk(nano, x, y, magn = 1) {
     }
 
     let tile = worldGrid.getTile(nano.x, nano.y);
-    let speed = (tile && tile.pathDifficulty) || 7
-    var sod = inverseLerp(8,4, speed)
+    let speed = (tile && tile.pathDifficulty) ?? 7
+   
+    var sod = inverseLerp(7,0, speed)
     sod = clamp(0, 1, sod);
     sod = lerp(.5, 1, sod);
-    
-    p.text(`${sod}`, nano.visualX, nano.visualY);
+    //console.log(sod)
+    p.text(`${sod} | ${speed}`, nano.visualX, nano.visualY);
     nano.x += vx * deltaTime * nano.speed*sod;
     nano.y += vy * deltaTime * nano.speed*sod;
-
     return mag >= magn;
 }
 

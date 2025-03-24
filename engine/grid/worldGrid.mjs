@@ -10,7 +10,8 @@ export class WorldGrid {
         this.tiles.set(`${this.x+ x}, ${ this.y+ y}`, obj);
     }
     getTile(x,y) {
-        return this.tiles.get(`${this.x+x}, ${this.y+y}`)
+        var xx = Math.floor(x), yy = Math.floor(y)
+        return this.tiles.get(`${this.x+xx}, ${this.y+yy}`)
     }
 
     get halfTileSize() {

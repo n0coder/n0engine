@@ -3,7 +3,11 @@ export class Inventory {
         this.slots = slots;
         this.list = [];
     }
-
+    *[Symbol.iterator]() {
+        for (const item of this.list) {
+          yield item;
+        }
+      }
     transfer(inventory) {
         var all = this.list.splice(0)
         inventory.transferRecieve(all)

@@ -62,12 +62,19 @@ n0loader.startLoading("categorization", (loaded) => {
 
 n0loader.startLoading("tiles", (loaded) => {
 
-    n0tiles.set('grass0', new Tile('assets/plains/grass.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass1', new Tile('assets/plains/grass2.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass2', new Tile('assets/plains/grass3.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [...grassFactors], [{ factor: "humidity", value: 1 }]))
-
+    n0tiles.set('grass0', new Tile('assets/plains/grass.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass1', new Tile('assets/plains/grass2.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass2', new Tile('assets/plains/grass3.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [], [{ factor: "humidity", value: 1 }]))
+    
+    n0tiles.set('grass3', new Tile('assets/plains/grass4.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1.3 }]))
+    n0tiles.set('grass4', new Tile('assets/plains/grass5.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1.3 }]))
+    n0tiles.set('grass5', new Tile('assets/plains/grass6.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass6', new Tile('assets/plains/grass7.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass7', new Tile('assets/plains/grass8.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1 }]))
+    n0tiles.set('grass8', new Tile('assets/plains/grass9.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 10, [], [{ factor: "humidity", value: 3 }]))
+    
     let dirtWeight = 1 / 20
-    let humidityDirt = -.2//-((1/20)*50)
+    let humidityDirt = -.5//-((1/20)*50)
     n0tiles.set('dirtGrass0', new Tile('assets/plains/dirtGrass0.png', [[0, 0, 0], [0, 0, 1], [1, 1, 1], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
     n0tiles.set('dirtGrass1', new Tile('assets/plains/dirtGrass1.png', [[1, 1, 1], [1, 0, 0], [0, 0, 0], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
     n0tiles.set('dirtGrass2', new Tile('assets/plains/dirtGrass2.png', [[1, 0, 0], [0, 0, 0], [1, 0, 0], [1, 1, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))

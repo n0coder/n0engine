@@ -3,6 +3,7 @@ import { n0tiles } from "./n0FunctionCollapse.mjs";
 import { Cell } from "./Cell.mjs";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
+import { worldFactors } from "../FactorManager.mjs";
 
 export const n0alea = Alea("n0");
 
@@ -26,7 +27,10 @@ export function buildn0Collapse(tile) {
     options = newCheckDir(x + 1, y, options, (a, b) => a.isRight(b))
     options = newCheckDir(x, y + 1, options, (a, b) => a.isDown(b))
     options = newCheckDir(x - 1, y, options, (a, b) => a.isLeft(b))
-   
+    options = newCheckDir(x - 1, y - 1, options, (a, b) => a.isUpLeft(b));   // Up-left
+    options = newCheckDir(x + 1, y - 1, options, (a, b) => a.isUpRight(b));  // Up-right
+    options = newCheckDir(x - 1, y + 1, options, (a, b) => a.isDownLeft(b)); // Down-left
+    options = newCheckDir(x + 1, y + 1, options, (a, b) => a.isDownRight(b)); // Down-right
     let later = []
     var myOptionvs = options.map(o => {
         var tvt = n0tiles.get(o);
@@ -34,12 +38,12 @@ export function buildn0Collapse(tile) {
         let multiple = 1;
         for (var t of tvt.biases) {
             var factor = tile.genCache.get(t.factor)
+            let wf = worldFactors.get(t.factor)
             if (!factor) continue; //if the factor doesn't exist don't use it
+            
+            var bias = inverseLerp(wf.mini, wf.maxi, factor)
+            multiple *= lerp(-t.value, t.value, bias)
 
-            var bias = inverseLerp(-1, 1, t.value)
-            //            var bias = inverseLerp(factor.minm, factor.maxm, factor.sum)
-
-            multiple *= bias
 
         }
         return { option: o, bias: multiple }
@@ -63,7 +67,6 @@ export function buildn0Collapse(tile) {
             })
         } else return options;
     }
-
 }
 
 function weightedRandom(items) {

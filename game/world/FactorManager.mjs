@@ -110,9 +110,9 @@ worldFactors.set("fantasy", fantasy);
 
 var triverWsforks2 = new NoiseGenerator({ scale: scale * 350, octaves: 5, persistance: .5, lacunarity: 1.3, offset: 0, offsetX: 533, offsetY: 3222, amp: 2 })
 var triverWsforks = new NoiseGenerator({ scale: scale * 350, abs: true, octaves: 5, persistance: .5, offset: 0, lacunarity: 1.75, offsetY: triverWsforks2, offsetX: 1653, amp: 1 })
-var sugar = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
+var sugar = new NoiseGenerator({ scale: scale * 550, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [0, 2] });
 var sugarO = new NoiseGenerator({scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222  });
-var bitter = new NoiseGenerator({ scale: scale * 250, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
+var bitter = new NoiseGenerator({ scale: scale * 550, octaves: 6, persistance: .5, lacunarity: 2, offsetX: triverWsforks, offsetY: -3222, blend: [-2, 0] });
 /*
 var sugarzonea = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
     add: [[elevation, -.2]], mapSpace: [0, 1], map: [

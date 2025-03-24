@@ -10,27 +10,35 @@ import { DebugCursor } from "../world/debugCursor.mjs";
 export let tile = null, tpos = null;
 export let tiles = [], edges = []
 let mc = new DebugCursor();
-worldGrid.gridSize=16
+worldGrid.gridSize=8
 worldGrid.x= 227210
 worldGrid.y= 117111
 class n0fcEditor {
     constructor(){
        this.setActive = setActive, this.renderOrder = -5;
        this.setActive(true)
-       this.state = "paint"
-       this.scale = 2;
+       this.state = "add"
+       this.scale = 4;
 
     }
     draw(){
-        var { x, y } = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
+        var { x, y } =worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
         p.scale(this.scale)
-        for (const [_, {wfc,n0fc, pos}] of worldGrid.tiles) {
+        for (const [_, t] of worldGrid.tiles) {
+            var {wfc,n0fc, biome, pos}=t
+            if (biome) {
+                let color = biome.colorsugar(t)
+                p.fill(color);
+                p.rect(pos.x, pos.y, worldGrid.gridSize, worldGrid.gridSize)
+            }
             if (wfc) {
                 p.image(wfc.img, pos.x, pos.y)
             }
             if (n0fc) {
-                if(n0fc?.tile?.img)
-                p.image(n0fc.tile.img, pos.x, pos.y)
+                let i = n0fc?.tile?.img
+                if(i) {
+                p.image(i, pos.x, pos.y-i.height+worldGrid.gridSize)
+                }
             }
         }
 
@@ -81,6 +89,8 @@ class n0fcEditor {
                 p.text(side.get()[2], tile.pos.x + hgrid + x3, tile.pos.y + hgrid + y3)
                
             }
+
+            p.textSize(16/this.scale)
             drawSide(0)
             var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
             drawSide(1)
@@ -94,17 +104,41 @@ class n0fcEditor {
     }
     mousePressed() {
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
-            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
-        let wtile = worldGrid.getTile(x,y)
-        if(wtile) setTile(wtile);
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale);
+            let wtile = worldGrid.getTile(x, y);
 
-        if (this.state === "paint"&&tpos) {
-            let ti = genTile(tpos.x, tpos.y)
-            ti.tpos = tpos;
-            ti.pos =tpos.screen();
-        }
+            if (this.state === "add") {
+                if (wtile) setTile(wtile);
+            }
+
+            if (this.state === "paint" && tpos) {
+                this.isPainting = true; // Start painting
+                this.paintTile(tpos.x, tpos.y); // Paint immediately on click
+            }
         }
     }
+
+    mouseDragged() {
+        if (this.state === "paint" && this.isPainting) {
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale);
+            let wtile = worldGrid.getTile(x, y);
+            if (!wtile) { // Only paint if there's no tile already
+                this.paintTile(x, y);
+            }
+        }
+    }
+
+    mouseReleased() {
+        if (this.state === "paint") {
+            this.isPainting = false; // Stop painting when mouse is released
+        }
+    }
+
+    paintTile(x, y) {
+        let ti = genTile(x, y);
+        ti.pos = worldGrid.gridToScreenPoint(x, y);
+    }
+
     doubleClicked(){
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
             let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)

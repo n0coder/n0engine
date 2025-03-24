@@ -44,7 +44,8 @@ export function findPath(cX, cY, tX, tY, sightDistance, padding, out) {
             let ga =  minax + x - pad;
             let gb = minay + y - pad;
             let tile = worldGrid.getTile(ga, gb);
-            gridArray[y][x] = (tile && tile.pathDifficulty) || 7
+            let p = (tile && tile.pathDifficulty) ?? 7
+            gridArray[y][x] = p <0 ?0 :p
         }
     }
 
@@ -107,6 +108,8 @@ function stars(grid) {
     astar.setTileCost(5, 5) //rocky
     astar.setTileCost(6, 6) //thicks
     astar.setTileCost(7, 7) //bitter
+    astar.setTileCost(8,8)
+    astar.setTileCost(9,9)
     return function (ax, ay, bx, by, pathFn) {
        
         astar.findPath(ax, ay, bx, by, pathFn);

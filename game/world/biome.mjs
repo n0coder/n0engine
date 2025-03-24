@@ -23,6 +23,7 @@ document.lutMissingMap = new Map()
 export class Biome {
     constructor(name, colorName, color, tags, tiles) {
         this.name = name
+        this.sugara=null;
         this.colorName = colorName;
         if (!luts[0][colorName]) 
             document.lutMissingMap.set(`0, ${colorName}`, true);
@@ -52,6 +53,13 @@ export class Biome {
         let g = cubicBlendW([this.bitter[1], this.plain[1], this.sugar[1]], isu, 2)
         let b = cubicBlendW([this.bitter[2], this.plain[2], this.sugar[2]], isu, 2)
         return [r,g,b]
+    }
+    colora(){
+        let c = {}
+        c[0]=this.bitter
+        c[1]=this.plain
+        c[2]=this.sugar
+        return c[this.sugara]
     }
     getDifficulty (tile) {
         var gc = tile.sugar;

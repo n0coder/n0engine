@@ -22,17 +22,18 @@ loadImgArray("assets/nano/left", 4, imgArray => {
     addAnimationSet("nano", "walkLeft", imgArray)
 });
 export class Nanoai {
-    constructor(name, x, y) {
+    constructor(name, x, y, z) {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
+        this.z = z
         this.fov = 180, this.sightRadius = worldGrid.gridSize*2.5; //reasonable fov
         this.speed = 5;
         this.sugar = -4;
         this.lover = null;
         loadImg('../nanoai.png', (img) => this.img = img);
         this.brain = new NanoaiBrain(this);
-        this.inventory = new NanoInventory(3, [[-0, -0], [1, -0], [0, -20]]);
+        this.inventory = new NanoInventory(9, [[-0, -0], [1, -0], [0, -20]]);
         this.identity = {
             skills: new Map([
                 ["harvesting", 1],
