@@ -14,7 +14,6 @@ nanoaiActions.set("craft", function (table, item){
             //do the inventory management here
             
             let out = table.craft(nano, item);
-            console.log(out)
             return out
         },
         

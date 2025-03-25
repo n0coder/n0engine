@@ -9,13 +9,9 @@ export var jobTasksa = new Map([
         console.log(args)
         return {
             name: "smile",
-            args, working: false, job:null,
-            requires: [["hold", args[0]]],
+            args, requires: [["hold", args[0]]],
             interactions: [["smiling"]], 
-            work: function(nano, done) {
-                console.log(done)
-                if (this.working) return true;
-                this.working = true;
+            work: function(job, nano, done) {
                 console.log(`${nano.name} smiling`, args, this.items);
                 done(this);
             }
@@ -23,12 +19,9 @@ export var jobTasksa = new Map([
     }], ["wink", function(...args) {
         return {
             name: "wink",
-            args, working: false, job:null,
+            args,
             interactions: [["winking"]], 
-            work: function(nano, done) {
-                console.log(done)
-                if (this.working) return true;
-                this.working = true;
+            work: function(job, nano, done) {
                 this.item.winked = "winked";
                 console.log(`${nano.name} winking`, args);
                 done(this);
@@ -37,29 +30,21 @@ export var jobTasksa = new Map([
     }],["hold", function(...args) {
         return {
             name: "hold",
-            args, working: false, job:null, pos: [args[0].x, args[0].y], //?
+            args, pos: [args[0].x, args[0].y], //?
             interactions: [["walking"],["pickup", "item", args[0]]], 
-            work: function(nano, done) {
-                console.log(this.args)
-                if (this.working) return true;
-                this.working = true;
+            work: function(job, nano, done) {
                 this.item.item = this.args[1];
                 nano.brain.do("pickup", this.item.item, null, (a)=>{
                     console.log("picked up", a);
                     this.args[0](this);
                 })
-                
-                //done(this);
+                done(this);
             }
         }
     }],
     ["read", function(args) {
-        return { args, job: null,
-        working: false,
+        return { args,
         work: function(job, nano, done) {
-            if (this.working) return true;
-            this.working = true;
-            
             if (this.crop === null) {
                 this.crop = job.crops.find(c => c.waterLevel === null);
                 this.crop.waterLevel = NaN
@@ -79,8 +64,9 @@ var stageTemplate = {
     work: function(job, nano) {
         let task = this.workIndex.get(nano);
         if (task) {
-            task.work(job, nano, (task)=>this.taskComplete(job, this,nano,task));
-            return true;
+            let a = task.work(job, nano)
+            if (!a) this.taskComplete(job, this,nano,task)
+            return a;
         } else {
             /*
             // this part of the functionality is depreciated, obsolete
@@ -183,9 +169,9 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
 }
 var job = {
     hire: null,
-    work: function(nano) {
+    work: function(nano, ...args) {
         let currentStage = this.stages[this.stage];
-        currentStage.work(this, nano);
+        return currentStage.work(this, nano);
     },
     stageComplete: function(stage) {
         //if the stage is complete, move onto the next stage
@@ -316,3 +302,24 @@ export function nanoStageSearch(nano, stage) {
         return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(t, n,stage))
     }
 }
+
+
+jobTasksa.set("gatherSeeds", function() {
+    return {
+        name: "gatherSeeds",
+        work: function(job, nano) {
+            console.log(`${nano.name} gathering seeds`);
+        }
+    }
+});
+
+// Define the plant seeds task
+jobTasksa.set("plantSeeds", function() {
+    return {
+        name: "plantSeeds",
+        requires: [["gatherSeeds"]],
+        work: function(job, nano) {
+            console.log(`${nano.name} planting seeds`);
+        }
+    }
+});

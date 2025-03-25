@@ -241,19 +241,20 @@ class Radio {
         return nanos.filter((n) => (this.findChannel(channel, n) === this.findChannel(channel, c)));
     }
     assignTask(job, stage, task, nano) {
-        console.log({stage, task, nano})
         let i = stage.tasks.indexOf(task);
         if (i != -1) {
             stage.tasks.splice(i,1) //remove from tasks
             stage.workIndex.set(nano, task);
             console.log({goal: "giving nano task", nano, task })
             //give the nano the task...
-            nano.brain.do(task, (task)=>{stage.taskComplete(job, stage,nano, task);console.log("yo")}) // ...
+            let action = nano.brain.do(job) // ...
+            nano.brain.do("ping", console.log("job done"))
+            console.log({nano, action})
+            task.done = (task)=>{stage.taskComplete(job, stage,nano, task); nano.brain.remove(action) }
             this.nanosSearching.delete(nano); //remove from searching
         } 
     }
     findJob(key) {
-        console.log(key);
         //what would we do if multiple nanos are a key
         //so we gotta find jobs where both nanos can work together well
         //say we insert nanoai team, they will queue up for jobs together
@@ -271,7 +272,7 @@ class Radio {
                 jobScores.push([job, best])
             }
         }
-        c
+        
         for (const [ckey, channel] of this.channels) {
             if (channel.getJobs) {
                 let jobs = channel.getJobs(key);

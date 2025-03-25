@@ -100,7 +100,10 @@ export class NanoaiBrain {
       this.laterQueue.splice(0, 0, t); 
     }); 
   }
-
+  remove(task) {
+    var i = this.queue.indexOf(task);
+    this.queue.splice(i, 1);
+  }
   actionBuilder(task, args, found) {
     if (typeof task === 'string') {
     var action = nanoaiActions.get(task);

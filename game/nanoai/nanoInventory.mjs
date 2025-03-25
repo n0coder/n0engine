@@ -40,8 +40,6 @@ export class NanoInventory extends Inventory {
            item.held = true;
             this.refresh()
         })
-        console.log(item, a)
-        
         return a
     }
        

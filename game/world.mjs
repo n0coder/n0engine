@@ -5,11 +5,21 @@ import { worldGrid } from "../engine/grid/worldGrid.mjs";
 import { Seed } from "./world/props/seed.mjs";
 import { Soil } from "./farm/soil.mjs";
 import { CraftingTable } from "./world/props/craftingTable.mjs";
+import { createJobu } from "./radio/jobSystem.mjs";
+import { n0radio } from "./radio/n0radio.mjs";
 worldGrid.x= 32*0
 worldGrid.y= 32*-7
 
 let n0 = new Nanoai("n0",10,10, 20)
 globalThis.n0 = n0;
+
+
+
+// Create the job
+const plantJob = createJobu(["a"], "plantSeeds");
+n0radio.postJob("nano", plantJob)
+
+
 
 //let bfc = new WorldGenerator(n0)
 /*
@@ -23,6 +33,16 @@ var craftingTable = new CraftingTable(11,16)
 var seed = new Seed(6,6)
 n0.brain.do("pickup", seed)
 
+/*
+   core game loop:
+   a nano wants to do something, so we give them a project, as they form ideas they form jobs and start working.
+   a job like fill the soils with seeds springs nanos into action, 
+   crafting will require items so a nano will have to start the collection process.
+   the core game loop from the players view is creating jobs for the nano
+   the nanos handle all the tedius work.
+   its alot like a factory building game?
+*/
+
 let soils = [];
 for (let o = 10; o < 11; o++)
 for (let i = 10; i < 20; i++) {
@@ -30,16 +50,6 @@ for (let i = 10; i < 20; i++) {
     soils.push(new Soil(i, o))
 
 }
-let dan = 0
-n0.brain.do("hook", (hook, marker)=>{
-    if (dan < 10) {
-        n0.brain.doBefore(marker, "dance")
-    dan += 1
-    }else hook.pull()
-    console.log("runs every frame until hook is pulled")
-}, true, () => {
-    console.log("hook pulled")
-})
 function plant(slot) {
     n0.brain.do("plant", soils[slot])
 }
