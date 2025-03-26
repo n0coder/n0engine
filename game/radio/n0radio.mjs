@@ -193,7 +193,11 @@ class Radio {
             }
         }
     }
-
+    findNano(job, channel, key){
+        if (n0radio.nanosSearching.size === 0) return;
+        let nanos = n0radio.nanosInChannel(channel, key)
+        job.hireNanos(nanos)
+    }
     postJob(channel, job, key) {
         let c = this.findCreateChannel(channel, key);
         if (c) {
@@ -205,54 +209,46 @@ class Radio {
             }
             this.findNano(job, channel, key) //we want to tell any nanos currently waiting, that they can start working
         }
+        if (key)
+        job.keys.push(key)
+        job.done.add(()=>this.jobDone(job))
+        job.failed.add(()=>this.jobFail(job))
+        job.nanoAssigned.add(()=>{
+            this.nanosSearching.delete(nano); //remove from searching
+        })
         job.hire = ()=> {this.findNano(job, channel, key)}
     }
-    
-    findNano(job, channel, key) {
-        console.log({job, channel, key})
-        if (this.nanosSearching.size === 0) return;
-        let stage = job.stages[job.stage]
-        let nanos = this.nanosInChannel(channel, key)
-        let tasks = stage.tasks;
-        //the idea is that we rank the nanos based on the tasks
-        //highest score nano and task get job
-        
-        //conditional entry, loop until nanos are still searching
-        while (nanos.length > 0 && tasks.length > 0) {
-            let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage));
-
-            let bestScore = -Infinity, bestNano = null;
-            for (let [o, t] of score) {
-                if (bestScore < t.score) {
-                    bestNano = [o, t.b], bestScore = t.score;
-                }
+    removeJob(channel, job, key) {
+        let c = this.findChannel(channel, key);
+        console.log({c, channel, key})
+        if (c) {
+            
+            //if c is a type with a custom post, we use that version instead of directly pushing to the channel list
+            if (c.removeJob) { 
+                c.removeJob(job, key)
+            } else {
+                let i = c.jobs.indexOf(job)
+                c.jobs.splice(i, 1)
             }
-            this.assignTask(job, stage, bestNano[0], bestNano[1])
-
-            //this.nanosInChannel(channel, key); //idk what this for
         }
-        console.log("complete");
-
     }
-
+    
     nanosInChannel(channel, c) {
-        console.log(this.nanosSearching)
         let nanos = Array.from(this.nanosSearching.keys())
         return nanos.filter((n) => (this.findChannel(channel, n) === this.findChannel(channel, c)));
     }
-    assignTask(job, stage, task, nano) {
-        let i = stage.tasks.indexOf(task);
-        if (i != -1) {
-            stage.tasks.splice(i,1) //remove from tasks
-            stage.workIndex.set(nano, task);
-            console.log({goal: "giving nano task", nano, task })
-            //give the nano the task...
-            let action = nano.brain.do(job) // ...
-            nano.brain.do("ping", console.log("job done"))
-            console.log({nano, action})
-            task.done = (task)=>{stage.taskComplete(job, stage,nano, task); nano.brain.remove(action) }
-            this.nanosSearching.delete(nano); //remove from searching
-        } 
+    jobDone(job) {
+        console.log("job done", job)
+        
+        for (const [ckey, channel] of this.channels) {
+            if (job.keys.length > 0) {
+            for (let key of job.keys)
+            this.removeJob(ckey, job, key)
+            } else this.removeJob(ckey, job)
+        }
+    }
+    jobFail(job) {
+        console.log("job failed", job)
     }
     findJob(key) {
         //what would we do if multiple nanos are a key
@@ -260,7 +256,6 @@ class Radio {
         //say we insert nanoai team, they will queue up for jobs together
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
-        console.log(this.nanosSearching)
         console.log("(nano searching): nano is searching")
         let jobScores = [];
         function rateJobs(jobs, nano) {
@@ -300,12 +295,13 @@ class Radio {
 
         let stage = job[0].stages[job[0].stage]
         let task = job[1].get(key).b
-        this.assignTask(job[0], stage, task, key);
-        
+        stage.assignTask(job[0], stage, task, key);
     }
     constructor(){
         this.nanosSearching = new Map();
         this.channels = new Map();
+        this.friendsList = new Map();
     }
 }
 export let n0radio = new Radio();
+globalThis.n0radio = n0radio

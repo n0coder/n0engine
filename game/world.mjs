@@ -7,6 +7,7 @@ import { Soil } from "./farm/soil.mjs";
 import { CraftingTable } from "./world/props/craftingTable.mjs";
 import { createJobu } from "./radio/jobSystem.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
+import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 worldGrid.x= 32*0
 worldGrid.y= 32*-7
 
@@ -14,9 +15,9 @@ let n0 = new Nanoai("n0",10,10, 20)
 globalThis.n0 = n0;
 
 
-
+let o = {o:"o"}
 // Create the job
-const plantJob = createJobu(["a"], "plantSeeds");
+const plantJob = createJobu([o,o], "plantSeeds");
 n0radio.postJob("nano", plantJob)
 
 
@@ -85,6 +86,8 @@ plant(2); plant(4);
 n0.brain.do("wait", (n, t) => {
     return soils.some(s=>s.crop&&s.crop.growth < 1)
 })
+console.log(new Set([[234,456]]))
+n0.brain.do("ping", ()=>console.log(JSON.stringify(cosmicEntityManager)))
 let zzz = [0,1,2,4]
 zzz.map((a)=>n0.brain.do("harvest", soils[a]))
 let pop3 = n0.brain.do("ping", (nano)=>{

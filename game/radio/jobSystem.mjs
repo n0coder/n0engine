@@ -1,25 +1,24 @@
 
 
+import { event } from "../../engine/core/Utilities/events.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { n0radio } from "./n0radio.mjs";
+import { nanoaiActions } from "../nanoai/nanoaiActions.mjs";
+
 export var jobTasksa = new Map([
 
-    ["smile", function(...args) {
-        console.log(args)
+    ["smile", function(item) {
         return {
             name: "smile",
-            args, requires: [["hold", args[0]]],
+            requires: [["hold", item]],
             interactions: [["smiling"]], 
             work: function(job, nano, done) {
                 console.log(`${nano.name} smiling`, args, this.items);
-                done(this);
             }
         }
-    }], ["wink", function(...args) {
+    }], ["wink", function() {
         return {
             name: "wink",
-            args,
             interactions: [["winking"]], 
             work: function(job, nano, done) {
                 this.item.winked = "winked";
@@ -68,26 +67,20 @@ var stageTemplate = {
             if (!a) this.taskComplete(job, this,nano,task)
             return a;
         } else {
-            /*
-            // this part of the functionality is depreciated, obsolete
-            // it handles the selection of tasks in this stage
-            // the nanos can't access it by normal means
-            // since we will have a whole selection of jobs in the radio, 
-            // we can't--- i mean it's not like we can fire off a work function on all jobs
-            // so, we have to write this functionality into the radio
-            task = this.tasks[0];
-            if (task) {
-                this.tasks.splice(0,1)
-                this.workIndex.set(nano, task);
-                task.work(nano, (task)=>this.taskComplete(job, this,nano, task))
-                return true;
-            } 
-            */
+           job.hireNanos([nano], true)
         }
+    },
+    assignTask(job, stage, task, nano) {
+        let i = stage.tasks.indexOf(task);
+        if (i != -1) {
+            stage.tasks.splice(i,1) //remove from tasks
+            stage.workIndex.set(nano, task);
+            nano.brain.do(job);
+            job.nanoAssigned()
+        } 
     },
     taskComplete: (job, stage, nano, task)=> {
         stage.workIndex.delete(nano); //this remove the worker
-        n0radio.nanosSearching.set(nano, 1)
         stage.validateStage(job)
     },
     validateStage(job){
@@ -100,6 +93,60 @@ var stageTemplate = {
     },
 tasks: [ ]
  
+}
+
+var job = {
+    keys: [], volunteerIndex: new Map(), 
+    hireNanos(nanos, volunteer) {
+        let stage =  this.stages[this.stage];
+        let tasks = stage.tasks;
+
+        while (nanos.length > 0 && tasks.length > 0) {
+            let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage));
+
+            let bestScore = -Infinity, bestNano = null;
+            for (let [o, t] of score) {
+                if (bestScore < t.score) {
+                    bestNano = [o, t.b], bestScore = t.score;
+                }
+            }
+            stage.assignTask(job, stage, bestNano[0], bestNano[1])
+            if (volunteer) {
+                this.volunteerIndex.set(bestNano[1],1)
+            }
+        }
+    },
+    work: function(nano) {
+        //if (this.volunteerIndex.get(nano))
+        //if nano is a volunteer and there is more work to do
+        //(more stages, not failed)
+
+        let a = this.stages[this.stage].work(this, nano);
+        return (a || this.volunteerIndex.get(nano))
+    },
+    stageComplete: function(stage) {
+        //if the stage is complete, move onto the next stage
+        this.nextStage();
+    }, 
+    stageFailed: function(stage) {
+        if (!stage.important) this.nextStage();
+        else this.failed(this); 
+    },
+    nextStage: function() {
+        if (this.stage+1<this.stages.length) 
+            this.stage++;
+        else this.done(this);
+    },
+    done: event(function() { //custom c# action style event
+        console.log("job done")
+        this.volunteerIndex.delete(nano)
+    }),
+    failed: event(function() {
+        console.log("job failed")
+        this.volunteerIndex.delete(nano)
+    }),
+    nanoAssigned: event(),
+    stage: 0, stages: null
 }
 
 function tasksToStages(tasks) {
@@ -166,35 +213,6 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
                 return item;        
         }).join('');
     }
-}
-var job = {
-    hire: null,
-    work: function(nano, ...args) {
-        let currentStage = this.stages[this.stage];
-        return currentStage.work(this, nano);
-    },
-    stageComplete: function(stage) {
-        //if the stage is complete, move onto the next stage
-        console.log(stage)
-        this.nextStage();
-        this.hire();
-        //tell radio to hire more
-    }, 
-    stageFailed: function(stage) {
-        if (!stage.important) this.nextStage();
-        else n0radio.jobFail(this); 
-    },
-    nextStage: function() {
-        if (this.stage+1<this.stages.length) {
-            this.stage++;
-            console.log("job: moved to next stage")
-        } 
-        else {
-            //n0radio.jobDone(this);
-            console.log("job: completed")
-        }
-    },
-    stage: 0, stages: null
 }
 
 export function createJobu(objs,task, ...argsa) {
@@ -306,20 +324,24 @@ export function nanoStageSearch(nano, stage) {
 
 jobTasksa.set("gatherSeeds", function() {
     return {
-        name: "gatherSeeds",
+        name: "gatherSeeds", 
         work: function(job, nano) {
+            this.item.seeds = [0,1,2]
             console.log(`${nano.name} gathering seeds`);
         }
     }
 });
 
 // Define the plant seeds task
-jobTasksa.set("plantSeeds", function() {
+jobTasksa.set("plantSeeds", function(crop) {
     return {
-        name: "plantSeeds",
-        requires: [["gatherSeeds"]],
+        name: "plantSeeds", crop,
+        requires: [["gatherSeeds", {}]], /* requires 2nd argument IS a shared object used for resource management */
         work: function(job, nano) {
-            console.log(`${nano.name} planting seeds`);
+            let seeds = this.items[0].seeds;
+            console.log(`${nano.name} planting seeds`, this);
         }
     }
 });
+
+
