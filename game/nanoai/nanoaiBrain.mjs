@@ -7,20 +7,12 @@ export class NanoaiBrain {
   constructor() {
     this.state = "idle";
     this.queue = []
-    this.laterQueue = []
-    this.currentQueue = this.queue
     this.currentActivity = null;
     this.stateMachine = {
       idle: function (nano) {
         if (nano.brain.queue.length > 0) {
           this.processQueue(nano, "queue");
         }
-        else if (nano.brain.laterQueue.length > 0) { //this is when i should refactor into a function for shared code
-          nano.brain.laterQueue = nano.brain.laterQueue.filter(q => { //AHAHAHAHAHAHAHA it's been months since i said that
-            if (Array.isArray(q) || q.condition(...(q.args))) return q
-          })
-          this.processQueue(nano, "laterQueue");
-        } 
         else nano.idle(); 
       },
       active: function (nano) {
@@ -44,7 +36,6 @@ export class NanoaiBrain {
         }
         var q = queue[0];
         if (q) {
-          nano.brain.currentQueue = queue;
           nano.brain.currentActivity = q;
           nano.brain.active(nano);
         }
@@ -53,31 +44,39 @@ export class NanoaiBrain {
   }
   
   do(task, ...args) {
-      return this.actionBuilder(task, args, (t) => { this.queue.push(t); }); 
+    let action = this.actionBuilder(task, args, (t) => { this.queue.push(t); }); 
+    action.name = task
+    return action
   }
 
   doNow(task, ...args) {
-    return this.actionBuilder(task, args, (t) => { 
+    let action = this.actionBuilder(task, args, (t) => { 
       this.queue.unshift(t);
       this.currentActivity = null; 
       this.state = "idle"
     });
+    action.name = `*${task}*`
+    return 
   }
   
 
   doBefore(targetTasks, task, ...args) {
-    return this.doRelative(targetTasks, task, (t, index) => { 
+    let action = this.doRelative(targetTasks, task, (t, index) => { 
       
       this.queue.splice(index, 0, t); 
       this.currentActivity = null; 
       this.state = "idle"
-    }, (array)=> array[0], ...args);    
+    }, (array)=> array[0], ...args); 
+     action.name = `${task} <| ${action?.name??"O"}`
+    return action
   }
   doAfter(targetTasks, task, ...args) {
-    return this.doRelative(targetTasks, task,  (t, index)  => { 
+    let action = this.doRelative(targetTasks, task,  (t, index)  => { 
      
       this.queue.splice(index+1, 0, t);
     }, (array)=> array[array.length], ...args);  
+    action.name = `${task} <| ${action?.name??"O"}`
+    return action
   }
 
 
@@ -93,12 +92,6 @@ export class NanoaiBrain {
 
     let targetTask = Array.isArray(targetTasks) ? arrayIndex(targetTasks) : targetTasks
     return doR(targetTask, task, args)
-  }
-  doLater(task, condition, ...args) {
-    return this.actionBuilder(task, args, (t) => { 
-      t.condition = condition; 
-      this.laterQueue.splice(0, 0, t); 
-    }); 
   }
   remove(task) {
     var i = this.queue.indexOf(task);
@@ -136,7 +129,7 @@ export class NanoaiBrain {
 
   done(nano) {
     nano.brain.state = "idle"
-    nano.brain.currentQueue.shift();
+    nano.brain.queue.shift();
     nano.brain.currentActivity = null;
   }
   active(nano) {

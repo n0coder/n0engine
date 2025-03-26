@@ -76,7 +76,7 @@ var stageTemplate = {
             stage.tasks.splice(i,1) //remove from tasks
             stage.workIndex.set(nano, task);
             nano.brain.do(job);
-            job.nanoAssigned()
+            job.nanoAssigned(job, nano)
         } 
     },
     taskComplete: (job, stage, nano, task)=> {
@@ -137,14 +137,14 @@ var job = {
             this.stage++;
         else this.done(this);
     },
-    done: event(function() { //custom c# action style event
+    done: event((function(job) { //custom c# action style event
         console.log("job done")
-        this.volunteerIndex.delete(nano)
-    }),
-    failed: event(function() {
+        job.volunteerIndex.clear()
+    })),
+    failed: event((function(job) {
         console.log("job failed")
-        this.volunteerIndex.delete(nano)
-    }),
+        job.volunteerIndex.clear()
+    })),
     nanoAssigned: event(),
     stage: 0, stages: null
 }

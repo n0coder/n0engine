@@ -211,9 +211,9 @@ class Radio {
         }
         if (key)
         job.keys.push(key)
-        job.done.add(()=>this.jobDone(job))
-        job.failed.add(()=>this.jobFail(job))
-        job.nanoAssigned.add(()=>{
+        job.done.add((j)=>this.jobDone(j))
+        job.failed.add((j)=>this.jobFail(j))
+        job.nanoAssigned.add((j, nano)=>{
             this.nanosSearching.delete(nano); //remove from searching
         })
         job.hire = ()=> {this.findNano(job, channel, key)}

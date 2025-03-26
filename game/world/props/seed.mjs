@@ -51,7 +51,6 @@ class Crop {
         this.growth += amount;
     }
     harvest(nano, pop) {
-        console.log("trying to harvest", this)
         pop()
         //if the nano can hold more items we add (rhis)
         nano.inventory.add(this)
