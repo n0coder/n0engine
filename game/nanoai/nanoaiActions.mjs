@@ -184,10 +184,7 @@ export const nanoaiActions = new Map([
     ["plant",function(soil, seeds) { return  {
         before: ["follow"],
         work: function (nano) {
-            if (soil.plant) {
-                return soil.plant(nano, seeds);
-            }
-            return true
+                return soil?.plant?.(nano, seeds);
         },
         
    }}],

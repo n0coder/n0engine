@@ -244,13 +244,12 @@ function scoreTask(task, nano, relationshipModifier = 1) {
             let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
             score *= typo;
         }
-        /*
+
         if (task.items) {
-        let a = task.items.some(a=> nano.inventory.has(a.item))
-    console.log({a, items:task.items, naninv:nano.inventory.list.slice()})
-    if (!a) return 0
+        let a = task.items.some(i=>i.nano === nano)
+        if (!a) return 0
         }
-        */
+        
     if (task.pos === undefined || !(task.pos[0] && task.pos[1])) {
         return score; //no distance related calculation needed
     } else {

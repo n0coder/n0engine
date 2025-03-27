@@ -15,6 +15,12 @@ let n0 = new Nanoai("n0",10,10, 20)
 
 globalThis.n0 = n0;
 new Nanoai("n0",10,11, 20)
+
+new Nanoai("n0",13,11, 20)
+
+new Nanoai("n0",10,8, 20)
+
+new Nanoai("n0",4,11, 20)
 let o = {o:"o"}
 
 
@@ -74,6 +80,7 @@ jobTasksa.set("getSeeds", function() {
         name: "getSeeds", 
         work: function (job, nano) {
             this.item.item = new Seed(2,2)
+            this.item.nano = nano
             nano.brain.do("pickup", this.item.item)
             console.log(`${nano.name} gathering seeds`);
         }
@@ -87,12 +94,11 @@ jobTasksa.set("plantSeeds", function(crop) {
         requires: [["getSeeds", {}]],
         work: function(job, nano) {
             console.log(this)
-            n0.brain.do("plant", crop, this.items[0].item)
+            nano.brain.do("plant", crop, this.items[0].item)
             console.log(`${nano.name} planting seeds`, this);
         }
     }
 });
-
 
 // Create the job
 const plantJob = createJobu(soils, "plantSeeds");
