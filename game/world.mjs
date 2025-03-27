@@ -2,23 +2,20 @@ import { DebugCursor } from "./world/debugCursor.mjs";
 import { WorldGenerator } from "./world/wave/worldGen/worldGenerator.mjs";
 import {Nanoai} from "./nanoai/nanoai.mjs"
 import { worldGrid } from "../engine/grid/worldGrid.mjs";
-import { Seed } from "./world/props/seed.mjs";
 import { Soil } from "./farm/soil.mjs";
-import { CraftingTable } from "./world/props/craftingTable.mjs";
-import { createJobu } from "./radio/jobSystem.mjs";
+import { CraftingTable } from "./farm/craftingTable.mjs";
+import { createJobu, jobTasksa } from "./radio/jobSystem.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { Seed } from "./farm/seed.mjs";
 worldGrid.x= 32*0
 worldGrid.y= 32*-7
 
 let n0 = new Nanoai("n0",10,10, 20)
+
 globalThis.n0 = n0;
-
-
+new Nanoai("n0",10,11, 20)
 let o = {o:"o"}
-// Create the job
-const plantJob = createJobu([o,o], "plantSeeds");
-n0radio.postJob("nano", plantJob)
 
 
 
@@ -31,9 +28,9 @@ n0.brain.do("wait", ()=>{
 */
 
 var craftingTable = new CraftingTable(11,16)
-var seed = new Seed(6,6)
-n0.brain.do("pickup", seed)
-
+//var seed = new Seed(6,6)
+//n0.brain.do("pickup", seed)
+//n0.brain.do("dance")
 /*
    core game loop:
    a nano wants to do something, so we give them a project, as they form ideas they form jobs and start working.
@@ -46,11 +43,12 @@ n0.brain.do("pickup", seed)
 
 let soils = [];
 for (let o = 10; o < 11; o++)
-for (let i = 10; i < 20; i++) {
+for (let i = 10; i < 16; i++) {
 
     soils.push(new Soil(i, o))
 
 }
+/*
 function plant(slot) {
     n0.brain.do("plant", soils[slot])
 }
@@ -69,7 +67,39 @@ let pop = n0.brain.do("ping", (nano)=>{
     }
 })
 
-plant(0); plant(1);
+plant(0); 
+*/
+jobTasksa.set("getSeeds", function() {
+    return {
+        name: "getSeeds", 
+        work: function (job, nano) {
+            this.item.item = new Seed(2,2)
+            nano.brain.do("pickup", this.item.item)
+            console.log(`${nano.name} gathering seeds`);
+        }
+    }
+});
+
+// Define the plant seeds task
+jobTasksa.set("plantSeeds", function(crop) {
+    return {
+        name: "plantSeeds", crop,
+        requires: [["getSeeds", {}]],
+        work: function(job, nano) {
+            console.log(this)
+            n0.brain.do("plant", crop, this.items[0].item)
+            console.log(`${nano.name} planting seeds`, this);
+        }
+    }
+});
+
+
+// Create the job
+const plantJob = createJobu(soils, "plantSeeds");
+n0radio.postJob("nano", plantJob)
+
+/*
+plant(1);
 n0.brain.do("wait", (n, t) => {
     return soils.some(s=>s.crop&&s.crop.growth < 1)
 })
@@ -96,8 +126,9 @@ let pop3 = n0.brain.do("ping", (nano)=>{
     }
 })
 
-zzz= [0,1,2,3,4,5,6,7];
+zzz= [8,1,2,3,4,5,6,7];
 zzz.map((i)=>plant(i))
+*/
 //i wanna make a loop where the nano plants all the seeds in its inventory
 //waits for all the currently growing crops to grow
 //harvest up to half the nanos inventory's max capacity

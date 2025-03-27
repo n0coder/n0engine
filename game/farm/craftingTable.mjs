@@ -1,7 +1,7 @@
-import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../../../engine/core/p5engine.mjs";
-import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
-import { nanoaiActions } from "../../nanoai/nanoaiActions.mjs";
+import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { p } from "../../engine/core/p5engine.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { nanoaiActions } from "../nanoai/nanoaiActions.mjs";
 
 export let craftingRecipes = new Map();
 

@@ -1,7 +1,7 @@
-import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../../../engine/core/p5engine.mjs";
-import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
-import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
+import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
+import { p } from "../../engine/core/p5engine.mjs";
+import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { craftingRecipes } from "./craftingTable.mjs";
 
 export class Seed {
@@ -42,6 +42,8 @@ class Crop {
         this.name = "crop"
         this.setActive = setActive;
         this.setActive(true)
+        let e = function(){console.log(this)}
+        e.call(":o")
     }
     get heldPos() {
         return this.held ? 0 : worldGrid.gridSize/2

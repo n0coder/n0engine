@@ -140,6 +140,11 @@ export class NanoaiBrain {
     nano.brain.state = "idle"
   }
   work(nano) {
-    this.stateMachine[this.state](nano);
+    try {
+      this.stateMachine[this.state](nano);
+    } catch (e) {
+      e.name = `in nano action (${this.currentActivity?.name??""}): ${e.message}`
+      throw e
+    }
   }
 }

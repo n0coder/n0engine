@@ -262,9 +262,9 @@ class Radio {
             for (const job of jobs) {
                 let stage = job.stages[job.stage]
                 if (stage.tasks.length === 0) continue; //no tasks in job available? skip
-
                 let best = bestSearch([nano], stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
                 jobScores.push([job, best])
+                console.log({job, best, inv:nano.inventory.list.slice()})
             }
         }
         
@@ -290,7 +290,7 @@ class Radio {
             return;
         }
         let job = bestSearch([key], jobScores, (k, j)=> {
-            return j[1].get(key).score
+            return j[1].get(key).score 
         }, true).get(key);
 
         let stage = job[0].stages[job[0].stage]

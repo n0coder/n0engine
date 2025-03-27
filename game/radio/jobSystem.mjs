@@ -96,14 +96,15 @@ tasks: [ ]
 }
 
 var job = {
-    keys: [], volunteerIndex: new Map(), 
+    name: "job", keys: [], volunteerIndex: new Map(), 
     hireNanos(nanos, volunteer) {
         let stage =  this.stages[this.stage];
         let tasks = stage.tasks;
 
         while (nanos.length > 0 && tasks.length > 0) {
             let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage));
-
+            console.log(score)
+            
             let bestScore = -Infinity, bestNano = null;
             for (let [o, t] of score) {
                 if (bestScore < t.score) {
@@ -112,6 +113,7 @@ var job = {
             }
             stage.assignTask(job, stage, bestNano[0], bestNano[1])
             if (volunteer) {
+                console.log("volunteer")
                 this.volunteerIndex.set(bestNano[1],1)
             }
         }
@@ -242,7 +244,13 @@ function scoreTask(task, nano, relationshipModifier = 1) {
             let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
             score *= typo;
         }
-
+        /*
+        if (task.items) {
+        let a = task.items.some(a=> nano.inventory.has(a.item))
+    console.log({a, items:task.items, naninv:nano.inventory.list.slice()})
+    if (!a) return 0
+        }
+        */
     if (task.pos === undefined || !(task.pos[0] && task.pos[1])) {
         return score; //no distance related calculation needed
     } else {
@@ -302,7 +310,7 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
 export function scoreStageTask(task, nano, stage) {
     let relationshipModifier = getRelationshipModifer(stage, nano)
     let score = scoreTask(task,nano, relationshipModifier)
-    console.log(score)
+    console.log({score, task, nano})
     return score
 }
 //this code takes in a nano, and a stage
@@ -320,28 +328,3 @@ export function nanoStageSearch(nano, stage) {
         return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(t, n,stage))
     }
 }
-
-
-jobTasksa.set("gatherSeeds", function() {
-    return {
-        name: "gatherSeeds", 
-        work: function(job, nano) {
-            this.item.seeds = [0,1,2]
-            console.log(`${nano.name} gathering seeds`);
-        }
-    }
-});
-
-// Define the plant seeds task
-jobTasksa.set("plantSeeds", function(crop) {
-    return {
-        name: "plantSeeds", crop,
-        requires: [["gatherSeeds", {}]], /* requires 2nd argument IS a shared object used for resource management */
-        work: function(job, nano) {
-            let seeds = this.items[0].seeds;
-            console.log(`${nano.name} planting seeds`, this);
-        }
-    }
-});
-
-

@@ -108,7 +108,10 @@ export class Nanoai {
             if (!(b[0]===0&&b[1]===0))
                 this.cimg = getAnimation("nano", bestDir.dir, ticks)
         p.fill(125, 222, 152)
-        p.text(`${this.vx.toFixed(2)}, ${this.vy.toFixed(2)}`, this.visualX+10, this.visualY-10);
+
+        p.text(`${this.brain.currentActivity?.name??""}`, this.visualX+10, this.visualY-10);
+        
+        //p.text(`${this.vx.toFixed(2)}, ${this.vy.toFixed(2)}`, this.visualX+10, this.visualY-10);
         if (this.cimg) {
             p.image(this.cimg, this.centerX+worldGrid.halfTileSize, this.centerY+worldGrid.halfTileSize);
         } else {
