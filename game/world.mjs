@@ -14,28 +14,28 @@ worldGrid.y= 32*-7
 let n0 = new Nanoai("n0",10,10, 20)
 
 globalThis.n0 = n0;
-new Nanoai("n0",10,11, 20)
+new Nanoai("n1",10,11, 20)
 
-new Nanoai("n0",13,11, 20)
+new Nanoai("n2",13,11, 20)
 
-new Nanoai("n0",10,8, 20)
+new Nanoai("n3",10,8, 20)
 
-new Nanoai("n0",4,11, 20)
+new Nanoai("n4",4,11, 20)
 let o = {o:"o"}
 
 
 
-//let bfc = new WorldGenerator(n0)
-/*
+let bfc = new WorldGenerator(n0)
+
 //wait until the world loads
 n0.brain.do("wait", ()=>{
     return worldGrid.getTile(6,6)===undefined
 })
-*/
+
 
 var craftingTable = new CraftingTable(11,16)
-//var seed = new Seed(6,6)
-//n0.brain.do("pickup", seed)
+var seed = new Seed(6,6)
+n0.brain.do("pickup", seed)
 //n0.brain.do("dance")
 /*
    core game loop:
@@ -47,13 +47,41 @@ var craftingTable = new CraftingTable(11,16)
    its alot like a factory building game?
 */
 
-let soils = [];
-for (let o = 10; o < 11; o++)
-for (let i = 10; i < 16; i++) {
+jobTasksa.set("getSeeds", function() {
+    return {
+        name: "getSeeds", 
+        work: function (job, nano) {
+            this.item.item = new Seed(2,2)
+            this.item.nano = nano
+            nano.brain.do("pickup", this.item.item)
+            console.log(`${nano.name} gathering seeds`);
+        }
+    }
+});
 
-    soils.push(new Soil(i, o))
+// Define the plant seeds task
+jobTasksa.set("plantSeeds", function(crop) {
+    return {
+        name: "plantSeeds", crop,
+        requires: [["getSeeds", {}]],
+        work: function(job, nano) {
+            console.log({nano, nano2: this.items[0].nano})
+            nano.brain.do("plant", crop, this.items[0].item)
+            console.log(`${nano.name} planting seeds`, this);
+        }
+    }
+});
+
+var soils = [];
+for (let o = 3; o < 6; o++)
+for (let i = 3; i < 6; i++) {
+
+    soils.push(new Soil(i*2, o*2))
 
 }
+
+
+n0radio.postJob("nano", createJobu(soils, "plantSeeds"))
 /*
 function plant(slot) {
     n0.brain.do("plant", soils[slot])
@@ -74,37 +102,7 @@ let pop = n0.brain.do("ping", (nano)=>{
 })
 
 plant(0); 
-*/
-jobTasksa.set("getSeeds", function() {
-    return {
-        name: "getSeeds", 
-        work: function (job, nano) {
-            this.item.item = new Seed(2,2)
-            this.item.nano = nano
-            nano.brain.do("pickup", this.item.item)
-            console.log(`${nano.name} gathering seeds`);
-        }
-    }
-});
 
-// Define the plant seeds task
-jobTasksa.set("plantSeeds", function(crop) {
-    return {
-        name: "plantSeeds", crop,
-        requires: [["getSeeds", {}]],
-        work: function(job, nano) {
-            console.log(this)
-            nano.brain.do("plant", crop, this.items[0].item)
-            console.log(`${nano.name} planting seeds`, this);
-        }
-    }
-});
-
-// Create the job
-const plantJob = createJobu(soils, "plantSeeds");
-n0radio.postJob("nano", plantJob)
-
-/*
 plant(1);
 n0.brain.do("wait", (n, t) => {
     return soils.some(s=>s.crop&&s.crop.growth < 1)

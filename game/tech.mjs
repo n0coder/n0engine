@@ -4,7 +4,7 @@ import { p } from "../engine/core/p5engine.mjs";
 import { n0loader } from "../engine/core/ResourceManagement/loader.mjs";
 let experiment ="./tools/n0fcEditor.mjs" //"./world.mjs;"
 n0loader.startLoading('world', (done) => {
-    import("./world.mjs")
+    import("./experiments/newJobScoring.mjs")
     .then((script)=>{
         done();
     })
