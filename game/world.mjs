@@ -14,7 +14,7 @@ worldGrid.y= 32*-7
 let n0 = new Nanoai("n0",10,10, 20)
 
 globalThis.n0 = n0;
-new Nanoai("n0",10,11, 20)
+//new Nanoai("n0",10,11, 20)
 let o = {o:"o"}
 
 
