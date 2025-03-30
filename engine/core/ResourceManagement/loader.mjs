@@ -20,7 +20,7 @@ export class Loader {
     }
 
     startLoading(key, item, dependencies) {
-        //console.log(`loading ${key}`)
+        console.log(`loading ${key}`)
         if (dependencies == null) {
             this.loadItem(key, item);
             return false;
@@ -43,7 +43,7 @@ export class Loader {
     }
 
     loaded(item) {
-        //console.log("loaded item", item);
+        console.log("loaded item", item);
     }
 }
 export let n0loader = new Loader();

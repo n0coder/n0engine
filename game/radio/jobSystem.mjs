@@ -57,8 +57,6 @@ export var jobTasksa = new Map([
     }]
 ]);
 
-
-
 var stageTemplate = {
     workIndex: new Map(), 
     important: true,
@@ -104,7 +102,7 @@ var job = {
         let tasks = stage.tasks;
 
         while (nanos.length > 0 && tasks.length > 0) {
-            let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage, this));
+            let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage));
             console.log(score)
             
             let bestScore = -Infinity, bestNano = null;
@@ -142,7 +140,7 @@ var job = {
         else this.done(this);
     },
     done: event((function(job) { //custom c# action style event
-        console.log("job done", this)
+        console.log("job done")
         job.volunteerIndex.clear()
     })),
     failed: event((function(job) {
@@ -153,9 +151,6 @@ var job = {
     stage: 0, stages: null
 }
 
-
-
-
 function tasksToStages(tasks) {
 let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
     let stages = []
@@ -165,7 +160,6 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
         let base = currentTask.base;
         let task = currentTask.task;
         let depth = currentTask.depth;
-        
         if(task.requires) {
             for(let i = 0; i < task.requires.length; i++) {
                 //we need to form tasks based on arguments here?
@@ -181,8 +175,8 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
                     console.error(`there is no job task called ${action}`)
                 } 
                 //ok so we will need a referense towards how we form tasks to begin with.
-                let tasku = ss(...argsa)||{}  // cloneAction(ss, null, ...argsa);
-                depthStack.push({task: tasku, broken, key, depth: depth + 1, base: task});
+                let tasku = [ss(...argsa)||{}]  // cloneAction(ss, null, ...argsa);
+                depthStack.push({task: tasku[0], broken, key, depth: depth + 1, base: task});
             }
         }
 
@@ -246,15 +240,14 @@ function scoreTask(task, nano, relationshipModifier = 1) {
         for (const [skill, type, thing] of task.interactions) {
             let skillb = nano.identity.skills?.get(skill) || 1;
             let skillo = nano.identity.opinions?.get("skills")?.get(skill) || 1;
-            score *= skillo * skillb;
+            score *= skillo * skillb; //high skill but low interest in the skill means lower score for skill
             let typo = nano.identity.opinions?.get(type)?.get(thing.name) || 1;
             score *= typo;
         }
 
         if (task.items) {
-        let a = task.items.filter(i=>i.nano === nano)
-        console.log(a)
-        if (a.length === 0) return 0
+        let a = task.items.some(i=>i.nano === nano)
+        if (!a) return 0
         }
         
     if (task.pos === undefined || !(task.pos[0] && task.pos[1])) {
@@ -291,43 +284,31 @@ function getRelationshipModifer(stage, nano) {
 
 export function bestSearch(as, bs, scoring, clean = false, fit) {
     let matches = new Map(); 
+    //i think for us to implement the feature where we give a best rating to multiple nanos, we'd have to run our loop as many times as we have nanos
     for (let a of as) {
+        //we are choosing "the best nano for the job" or "the best task for the job"
+        //but we are still giving each nano a job, but not caring about which job, 
+        //we are assigning multiple nanos to the same job
 
-        let scores = bs.map(b => {
-            let score = scoring(a,b)
-            return ({b, score})
-        });
+        //would it be better to run the uniqueification here? 
+        //i'm starting to think we could just implement it in the radio, since we do a similar tech in the nano rates jobs thing
+        let scores = bs.map(b => ({b, score:scoring(a, b)}));
         for (let {b, score} of scores) {
-
-            if (!matches.has(a)) { 
-                matches.set(a, { b, score });
-                
-            } else if ((fit?.(score, matches.get(a).score)??(score > matches.get(a).score))) {
-          
+            if (!matches.has(a) || (fit?.(score, matches.get(a).score) ?? (score > matches.get(a).score)) ) {
                 matches.set(a, { b, score });
             }
+        }
     }
-
-    for (let [key, value] of matches) {
-        if (value.b===undefined)
-        matches.delete(key, value.b)
-     }
-
-
-    console.log(matches)
     if (clean)
     for (let [key, value] of matches) {
-    
        matches.set(key, value.b)
     }
     return matches;
  }
-}
-console.log(1/4)
-export function scoreStageTask(task, nano, stage, jobIndex=1 ) {
+
+export function scoreStageTask(task, nano, stage) {
     let relationshipModifier = getRelationshipModifer(stage, nano)
     let score = scoreTask(task,nano, relationshipModifier)
-    if (jobIndex!==0) score *= 1/jobIndex //higher score for older jobs
     console.log({score, task, nano})
     return score
 }
@@ -344,62 +325,5 @@ export function nanoStageSearch(nano, stage) {
     } else {
         console.log("more nanos than tasks")
         return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(t, n,stage))
-    }
-}
-
-class n0Radiow {
-constructor (){
-    this.channels = new Map()
-}
-    findJob(key) {
-        //what would we do if multiple nanos are a key
-        //so we gotta find jobs where both nanos can work together well
-        //say we insert nanoai team, they will queue up for jobs together
-        if (this.nanosSearching.get(key)) return;
-        this.nanosSearching.set(key,1);
-        console.log("(nano searching): nano is searching")
-        let jobScores = [];
-        function rateJobs(jobs, nano) {
-            let a = 1;
-            for (const job of jobs) {
-                let stage = job.stages[job.stage]
-                if (stage.tasks.length === 0) continue; //no tasks in job available? skip
-
-                let best = bestSearch([nano], stage.tasks, (n,t)=> scoreStageTask(t,n,stage, a))
-                jobScores.push([job, best])
-                console.log({a, job, best, inv:nano.inventory.list.slice()})
-                a++;
-            }
-        }
-        
-        for (const [ckey, channel] of this.channels) {
-            if (channel.getJobs) {
-                let jobs = channel.getJobs(key);
-                if (jobs)
-                    rateJobs(jobs, key)
-
-            }else if (channel instanceof Map) {
-                var c = channel.get(key);
-                if (c) 
-                    rateJobs(c.jobs, key)
-                
-            } else {
-                rateJobs(channel.jobs, key)
-
-            }
-        }
-        
-        if (jobScores.length === 0) {
-            console.log("(nano searching): no jobs right now", key)
-            return;
-        }
-        let job = bestSearch([key], jobScores, (k, j)=> {
-            return j[1]?.get(key)?.score 
-        }, true).get(key);
-        if (job === undefined) return;
-        console.log(job)
-        let stage = job[0].stages[job[0].stage]
-        let task = job[1].get(key).b
-        stage.assignTask(job[0], stage, task, key);
     }
 }

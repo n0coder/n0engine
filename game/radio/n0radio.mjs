@@ -211,17 +211,16 @@ class Radio {
         }
         if (key)
         job.keys.push(key)
-        job.done.add(this, (j)=>this.jobDone(j))
-        job.failed.add(this, (j)=>this.jobFail(j))
-        job.nanoAssigned.add(this, (j, nano)=>{
+        job.done.add((j)=>this.jobDone(j))
+        job.failed.add((j)=>this.jobFail(j))
+        job.nanoAssigned.add((j, nano)=>{
             this.nanosSearching.delete(nano); //remove from searching
         })
         job.hire = ()=> {this.findNano(job, channel, key)}
     }
     removeJob(channel, job, key) {
-        if (!job) return
         let c = this.findChannel(channel, key);
-        console.log({c, job, channel, key})
+        console.log({c, channel, key})
         if (c) {
             
             //if c is a type with a custom post, we use that version instead of directly pushing to the channel list
@@ -229,12 +228,7 @@ class Radio {
                 c.removeJob(job, key)
             } else {
                 let i = c.jobs.indexOf(job)
-                let j = c.jobs.splice(i, 1)
-                try {
-                throw new Error("")
-                } catch (e) {
-                   console.error(e)
-                }
+                c.jobs.splice(i, 1)
             }
         }
     }
@@ -249,7 +243,7 @@ class Radio {
         for (const [ckey, channel] of this.channels) {
             if (job.keys.length > 0) {
             for (let key of job.keys)
-                this.removeJob(ckey, job, key)
+            this.removeJob(ckey, job, key)
             } else this.removeJob(ckey, job)
         }
     }
@@ -265,14 +259,12 @@ class Radio {
         console.log("(nano searching): nano is searching")
         let jobScores = [];
         function rateJobs(jobs, nano) {
-            let a = 1;
             for (const job of jobs) {
                 let stage = job.stages[job.stage]
                 if (stage.tasks.length === 0) continue; //no tasks in job available? skip
-
-                let best = bestSearch([nano], stage.tasks, (n,t)=> scoreStageTask(t,n,stage, a))
+                let best = bestSearch([nano], stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
                 jobScores.push([job, best])
-                a++;
+                console.log({job, best, inv:nano.inventory.list.slice()})
             }
         }
         
@@ -298,10 +290,9 @@ class Radio {
             return;
         }
         let job = bestSearch([key], jobScores, (k, j)=> {
-            return j[1]?.get(key)?.score 
+            return j[1].get(key).score 
         }, true).get(key);
-        if (job === undefined) return;
-        console.log(job)
+
         let stage = job[0].stages[job[0].stage]
         let task = job[1].get(key).b
         stage.assignTask(job[0], stage, task, key);
