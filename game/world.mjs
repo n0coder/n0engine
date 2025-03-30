@@ -14,6 +14,7 @@ worldGrid.y= 32*-7
 let n0 = new Nanoai("n0",10,10, 20)
 
 globalThis.n0 = n0;
+/*
 new Nanoai("n0",10,11, 20)
 
 new Nanoai("n0",13,11, 20)
@@ -21,6 +22,7 @@ new Nanoai("n0",13,11, 20)
 new Nanoai("n0",10,8, 20)
 
 new Nanoai("n0",4,11, 20)
+*/
 let o = {o:"o"}
 
 
@@ -49,7 +51,7 @@ var craftingTable = new CraftingTable(11,16)
 
 let soils = [];
 for (let o = 10; o < 11; o++)
-for (let i = 10; i < 16; i++) {
+for (let i = 10; i < 19; i++) {
 
     soils.push(new Soil(i, o))
 
