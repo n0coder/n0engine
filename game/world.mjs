@@ -8,22 +8,23 @@ import { createJobu, jobTasksa } from "./radio/jobSystem.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { Seed } from "./farm/seed.mjs";
-worldGrid.x= 32*0
-worldGrid.y= 32*-7
+worldGrid.x=  Math.floor(Math.random()*2562)
+//32*0
+worldGrid.y= Math.floor(Math.random()*2562)
 
 let n0 = new Nanoai("n0",10,10, 20)
 
 globalThis.n0 = n0;
-/*
-new Nanoai("n0",10,11, 20)
-new Nanoai("n0",13,11, 20)
+
+let n2 = new Nanoai("n0",10,11, 20)
+let n1 = new Nanoai("n0",13,11, 20)
 new Nanoai("n0",10,8, 20)
 new Nanoai("n0",4,11, 20)
-*/
+
 let o = {o:"o"}
 
 
-
+new DebugCursor()
 let bfc = new WorldGenerator(n0)
 /*
 //wait until the world loads
@@ -46,11 +47,7 @@ var craftingTable = new CraftingTable(11,16)
    its alot like a factory building game?
 */
 
-let soils = [];
-for (let o = 10; o < 14; o++)
-for (let i = 10; i < 11; i++) {
-    soils.push(new Soil(i, o))
-}
+
 /*
 function plant(slot) {
     n0.brain.do("plant", soils[slot])
@@ -74,7 +71,7 @@ plant(0);
 */
 jobTasksa.set("getSeeds", function() {
     return {
-        name: "getSeeds", 
+        name: "getSeeds",  
         work: function (job, nano) {
             this.item.item = new Seed(2,2)
             this.item.nano = nano
@@ -97,11 +94,35 @@ jobTasksa.set("plantSeeds", function(crop) {
     }
 });
 
-// Create the job
-const plantJob = createJobu(soils, "plantSeeds");
-//n0radio.postJob("nano", plantJob)
-n0.brain.do(plantJob)
 
+var soils = [];
+for (let o = 10; o < 11; o++)
+for (let i = 10; i < 15; i++) {
+    soils.push(new Soil(i, o))
+}
+var plantJob = createJobu(soils, "plantSeeds");
+//n0radio.postJob("nano", plantJob)
+
+var soils2 = [];
+for (let o = 11; o < 12; o++)
+for (let i = 10; i < 15; i++) {
+    soils2.push(new Soil(i, o))
+}
+var plantJob2 = createJobu(soils2, "plantSeeds");
+//n0radio.postJob("nano", plantJob2)
+
+var soils3 = [];
+for (let o = 12; o < 13; o++)
+for (let i = 10; i < 15; i++) {
+    soils3.push(new Soil(i, o))
+}
+var plantJob3 = createJobu(soils3, "plantSeeds");
+//n0radio.postJob("nano", plantJob3)
+
+n0.brain.do(plantJob)
+n1.brain.do(plantJob2)
+n2.brain.do(plantJob3)
+//plantJob.hireNano(n0)
 /*
 plant(1);
 n0.brain.do("wait", (n, t) => {

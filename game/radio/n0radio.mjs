@@ -3,7 +3,7 @@
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Circle } from "../farm/circle.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
-import { bestSearch, nanoStageSearch, scoreStageTask } from "./jobSystem.mjs";
+import { bestSearch } from "./jobSystem.mjs";
 
 export class Channel {
     constructor() {
@@ -211,12 +211,11 @@ class Radio {
         }
         if (key)
         job.keys.push(key)
-        job.done.add(this,(j)=>this.jobDone(j))
-        job.failed.add(this,(j)=>this.jobFail(j))
+        job.done.add(this,(j,n)=>this.jobDone(j,n))
+        job.failed.add(this,(j,n)=>this.jobFail(j,n))
         job.nanoAssigned.add(this, (j, nano)=>{
             this.nanosSearching.delete(nano); //remove from searching
         })
-        job.hire = ()=> {this.findNano(job, channel, key)}
     }
     removeJob(channel, job, key) {
         let c = this.findChannel(channel, key);
@@ -239,66 +238,57 @@ class Radio {
     }
     jobDone(job) {
         console.log("job done", job)
-        
-        for (const [ckey, channel] of this.channels) {
-            if (job.keys.length > 0) {
-            for (let key of job.keys)
-            this.removeJob(ckey, job, key)
-            } else this.removeJob(ckey, job)
-        }
+        this.nanosWorking.delete(job.nano)
     }
     jobFail(job) {
         console.log("job failed", job)
+        this.nanosWorking.delete(job.nano)
     }
     findJob(key) {
-        //what would we do if multiple nanos are a key
-        //so we gotta find jobs where both nanos can work together well
-        //say we insert nanoai team, they will queue up for jobs together
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
+
+        let jobu = this.nanosWorking.get(key)
+        if (jobu) {
+            jobu.hireNano(key, true)
+            return;
+        }
+
         console.log("(nano searching): nano is searching")
-        let jobScores = [];
-        function rateJobs(jobs, nano) {
-            for (const job of jobs) {
-                let stage = job.stages[job.stage]
-                if (stage.tasks.length === 0) continue; //no tasks in job available? skip
-                let best = bestSearch([nano], stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
-                jobScores.push([job, best])
-                console.log({job, best, inv:nano.inventory.list.slice()})
-            }
+       
+        function rateJobs(jobs, nano, channel) {
+            let jobScores = [];
+            let best = bestSearch([nano], jobs, (n,j)=> j.rateJob(n) )
+            jobScores.push([best, channel])
+            return jobScores
         }
         
+        let jobScores = null;
         for (const [ckey, channel] of this.channels) {
             if (channel.getJobs) {
                 let jobs = channel.getJobs(key);
                 if (jobs)
-                    rateJobs(jobs, key)
-
+                    jobScores =rateJobs(jobs, key, channel)
             }else if (channel instanceof Map) {
                 var c = channel.get(key);
                 if (c) 
-                    rateJobs(c.jobs, key)
-                
+                    jobScores =rateJobs(c.jobs, key, channel)
             } else {
-                rateJobs(channel.jobs, key)
-
+                jobScores =rateJobs(channel.jobs, key, channel)
             }
         }
-        
-        if (jobScores.length === 0) {
+        if (!jobScores || jobScores.length === 0) {
             console.log("(nano searching): no jobs right now", key)
             return;
         }
-        let job = bestSearch([key], jobScores, (k, j)=> {
-            return j[1].get(key).score 
-        }, true).get(key);
-
-        let stage = job[0].stages[job[0].stage]
-        let task = job[1].get(key).b
-        stage.assignTask(job[0], stage, task, key);
+        let job = jobScores[0][0].get(key).b
+        this.removeJob(jobScores[0][1], job, key)
+        job.hireNano(key, true)
+        this.nanosWorking.set(key, job)
     }
     constructor(){
         this.nanosSearching = new Map();
+        this.nanosWorking = new Map()
         this.channels = new Map();
         this.friendsList = new Map();
     }
