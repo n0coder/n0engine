@@ -62,26 +62,46 @@ var stageTemplate = {
     important: true,
     work: function(job, nano) {
         let task = this.workIndex.get(nano);
+        
         if (task) {
             let a = task.work(job, nano)
-            if (!a) this.taskComplete(job, this,nano,task)
+            if (!a) this.taskComplete(job,nano,task)
             return a;
-        } else {
-           job.hireNanos([nano], true)
+        }   else {
+            job.hireNano(nano, true)
+            return false
         }
     },
-    assignTask(job, stage, task, nano) {
-        let i = stage.tasks.indexOf(task);
+    findBestTask(nano) {
+        let best = bestSearch([nano], this.tasks, (n,t)=> this.scoreTask(t,n,this))
+        return best?.get?.(nano)?.b;
+    },
+    rateStage(nano){
+        let score = 1;
+        for (const task of this.tasks) 
+            score *= this.scoreTask(task,nano)
+        return score;
+    },
+    scoreTask(task, nano) {
+        console.log(this, nano)
+        let relationshipModifier = getRelationshipModifer(this, nano)
+        let score = scoreTask(task,nano, relationshipModifier)
+        console.log({score, task, nano})
+        return score
+    },
+    assignTask(job, task, nano) {
+        let i = this.tasks.indexOf(task);
         if (i != -1) {
-            stage.tasks.splice(i,1) //remove from tasks
-            stage.workIndex.set(nano, task);
+            this.tasks.splice(i,1) //remove from tasks
+            this.workIndex.set(nano, task);
             nano.brain.do(job);
             job.nanoAssigned(job, nano)
+            return task;
         } 
     },
-    taskComplete: (job, stage, nano, task)=> {
-        stage.workIndex.delete(nano); //this remove the worker
-        stage.validateStage(job)
+    taskComplete(job, nano, task) {
+        this.workIndex.delete(nano); //this remove the worker
+        this.validateStage(job)
     },
     validateStage(job){
         if (this.tasks.length === 0 && this.workIndex.size === 0) {
@@ -96,35 +116,34 @@ tasks: [ ]
 }
 
 var job = {
-    name: "job", keys: [], volunteerIndex: new Map(), 
-    hireNanos(nanos, volunteer) {
-        let stage =  this.stages[this.stage];
-        let tasks = stage.tasks;
-
-        while (nanos.length > 0 && tasks.length > 0) {
-            let score = bestSearch(tasks, nanos, (t,n)=> scoreStageTask(t, n,stage));
-            console.log(score)
-            
-            let bestScore = -Infinity, bestNano = null;
-            for (let [o, t] of score) {
-                if (bestScore < t.score) {
-                    bestNano = [o, t.b], bestScore = t.score;
-                }
-            }
-            stage.assignTask(job, stage, bestNano[0], bestNano[1])
-            if (volunteer) {
-                console.log("volunteer")
-                this.volunteerIndex.set(bestNano[1],1)
-            }
+    name: "job", nano: null, keys: [],
+    volunteerIndex: new Map(),
+    hireNano(nano, volunteer) {
+        let stage = this.stages[this.stage]
+        if (!stage) return null;
+        let task = stage.findBestTask(nano)
+        if (volunteer) this.volunteerIndex.set(nano, 1)
+        return stage.assignTask(this, task, nano);
+    },
+    rateJob(nano) { //to differentiate this job on the radio
+        let score = 1
+        for (const stage of this.stages) {
+            if (stage.tasks.length === 0) continue; 
+            stage.rateStage(nano)
         }
+        return score
     },
     work: function(nano) {
+        if (!this.nano) this.nano = nano
         //if (this.volunteerIndex.get(nano))
         //if nano is a volunteer and there is more work to do
         //(more stages, not failed)
+        let vol = this.volunteerIndex.get(nano)
+        let stage = this.stages[this.stage] 
+        let a = stage?.work?.(this, nano);
 
-        let a = this.stages[this.stage].work(this, nano);
-        return (a || this.volunteerIndex.get(nano))
+        //console.log({stage,a, vol})
+        return (a || vol) && this.stages.length > this.stage
     },
     stageComplete: function(stage) {
         //if the stage is complete, move onto the next stage
@@ -137,7 +156,7 @@ var job = {
     nextStage: function() {
         if (this.stage+1<this.stages.length) 
             this.stage++;
-        else this.done(this);
+        else { this.stage++; this.done(this); }
     },
     done: event((function(job) { //custom c# action style event
         console.log("job done")
@@ -245,10 +264,12 @@ function scoreTask(task, nano, relationshipModifier = 1) {
             score *= typo;
         }
 
+        /*
         if (task.items) {
         let a = task.items.some(i=>i.nano === nano)
         if (!a) return 0
         }
+        */
         
     if (task.pos === undefined || !(task.pos[0] && task.pos[1])) {
         return score; //no distance related calculation needed
@@ -306,12 +327,6 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
     return matches;
  }
 
-export function scoreStageTask(task, nano, stage) {
-    let relationshipModifier = getRelationshipModifer(stage, nano)
-    let score = scoreTask(task,nano, relationshipModifier)
-    console.log({score, task, nano})
-    return score
-}
 //this code takes in a nano, and a stage
 //it scores the nano based on the tasks in the stage. 
 export function nanoStageSearch(nano, stage) {

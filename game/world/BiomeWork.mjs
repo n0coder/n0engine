@@ -230,7 +230,7 @@ formBiome({
     plaintags: ["deep"], tiles: ["ledogamo",  "vedogamo", "redogamo", "nedogamo"],
     sweettags: ["deep", ...sweeta],
     bittertags: ["deep", ...bittera],
-    difficulty: 5
+    difficulty: 4
 })
 /*
 formBiome({
@@ -246,14 +246,14 @@ formBiome({
     plaintags: ["low"], tiles: ["ledgamo",  "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
     sweettags: ["low", ...sweeta],
     bittertags: ["low",...bittera],
-    difficulty: 4
+    difficulty: 3
 })
 formBiome({
     name: "icywater",
     plaintags: ["low", "frozen"], tiles: [],
     sweettags: ["low", "frozen", ...sweeta],
     bittertags: ["low", "frozen", ...bittera],
-    difficulty: 5 
+    difficulty: 2
 }) 
 
 formBiome({
@@ -399,7 +399,7 @@ formBiome({
     plaintags: [...rivera], tiles: ["ledgamo", "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
     sweettags: [...rivera, ...sweeta],
     bittertags: [...rivera, ...bittera],
-    difficulty: 5
+    difficulty: 4
 })
 let mountain = ["high"];
 formBiome({
