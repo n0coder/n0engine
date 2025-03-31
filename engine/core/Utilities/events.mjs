@@ -1,16 +1,16 @@
 export function event(a){
-    let e = (...args) => {
-        for(let l of e.o) {
+    let callback = (...args) => {
+        for(let [t, l] of callback.listeners) {
             l?.(...args)
         }
     }
-    e.o=[a]
-    e.add = (l) => {
-        e.o.push(l)
+    callback.listeners=new Map()
+    if (a) callback.listeners.set(a,a)
+    callback.add = (t, l) => {
+        callback.listeners.set(t,l)
     }
-    e.remove = (l) => {
-       let i = e.o.indexOf(l);
-       e.o.splice(i,1)
+    callback.remove = (t) => {
+       let i = callback.listeners.delete(t);
     }
-    return e;
+    return callback;
 }
