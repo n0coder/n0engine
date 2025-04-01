@@ -173,7 +173,7 @@ class Radio {
 
     }
     findChannel(channel, key) {
-        let c = this.channels.get(channel);
+        let c = (channel instanceof Channel) ? channel : this.channels.get(channel);
         if (c && c instanceof Map) {
             return c.get(key);
         } else if (c) {
@@ -195,8 +195,7 @@ class Radio {
     }
     findNano(job, channel, key){
         if (n0radio.nanosSearching.size === 0) return;
-        let nanos = n0radio.nanosInChannel(channel, key)
-        job.hireNanos(nanos)
+        n0radio.nanosSearching.clear()
     }
     postJob(channel, job, key) {
         let c = this.findCreateChannel(channel, key);
@@ -218,6 +217,7 @@ class Radio {
         })
     }
     removeJob(channel, job, key) {
+
         let c = this.findChannel(channel, key);
         console.log({c, channel, key})
         if (c) {
@@ -238,52 +238,66 @@ class Radio {
     }
     jobDone(job) {
         console.log("job done", job)
-        this.nanosWorking.delete(job.nano)
+        for (const nano of job.nanos) {
+            this.nanosWorking.delete(nano)
+        }
     }
     jobFail(job) {
         console.log("job failed", job)
-        this.nanosWorking.delete(job.nano)
+        for (const nano of job.nanos) {
+            this.nanosWorking.delete(nano)
+        }
+        
+    }
+
+    getResource(source, key, callback) {
+        if (!source) throw new Error("no source")
+        if (!callback) throw new Error("no callback function")
+        let output = null;
+            for (var [ckey, channel] of this.channels) {
+            channel = (channel instanceof Map) ? channel.get(key) : channel;
+            if (typeof channel[source] === 'function') {
+                let jobs = (channel[source])(key);
+                if (jobs)
+                    output =callback(jobs, channel, key)
+            } else {
+                output =callback((channel[source]), channel, key)
+            }
+        }
+        return output
     }
     findJob(key) {
+        
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
-
+        
         let jobu = this.nanosWorking.get(key)
         if (jobu) {
-            jobu.hireNano(key, true)
+            jobu.hireNano(key, false)
             return;
         }
-
-        console.log("(nano searching): nano is searching")
+        
+        //console.log("(nano searching): nano is searching")
        
         function rateJobs(jobs, nano, channel) {
             let jobScores = [];
-            let best = bestSearch([nano], jobs, (n,j)=> j.rateJob(n) )
+            let best = bestSearch([nano], jobs, (n,j)=>{ j.rateJob(n); } )
+            if (best.size > 0)
             jobScores.push([best, channel])
             return jobScores
         }
         
-        let jobScores = null;
-        for (const [ckey, channel] of this.channels) {
-            if (channel.getJobs) {
-                let jobs = channel.getJobs(key);
-                if (jobs)
-                    jobScores =rateJobs(jobs, key, channel)
-            }else if (channel instanceof Map) {
-                var c = channel.get(key);
-                if (c) 
-                    jobScores =rateJobs(c.jobs, key, channel)
-            } else {
-                jobScores =rateJobs(channel.jobs, key, channel)
-            }
-        }
+        let [jobScores] = this.getResource("jobs", key, (jobs, channel, key)=>{
+            return rateJobs(jobs, key, channel)
+        })
+         
         if (!jobScores || jobScores.length === 0) {
             console.log("(nano searching): no jobs right now", key)
             return;
         }
-        let job = jobScores[0][0].get(key).b
-        this.removeJob(jobScores[0][1], job, key)
-        job.hireNano(key, true)
+        let job = jobScores[0].get(key).b
+        this.removeJob(jobScores[1], job, key)
+        job.hireNano(key, false)
         this.nanosWorking.set(key, job)
     }
     constructor(){

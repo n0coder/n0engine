@@ -83,10 +83,8 @@ var stageTemplate = {
         return score;
     },
     scoreTask(task, nano) {
-        console.log(this, nano)
         let relationshipModifier = getRelationshipModifer(this, nano)
         let score = scoreTask(task,nano, relationshipModifier)
-        console.log({score, task, nano})
         return score
     },
     assignTask(job, task, nano) {
@@ -116,13 +114,14 @@ tasks: [ ]
 }
 
 var job = {
-    name: "job", nano: null, keys: [],
+    name: "job", nanos: [], keys: [],
     volunteerIndex: new Map(),
     hireNano(nano, volunteer) {
         let stage = this.stages[this.stage]
         if (!stage) return null;
         let task = stage.findBestTask(nano)
         if (volunteer) this.volunteerIndex.set(nano, 1)
+        this.nanos.push(nano)
         return stage.assignTask(this, task, nano);
     },
     rateJob(nano) { //to differentiate this job on the radio
@@ -159,11 +158,11 @@ var job = {
         else { this.stage++; this.done(this); }
     },
     done: event((function(job) { //custom c# action style event
-        console.log("job done")
+        //console.log("job done")
         job.volunteerIndex.clear()
     })),
     failed: event((function(job) {
-        console.log("job failed")
+       // console.log("job failed")
         job.volunteerIndex.clear()
     })),
     nanoAssigned: event(),
@@ -286,7 +285,6 @@ function scoreTask(task, nano, relationshipModifier = 1) {
 
 //this is how we can get the nanos relationship info
 function getRelationshipModifer(stage, nano) {
-    console.log(nano)
     let relationshipModifier = 1;
     console.warn("we need to set up relationships in nano identities here")
     let relationships = nano.identity.relationships;
