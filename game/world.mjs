@@ -101,7 +101,7 @@ for (let i = 10; i < 15; i++) {
     soils.push(new Soil(i, o))
 }
 var plantJob = createJobu(soils, "plantSeeds");
-//n0radio.postJob("nano", plantJob)
+n0radio.postJob("nano", plantJob)
 
 var soils2 = [];
 for (let o = 11; o < 12; o++)
@@ -109,7 +109,7 @@ for (let i = 10; i < 15; i++) {
     soils2.push(new Soil(i, o))
 }
 var plantJob2 = createJobu(soils2, "plantSeeds");
-//n0radio.postJob("nano", plantJob2)
+n0radio.postJob("nano", plantJob2)
 
 var soils3 = [];
 for (let o = 12; o < 13; o++)
@@ -117,11 +117,14 @@ for (let i = 10; i < 15; i++) {
     soils3.push(new Soil(i, o))
 }
 var plantJob3 = createJobu(soils3, "plantSeeds");
-//n0radio.postJob("nano", plantJob3)
-
+n0radio.postJob("nano", plantJob3)
+/*
 n0.brain.do(plantJob)
 n1.brain.do(plantJob2)
 n2.brain.do(plantJob3)
+*/
+let nanos = n0radio.nanosInChannel("nano", n0)
+console.log(nanos)
 //plantJob.hireNano(n0)
 /*
 plant(1);
