@@ -12,7 +12,7 @@ export const n0alea = Alea("n0");
 //
 
 export function buildn0Collapse(tile) {
-    console.log("n0")
+
     var x = tile.wx, y = tile.wy
     let rules = tile.biome.tiles.filter(t => n0tiles.get(t))
     if (rules.length === 0) return;
@@ -27,10 +27,12 @@ export function buildn0Collapse(tile) {
     options = newCheckDir(x + 1, y, options, (a, b) => a.isRight(b))
     options = newCheckDir(x, y + 1, options, (a, b) => a.isDown(b))
     options = newCheckDir(x - 1, y, options, (a, b) => a.isLeft(b))
+    /*
     options = newCheckDir(x - 1, y - 1, options, (a, b) => a.isUpLeft(b));   // Up-left
     options = newCheckDir(x + 1, y - 1, options, (a, b) => a.isUpRight(b));  // Up-right
     options = newCheckDir(x - 1, y + 1, options, (a, b) => a.isDownLeft(b)); // Down-left
     options = newCheckDir(x + 1, y + 1, options, (a, b) => a.isDownRight(b)); // Down-right
+    */
     let later = []
     var myOptionvs = options.map(o => {
         var tvt = n0tiles.get(o);

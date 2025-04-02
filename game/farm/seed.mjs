@@ -39,6 +39,7 @@ class Crop {
         this.y = y;
         this.s = 16;
         this.growth = 0
+        this.grown = false;
         this.name = "crop"
         this.setActive = setActive;
         this.setActive(true)
@@ -49,8 +50,14 @@ class Crop {
         return this.held ? 0 : worldGrid.gridSize/2
     }
     grow(amount) {
-        if (this.growth <= 1)
-        this.growth += amount;
+        if (this.growth <= 1){
+            this.growth += amount;
+
+        } else if (!this.grown) {
+            this.grown = true;
+            //linking pings emit
+            n0radio.ping("harvest", this)
+        }
     }
     harvest(nano, pop) {
         pop()
