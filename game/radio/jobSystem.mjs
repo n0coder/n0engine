@@ -57,6 +57,18 @@ export var jobTasksa = new Map([
     }]
 ]);
 
+var microStageTemplate = {
+    tasks:[],
+    work(job, nano){
+        if (this.tasks.length>0) {
+            let task = this.tasks[0]
+            let o = task.work(job, nano)
+            if (!o) this.tasks.splice(0, 1)
+            return true
+        } 
+        return false
+    }
+}
 var stageTemplate = {
     workIndex: new Map(), 
     important: true,
@@ -178,8 +190,17 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
         let base = currentTask.base;
         let task = currentTask.task;
         let depth = currentTask.depth;
+
+        let microstage;
         if(task.requires) {
             for(let i = 0; i < task.requires.length; i++) {
+                if (task.requires[i][2]) {
+                    if (!microstage) {
+                        microstage = atomicClone(microStageTemplate)
+                        microstage.tasks.push(task)
+                    }
+                }
+
                 //we need to form tasks based on arguments here?
                 //let isu = nanoaiActions.get(vis[0])
                 let key = generateKey(task.requires[i], keyMap); 
@@ -193,11 +214,17 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
                     console.error(`there is no job task called ${action}`)
                 } 
                 //ok so we will need a referense towards how we form tasks to begin with.
-                let tasku = [ss(...argsa)||{}]  // cloneAction(ss, null, ...argsa);
-                depthStack.push({task: tasku[0], broken, key, depth: depth + 1, base: task});
+                let tasku = ss(...argsa)||{} // cloneAction(ss, null, ...argsa);
+                if (microstage) { 
+                    microstage.tasks.splice(0,0, tasku);
+                    let item = resourceMap.getSet(key, {}); 
+                    tasku.item = item;
+                    if  (task.items) task.items.push(item);
+                    else task.items = [item]; 
+                }
+                else depthStack.push({task: tasku, broken, key, depth: depth + 1, base: task});
             }
         }
-
         let key = currentTask.key;
          
         if(base) { //if it has a base, the base will need to access it's output
@@ -206,11 +233,14 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
             if  (base.items) base.items.push(item);
             else base.items = [item]; 
         }
+
         let anya = resourceKeyMap.get(key);
         
         if (!key || !anya) {
             resourceKeyMap.set(key, true);
 
+            if (microstage)
+            task = microstage
         if(stages[depth]) {
             stages[depth].tasks.push(task);
             if (currentTask.broken)
@@ -244,6 +274,7 @@ export function createJobu(objs,task, ...argsa) {
     }
     let tasks = objs.map(o=>action(o, ...argsa))
     let stages = tasksToStages(tasks);
+    console.log(stages)
     let jobu = atomicClone(job); //atomically clone the job template
     jobu.stages = stages; //insert the job details
 return jobu;
@@ -324,19 +355,3 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
     }
     return matches;
  }
-
-//this code takes in a nano, and a stage
-//it scores the nano based on the tasks in the stage. 
-export function nanoStageSearch(nano, stage) {
-    let nanos = Array.isArray(nano) ? nano : [nano];
-    console.warn("we need to add tech to the bestsearch, to allow it to only give out one of the many tasks")
-
-    // in fact, this is a great example of when data structure duplication, can be a good thing
-    if (stage.tasks.length > nanos.length) {
-        console.log("more tasks than nanos (this is nano first searching)") 
-        return bestSearch(nanos, stage.tasks, (n,t)=> scoreStageTask(t,n,stage))
-    } else {
-        console.log("more nanos than tasks")
-        return bestSearch(stage.tasks, nanos, (t,n)=> scoreStageTask(t, n,stage))
-    }
-}
