@@ -25,6 +25,7 @@
     "simplex-noise": "^4.0.1"
   },
   "devDependencies": {
+    "typescript": "^5.8.2",
     "vite": "^5.4.10"
   }
 }

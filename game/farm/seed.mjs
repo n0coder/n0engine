@@ -2,6 +2,7 @@ import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mj
 import { p } from "../../engine/core/p5engine.mjs";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { pinga } from "../radio/linkingPings";
 import { craftingRecipes } from "./craftingTable.mjs";
 
 export class Seed {
@@ -14,6 +15,7 @@ export class Seed {
         this.setActive(true)
     }
     crop(x,y) {
+        this.setActive(false)
         return new Crop(x,y)
     }
     draw() {
@@ -39,24 +41,27 @@ class Crop {
         this.y = y;
         this.s = 16;
         this.growth = 0
+        this.grown = false
         this.name = "crop"
         this.setActive = setActive;
         this.setActive(true)
-        let e = function(){console.log(this)}
-        e.call(":o")
     }
+
     get heldPos() {
         return this.held ? 0 : worldGrid.gridSize/2
     }
     grow(amount) {
-        if (this.growth <= 1)
+        if (this.growth <= 1) {
         this.growth += amount;
+        } else if (!this.grown) {
+            this.grown=true
+            pinga.ping("harvest", this, "crop")
+        }
     }
     harvest(nano, pop) {
-        pop()
         //if the nano can hold more items we add (rhis)
         nano.inventory.add(this)
-        return this;
+        pop(this)
     }
     draw(){
         p.fill(255)

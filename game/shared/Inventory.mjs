@@ -27,6 +27,8 @@ export class Inventory {
             return false;
         }
     }
+    
+    
     get isOpen() {
         return this.slots === -1 || this.list.length < this.slots;
     }
