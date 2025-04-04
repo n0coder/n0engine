@@ -439,7 +439,7 @@ export function walk(nano, x, y, magn = 1) {
     sod = clamp(0, 1, sod);
     sod = lerp(.5, 1, sod);
     //console.log(sod)
-    p.text(`${sod} | ${speed}`, nano.visualX, nano.visualY);
+    //p.text(`${sod} | ${speed}`, nano.visualX, nano.visualY);
     nano.x += vx * deltaTime * nano.speed*sod;
     nano.y += vy * deltaTime * nano.speed*sod;
     return mag >= magn;

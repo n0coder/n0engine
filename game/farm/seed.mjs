@@ -41,7 +41,7 @@ class Crop {
         this.y = y;
         this.s = 16;
         this.growth = 0
-        this.grown = false
+        this.grown = false;
         this.name = "crop"
         this.setActive = setActive;
         this.setActive(true)
@@ -56,6 +56,7 @@ class Crop {
         } else if (!this.grown) {
             this.grown=true
             pinga.ping("harvest", this, "crop")
+
         }
     }
     harvest(nano, pop) {

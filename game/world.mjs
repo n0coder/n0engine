@@ -85,7 +85,7 @@ jobTasksa.set("getSeeds", function() {
 jobTasksa.set("plantSeeds", function(crop) {
     return {
         name: "plantSeeds", crop,
-        requires: [["getSeeds", {}]],
+        requires: [["getSeeds", {}, true]],
         work: function(job, nano) {
             console.log(this)
             nano.brain.do("plant", crop, this.items[0].item)

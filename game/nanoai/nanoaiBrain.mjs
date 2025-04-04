@@ -68,7 +68,7 @@ export class NanoaiBrain {
       this.currentActivity = null; 
       this.state = "idle"
     }, (array)=> array[0], ...args); 
-     action.name = `${task} <| ${action?.name??"O"}`
+     action.name = `${action?.name??"O"} -> ${task}`
     return action
   }
   doAfter(targetTasks, task, ...args) {
@@ -107,7 +107,7 @@ export class NanoaiBrain {
     }
 
     var task = action(...args)
-    let doBefore = (task,actions,args) => this.before(task,actions, args, this)
+    let doBefore = (task,actions,args) => this.before(task,actions, args, this, task)
     let o = handleBefore(task, doBefore, ...args); //o is an array (bc of before returning multiple tasks) 
     found(o);
     return (o.length === 1) ? o[0] : o
@@ -117,12 +117,15 @@ export class NanoaiBrain {
     return task;
   }
   }
-  before(clone, actions, args, ths) {
+  before(clone, actions, args, ths, task) {
     if (clone.before != undefined) {
       for (let i = 0; i < clone.before.length; i++) {
         let action = nanoaiActions.get(clone.before[i]);  
         action = action(...args)
+        if (task.name)
+             action.name = `${action?.name??"O"} -> ${task.name}`
           var beforeAction = handleBefore(action, (a,b,c)=>ths.before(a,b,c, ths), ...args);
+          console.log({action, beforeAction})
           actions.push(...beforeAction)
       }
   };

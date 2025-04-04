@@ -208,8 +208,7 @@ class Radio {
             }
             this.findNano(job, channel, key) //we want to tell any nanos currently waiting, that they can start working
         }
-        if (key)
-        job.keys.push(key)
+        job.keys.push([key, channel])
         job.done.add(this,(j,n)=>this.jobDone(j,n))
         job.failed.add(this,(j,n)=>this.jobFail(j,n))
         job.nanoAssigned.add(this, (j, nano)=>{
@@ -238,6 +237,10 @@ class Radio {
     }
     jobDone(job) {
         console.log("job done", job)
+         for (const [key, channel] of job.keys) {
+            this.removeJob(channel, job, key)
+         } 
+        
         for (const nano of job.nanos) {
             this.nanosWorking.delete(nano)
         }
@@ -271,13 +274,13 @@ class Radio {
         
         if (this.nanosSearching.get(key)) return;
         this.nanosSearching.set(key,1);
-        
+        /*
         let jobu = this.nanosWorking.get(key)
         if (jobu) {
             jobu.hireNano(key, false)
             return;
         }
-        
+        */
         //console.log("(nano searching): nano is searching")
        
         function rateJobs(jobs, nano, channel) {
@@ -300,9 +303,12 @@ class Radio {
             return;
         }
         let job = jobScores[0].get(key).b
-        this.removeJob(jobScores[1], job, key)
+        //this.removeJob(jobScores[1], job, key)
         job.hireNano(key, false)
         this.nanosWorking.set(key, job)
+    }
+    ping(type, item) {
+        console.log("ping appeared", {type, item})
     }
     constructor(){
         this.nanosSearching = new Map();
