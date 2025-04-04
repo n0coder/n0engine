@@ -257,6 +257,7 @@ class Radio {
         if (!source) throw new Error("no source")
         if (!callback) throw new Error("no callback function")
         let output = null;
+            if (this.channels.size>0)
             for (var [ckey, channel] of this.channels) {
             channel = (channel instanceof Map) ? channel.get(key) : channel;
             if (typeof channel[source] === 'function') {
@@ -290,10 +291,13 @@ class Radio {
             return jobScores
         }
         
-        let [jobScores] = this.getResource("jobs", key, (jobs, channel, key)=>{
+        let js =this.getResource("jobs", key, (jobs, channel, key)=>{
             return rateJobs(jobs, key, channel)
         })
-         
+
+        let jobScores
+         if (js) jobScores =js[0]
+
         if (!jobScores || jobScores.length === 0) {
             console.log("(nano searching): no jobs right now", key)
             return;

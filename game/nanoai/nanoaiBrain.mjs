@@ -45,6 +45,7 @@ export class NanoaiBrain {
   
   do(task, ...args) {
     let action = this.actionBuilder(task, args, (t) => { this.queue.push(t); }); 
+    if (typeof task === 'string' && action)
     action.name = task
     return action
   }

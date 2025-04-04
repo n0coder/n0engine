@@ -161,15 +161,23 @@ export const nanoaiActions = new Map([
         },
         
    }}],
-    ["harvest",function(soil) { return  {
+    ["harvest",function(soil, harvested) { return  {
         before: ["follow"],
         work: function (nano) {
-            
-            return soil?.harvest?.(nano);
+            soil.harvest(nano, harvested);
            
         },
         
    }}],
+   ["insert",function(chest, item) { return  {
+    before: ["follow"],
+    work: function (nano) {
+        
+        chest.insert(nano, item?.()??item);
+       
+    },
+    
+}}],
     ["use",function(obj, ...args) { return  {
         args,
         before: ["follow"],
