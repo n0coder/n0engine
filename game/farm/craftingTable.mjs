@@ -2,19 +2,20 @@ import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mj
 import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { nanoaiActions } from "../nanoai/nanoaiActions.mjs";
+import { pinga } from "../radio/linkingPings";
 
 export let craftingRecipes = new Map();
 
 //nano.brain.do("craft", table, item)
-nanoaiActions.set("craft", function (table, item){
+nanoaiActions.set("craft", function (table, item, outa){
     return  {
-        before: ["follow"],
+        before: ["follow"], table, item,
         work: function (nano) {
             //nanos interface with the crafting table
             //do the inventory management here
-            
-            let out = table.craft(nano, item);
-            return out
+            console.log(this)
+            let out = table.craft(nano, item?.());
+            outa?.(out)
         },
         
     } 
@@ -23,27 +24,28 @@ export class CraftingTable {
     constructor(x,y) {
         this.x = x
         this.y = y
-
+        pinga.ping("craft", this, "crop")
         this.setActive = setActive; 
         this.setActive(true);
     }
     craft(nano, items) {
         if (!Array.isArray(items)) 
             items = [items];
+        console.log(items)
         let recipe =`${items.map(c => c.name).sort()}`
         let crafta = craftingRecipes.get(recipe)
         if (!crafta) {
             console.warn(`no recipe for item (${recipe})`)
             return false;
         }
-
         let out = crafta(nano, items)
+        pinga.ping("craft", this, "crop")
         return out
     }
     draw(){
         let x = this.x *worldGrid.gridSize
-            let y = this.y *worldGrid.gridSize
-            let t = worldGrid.gridSize
+        let y = this.y *worldGrid.gridSize
+        let t = worldGrid.gridSize
             p.fill(255,255,255)
             p.rect(x, y, t, t)
     }

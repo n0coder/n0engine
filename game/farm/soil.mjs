@@ -3,6 +3,7 @@ import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import {worldGrid} from "../../engine/grid/worldGrid.mjs"
 import { lerp } from "../../engine/n0math/ranges.mjs";
+import { pinga } from "../radio/linkingPings";
 
 
 export class Soil {
@@ -13,6 +14,7 @@ export class Soil {
         this.colorWet = [202, 144, 126]
         this.crop=null;
 
+        pinga.ping("plant", this, "seeds")
         this.sugarLevel = worldGrid?.getTile(x,y)?.sugarLevel ?? 0;
         this.waterLevel = 1;
         this.setActive = setActive;
@@ -33,16 +35,21 @@ export class Soil {
     p.rect(x, y, t, t)
     }
     plant(nano, seed) {
-        seed ??= nano.inventory.hasItem('seed', 'kind')
+
+        if (typeof seed === "string")
+            seed = nano.inventory.hasItem(seed)
         if(seed) {
         nano.inventory.remove(seed)
-        
+        console.log(seed)
         this.crop = seed.crop(this.x, this.y)
+        this.crop.pop =()=>{
+            console.log("put seeds in me", this)
+            pinga.ping("plant", this, "seeds")
+            this.crop = null;
+        }
     }
     }
     harvest(nano) {
-        return this.crop?.harvest?.(nano, ()=>{
-            this.crop = null;
-        });
+        return this.crop?.harvest?.(nano);
     }
 }

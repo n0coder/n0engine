@@ -172,11 +172,25 @@ export const nanoaiActions = new Map([
    ["insert",function(chest, item) { return  {
     before: ["follow"],
     work: function (nano) {
-        
-        chest.insert(nano, item?.()??item);
+        let a= item?.()??item
+        chest.insert(nano, a);
        
     },
     
+    
+}}], 
+["take", function (chest, item, out){ return {
+    before: ["follow"], chest, item, out,
+    work(nano) {
+        //take item out of chest inventory
+        //put it into nano inventor
+        chest.take(nano, item, out)
+        /*
+        nano.brain.do("take", chest1, itema, (item)=>{
+            this.item = item
+        });
+        */
+    }
 }}],
     ["use",function(obj, ...args) { return  {
         args,
