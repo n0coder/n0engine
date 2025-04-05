@@ -29,7 +29,7 @@ export class Inventory {
     }
     
     
-    get isOpen() {
+    isOpen() {
         return this.slots === -1 || this.list.length < this.slots;
     }
 
@@ -41,14 +41,14 @@ export class Inventory {
     hasItem(item, type) {
         const condition = type === "kind" 
          ? element => element && element.kind === item 
-         : element => element && element.constructor.name === item;
+         : element => element && (element.name ===item || element.constructor.name === item);
         return this.list.find(condition);
        }
        
     hasItems(item, type, count) {
         const condition = type === "kind" 
         ? element => element && element.kind === item 
-        : element => element && element.constructor.name === item;
+        : element => element && (element.name ===item || element.constructor.name === item)
        
         const items = this.list.filter(condition);
         return items.length >= count ? items : null;
@@ -58,10 +58,8 @@ export class Inventory {
         if (this.list.includes(item)) {
             var i = this.list.indexOf(item);
             var o = this.list.splice(i, 1);
-            onRemoved?.()
+            onRemoved?.(item)
             return o;
-        } else {
-            return false;
         }
     }
 

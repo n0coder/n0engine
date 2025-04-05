@@ -11,6 +11,7 @@ export class Seed {
         this.y = y;
         this.s = 8;
         this.kind = 'seed'
+        this.name = 'seeds'
         this.setActive = setActive;
         this.setActive(true)
     }
@@ -30,9 +31,9 @@ craftingRecipes.set("crop", (nano, crops)=>{
         nano.inventory.remove(crop)
         var seed = new Seed(nano.x, nano.y)
         nano.inventory.add(seed)
-        var seed = new Seed(nano.x, nano.y)
-        nano.inventory.add(seed)
-        return seed
+        var seed2 = new Seed(nano.x, nano.y)
+        nano.inventory.add(seed2)
+        return [seed, seed2]
     }
 })
 class Crop {
@@ -59,10 +60,12 @@ class Crop {
 
         }
     }
+    pop
     harvest(nano, pop) {
         //if the nano can hold more items we add (rhis)
         nano.inventory.add(this)
         pop(this)
+        this.pop()
     }
     draw(){
         p.fill(255)
