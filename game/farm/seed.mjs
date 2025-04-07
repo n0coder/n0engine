@@ -60,7 +60,6 @@ class Crop {
 
         }
     }
-    pop
     harvest(nano, pop) {
         //if the nano can hold more items we add (rhis)
         nano.inventory.add(this)

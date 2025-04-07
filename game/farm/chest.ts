@@ -9,6 +9,7 @@ export class Chest extends Inventory{
     x: number;
     y: number;
     insert(nano:Nanoai, item) {
+        //console.log(item)
         if (Array.isArray(item)) {
             for (const i of item) 
                 this.insert(nano, i)
@@ -16,22 +17,18 @@ export class Chest extends Inventory{
         }
         nano.inventory.remove(item)
         let c =this.add(item)
-        console.log(item)
         pinga.ping("take", this, item.name)
-        if (this.isOpen()) 
-            pinga.ping("insert", this, "crop")
+        //console.log(item)
         return c;
     }
     take(nano:Nanoai, item, out) {
-        console.log({has:this.hasItem(item), chest: this})
+        //console.log({has:this.hasItem(item), chest: this})
         let i = this.hasItem(item)
         if (i){
             this.remove(i)
             nano.inventory.add(i)
             out?.(i)
 
-             if (this.isOpen()) 
-             pinga.ping("insert", this, "crop")
         }
     }
     setActive
@@ -39,7 +36,7 @@ export class Chest extends Inventory{
         super(slots)
         this.x =x;
         this.y =y;
-        pinga.ping("insert", this, "crop")
+        pinga.ping("insert", this, "crop", true)
         this.setActive = setActive; 
         this.setActive(true);
     }

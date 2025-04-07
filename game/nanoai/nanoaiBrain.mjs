@@ -1,3 +1,4 @@
+import { t } from "../../engine/core/Time/n0Time.mjs";
 import { cloneAction as handleBefore } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
@@ -105,8 +106,9 @@ export class NanoaiBrain {
       console.error(`there is no action for ${task}`)
       return null; // i do hate the "guard clauses" syntax 
     }
-
     var task = action(...args)
+    try { throw new Error("call stack") }
+    catch (callstack) {task.callstack = callstack}
     let doBefore = (task,actions,args) => this.before(task,actions, args, this, task)
     let o = handleBefore(task, doBefore, ...args); //o is an array (bc of before returning multiple tasks) 
     found(o);
@@ -114,6 +116,9 @@ export class NanoaiBrain {
   } else {
       if (args[0]) task.done = args[0] 
       found(task)
+
+    try { throw new Error("call stack") }
+    catch (callstack) {task.callstack = callstack}
     return task;
   }
   }
@@ -125,7 +130,6 @@ export class NanoaiBrain {
         if (task.name)
              action.name = `${action?.name??"O"} -> ${task.name}`
           var beforeAction = handleBefore(action, (a,b,c)=>ths.before(a,b,c, ths), ...args);
-          console.log({action, beforeAction})
           actions.push(...beforeAction)
       }
   };

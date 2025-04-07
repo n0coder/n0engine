@@ -24,7 +24,7 @@ export class CraftingTable {
     constructor(x,y) {
         this.x = x
         this.y = y
-        pinga.ping("craft", this, "crop")
+        pinga.ping("craft", this, "crop", true)
         this.setActive = setActive; 
         this.setActive(true);
     }
@@ -39,7 +39,6 @@ export class CraftingTable {
             return false;
         }
         let out = crafta(nano, items)
-        pinga.ping("craft", this, "crop")
         return out
     }
     draw(){

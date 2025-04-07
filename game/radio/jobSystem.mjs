@@ -69,6 +69,12 @@ var microStageTemplate = {
         return false
     }
 }
+var microJobTemplate = {
+    stages:[],
+    work(job, nano) {
+        
+    }
+}
 var stageTemplate = {
     workIndex: new Map(), 
     important: true,
@@ -115,7 +121,7 @@ var stageTemplate = {
     },
     validateStage(job){
         if (this.tasks.length === 0 && this.workIndex.size === 0) {
-            console.log("ready to pass to next stage?")
+            //console.log("ready to pass to next stage?")
             
               return job.stageComplete(this);
             
@@ -181,7 +187,7 @@ var job = {
     stage: 0, stages: null
 }
 
-function tasksToStages(tasks) {
+function tasksToStages(tasks, microJob) {
 let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
     let stages = []
     let resourceMap = new Map(), keyMap = new Map(), resourceKeyMap = new Map();
@@ -196,8 +202,8 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
             for(let i = 0; i < task.requires.length; i++) {
                 if (task.requires[i][2]) {
                     if (!microstage) {
-                        microstage = atomicClone(microStageTemplate)
-                        microstage.tasks.push(task)
+                        //microstage = atomicClone(microStageTemplate)
+                        //microstage.tasks.push(task)
                     }
                 }
 
@@ -240,7 +246,7 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
             resourceKeyMap.set(key, true);
 
             if (microstage)
-            task = microstage
+                task = microstage
         if(stages[depth]) {
             stages[depth].tasks.push(task);
             if (currentTask.broken)
@@ -274,8 +280,9 @@ export function createJobu(objs,task, ...argsa) {
     }
     let tasks = objs.map(o=>action(o, ...argsa))
     let stages = tasksToStages(tasks);
-    console.log(stages)
+    //console.log(stages)
     let jobu = atomicClone(job); //atomically clone the job template
+    jobu.name = task
     jobu.stages = stages; //insert the job details
 return jobu;
 

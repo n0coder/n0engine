@@ -212,13 +212,14 @@ class Radio {
         job.done.add(this,(j,n)=>this.jobDone(j,n))
         job.failed.add(this,(j,n)=>this.jobFail(j,n))
         job.nanoAssigned.add(this, (j, nano)=>{
+            //console.log(j)
             this.nanosSearching.delete(nano); //remove from searching
         })
     }
     removeJob(channel, job, key) {
 
         let c = this.findChannel(channel, key);
-        console.log({c, channel, key})
+        
         if (c) {
             
             //if c is a type with a custom post, we use that version instead of directly pushing to the channel list
@@ -236,7 +237,7 @@ class Radio {
         return nanos.filter((n) => (this.findChannel(channel, n) === this.findChannel(channel, c)));
     }
     jobDone(job) {
-        console.log("job done", job)
+        //console.log("job done", job)
          for (const [key, channel] of job.keys) {
             this.removeJob(channel, job, key)
          } 

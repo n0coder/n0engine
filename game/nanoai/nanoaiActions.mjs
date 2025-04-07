@@ -184,6 +184,7 @@ export const nanoaiActions = new Map([
     work(nano) {
         //take item out of chest inventory
         //put it into nano inventor
+        //console.log(chest)
         chest.take(nano, item, out)
         /*
         nano.brain.do("take", chest1, itema, (item)=>{
