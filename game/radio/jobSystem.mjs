@@ -95,9 +95,9 @@ var stageTemplate = {
         return best?.get?.(nano)?.b;
     },
     rateStage(nano){
-        let score = 1;
+        let score = 0;
         for (const task of this.tasks) 
-            score *= this.scoreTask(task,nano)
+            score += this.scoreTask(task,nano)
         return score;
     },
     scoreTask(task, nano) {
@@ -143,11 +143,12 @@ var job = {
         return stage.assignTask(this, task, nano);
     },
     rateJob(nano) { //to differentiate this job on the radio
-        let score = 1
+        let score = 0
         for (const stage of this.stages) {
             if (stage.tasks.length === 0) continue; 
-            stage.rateStage(nano)
+            score += stage.rateStage(nano)
         }
+        console.log(score)
         return score
     },
     work: function(nano) {

@@ -286,9 +286,10 @@ class Radio {
        
         function rateJobs(jobs, nano, channel) {
             let jobScores = [];
-            let best = bestSearch([nano], jobs, (n,j)=>{ j.rateJob(n); } )
+            let best = bestSearch([nano], jobs, (n,j)=>{ return j.rateJob(n); } )
             if (best.size > 0)
             jobScores.push([best, channel])
+            console.log(jobScores)
             return jobScores
         }
         

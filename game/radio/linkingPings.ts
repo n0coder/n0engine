@@ -20,8 +20,9 @@ n0pingJobs.set("harvest", harvest)
 harvest.set("insert",  {
     create: (a, itema)=>{ 
         let tasks = a.map((a,i)=>{return {crop: a.a.resource, chest: a.b.resource, itema}}) 
-        console.log(tasks)
-        let job = createJobu(splitArray(tasks,8),  "harvest-insert", itema); 
+        //console.log(tasks)
+        let job = createJobu(splitArray(tasks,1),  "harvest-insert", itema); 
+        console.log(job)
         n0radio.postJob("nano", job); 
     },
     canLink: (harvest, insert) => {
@@ -35,6 +36,7 @@ jobTasksa.set("harvest-insert", function(a, itema) {
 let {crop} = a[0]
     return {
         name: "harvest-insert", item:null, pos:[crop.x, crop.y],
+        interactions: [["harvesting"]],
         work: function(job, nano) {
             nano.brain.do(createJobu(a,  "insert", "harvest"))
         }
@@ -54,6 +56,8 @@ jobTasksa.set("bundle", function(a, chunks, jobu, ...args){
 jobTasksa.set("harvest", function({crop, itema}){
     //console.log(crop, itema)
     return {
+        pos:[crop.x, crop.y],
+        interactions: [["harvesting"]],
         work(job, nano) {
             nano.brain.do("harvest", crop, (item)=>{
                 this.item.o = item
@@ -136,7 +140,7 @@ jobTasksa.set("take-craft", function(a, itema) {
     });
 
     jobTasksa.set("craft", function(a, req){
-        console.log(a)
+        //console.log(a)
         let {table, itema} = a
         return {
             requires: [[req, a]],
@@ -167,7 +171,8 @@ jobTasksa.set("take-craft", function(a, itema) {
         let cs= a[0], {chest, soil} = cs;
         
             return {
-                pos:[chest.x, chest.y],
+                pos:[soil.x, soil.y],
+                interactions: [["harvesting"]],
                 //requires: a.map(o=>(["plant", o])),
                 name: "take-plant", item:null,chest, soil, itema, crafts:null,
                 work(job, nano) {
@@ -191,6 +196,8 @@ jobTasksa.set("take-craft", function(a, itema) {
         let {soil, itema} = sci
         //console.log(soil, itema)
         return {
+            pos:[soil.x, soil.y],
+            interactions: [["harvesting"]],
             requires: [["take", sci]],
             work(job, nano) {
                 nano.brain.do("plant", soil, itema);
@@ -333,32 +340,27 @@ worldGrid.y= Math.floor(Math.random()*2562)
 
 globalThis.pinga = pinga
 let n0 = new Nanoai("n0", 5,5,5)
+n0.identity.skills.set("harvesting", 2)
 let n1 = new Nanoai("n1", 5,6,5)
-let n2 = new Nanoai("n2", 5,7,5)
-let n3 = new Nanoai("n3", 4,8,5)
-let n4 = new Nanoai("n0", 4,5,5)
-let n5 = new Nanoai("n1", 4,6,5)
-let n6 = new Nanoai("n2", 4,7,5)
-let n7 = new Nanoai("n3", 4,8,5)
 let bfc = new WorldGenerator(n0)
 
 
-globalThis.nanos = [n0,n1,n2,n3]
+globalThis.nanos = [n0,n1]
 
 //let seed = new Seed(0,0)
 //n0.brain.do("pickup", seed)
 for (let i = 0; i < 32; i++) {
     for (let o = 3; o < 5; o++) 
 
-    new Soil(i,o, true).plant(n0, new Seed(2,2))
+    new Soil(i,o, true)//.plant(n0, new Seed(2,2))
     
 }
 //n0.brain.do("plant", soil, seed)
 
 let chest = new Chest(16, 11, 8)
 
-//chest.insert(n0, new Seed(-5, -5))
-//chest.insert(n0, new Seed(-5, -5))
+chest.insert(n0, new Seed(-5, -5))
+chest.insert(n0, new Seed(-5, -5))
 
 let table = new CraftingTable(4, 8)
 //pinga.ping("take", chest, "crop")

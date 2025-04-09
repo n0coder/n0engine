@@ -13,7 +13,7 @@ nanoaiActions.set("craft", function (table, item, outa){
         work: function (nano) {
             //nanos interface with the crafting table
             //do the inventory management here
-            console.log(this)
+            //console.log(this)
             let out = table.craft(nano, item?.());
             outa?.(out)
         },
@@ -31,7 +31,7 @@ export class CraftingTable {
     craft(nano, items) {
         if (!Array.isArray(items)) 
             items = [items];
-        console.log(items)
+        //console.log(items)
         let recipe =`${items.map(c => c.name).sort()}`
         let crafta = craftingRecipes.get(recipe)
         if (!crafta) {
