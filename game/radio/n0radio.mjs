@@ -4,6 +4,7 @@ import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Circle } from "../farm/circle.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
 import { bestSearch } from "./jobSystem.mjs";
+import { pinga } from "./linkingPings";
 
 export class Channel {
     constructor() {
@@ -245,6 +246,7 @@ class Radio {
         for (const nano of job.nanos) {
             this.nanosWorking.delete(nano)
         }
+
     }
     jobFail(job) {
         console.log("job failed", job)
@@ -289,7 +291,7 @@ class Radio {
             let best = bestSearch([nano], jobs, (n,j)=>{ return j.rateJob(n); } )
             if (best.size > 0)
             jobScores.push([best, channel])
-            console.log(jobScores)
+            //console.log(jobScores)
             return jobScores
         }
         

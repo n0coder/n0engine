@@ -57,10 +57,16 @@ export class Nanoai {
         ]) 
     }
     get visualX() {
-        return (this.x*worldGrid.gridSize)+(this.img ? this.img.width / 2 : 0);
+        return (this.x*worldGrid.gridSize)+(this.spriteX/2);
     }
     get visualY() {
-        return (this.y*worldGrid.gridSize)-(this.img ? this.img.height/2 : 0)
+        return (this.y*worldGrid.gridSize)-(this.spriteY/2)
+    }
+    get spriteY() {
+        return (this.img ? this.img.height : 0)
+    }
+    get spriteX() {
+        return (this.img ? this.img.width : 0)
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {

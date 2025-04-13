@@ -174,7 +174,7 @@ export const nanoaiActions = new Map([
     work: function (nano) {
         let a= item?.()??item
         chest.insert(nano, a);
-       
+        
     },
     
     
@@ -452,7 +452,7 @@ export function walk(nano, x, y, magn = 1) {
    
     var sod = inverseLerp(7,0, speed)
     sod = clamp(0, 1, sod);
-    sod = lerp(.5, 1, sod);
+    sod = lerp(.2, 1, sod);
     //console.log(sod)
     //p.text(`${sod} | ${speed}`, nano.visualX, nano.visualY);
     nano.x += vx * deltaTime * nano.speed*sod;

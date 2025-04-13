@@ -99,7 +99,7 @@ function stars(grid) {
     let astar = new star.js();
     astar.setGrid(grid);
     astar.setAcceptableTiles([0, 1, 2, 3, 4, 5, 6, 7]);
-    astar.disableDiagonals();
+    //astar.disableDiagonals();
     astar.setTileCost(0, 0); // Clouds
     astar.setTileCost(1, 1); // Dirt
     astar.setTileCost(2, 2); // Grass/Sand

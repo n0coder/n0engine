@@ -9,21 +9,27 @@ export class Chest extends Inventory{
     x: number;
     y: number;
     insert(nano:Nanoai, item) {
-        //console.log(item)
+       
         if (Array.isArray(item)) {
             for (const i of item) 
                 this.insert(nano, i)
             return
         }
-        nano.inventory.remove(item)
+        let ir = nano.inventory.remove(item)
+        if (ir) {}
         let c =this.add(item)
         pinga.ping("take", this, item.name)
         //console.log(item)
         return c;
+        
     }
     take(nano:Nanoai, item, out) {
         //console.log({has:this.hasItem(item), chest: this})
-        let i = this.hasItem(item)
+        let i;
+        if (typeof item === "string" )
+            i = this.hasItem(item)
+        else if (this.list.indexOf(item) >= 0)
+            i = item
         if (i){
             this.remove(i)
             nano.inventory.add(i)

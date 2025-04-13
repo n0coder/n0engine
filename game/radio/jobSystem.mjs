@@ -148,7 +148,7 @@ var job = {
             if (stage.tasks.length === 0) continue; 
             score += stage.rateStage(nano)
         }
-        console.log(score)
+        //console.log(score)
         return score
     },
     work: function(nano) {

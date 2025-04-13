@@ -143,7 +143,7 @@ export class NoiseGenerator {
         }
 
         //sum = lerp(minm, maxm, sim);
-
+        
         (this.doMultiply(x, y, minmax));
         (this.doAdd(x, y, minmax));
         this.doPow(x, y, minmax, 1);

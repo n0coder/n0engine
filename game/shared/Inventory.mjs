@@ -59,7 +59,7 @@ export class Inventory {
             var i = this.list.indexOf(item);
             var o = this.list.splice(i, 1);
             onRemoved?.(item)
-            return o;
+            return i>=0;
         }
     }
 

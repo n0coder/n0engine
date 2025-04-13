@@ -32,6 +32,7 @@ export class CraftingTable {
         if (!Array.isArray(items)) 
             items = [items];
         //console.log(items)
+        console.log(items)
         let recipe =`${items.map(c => c.name).sort()}`
         let crafta = craftingRecipes.get(recipe)
         if (!crafta) {

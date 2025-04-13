@@ -5,6 +5,7 @@ export class WorldGrid {
         this.x = -15 * this.chunkSize
         this.y = 240 * this.chunkSize;
         this.tiles = new Map();
+        this.chunks = new Map();
     }
     setTile(x,y, obj) {
         this.tiles.set(`${this.x+ x}, ${ this.y+ y}`, obj);
@@ -13,7 +14,15 @@ export class WorldGrid {
         var xx = Math.floor(x), yy = Math.floor(y)
         return this.tiles.get(`${this.x+xx}, ${this.y+yy}`)
     }
-
+    getChunk(x,y) {
+        var xx = Math.floor(x), yy = Math.floor(y)
+        let c = this.chunks.get(`${this.x+xx}, ${this.y+yy}`)
+        if (!c) {
+             c = {pos: [xx, yy]}
+            this.chunks.set(`${this.x+xx}, ${this.y+yy}`, c)
+        }
+        return c
+    }
     get halfTileSize() {
         return this.gridSize / 2
     }
@@ -171,6 +180,30 @@ export class WorldGrid {
 
         return [screenX, screenY];
     }
+    alignPositionChunk(x, y) {
+        if (Array.isArray(x)) [x, y] = x;
 
+        // Scale down to world space.
+        let worldX = x / (this.chunkSize*this.gridSize);
+        let worldY = y / (this.chunkSize*this.gridSize);
+
+        // Floor the position to align with world position.
+        worldX = Math.round(worldX);
+        worldY = Math.round(worldY);
+
+        // Scale back up to screen space.
+        let screenX = worldX * this.chunkSize*this.gridSize;
+        let screenY = worldY * this.chunkSize*this.gridSize;
+
+        return [screenX, screenY];
+    }
+
+    circleChunks(i,o) {
+        i=i*this.gridSize, o=o*this.gridSize
+        let ac = (x,y) => { var [xx,yy] = this.alignPositionChunk(x,y); return this.getChunk(xx/this.gridSize,yy/this.gridSize) }
+        let h = (this.gridSize/2);
+        return [ac(i+h,o), ac(i-h,o), ac(i,o+h),ac(i,o-h)].filter((o,i, a)=> a.findIndex(item => item === o) === i)
+    }
+    
 }
 export const worldGrid = new WorldGrid(); 

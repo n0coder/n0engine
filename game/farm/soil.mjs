@@ -22,7 +22,7 @@ export class Soil {
     }
     draw() {
 
-        this.crop?.grow?.(deltaTime*0.2*this.waterLevel)
+        this.crop?.grow?.(deltaTime*this.waterLevel)
         
     
         let x = this.x *worldGrid.gridSize
