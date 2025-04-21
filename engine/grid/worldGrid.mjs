@@ -180,7 +180,27 @@ export class WorldGrid {
 
         return [screenX, screenY];
     }
+    alignGridPosition(x,y) {
+        return [Math.floor(x), Math.floor(y)]
+    }
     alignPositionChunk(x, y) {
+        if (Array.isArray(x)) [x, y] = x;
+
+        // Scale down to world space.
+        let worldX = x / (this.chunkSize);
+        let worldY = y / (this.chunkSize);
+
+        // Floor the position to align with world position.
+        worldX = Math.round(worldX);
+        worldY = Math.round(worldY);
+
+        // Scale back up to screen space.
+        let screenX = worldX * this.chunkSize;
+        let screenY = worldY * this.chunkSize;
+
+        return [screenX, screenY];
+    }
+    alignScreenPositionChunk(x, y) {
         if (Array.isArray(x)) [x, y] = x;
 
         // Scale down to world space.

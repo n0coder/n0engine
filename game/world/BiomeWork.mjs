@@ -10,6 +10,7 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 
 //lets split world height into 2 ideas
 //erosion, and 
+
 var height = new RangeMap(0, 1)
 height.add("deep", .05).add("low", .15).add("border", .35)
 height.add("surface", 1).add("high", .1).add("cloud", .1)
@@ -214,8 +215,8 @@ function formBiome(o) { //this is baking sugar into the generation... not ideal 
     biomes.unshift(bitter)
 }
 
-let sweeta = [["sweetzone"], ["sweet","plainzone"]];
-let bittera = [["bitterzone"],["bitter","plainzone"]];
+let sweeta = [["sweet"]];
+let bittera = [["bitter"]];
 
 formBiome({
     name: "test",

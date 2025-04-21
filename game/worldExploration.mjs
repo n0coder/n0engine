@@ -8,16 +8,17 @@ import { Nanoai } from "./nanoai/nanoai.mjs";
 import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { findPath } from "./nanoai/research/n0Pathfinder.mjs";
 import { Wall } from "./world/props/wall.mjs";
-import { Water } from "./world/props/water.mjs";
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs"
 import { camera } from "../engine/core/Camera/camera.mjs";
 import Alea from "alea";
+import { WorldGenerator } from "./world/wave/worldGen/worldGenerator.mjs";
 let n0 = new Nanoai("n0", 16, 16);
 globalThis.n0 =n0;
 [[5,5], [6,5], [7,5], [8,5], [9,5]].map(([x,y]) => 
 	worldGrid.setTile(x, y, new Wall(x,y)))
-let water = new Water(7, 7)
-worldGrid.setTile(7, 7, water)
+let bfc = new WorldGenerator(n0)
+//let water = new Water(7, 7)
+//worldGrid.setTile(7, 7, water)
 /*
 n0.brain.do("follow", water)
 n0.brain.do("walk", 15,11);
@@ -58,24 +59,6 @@ n0.brain.do("search", search, 6, 120, onFound)
 n0.brain.do("ping", (n)=>{n.vy =1, n.vx=0});
 n0.brain.do("search", search, 6, 120, onFound)
 */
-console.log(Math.PI)
-console.log(Math.PI/Math.SQRT2)
-console.log(Math.sqrt(2.25))
-console.log(Math.sqrt(2.221))
-console.log(Math.sqrt(2)*(3.1415926 / 2))
-console.log(3.1415926 / 2)
-console.log((3.1415926 / 2)*(3.1415926 / 2))
-
-let o =[0, 1,2,3,4,5,6,7,8,9,10].map(i => (Math.round((i)/2)*2))
-console.log(o);
-
-
-var nano = {
-	face: "XD",
-	say(msg) { console.log(`${this.face}: ${msg}`) }
-}
-nano.say("hi")
-
 //coming up with a search space tech
 
 // *search*, *rotate 90*, *search*, *rotate 90*, *search*, *rotate 90*, *search*, *rotate 90*,
@@ -278,13 +261,13 @@ n0.brain.do( "search", search, 8, 360, (results) => {
 	n0.brain.do("spin", 10, 12);
 })
 */
-
+/*
 n0.brain.do("radialSearch", search, (results) => {
 	console.log(results); 
 	if (results.length > 0)
 	n0.brain.do("spin", 10, 10);
 });
-
+*/
 
 
 
@@ -328,7 +311,7 @@ nanoaiActions.set("exploreSearch", function (onFound) {
 		}		
 	}
 })
-n0.brain.do("exploreSearch")
+//n0.brain.do("exploreSearch")
 export class Visualizer {
 	constructor (nano) {
 		this.gridSize = worldGrid.gridSize;
@@ -442,4 +425,69 @@ function searchSpace(nano, condition, radius, fov) {
 }
 //searchSpace(n0, search, 6, 120);
 
+//2025 april effort to make groupRadialArcBFS
 
+/*
+the first thing we need to prioritize is working with BFS rules outside the work function
+*/
+export function distance(x1, y1, x2, y2) {
+	let dx = x2 - x1;
+	let dy = y2 - y1;
+	return Math.sqrt(dx * dx + dy * dy);
+ }
+//visited is outside search function, to allow multiple searches to contribute
+let bxs = ()=> ({ visited: new Map(), visitedChunks: new Set(),
+	tile(x,y){ return {x,y, tile:()=>worldGrid.getTile(x,y)}},
+	ping(nano,out) {
+		var {x,y} = nano;
+        for (const [_, pos] of this.visited) {
+			p.fill(pos.color.r, pos.color.g, pos.color.b)
+			p.circle(pos.x*worldGrid.gridSize+(worldGrid.gridSize/2),pos.y*worldGrid.gridSize+(worldGrid.gridSize/2), worldGrid.gridSize)
+		}
+		let color = {r: Math.floor(Math.random()*255), g: Math.floor(Math.random()*255), b: Math.floor(Math.random()*255)}
+        let r = worldGrid.chunkSize * Math.SQRT2
+        //r *= Math.SQRT2;
+        let queue = [this.tile(x,y)], ox = x, oy = y
+		var [x,y] = worldGrid.alignGridPosition(x,y)
+		if (this.visited.get(`${x}, ${y}`)) return;
+        while (queue.length > 0) {
+			var {x,y,tile} = queue[0]
+			queue.shift()
+		    var [x,y] = worldGrid.alignGridPosition(x,y)
+            var [cx,cy] = worldGrid.alignPositionChunk(x,y); //chunk coords world space
+            //console.log({x,y,cx,cy, dx: cx-x, dy:cy-y})
+            if (this.visited.get(`${x}, ${y}`)) continue;
+		    let bop = (xo,yo)=>{
+				
+				let v = this.visited.get(`${xo}, ${yo}`)
+				//console.log(v)
+				let d = distance(ox,oy,xo,yo)
+		        if (!v && d < r)
+                    queue.push(this.tile(xo,yo))
+				
+	        }
+			//why is bop only exploring tiles that are diagonal (x+1, y+1) etc...
+            bop(x-1, y); bop(x+1, y); bop(x, y-1); bop(x, y+1);
+			out(tile())
+	        //console.log({x,y,tile: ;
+			this.visited.set(`${x}, ${y}`, {x,y, color})
+	    }
+
+		//if we did not we check it then
+		//calculate neighbor distance to starting point
+		//add not visited neighbors within radius
+	}
+})
+let bxo = bxs()
+n0.brain.do("walk", 3,3)
+
+n0.brain.do("ping", ()=>{
+	bxo.ping(n0, (i)=>{console.log(i); return true})
+	return false;
+})
+n0.brain.do("walk", 3,12)
+
+n0.brain.do("ping", ()=>{
+	bxo.ping(n0, (i)=>{console.log(i); return true})
+	return true;
+})

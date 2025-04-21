@@ -126,7 +126,7 @@ var sugarzone = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistanc
 );
 */
 var sugarzonea = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
-    add: [[elevation, -.2]], mapSpace: [0, 1], map: [
+    add: [[elevation, -.2]], mapSpace: [0, 1], add:[triverWforks2],map: [
         { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [sugar, bitter] //bitter zone, original mix, sugar zone
     }
 );
@@ -134,8 +134,12 @@ var sugarzone = new NoiseGenerator({
     scale: scale * 1300,
     blend: [0, 1], add: [[temp, 7.5], [humidity, 2], [elevation, -.2], [sugarzonea, 3]]
 });
+var sugao = new NoiseGenerator({
+    scale: scale*1500, blend: [sugarzone, sugarzonea]
+})
+
 //worldFactors.set("elevation", sugarzone)
-worldFactors.set("sugar", sugarzonea)
+worldFactors.set("sugar", sugao)
 worldFactors.set("sugarzone", sugarzone)
 
 let alea = Alea("n0");

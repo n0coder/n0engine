@@ -130,15 +130,6 @@ jobTasksa.set("take-craft", function(a, itema) {
             work: function(job, nano) {
                 console.log(a)
                 nano.brain.do(createJobu(a, "insert", "craft", "take"))
-                /*
-                nano.brain.do("take", chest, itema, (item)=>{
-                    this.item = item
-                });
-                nano.brain.do("craft", table, ()=> [this.item], (out)=>{
-                    this.crafts = out
-                })
-                nano.brain.do("insert", chest, ()=>this.crafts)
-                */
             }
         }
     });
@@ -175,10 +166,10 @@ jobTasksa.set("take-craft", function(a, itema) {
     jobTasksa.set("take-plant", function(a, itema) {
         //console.log(a)
         
-        let cs= a[0], {c, soil} = cs;
+        let cs= a[0], {chest, soil} = cs;
             return {
                 pos:[soil.x, soil.y],
-                interactions: [["harvesting"]],
+                interactions: [["planting"]],
                 //requires: a.map(o=>(["plant", o])),
                 name: "take-plant", item:null,chest, soil, itema, crafts:null,
                 work(job, nano) {
@@ -201,13 +192,41 @@ jobTasksa.set("take-craft", function(a, itema) {
         //console.log(soil, itema)
         return {
             pos:[soil.x, soil.y],
-            interactions: [["harvesting"]],
+            interactions: [["planting"]],
             requires: [["take", sci]],
             work(job, nano) {
                 nano.brain.do("plant", soil, itema);
             }
         }
     })
+
+//createJobu([chunk], "checkRun", "pops")
+jobTasksa.set("checkrun", function(a, itema) {
+    
+    return {
+            pos:[a.pos[0], a.pos[1]],
+            name: "checkrun", requires: [["walk", a.pos]],
+            work: function(job, nano) {
+                
+                let b = false
+                for (let [_,pop] of a[itema]) {
+                    b ||= pop();
+                }
+                return b
+            }
+        }
+    });
+
+    jobTasksa.set("walk", function(a){
+       console.log(a)
+        return {
+            pos: a,
+            work(job, nano) {
+                nano.brain.do("walk", a[0], a[1])
+            }
+        }
+    })
+    
 
 function sort(a, a0) {
     let distance = (a, b) => {
@@ -244,10 +263,6 @@ export let pinga = {
         
     }, 
     pingChunk(action, resource, item, promise, success) { 
-        //instance this object between chunks, to prevent pinging multiple times
-
-        let itemsu, itex;
-
         let chunks: any[] = worldGrid.circleChunks(resource.x, resource.y)
         let ping = {action, resource, item, promise, success, chunks};
         
@@ -267,27 +282,45 @@ export let pinga = {
                 items.push(ping)
             } 
         }
-
         if (!promise) {
-            //sort chunks by ping count
+        //store ping info on chunk
+            
+        let chunka = (c) => c.pings.get(action).get(item)
+        let chuns = chunks.sort((a,b)=>chunka(a).length-chunka(b).length)
+        let chunk = chuns[chuns.length-1]
+        let pos = chunk.pos;
+        //chunk
+        //create job to tell nano to check this spot and run this function
+        
+        let key = `${action}-${item}`
+        
+        for (const chusx of chuns) {
+            if (chusx.pops===undefined)   chusx.pops = new Map();
+            if (!chusx.pops.get(key))  {
+        chusx.pops.set(key, () => {
+
+        let items = chunka(chusx).slice();
             console.log("pop")
-            let chunka = (c) => c.pings.get(action).get(item)
-            let chuns = chunks.sort((a,b)=>chunka(a).length-chunka(b).length)
-            let chunk = chuns[chuns.length-1]
-            let items = chunka(chunk).slice();
-            let pos = chunk.pos;
             if (items.every(ping => !ping.promise || ping.promise())) { //if every promise is met, or if no pings of this type have a promise
-             
-        for (const item of items) {
-            for (let chunk of item.chunks){
-                let ps = chunk.pings.get(item.action).get(item.item)
-                let i = ps.indexOf(item);
-                ps.splice(i, 1)
-            }
-            //item?.success?.();
-        }
-        this.linkBundle(action, items, item, pos)
+                console.log("popped")
+                for (const item of items) {
+                    console.log("popping", item)
+                for (let chunk of item.chunks){
+                    let ps = chunk.pings.get(item.action).get(item.item)
+                    let i = ps.indexOf(item);
+                    ps.splice(i, 1)
+                }
+                //item?.success?.();
+                }
+                chusx.pops.delete(key)
+                this.linkBundle(action, items, item, pos)
+            } else return true
+        })
+        let check = createJobu(chuns, "checkrun", "pops")
+        n0radio.postJob("nano", check)
     }
+    }
+
     }
 },
     linkBundle(action:string, as:Array<any>, item: string, pos) {
@@ -352,8 +385,8 @@ export let pinga = {
 }
 
 
-let n0 = new Nanoai("n0", 5,5,5)
-let bfc = new WorldGenerator(n0)
+//let n0 = new Nanoai("n0", 7,7,5)
+//let bfc = new WorldGenerator(n0)
 
 class Pingy{
     setActive; renderOrder; f;
@@ -378,25 +411,22 @@ class Pingy{
 new Pingy()
 
 
-let m = new Map();
-m.set(undefined, ":)")
-console.log(m.get(undefined))
-
-//worldGrid.x=  Math.floor(Math.random()*2562)
+worldGrid.x=  Math.floor(Math.random()*2562)
 //32*0
-//worldGrid.y= Math.floor(Math.random()*2562)
+worldGrid.y= Math.floor(Math.random()*2562)
 
 globalThis.pinga = pinga
-n0.identity.skills.set("harvesting", 2)
-let n1 = new Nanoai("n1", 5,6,5)
-new Nanoai("n1", 10,10,5)
-new Nanoai("n1", 10,10,5)
+//n0.identity.skills.set("harvesting", 2)
+//let n1 = new Nanoai("n1", 5,6,5)
+//let n2 = new Nanoai("n2", 10,10,5)
+//let n3 = new Nanoai("n3", 10,10,5)
 
 
-globalThis.nanos = [n0,n1]
+//globalThis.nanos = [n0,n1,n2,n3]
 
 //let seed = new Seed(0,0)
 //n0.brain.do("pickup", seed)
+/*
 for (let i = 0; i < 32; i++) {
     for (let o = 13; o < 15; o++) 
 
@@ -411,7 +441,7 @@ chest.insert(n0, new Seed(-5, -5))
 chest.insert(n0, new Seed(-5, -5))
 
 let table = new CraftingTable(4, 8)
-
+*/
 //pinga.ping("take", chest, "crop")
 
 

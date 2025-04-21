@@ -375,9 +375,20 @@ export function walkObj(obj, nano) {
     let foundPath = (nano, obj) => {
         findPath(nano.x, nano.y, obj.args[0], obj.args[1], 32, 7, (path) => {
         obj.path = path;
-        });
+        p.fill(255,255,255)
+        p.image(path.graphics, 0, 0)
+        console.log("BRO WHY")
+        //console.log(path)
+        }, obj?.path?.graphics);
     }
-    return processWalk(nano, obj, obj.args[0], obj.args[1], stopped,  foundPath, .75);
+
+
+    if (!obj?.path) {
+        //?
+    }
+    let pw = processWalk(nano, obj, obj.args[0], obj.args[1], stopped,  foundPath, .75);
+    
+    return pw;
 }
 p.noLoopLoud = function() {
     p.noLoop(); console.error("the loop was paused");
@@ -395,7 +406,7 @@ function processWalk(nano, obj, ox, oy, stopDirection, findaPath, magn = .5) {
         return false;
     }
     
-    if (!obj.path|| obj.path.points.length ==0) { 
+    if (!obj.path || !obj.path.points || obj.path.points.length ==0) { 
         findaPath(nano, obj)
     } 
     else if (obj.path.points.length >0) {
