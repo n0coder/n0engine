@@ -1,5 +1,3 @@
- ![nano](./n0engine3.png)
-
 a small game engine designed to make open world sandbox games
 
 ![nano](./nanoai.png) **n0farm**: a game about nanoai girls farming in a big open world.
