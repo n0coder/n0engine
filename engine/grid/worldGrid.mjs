@@ -2,8 +2,8 @@ export class WorldGrid {
     constructor() {
         this.gridSize = 16;
         this.chunkSize = 4;
-        this.x = -15 * this.chunkSize
-        this.y = 240 * this.chunkSize;
+        this.x = 724 //-15 * this.chunkSize
+        this.y = 2375 //240 * this.chunkSize;
         this.tiles = new Map();
         this.chunks = new Map();
     }

@@ -37,6 +37,7 @@ export class NanoaiBrain {
         }
         var q = queue[0];
         if (q) {
+          q.start?.(nano);
           nano.brain.currentActivity = q;
           nano.brain.active(nano);
         }
@@ -63,11 +64,11 @@ export class NanoaiBrain {
   
 
   doBefore(targetTasks, task, ...args) {
-    let action = this.doRelative(targetTasks, task, (t, index) => { 
-      
+    let action = this.doRelative(targetTasks, task, (t, index) => {
       this.queue.splice(index, 0, t); 
       this.currentActivity = null; 
       this.state = "idle"
+
     }, (array)=> array[0], ...args); 
      action.name = `${action?.name??"O"} -> ${task}`
     return action

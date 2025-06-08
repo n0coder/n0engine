@@ -8,9 +8,9 @@ import { createJobu, jobTasksa } from "./radio/jobSystem.mjs";
 import { n0radio } from "./radio/n0radio.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { Seed } from "./farm/seed.mjs";
-worldGrid.x=  Math.floor(Math.random()*2562)
+//worldGrid.x=  Math.floor(Math.random()*2562)
 //32*0
-worldGrid.y= Math.floor(Math.random()*2562)
+//worldGrid.y= Math.floor(Math.random()*2562)
 
 let n0 = new Nanoai("n0",10,10, 20)
 

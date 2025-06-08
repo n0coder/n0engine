@@ -18,7 +18,7 @@ export function calculateDeltaTime() {
 
     var dt = (currentTime - previousTime)/1000;
     //testing if deltatime calculation is breaking my game some
-    deltaTime = .1//.025 //=Math.min(dt, maxDeltaTime); // 0.025 // 
+    deltaTime =Math.min(dt, maxDeltaTime); //.1//.025 //= // 0.025 // 
     previousTime = currentTime;
     ingameTime+=deltaTime;
 }

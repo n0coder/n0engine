@@ -79,22 +79,46 @@ export function createInterpolator(points) {
     }
 }
 
+function recubic(points, x, p=1) {
+    let a = points[0] * Math.pow(1 - x, p);
+    let b = points[1] * Math.pow(x, p);
+    return a + b;
+}
+
+var b = [0].map((a)=>recubic([0,1], a, 1));
+console.log(b);
+
+//var b = [0, .5, 1].map((a)=>recubic([0,1], a, 1));
+//console.log(b);
+
+
 export function cubicBlendW(points, x, p = 2) {
+
+    if (points.length == 2) {
+        let a = points[0] * Math.pow(1 - x, p);
+        let b = points[1] * Math.pow(x, p);
+        return a+b;
+    }
+
     for (let i = 0; i < points.length - 1; i++) {
         var p1 = inverseLerp(0, points.length - 1, i)
         var p2 = inverseLerp(0, points.length - 1, i + 1)
+
         var bo = x >= p1 && x <= p2;
-        if (i == 0) bo = x <= p2
-        if (i == points.length - 2) bo = x >= p1;
+        //if (i == 0) bo = x <= p2
+        //if (i == points.length - 2) bo = x >= p1;
         if (bo) {
             let t = (x - p1) / (p2 - p1);
-            let a = points[i] * (1 + 2 * t) * Math.pow(1 - t, p);
-            let b = points[i + 1] * (3 - 2 * t) * Math.pow(t, p);
+            let a = points[i] * Math.pow(1 - t, p);
+            let b = points[i + 1] * Math.pow(t, p);
             return a + b;
         }
     }
     return null;
 }
+
+var b = [0, 0.25, .5, .75, 1].map((a)=>cubicBlendW([0,3,1], a, 1));
+console.log(b);
 export function createCubicInterpolator(points) {
     points.sort((a, b) => a.c - b.c);
     return function (x) {

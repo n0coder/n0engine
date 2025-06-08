@@ -12,15 +12,15 @@ import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
 //erosion, and 
 
 var height = new RangeMap(0, 1)
-height.add("deep", .05).add("low", .15).add("border", .35)
-height.add("surface", 1).add("high", .1).add("cloud", .1)
+height.add("deep", 1).add("low", 1).add("border", 1)
+height.add("surface", 1).add("high", 1).add("cloud", 1)
 addBiomeFactors(height, "elevation",worldFactors);
-
+/*
 var squish = new RangeMap(0, 1);
 squish.add("peaks", .22).add("mountainous", .405).add("hilly", .1525)
 squish.add("rolling", 0.2725).add("folds", .4).add("shattered", .1).add("flat", .55)
 addBiomeFactors(squish, "squish",worldFactors);
-
+*/
 //forcing the mid biome gen is, not going to work well.
 
 var inland = ["surface", [["hilly"], ["mountainous"], ["folds"], ["rolling"], ["flat"]]]
@@ -29,7 +29,7 @@ var allland = [[["high"], ["cloud"]], [["flat"], ["folds"]]]
 var surface = "surface";// [[inland], [midland], [allland]];
 
 //console.log(pop([true, false]))
-
+/*
 var temp = new RangeMap(0, 1)
 temp.add("frozen", 1).add("cold", 1).add("neutral", 1)
 temp.add("warm", 1).add("hot", 1)
@@ -39,7 +39,8 @@ var humidity = new RangeMap(0, 1)
 humidity.add("arid").add("dry").add("moderate")
 humidity.add("moist").add("wet");
 addBiomeFactors(humidity, "humidity",worldFactors);
-
+*/
+/*
 var river = new RangeMap(0, 1)
 river.add("river", 1) //the split i thought
 river.add("riverborder", .1) //lowest part of the map i thought
@@ -57,7 +58,7 @@ addBiomeFactors(sugar, "sugar",worldFactors);
 var fantasy = new RangeMap(0, 1);
 fantasy.add("ordinary").add("fantasy");
 addBiomeFactors(fantasy, "fantasy",worldFactors);
-
+*/
 
 export var biomes = []
 

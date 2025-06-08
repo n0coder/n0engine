@@ -9,14 +9,19 @@ import { nanoaiActions } from "./nanoai/nanoaiActions.mjs";
 import { findPath } from "./nanoai/research/n0Pathfinder.mjs";
 import { Wall } from "./world/props/wall.mjs";
 import { startGlobalEntities } from "../engine/core/globalEntities.mjs"
-import { camera } from "../engine/core/Camera/camera.mjs";
+import { Camera, camera } from "../engine/core/Camera/camera.mjs";
 import Alea from "alea";
 import { WorldGenerator } from "./world/wave/worldGen/worldGenerator.mjs";
-let n0 = new Nanoai("n0", 16, 16);
-globalThis.n0 =n0;
+let n0 = new Nanoai("n0", 0, 0);
+let n1 = new Nanoai("n1", 2, 0);
+let n2 = new Nanoai("n2", 4, 0);
+globalThis.n0 =[n0,n1,n2];
+globalThis.worldGrid = worldGrid;
 [[5,5], [6,5], [7,5], [8,5], [9,5]].map(([x,y]) => 
 	worldGrid.setTile(x, y, new Wall(x,y)))
-let bfc = new WorldGenerator(n0)
+//
+cosmicEntityManager.addEntity(camera);
+camera.follow(n0)
 //let water = new Water(7, 7)
 //worldGrid.setTile(7, 7, water)
 /*
@@ -137,7 +142,7 @@ function dotFov(x, y, tx, ty, vx, vy, fov) {
     return angle <= fov;
 }
 
-nanoaiActions.set("search", function(condition, radius = 16, fov = 120, out) {
+nanoaiActions.set("searcho", function(condition, radius = 16, fov = 120, out) {
 	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 	return {
 		iterator: null, results: [], radius, fov, //(((2*3.1415926)/360)*fov), 
@@ -368,8 +373,8 @@ export class Visualizer {
 }
 console.log((36)/(8*4))
 //console.log(([[2,5], [2,2]]).find(a => [2,6]));
-let bfs = new Visualizer(n0);
-cosmicEntityManager.addEntity(bfs);
+//let bfs = new Visualizer(n0);
+//cosmicEntityManager.addEntity(bfs);
 
 
 
@@ -438,8 +443,11 @@ export function distance(x1, y1, x2, y2) {
 //visited is outside search function, to allow multiple searches to contribute
 let bxs = ()=> ({ visited: new Map(), visitedChunks: new Set(),
 	tile(x,y){ return {x,y, tile:()=>worldGrid.getTile(x,y)}},
-	ping(nano,out) {
-		var {x,y} = nano;
+	ping(nano,xi, yo, out) {
+        nano.brain.do("walk", xi*worldGrid.chunkSize,yo*worldGrid.chunkSize)
+		nano.brain.do("ping", ()=>{
+		let aosi = 1;
+		var x = xi*worldGrid.chunkSize, y = yo*worldGrid.chunkSize;
         for (const [_, pos] of this.visited) {
 			p.fill(pos.color.r, pos.color.g, pos.color.b)
 			p.circle(pos.x*worldGrid.gridSize+(worldGrid.gridSize/2),pos.y*worldGrid.gridSize+(worldGrid.gridSize/2), worldGrid.gridSize)
@@ -447,47 +455,134 @@ let bxs = ()=> ({ visited: new Map(), visitedChunks: new Set(),
 		let color = {r: Math.floor(Math.random()*255), g: Math.floor(Math.random()*255), b: Math.floor(Math.random()*255)}
         let r = worldGrid.chunkSize * Math.SQRT2
         //r *= Math.SQRT2;
-        let queue = [this.tile(x,y)], ox = x, oy = y
+        let queue = [], ox = x, oy = y
 		var [x,y] = worldGrid.alignGridPosition(x,y)
-		if (this.visited.get(`${x}, ${y}`)) return;
+		var [x,y] = worldGrid.alignPositionChunk(x,y); //chunk coords world space
+
+		let bop = (xo,yo)=>{
+				
+			let v = this.visited.get(`${xo}, ${yo}`)
+			//console.log(v)
+			let d = Math.floor(distance(ox,oy,xo,yo))
+			if (v===undefined &&  d < r)
+				queue.push(this.tile(xo,yo))
+			
+		}
+		bop(x, y); bop(x-1, y); bop(x+1, y); bop(x, y-1); bop(x, y+1);
+		//if (this.visited.get(`${x}, ${y}`)) return;
         while (queue.length > 0) {
+			aosi++;
 			var {x,y,tile} = queue[0]
 			queue.shift()
 		    var [x,y] = worldGrid.alignGridPosition(x,y)
-            var [cx,cy] = worldGrid.alignPositionChunk(x,y); //chunk coords world space
+            
             //console.log({x,y,cx,cy, dx: cx-x, dy:cy-y})
-            if (this.visited.get(`${x}, ${y}`)) continue;
-		    let bop = (xo,yo)=>{
-				
-				let v = this.visited.get(`${xo}, ${yo}`)
-				//console.log(v)
-				let d = distance(ox,oy,xo,yo)
-		        if (!v && d < r)
-                    queue.push(this.tile(xo,yo))
-				
-	        }
+            
+		   
+			if (this.visited.get(`${x}, ${y}`)) { continue; };
 			//why is bop only exploring tiles that are diagonal (x+1, y+1) etc...
             bop(x-1, y); bop(x+1, y); bop(x, y-1); bop(x, y+1);
 			out(tile())
 	        //console.log({x,y,tile: ;
 			this.visited.set(`${x}, ${y}`, {x,y, color})
 	    }
+	})
 
 		//if we did not we check it then
 		//calculate neighbor distance to starting point
 		//add not visited neighbors within radius
 	}
+
 })
 let bxo = bxs()
-n0.brain.do("walk", 3,3)
+/*
+bxo.ping(n0, 2,6, (i)=>{return true})
+bxo.ping(n0, 12,12, (i)=>{ return true})
+bxo.ping(n0, -2,2, (i)=>{ return true})
+bxo.ping(n0, -12,12, (i)=>{ return true})
+bxo.ping(n0, 12,-12, (i)=>{ return true})
+bxo.ping(n1, 2,2, (i)=>{ return true})
+bxo.ping(n1, 2,4, (i)=>{return true})
+bxo.ping(n2, 4,2, (i)=>{ return true})
+bxo.ping(n2, 2,4, (i)=>{ return true})
+*/
+n0.brain.do("dance");
 
-n0.brain.do("ping", ()=>{
-	bxo.ping(n0, (i)=>{console.log(i); return true})
-	return false;
-})
-n0.brain.do("walk", 3,12)
-
-n0.brain.do("ping", ()=>{
-	bxo.ping(n0, (i)=>{console.log(i); return true})
+n0.brain.do("ping-", () => {
+	let bopo = 0;
+	console.log(`running a rountine bopo ${bopo}`)
+    if (bopo === 2) return false;
+    n0.brain.doNow("dance")
+	bopo++;
 	return true;
 })
+
+nanoaiActions.set("bopo", function () {
+	return {  
+		start() {
+			this.bopo = 0;
+		},
+		work() {
+			console.log(`running a rountine bopo ${this.bopo}`)
+			if (this.bopo === 2) return false;
+			n0.brain.doNow("dance")
+			this.bopo++;
+			return true;
+		}
+	}
+})
+//n0.brain.do("bopo")
+// it's currently unclear that the ping tech is a nano search tech
+
+// here i prototype thoughts
+// imagine we set up a reciever function
+// the idea is we run this on all visited tiles, 
+// if we return true, it is the tile we want
+// so we will log the tile internally? have the nano pick something up or do something?
+// the callback is current tile found by current nano
+let bxo2 = bxs((tile, nano)=>{ nano.brain.do(/* something? */); return true; })
+
+// ok so instead of pinging we run the bxo as an action, or we run xbo as part of an action
+
+// bxo as an action, this is extremely unclear, we don't even know if this syntax is valid
+// making the syntax valid would require a massive potentially breaking change to the core nano ai
+//n0.brain.do(bxo2, 0, 0) //pass in bxo2 with extra params/args is bad.
+
+n0.brain.do("search", 0, 0, bxo2) //search at 0, 0 on the bxo2 shared object
+// imagine we want to search single spots so we could init a brand new bxo but we don't have a default callback
+// which is aok. we can pass the callback instead
+n0.brain.do("search", 0, 0, (tile, nano)=> { /* do something */ return true; })
+// now i'm identifying a potential issue with the current implementation
+// say we want the nano to walk to a point mid search when they find something worth looking at,
+// if we interupt the search flow, 
+// the nano will start at the beginning of their task again, which could reinit the entire setup
+
+// one solution could be to use a generator function, really this is why those exist
+// but there are more issues with the current nanoai action system. 
+// like we identified moments ago, actions being interupted partially breaks init
+// a notable issue that's common in games, is when an ai goes back to following some path, 
+// it has to trace back to the previous point even if it's already past it
+
+// we are going to add another control flow concept
+
+// this is a nanoai action
+nanoaiActions.set("paint", function(canvas) {
+	// first init space
+    return { work(){ /*
+		 what to do every frame, 
+		 more often than not, 
+		 we return false to dequeue and not run another frame
+		 which opens up the ability to naturally not consider repeating snippits
+		 even to forget we're working with data outside the closure
+		 what that means is expecting a character to be following a path, 
+		 keeping track of its position in the path 
+		 (not x and y but the index of the path array) and walking towards that
+		 but gets interupted, teleported 20000 tiles in some direction
+		 will still try to walk to that point, when it should recalculate the pathing
+
+		 having noted another case where we run into potential issues i say we target making a feature
+		 which runs when we shift back to an action, it will be optional because not every action needs the tech
+		 */ } }
+})
+
+//start

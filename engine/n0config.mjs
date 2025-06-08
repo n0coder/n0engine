@@ -1,3 +1,5 @@
+import { WorldGenerator } from "../game/world/wave/worldGen/worldGenerator.mjs";
+import { DebugCursor } from "../game/world/debugCursor.mjs";
 //forced canvas size, kept since p5.js's width and height variables are window based
 export let gameH = window.innerHeight;
 export let gameW = window.innerWidth// gameH//*1.77777;
@@ -26,7 +28,8 @@ gameScreenMode.get("square")(512)
 export const backgroundColor = [33, 33, 33];
 export const defaultScale = 2;
 
-
+let bfc = new WorldGenerator();
+let debug = new DebugCursor();
 //this is a quirk of the original implementation of the engine
 //https://github.com/n0coder/goblins-haven
 //it is subject to removal, as i work on design systems

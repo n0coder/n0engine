@@ -411,9 +411,9 @@ class Pingy{
 new Pingy()
 
 
-worldGrid.x=  Math.floor(Math.random()*2562)
+//worldGrid.x=  Math.floor(Math.random()*2562)
 //32*0
-worldGrid.y= Math.floor(Math.random()*2562)
+//worldGrid.y= Math.floor(Math.random()*2562)
 
 globalThis.pinga = pinga
 //n0.identity.skills.set("harvesting", 2)

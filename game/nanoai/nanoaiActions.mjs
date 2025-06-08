@@ -211,27 +211,17 @@ export const nanoaiActions = new Map([
         },
         
    }}],
-   ["hook", function(init, repeats, done) { 
-    let traphook = {pull: null};
-    let trap = {
+["hook", function (init){ 
+    return { 
         okok: true, 
-        work: function (nano) { //this is called every frame until we return false
-            if (!traphook.pull) {
-                traphook.pull = (d) => {
-                    this.okok = false;
-                    done?.(d)
-                }
-                if (!repeats) init(traphook, this); //only called on init
-
-            }
-            if (repeats&&this.okok) init(traphook, this); //called every time this action is touched
+        pull() { this.okok = false }, 
+        work(){
+            if (this.okok) init?.(this)
             return this.okok;
-        }        
+        } 
     }
-    //since this task doesn't control itself, we have to pass the task with the hook
-    traphook.trap = trap;
-    return trap
-}],["pull", function(hook) { 
+ }],
+["pull", function(hook) { 
     return {
         work: function (nano) {
             hook.pull("hi");
@@ -243,8 +233,9 @@ export const nanoaiActions = new Map([
             args, work: function (nano) {
                 let brain = nano.brain;
                 let t = .1;
-
-                brain.doAfter(this, "hook", (hook, marker) => {
+                console.log("pinging dance")
+                brain.doAfter(this, "hook", (marker) => {
+                    console.log("starting dance", marker.okok)
                     brain.doBefore(marker, "walkRelative", -1, 0) 
                     brain.doBefore(marker, "waitTime",t) 
                     brain.doBefore(marker, "walkRelative", 2, 0) 
@@ -263,7 +254,8 @@ export const nanoaiActions = new Map([
                     brain.doBefore(marker, "walkRelative", 0,  .51)
                     brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 0, - .51)
-                    brain.doBefore(marker, "pull", hook)
+                    marker.pull();
+                    console.log("ending dance", marker.okok)
                 }) 
                 
 
@@ -277,7 +269,7 @@ export const nanoaiActions = new Map([
                 let brain = nano.brain;
                 let t = .1;
 
-                brain.doAfter(this, "hook", (hook, marker) => {
+                brain.doAfter(this, "hook", (marker) => {
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = 0; nano.vx = -1 });                    
                     brain.doBefore(marker, "waitTime",t*2) 
                     brain.doBefore(marker, "ping", (nano)=> { nano.vx = 1 });
@@ -298,7 +290,7 @@ export const nanoaiActions = new Map([
                     brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "ping", (nano)=> { nano.vy = 1 });
                     brain.doBefore(marker, "waitTime",t)
-                    brain.doBefore(marker, "ping", () => {hook.pull("hi");})
+                    brain.doBefore(marker, "ping", () => {marker.pull("hi");})
                 }) 
                 
 
@@ -377,7 +369,7 @@ export function walkObj(obj, nano) {
         obj.path = path;
         p.fill(255,255,255)
         p.image(path.graphics, 0, 0)
-        console.log("BRO WHY")
+        //console.log("BRO WHY")
         //console.log(path)
         }, obj?.path?.graphics);
     }
@@ -473,9 +465,12 @@ export function walk(nano, x, y, magn = 1) {
 
 export function normalize(vx, vy) {
     var mag = Math.sqrt((vx * vx) + (vy * vy))
-    if (mag === 0) {
+    if (mag !== 0) {
         vx /= mag;
         vy /= mag;
+    } else {
+        vx = 0;
+        vy = 0
     }
     return {vx, vy, mag};
 

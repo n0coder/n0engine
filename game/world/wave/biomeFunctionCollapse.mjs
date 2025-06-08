@@ -19,8 +19,8 @@ export class BiomeFunctionCollapse {
         this.renderOrder = -5;
         this.w = 30 * 4;
         this.h = 20 * 4;
-        worldGrid.x = -150+111+(this.w*912);
-        worldGrid.y = -150+(this.h*4429);
+        //worldGrid.x = -150+111+(this.w*912);
+        //worldGrid.y = -150+(this.h*4429);
         this.alea = Alea("n0")
         this.nfc = new n0FunctionCollapse(this.alea)
         this.blocks = null

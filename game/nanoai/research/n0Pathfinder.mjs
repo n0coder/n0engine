@@ -70,7 +70,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
 
     let ezstar = stars(gridArray);
     ezstar(currentoX + pad, currentoY + pad, endoX + pad, endoY + pad, (path) => {
-        console.log(path)
+        //console.log(path)
         if (path !== null) {
 
             agraphics.fill(255);
@@ -146,12 +146,12 @@ function stars(grid) {
     astar.setTileCost(8,8)
     astar.setTileCost(9,9)
     
-    console.log(grid)
+    //console.log(grid)
     return function (ax, ay, bx, by, pathFn) {
         let a = grid[ay][ax]
         let b = grid[by][bx]
-        if (a > 7) console.error("path starts in a wall", {ax,ay});
-        if (b > 7) console.error("path ends in a wall",{bx,by});
+        if (a > 7) console.error("path starts in a wall", {ax,ay,a:worldGrid.getTile(ax, ay)});
+        if (b > 7) console.error("path ends in a wall",{bx,by,b:worldGrid.getTile(bx, by)});
 
             let vectorX = ax - bx;
             let vectorY = ay - by;
@@ -166,4 +166,4 @@ function stars(grid) {
     }
 }
 
-stars([[0,0,0],[0,0,0],[0,0,0]])(0,0,0,0, (path)=>{console.log(path)})
+//stars([[0,0,0],[0,0,0],[0,0,0]])(0,0,0,0, (path)=>{console.log(path)})

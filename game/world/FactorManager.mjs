@@ -30,7 +30,7 @@ export function getBiome(x, y) {
 }
 export var offsetX = 0, offsetY = 0
 export const one = false; //to display only one pixel (helpful for debugging)
-var vvscale = 1
+var vvscale = .05
 
 
 
@@ -72,14 +72,16 @@ var justTips = new NoiseGenerator({ scale: scale * 25, lowClip: 0, power: 3, hig
 
 var elevation3 = new NoiseGenerator({ scale: scale * 50, octaves: 1, persistance: .5, lacunarity: 1, offset: -1, offsetX: 3253, offsetY: 3222, amp: 3 })
 var elevation2 = new NoiseGenerator({ scale: scale * 15, octaves: 2, persistance: .5, lacunarity: 1.4, offsetX: 253, offsetY: 222, offset: elevation3, amp: 1 })
+
+let mapa = [
+    { "c": 0, "y": 0.01, "p": 3 }, { "c": .25, "y": 0.01, "p": 1.2 },
+    { "c": .3, "y": .4 }, { "c": .41, "y": .4 }, { "c": .45, "y": .7 },
+    { "c": .5, "y": .7 }, { "c": .53, "y": .72, "p": 1.8 },
+    { "c": .72, "y": .85 }, { "c": .99, "y": .99, "p": 3 }
+]
 var elevation = new NoiseGenerator({
-    power: squish, blend: [-1, 1], scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 2, 
-    mapSpace: [0, 1.1], map: [
-        { "c": 0, "y": 0.01, "p": 3 }, { "c": .25, "y": 0.01, "p": 1.2 },
-        { "c": .3, "y": .4 }, { "c": .41, "y": .4 }, { "c": .45, "y": .7 },
-        { "c": .5, "y": .7 }, { "c": .53, "y": .72, "p": 1.8 },
-        { "c": .72, "y": .85 }, { "c": .99, "y": .99, "p": 3 }
-    ]
+    /* power: squish, */ scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 1.4, 
+    mapSpace: [0, 1.1], map:mapa
 });
 
 worldFactors.set("squish", squish);

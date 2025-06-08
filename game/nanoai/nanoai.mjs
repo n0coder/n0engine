@@ -28,7 +28,7 @@ export class Nanoai {
         this.y = y, this.vy = 0
         this.z = z
         this.fov = 180, this.sightRadius = worldGrid.gridSize*2.5; //reasonable fov
-        this.speed = 5;
+        this.speed = 10;
         this.sugar = -4;
         this.lover = null;
         loadImg('../nanoai.png', (img) => this.img = img);
@@ -119,7 +119,7 @@ export class Nanoai {
         
         //p.text(`${this.vx.toFixed(2)}, ${this.vy.toFixed(2)}`, this.visualX+10, this.visualY-10);
         if (this.cimg) {
-            p.image(this.cimg, this.centerX+worldGrid.halfTileSize, this.centerY+worldGrid.halfTileSize);
+            p.image(this.cimg, Math.round(this.centerX+worldGrid.halfTileSize), Math.round(this.centerY+worldGrid.halfTileSize));
         } else {
             //p.rect(this.centerX, this.centerY, 48,20)
         }

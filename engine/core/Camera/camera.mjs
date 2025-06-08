@@ -46,7 +46,9 @@ export class Camera {
         }
         //render
         //p.scale(this.s);
-        p.translate(this.x,this.y)        
+        let rx = Math.round(this.x);
+        let ry = Math.round(this.y); 
+        p.translate(rx, ry)        
         
         p.ellipse(gameW/2, gameH/2, 3, 3)
     }

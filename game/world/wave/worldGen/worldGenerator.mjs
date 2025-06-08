@@ -18,7 +18,7 @@ export class WorldGenerator {
         this.setActive = setActive,this.renderOrder = -5;
         this.setActive(true)
 		
-        this.nano = nano;
+        this.nano = nano ?? {x: 0, y:0, z:0, sightRadius: 32};
 		 this.w = 22 * c, this.h = 10 * c;
 		 this.i = 0, this.o = 0;
 

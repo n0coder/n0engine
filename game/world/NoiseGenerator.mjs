@@ -6,7 +6,7 @@ import { blendw, clamp, createCubicInterpolator, cubicBlendW, inverseLerp, lerp 
 //
 export let noiseCount = 0;
 export class NoiseGenerator {
-    constructor(huh = { scale: 5, amp: 1, abs: false, blendClassic: false, mapSpace: [-1, 1], blendPower: 2, blendWeight: 1, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power: 1, offsetX: 0, offsetY: 0, offset: 0, add: [], multiply: [], blend: [], map: [] }) {
+    constructor(huh = { scale: 5, amp: 1, inverted: false, abs: false, blendClassic: false, mapSpace: [-1, 1], blendPower: 2, blendWeight: 1, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power: 1, offsetX: 0, offsetY: 0, offset: 0, add: [], multiply: [], blend: [], map: [] }) {
         this.offsetX = new ValueDriver(huh.offsetX || 0);
         this.offsetY = new ValueDriver(huh.offsetY || 0);
         this.offset = new ValueDriver(huh.offset || 0)
@@ -14,6 +14,7 @@ export class NoiseGenerator {
         this.highClip = new ValueDriver(huh.highClip != null ? huh.highClip : Infinity)
         this.lowClip = new ValueDriver(huh.lowClip != null ? huh.lowClip : -Infinity)
         this.abs = huh.abs || false;
+        this.inverted = huh.inverted || false;
         this.blendClassic = huh.blendClassic || false //i just realized this or false will never happen
         this.noise = null
         this.scale = new ValueDriver(huh.scale || 5);
@@ -66,10 +67,11 @@ export class NoiseGenerator {
             blend.clean?.()
         }
     }
-    init(noise2d) {
-
+    init(noise2d, min=-1, max=1) {
+        
         if (this.inited) return; //we set up our properties
-
+        this.max = max;
+        this.min = min;
         this.id = noiseCount++;
         this.noise = noise2d;
         this.offset.init(noise2d)
@@ -130,6 +132,7 @@ export class NoiseGenerator {
         var offset = this.offset.getValue(x, y)
 
         var minmax = this.generateNoise(x, y);
+        //minmax.sum = minmax.maxm - minmax.sum
         if (this.abs) {
             minmax.sum = Math.abs(minmax.sum);
             minmax.minm = 0;
@@ -143,11 +146,11 @@ export class NoiseGenerator {
         }
 
         //sum = lerp(minm, maxm, sim);
-        
         (this.doMultiply(x, y, minmax));
         (this.doAdd(x, y, minmax));
         this.doPow(x, y, minmax, 1);
-
+        if (this.inverted)
+        minmax.sum = minmax.maxm - minmax.sum
         var offset;
         (offset = this.ampoffset(x, y, minmax, offset));
 
@@ -159,6 +162,9 @@ export class NoiseGenerator {
                 this.newBlend(minmax, x, y, blendPower, blendWeight);
             }
         }
+
+        //invert 
+        
 
         value = minmaxsum ? minmax : minmax.sum
         this.mini = minmax.minm;
@@ -172,7 +178,7 @@ export class NoiseGenerator {
         var { sums, nvu } = this.blendSumMinMax(x, y, sim, blendPower);
 
         //cubic blend the mins and maxes too
-        minmax.sum = lerp(minmax.sum, nvu, blendWeight);
+        minmax.sum = nvu;
         let [min, max] = sums.reduce(([prevMin, prevMax], curr) => [Math.min(prevMin, curr), Math.max(prevMax, curr)], [Infinity, -Infinity]);
         minmax.minm = lerp(minmax.minm, min, blendWeight);
         minmax.maxm = lerp(minmax.maxm, max, blendWeight);
@@ -184,6 +190,7 @@ export class NoiseGenerator {
             if (v.sum != null) return v.sum;
             return v;
         });
+
         var nvu = cubicBlendW(sums, sim, blendPower);
 
         var mins = this.blend.map(b => {
@@ -303,19 +310,22 @@ export class NoiseGenerator {
         var lac = this.toValue(this.lacunarity, x, y);
         var octaves = this.toValue(this.octaves, x, y);
         var minm = 0, maxm = 0;
-        var amp = 1, freq = 1, sum = 0;
+        var amp = 1, freq = 1, sum = 0, soup = 0;
         for (let o = 0; o < octaves; o++) {
             var sx = x / scale * freq;
             var sy = y / scale * freq;
             var value = this.noise(sx + offsetX, sy + offsetY);
 
             sum += value * amp;
-            minm += -1 * amp;
-            maxm += 1 * amp;
+            minm += this.min * amp;
+            maxm += this.max * amp;
+
+            soup+=amp;
             amp *= pers;
             freq *= lac;
         }
         gens += 1
+        //console.log({sum, minm, maxm, min:this.min, max:this.max})
         return { sum, minm, maxm };
     }
 }
