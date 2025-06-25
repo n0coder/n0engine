@@ -79,7 +79,7 @@ export function createInterpolator(points) {
     }
 }
 
-function recubic(points, x, p=1) {
+export function recubic(points, x, p=1) {
     let a = points[0] * Math.pow(1 - x, p);
     let b = points[1] * Math.pow(x, p);
     return a + b;
@@ -94,12 +94,6 @@ console.log(b);
 
 export function cubicBlendW(points, x, p = 2) {
 
-    if (points.length == 2) {
-        let a = points[0] * Math.pow(1 - x, p);
-        let b = points[1] * Math.pow(x, p);
-        return a+b;
-    }
-
     for (let i = 0; i < points.length - 1; i++) {
         var p1 = inverseLerp(0, points.length - 1, i)
         var p2 = inverseLerp(0, points.length - 1, i + 1)
@@ -109,8 +103,8 @@ export function cubicBlendW(points, x, p = 2) {
         //if (i == points.length - 2) bo = x >= p1;
         if (bo) {
             let t = (x - p1) / (p2 - p1);
-            let a = points[i] * Math.pow(1 - t, p);
-            let b = points[i + 1] * Math.pow(t, p);
+            let a = points[i]* (1 + 2 * t)  * Math.pow(1 - t, p);
+            let b = points[i + 1]  * (3 - 2 * t)* Math.pow(t, p);
             return a + b;
         }
     }

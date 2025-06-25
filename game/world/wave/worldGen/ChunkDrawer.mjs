@@ -4,7 +4,7 @@ import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../../FactorManager.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
-let c = worldGrid.chunkSize, chunks = 24
+let c = worldGrid.chunkSize, chunks = 4
 export function drawChunks(nano) {
     for (let xc = -chunks; xc <= chunks; xc++) {
         for (let yc = -chunks; yc <= chunks; yc++) {

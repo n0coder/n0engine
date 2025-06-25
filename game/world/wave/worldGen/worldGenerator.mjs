@@ -19,7 +19,7 @@ export class WorldGenerator {
         this.setActive(true)
 		
         this.nano = nano ?? {x: 0, y:0, z:0, sightRadius: 32};
-		 this.w = 22 * c, this.h = 10 * c;
+		 this.w = c, this.h = c//22 * c, this.h = 10 * c;
 		 this.i = 0, this.o = 0;
 
          

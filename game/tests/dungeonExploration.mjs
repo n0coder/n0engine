@@ -7,19 +7,24 @@ import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import {camera} from "../../engine/core/Camera/camera.mjs"
 import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-
-
+import { WorldGenerator } from "../world/wave/worldGen/worldGenerator.mjs";
+import { DebugCursor } from "../world/debugCursor.mjs";
+import { Graph } from "../world/noiseGen/graph.mjs"
+import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
+import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
 let n0 = new Nanoai(`n0`, 2, 4)
 let n1 = new Nanoai(`n1`, 4, 4)
 let n2 = new Nanoai(`n2`, 6, 4)
 globalThis.n0 = n0;
+//new DebugCursor()
+//new WorldGenerator(n0)
+worldGrid.x =0; 
+worldGrid.y= -0;
 camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 
-n1.brain.do("walk", -4, -4)
-n2.brain.do("walk", -6,-6)
-n0.brain.do("walk", 6, 8)
-
+let tile = genTile(100,100);
+console.log(tile);
 
 /*
 
@@ -47,7 +52,8 @@ let circle = { x: 0, y: 0, distance: 3, thickness: 4, getValue(x ,y) {
 globalThis.circle = circle
 
 let noise2 = new NoiseGenerator({ 
-    octaves:3, lacunarity:1.1, persistance: .4, scale:10, power: 1
+    octaves:3, lacunarity:1.1, persistance: .4, scale:10, power: 1, 
+    blendStyle: "recubic"
 });
 noise2.init(createNoise2D(Alea(5)))
 
@@ -56,39 +62,100 @@ let circlo = (x,y)=>{
     var vx = xx-x;
     var vy = yy-y;
     let v = (vx * vx) + (vy * vy)
-    return  Math.sqrt(v)
+    return  clamp(0, 1, Math.sqrt(v))
 }
 
-let noise = new NoiseGenerator({ octaves:1, scale:6, lowClip:0, highClip:1 })
+let noise = new NoiseGenerator({ name: "noise", octaves:1, scale:6, lowClip:0, highClip:1 })
 noise.init(circlo, 0, 1)
-let noise3 = new NoiseGenerator({ blend: [0,1], octaves:1, scale:6 })
+let noise32 = new NoiseGenerator({ offsetX:1, amp:.3, ocaves:1, scale:6 })
+let noise31 = new NoiseGenerator({ offsetX:noise32, amp:.2, octaves:3, scale:15 })
+noise31.init(createNoise2D(Alea(3)));
+let noise3 = new NoiseGenerator({ abs:true, offsetY:noise31, offsetX:noise32, name: "noise3", inverted:true, blend: [1,0], add:[[noise31, .1]], blendPower:5, octaves:1, scale:6, blendStyle: "recubic" })
 noise3.init(circlo, 0, 1)
 let visualize = function visualize(noise) {
-    return () => {
-        for (let i = -5; i < 5; i++) {
-            for (let o = -5; o < 5; o++) {
+    let time = 0;
+
+    let map = []
     
-    
-                let on = circlo(i,o)
-                let n = noise.getValue(i,o).sum;
-                //console.log({on, n, non: on-n, noise})
-                //n = on-n;
-                if (n === NaN) p.fill(255, 111,111); else p.fill((n)*255);
-                p.ellipse(6*worldGrid.gridSize+(i *6), 6*worldGrid.gridSize +60 + (o*6), 6,6)
-            }
+    for (let i = -45; i < 45; i++) {
+        map[i] = []
+        for (let o = -45; o < 45; o++) {
+            let n = noise.create(i,o);
+            map[i][o] = inverseLerp(n.minm, n.maxm, n.sum)
         }
     }
+    return { work:() => {
+        for (let i = -45; i < 45; i++) {
+            for (let o = -45; o < 45; o++) {
+                let n = map[i][o]
+                if (n === NaN) p.fill(255, 111,111); else p.fill((n)*255);
+                let x = (i * worldGrid.gridSize*.25);
+                let y = (o * worldGrid.gridSize*.25);
+                p.rect(x,y, worldGrid.gridSize*.25,worldGrid.gridSize*.25)
+            }
+        }
+        return true
+    }
+    }
 }
+let inf = { 
+    input: (x,y) => { return x },
+    min: -1, max: 1
+}
+let sinf = {
+    input: (x,y) => { return Math.sin(x)+Math.cos(y) },
+    min: -1, max: 1
+}
+/*
+let graph = new Graph();
+graph.scale(10).fractal([inf, xnf, xnf], 1, .5, 2);
 
-let hooki2 =n0.brain.do("hook", visualize(noise3) )
-let hooki =n0.brain.do("hook", visualize(noise) )
-hooki.name = "visualize noise map"
-hooki2.name = "visualize noise map"
-let roomCount = p.floor(p.random(3,12));
+graph.amp().offsetX().offsetY(1);
+graph.lowClip(-1).highClip(1).abs()
+graph.invert().pow(1).add(1).multiply(1)
+graph.map([
+    { "c": 0.05, "y": 0, "p": 2 }, { "c": 0.5, "y": 0.9, "p": 3 }, { "c": .95, "y": 1, "p": 2 }
+])
+
+graph.amp(10)
+
+let ograph = new Graph();
+ograph.offsetX().offsetY()
+ograph.scale(3).fractal([sinf, xnf])//.amp(graph)
+//ograph.offsetX(20).offsetY(10).cartesian()
+//ograph.polar().offsetY(graph).cartesian()
+//ograph.fn((output)=>{ output.x *= .5 })
+//ograph.scale(graph).fractal([xnf])//.abs()//.invert()/////.add(graph).multiply(graph);
+ograph.pow(.2)//.abs()
+ograph.map([
+    { "c": 0.05, "y": 0, "p": 2 }, { "c": 0.5, "y": 0.9, "p": 3 }, { "c": .95, "y": 1, "p": 2 }
+])    
+ograph.bicubic([1, 0], 1);
+ograph.lowClip(0)
+//ograph.newBlend([0, 1, 0], 1);
+
+let fgraph = new Graph();
+fgraph.offsetX(graph).offsetY((o)=>0).scale((o)=>15)
+fgraph.fractal([inf]).newBlend([()=>0, 1, ()=>0]).map([
+    { "c": 0.05, "y": ()=>0, "p": 1 }, { "c": 0.5, "y": 1, "p": 1 }, { "c": .95, "y": ()=>0, "p": 1 }
+]);
+
+//fgraph.offset((o)=>0).amp((o)=>1).add((o)=>1)
+//fgraph.multiply((o)=>1).lowClip((o)=>-1).highClip((o)=>1);
+//fgraph.invert().pow((o)=>1).newBlend([1, (o)=>0, 1])
+//fgraph.bicubic([(o)=>0, 1])
+
+console.log(graph.create(0,0))
+let hooki2 =n0.brain.do(visualize(fgraph))
+//let hooki =n0.brain.do("hook", visualize(noise) )
+//hooki.name = "visualize noise map"
+//hooki2.name = "visualize noise map"
+*/
+let roomCount = p.floor(p.random(2,5));
 
 let ro = new Map(), roro = [];
 let neibors= [[1,0],[-1,0],[0,-1],[0,1]];
-
+let dina = 4;
 let oo = (x,y)=> { 
     let pop ={x, y, links: new Set()}; 
     ro.set(`${x}, ${y}`, pop); 
@@ -99,9 +166,7 @@ let opo = oo(0, 0);
 while (roro.length<=roomCount) {
     let r = p.random(roro);
     let n = p.random(neibors);
-    console.log(r, n)
-    
-    let x = r.x+n[0], y = r.y+n[1];
+    let x = r.x+(n[0]*dina), y = r.y+(n[1]*dina);
     let oio = ro.get(`${x}, ${y}`);
     if (oio) {
         oio.links.add(r);
@@ -114,6 +179,135 @@ while (roro.length<=roomCount) {
 
 }
 console.log(roro)
+
+let xnf = {
+    input: createNoise2D(Alea(5)),
+    min: -1, max: 1
+}
+function roomSDF(cx,cy,s) {
+    return {
+        input: (x,y)=>{
+            const dx = Math.abs(x - cx) - s;
+            const dy = Math.abs(y - cy) - s;
+        
+            const outsideDist = Math.sqrt(Math.max(dx, 0) ** 2 + Math.max(dy, 0) ** 2);
+            const insideDist = Math.min(Math.max(dx, dy), 0);
+            return outsideDist + insideDist;
+        },
+        min: -1, max: 1
+    }
+}
+function lineSDF(x, y, x1, y1, x2, y2, w) {
+    // Compute vectors AB (from A to B) and PA (from P to A)
+    let ABx = x2 - x1;  // x-component of AB
+    let ABy = y2 - y1;  // y-component of AB
+    let PAx = x - x1;   // x-component of PA (P - A)
+    let PAy = y - y1;   // y-component of PA
+
+    // Compute the squared length of AB
+    let lengthABSq = ABx * ABx + ABy * ABy;
+
+    // Handle zero-length segment (treat as a circle at A)
+    if (lengthABSq < 1e-6) {
+        let dist = Math.sqrt(PAx * PAx + PAy * PAy);
+        return dist - w / 2;
+    }
+
+    // Compute projection parameter t = (PA · AB) / (AB · AB)
+    let t = (PAx * ABx + PAy * ABy) / lengthABSq;
+
+    // Clamp t to [0, 1] to stay within the segment
+    t = Math.max(0, Math.min(1, t));
+
+    // Compute the closest point C on the segment: A + t * AB
+    let Cx = x1 + t * ABx;
+    let Cy = y1 + t * ABy;
+
+    // Compute vector from P to C
+    let PCx = x - Cx;
+    let PCy = y - Cy;
+
+    // Compute distance from P to C
+    let dist = Math.sqrt(PCx * PCx + PCy * PCy);
+
+    // Return SDF: distance minus half the width
+    return dist - w;
+}
+function dungeonSDF(rooms, xx, yy,  s, s2) {
+    return {
+        input: (x,y) => {
+            
+            let x1 = -1, y1 = 0, x2 = 1, y2=0;
+            
+            let minDist = Infinity;
+            
+            for (let room of rooms) {
+                const dx = Math.abs(x - (room.x+xx)) - s;
+                const dy = Math.abs(y - (room.y+yy))- s;
+                const outsideDist = Math.sqrt(Math.max(dx, 0) ** 2 + Math.max(dy, 0) ** 2);
+                const insideDist = Math.min(Math.max(dx, dy), 0);
+                minDist = Math.min(minDist, outsideDist + insideDist);
+                
+                for (const link of room.links) {
+                    minDist = Math.min(minDist, lineSDF(x,y, room.x+xx, room.y+yy, link.x+xx, link.y+yy, s2));    
+                }
+                
+                //minDist = Math.min(minDist, roomsdf);
+            }
+            return minDist;
+        },
+        min: -1, max: 1
+    }
+}
+
+function roomoSDF(rooms, xx, yy, s) {
+    return {
+        input: (x,y) => {
+            let minDist = Infinity;
+            
+            for (let room of rooms) {
+                const dx = Math.abs(x - (room.x+xx)) - s;
+                const dy = Math.abs(y - (room.y+yy))- s;
+                const outsideDist = Math.sqrt(Math.max(dx, 0) ** 2 + Math.max(dy, 0) ** 2);
+                const insideDist = Math.min(Math.max(dx, dy), 0);
+                minDist = Math.min(minDist, outsideDist + insideDist);
+                
+                //minDist = Math.min(minDist, roomsdf);
+            }
+            return minDist;
+        },
+        min: -1, max: 1
+    }
+}
+let shift = new Graph().scaleXY(.1).fractal([xnf]).amp(8);
+let shifty = new Graph().offsetX(120).scaleXY(.1).fractal([xnf]).amp(8);
+for (const ro of roro) {
+    let rox = ro.x, roy = ro.y
+    ro.x += shift.create(rox, roy).sum; 
+    ro.y += shifty.create(rox, roy).sum;
+} 
+
+let sia = 2
+let rooma = new Graph();
+let roomo = new Graph();
+let sinfz =new Graph().scaleXY(2*sia).fractal([xnf]).amp(.4);
+
+let dungeonG = new Graph();
+
+rooma.scaleXY(3*sia).offsetXY(sinfz, sinfz)
+roomo.copy(rooma);
+rooma.fractal(dungeonSDF(roro, 0,0, 2, .5))
+roomo.fractal([roomoSDF(roro, 0,0, .5)])
+rooma.pow(.2).threshold(.9);
+roomo.pow(.2).threshold(.9)
+roomo.invert();
+rooma.invert();
+//dungeonG.pow(.2).threshold(1);
+console.log(rooma.create(0, 0))
+
+let hooki2 =n0.brain.do(visualize(rooma))
+
+
 let hooko = n0.brain.do("hook", ()=>{ 
     
     for (const r of roro) {

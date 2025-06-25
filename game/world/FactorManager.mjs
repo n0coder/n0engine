@@ -1,6 +1,8 @@
 import Alea from "alea";
 import { NoiseGenerator } from "./NoiseGenerator.mjs";
 import { createNoise2D } from "simplex-noise";
+import { Graph } from "./noiseGen/graph.mjs";
+import { clamp } from "../../engine/n0math/ranges.mjs";
 
 export const worldFactors = new Map();
 export function buildFactors(tile) {
@@ -8,8 +10,8 @@ export function buildFactors(tile) {
     
     let genCache = new Map();
     for (const [factorKey, worldFactor] of worldFactors) {
-        genCache.set(factorKey, worldFactor.getValue(tile.x, tile.y, false));   
-        worldFactor.clean()
+        genCache.set(factorKey, worldFactor.getValue?.(tile.x, tile.y, false)??worldFactor.create?.(tile.x, tile.y)?.sum);   
+        worldFactor.clean?.()
     }
     tile.genCache = genCache;
     return tile;
@@ -28,14 +30,15 @@ export function getBiome(x, y) {
     
     return biomae
 }
-export var offsetX = 0, offsetY = 0
+export var offsetX = 100, offsetY = 100
 export const one = false; //to display only one pixel (helpful for debugging)
-var vvscale = .05
+var vvscale = .2
 
 
 
 
 var scale = vvscale * .75
+
 
 var rscale = 50;
 var riverWorks2 = new NoiseGenerator({ scale: scale * rscale, octaves: 1, persistance: .5, lacunarity: 1, offset: 0, offsetX: 3153, offsetY: 3222, amp: 1 })
@@ -72,18 +75,47 @@ var justTips = new NoiseGenerator({ scale: scale * 25, lowClip: 0, power: 3, hig
 
 var elevation3 = new NoiseGenerator({ scale: scale * 50, octaves: 1, persistance: .5, lacunarity: 1, offset: -1, offsetX: 3253, offsetY: 3222, amp: 3 })
 var elevation2 = new NoiseGenerator({ scale: scale * 15, octaves: 2, persistance: .5, lacunarity: 1.4, offsetX: 253, offsetY: 222, offset: elevation3, amp: 1 })
+var elevation = new NoiseGenerator({
+    power: squish, blend: [-1, 1], scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 2, 
+    mapSpace: [0, 1.1], map: [
+        { "c": 0, "y": 0.01, "p": 3 }, { "c": .25, "y": 0.01, "p": 1.2 },
+        { "c": .3, "y": .4 }, { "c": .41, "y": .4 }, { "c": .45, "y": .7 },
+        { "c": .5, "y": .7 }, { "c": .53, "y": .72, "p": 1.8 },
+        { "c": .72, "y": .85 }, { "c": .99, "y": .99, "p": 3 }
+    ]
+});
+let eleca = new NoiseGenerator({ blend: [0,1], blendStyle: "recubic", scale: scale * 400, octaves: 3 , persistance: .5, lacunarity: 2})
 
-let mapa = [
+let inf = { 
+    input: (x,y) => { return x+y },
+    min: 0, max: 1
+}
+let xnf = {
+    input: createNoise2D(Alea(5)),
+    min: -1, max: 1
+}
+let oxx = 1/15, oyy= 1/15
+let circlo = {
+    input: (x,y)=>{  
+    var vx = x;
+    var vy = y;
+    let v = (vx * vx) + (vy * vy)
+    return  Math.sqrt(v)
+    },
+    min:0, max:1
+}
+let xnfe = new Graph().scaleXY(1).fractal([xnf]).amp(.2)
+let ele = new Graph()
+ele.offsetXY(-8,8)
+ele.scaleXY(15)
+ele.offsetX(xnfe);
+ele.fractal([circlo]).add(xnfe).abs().invert().lowClip(.01).highClip(1)
+/*ele.map([
     { "c": 0, "y": 0.01, "p": 3 }, { "c": .25, "y": 0.01, "p": 1.2 },
     { "c": .3, "y": .4 }, { "c": .41, "y": .4 }, { "c": .45, "y": .7 },
     { "c": .5, "y": .7 }, { "c": .53, "y": .72, "p": 1.8 },
     { "c": .72, "y": .85 }, { "c": .99, "y": .99, "p": 3 }
-]
-var elevation = new NoiseGenerator({
-    /* power: squish, */ scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 1.4, 
-    mapSpace: [0, 1.1], map:mapa
-});
-
+], 0, 1.1)*/
 worldFactors.set("squish", squish);
 worldFactors.set("elevation", elevation);
 worldFactors.set("rivers", riverWorksR);
@@ -128,16 +160,17 @@ var sugarzone = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistanc
 );
 */
 var sugarzonea = new NoiseGenerator({ scale: scale * 1300, octaves: 7, persistance: .45, lacunarity: 2, offsetY: -3756 , 
-    add: [[elevation, -.2]], mapSpace: [0, 1], add:[triverWforks2],map: [
+    add: [[elevation, -.2]], mapSpace: [0, 1], name: "sugarzonea",
+    offsetX, offsetY, blendStyle: "recubic", map: [
         { "c": 0.0, "y": 0, "p": 2 },{ "c": 0.25, "y": 0, "p": 2 },  { "c": 0.5, "y": .5, "p": 3 },  { "c": .75, "y": 1, "p": 2 }, { "c": 1, "y": 1, "p": 2 }], blend: [sugar, bitter] //bitter zone, original mix, sugar zone
     }
 );
-var sugarzone = new NoiseGenerator({
-    scale: scale * 1300,
-    blend: [0, 1], add: [[temp, 7.5], [humidity, 2], [elevation, -.2], [sugarzonea, 3]]
+var sugarzone = new NoiseGenerator({ name: "sugarzone",
+    scale: scale * 1300, blendStyle: "recubic",
+    offsetX, offsetY, blend: [0, 0], add: [[temp, 7.5], [humidity, 2], [elevation, -.2], [sugarzonea, 3]]
 });
-var sugao = new NoiseGenerator({
-    scale: scale*1500, blend: [sugarzone, sugarzonea]
+var sugao = new NoiseGenerator({ name: "sugao",
+   scale: scale*4500, blend: [sugarzonea, sugarzone], blendStyle: "recubic"
 })
 
 //worldFactors.set("elevation", sugarzone)
@@ -146,6 +179,5 @@ worldFactors.set("sugarzone", sugarzone)
 
 let alea = Alea("n0");
 for (const [k, v] of worldFactors)
-	v.init(createNoise2D(alea));  
+	v.init?.(createNoise2D(alea), -1, 1);  
 
-		 

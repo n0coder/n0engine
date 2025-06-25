@@ -42,11 +42,13 @@ export function genTile(x, y) {
         addSugar, //uss sugar and biome to set basic sugar level    
         //buildn0Collapse
     ])
-    
+    /*
     let t = tile.genCache.get("elevation")
     let elevation = worldFactors.get("elevation")
+    console.log(elevation);
     let zz = inverseLerp(elevation.mini, elevation.maxi, t)
     tile.z = Math.floor( lerp(0, 32, zz) )
+    */
     globalThis.tiles += 1
     
     if (typeof tilet === 'function') {

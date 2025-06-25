@@ -1,12 +1,13 @@
 
 import { ValueDriver } from "../../engine/n0math/ValueDriver.mjs";
-import { blendw, clamp, createCubicInterpolator, cubicBlendW, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
+import { blendw, clamp, createCubicInterpolator, cubicBlendW, inverseLerp, lerp, recubic } from "../../engine/n0math/ranges.mjs";
 
 //octaves control how detailed a section is
 //
 export let noiseCount = 0;
 export class NoiseGenerator {
-    constructor(huh = { scale: 5, amp: 1, inverted: false, abs: false, blendClassic: false, mapSpace: [-1, 1], blendPower: 2, blendWeight: 1, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power: 1, offsetX: 0, offsetY: 0, offset: 0, add: [], multiply: [], blend: [], map: [] }) {
+    constructor(huh = { name: "noise", scale: 5, amp: 1, inverted: false, abs: false, blendStyle: "new", mapSpace: [-1, 1], blendPower: 2, blendWeight: 1, highClip: Infinity, lowClip: -Infinity, octaves: 1, persistance: .5, lacunarity: 1, power: 1, offsetX: 0, offsetY: 0, offset: 0, add: [], multiply: [], blend: [], map: [] }) {
+        this.name = huh.name || "noise";
         this.offsetX = new ValueDriver(huh.offsetX || 0);
         this.offsetY = new ValueDriver(huh.offsetY || 0);
         this.offset = new ValueDriver(huh.offset || 0)
@@ -15,7 +16,7 @@ export class NoiseGenerator {
         this.lowClip = new ValueDriver(huh.lowClip != null ? huh.lowClip : -Infinity)
         this.abs = huh.abs || false;
         this.inverted = huh.inverted || false;
-        this.blendClassic = huh.blendClassic || false //i just realized this or false will never happen
+        this.blendStyle = huh.blendStyle || "new" //i just realized this or false will never happen
         this.noise = null
         this.scale = new ValueDriver(huh.scale || 5);
         this.octaves = new ValueDriver(huh.octaves || 1);
@@ -132,6 +133,7 @@ export class NoiseGenerator {
         var offset = this.offset.getValue(x, y)
 
         var minmax = this.generateNoise(x, y);
+        //console.log(minmax.sum, this);
         //minmax.sum = minmax.maxm - minmax.sum
         if (this.abs) {
             minmax.sum = Math.abs(minmax.sum);
@@ -144,27 +146,30 @@ export class NoiseGenerator {
             minmax.minm = this.mapSpace[0]
             minmax.maxm = this.mapSpace[1]
         }
-
+        //console.log(minmax.sum, this);
         //sum = lerp(minm, maxm, sim);
         (this.doMultiply(x, y, minmax));
         (this.doAdd(x, y, minmax));
         this.doPow(x, y, minmax, 1);
-        if (this.inverted)
-        minmax.sum = minmax.maxm - minmax.sum
+        //console.log(minmax.sum, this);
+        //when we invert, and the maxm is too low, for whatever reason... 
+        // (such as input "noise" function being an axis instead of a constant...)
+        //this shifts the value way outside range; 
+        if (this.inverted && minmax.sum <= minmax.maxm )  
+            minmax.sum = minmax.maxm - minmax.sum
         var offset;
         (offset = this.ampoffset(x, y, minmax, offset));
-
+        //console.log(minmax.sum, this);
         //console.log({cola:"b4blend", aid: this.a,minm,sum,maxm})
         if (this.blend.length > 1) {
-            if (this.blendClassic) {
-                (this.classicBlend(x, y, minmax, blendWeight));
-            } else {
+            if (this.blendStyle === "new") {
                 this.newBlend(minmax, x, y, blendPower, blendWeight);
+            } else if (this.blendStyle === "recubic") {
+                let blenpa = blendPower;
+                this.recubix(minmax, x, y, blendPower, blendWeight);
+               
             }
         }
-
-        //invert 
-        
 
         value = minmaxsum ? minmax : minmax.sum
         this.mini = minmax.minm;
@@ -182,6 +187,18 @@ export class NoiseGenerator {
         let [min, max] = sums.reduce(([prevMin, prevMax], curr) => [Math.min(prevMin, curr), Math.max(prevMax, curr)], [Infinity, -Infinity]);
         minmax.minm = lerp(minmax.minm, min, blendWeight);
         minmax.maxm = lerp(minmax.maxm, max, blendWeight);
+    }
+    recubix(minmax, x, y, blenpa, blendWeight){
+        //console.log(blendPower)
+        var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
+        var sums = this.blend.map(b => {
+            var v = b.getValue != null ? b.getValue(x, y) : b;
+            if (v.sum != null) return v.sum;
+            return v;
+        });   
+        //console.log({mxsum:minmax.sum, mxmin:minmax.minm, mxmax: minmax.maxm, sim});
+        minmax.sum = recubic(sums, sim, blenpa);
+        //console.log(minmax.sum, sim);
     }
 
     blendSumMinMax(x, y, sim, blendPower) {
@@ -228,6 +245,7 @@ export class NoiseGenerator {
     //math.pow(math.abs(sim))
     doPow(x, y, minmax) {
         if (minmax.minm > minmax.sum) console.log("sum is lower than minm", minmax)
+        if (minmax.maxm < minmax.sum ) console.log("sum is higher than maxm", minmax)
         var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
 
         // console.log([1,minm, sum, maxm])

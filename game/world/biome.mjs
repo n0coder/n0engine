@@ -9,7 +9,12 @@ export function mapDeep(arr, mapFn) {
 export const biomeFactorMap = new Map()
 export function addBiomeFactors(map, factor, gens) {
     let f = gens.get(factor)
-    let gen = f?.getValue(0,0) || 0
+    let gen = f?.getValue?.(0,0) ?? f?.create?.(0,0) ?? 0
+    if (gen === 0) {
+        console.error(`${factor} could not be split into ranges. (please clarify this lol)`)
+        return;
+    } 
+    console.log(gen, factor);
     var ranges = map.exportRanges(factor, gen.minm, gen.maxm)
     
     ranges.forEach(r => {
@@ -17,7 +22,9 @@ export function addBiomeFactors(map, factor, gens) {
         var obj = { factor: fact, min: min, max: max }
        
         biomeFactorMap.set(tag, obj)
+        //console.log(r);
     })
+    console.log({ranges, biomeFactorMap, factor})
 }
 document.lutMissingMap = new Map()
 export class Biome {
