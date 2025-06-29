@@ -143,6 +143,11 @@ export class Graph {
             return pow*sign
         }
      }
+     sqrt () {
+        this.sequence.push(function(output) {
+            output.sum = Math.sqrt(output.sum)
+        })
+    }
      add(v) {
         if (typeof v === "function") {
             this.sequence.push(function(output){
@@ -293,6 +298,14 @@ export class Graph {
         })
         return this;
      }
+     clamp(low=-1, high=1) {
+        this.lowClip(low).highClip(high);
+        return this;
+     }
+     saturate() {
+        this.lowClip(0).highClip(1);
+        return this;
+     }
      threshold(value) {
         if (typeof value === "function") {
             this.sequence.push(function (output) {
@@ -317,31 +330,83 @@ export class Graph {
         }
         return this;
     }
-    scaleXY(value) {
+
+    posterize(steps) {
+        this.sequence.push(function(output) {
+            if ((steps-1) <= 0) {
+                output.sum = 0;
+                return 
+            }
+            let sum = output.sum * (steps-1);
+            sum = Math.round(sum)
+            output.sum = sum / (steps-1);
+        })
+        return this;
+    }
+    floor () {
+        this.sequence.push(function(output) {
+            output.sum = Math.floor(output.sum)
+        })
+        return this;
+    }
+    ceil () {
+        this.sequence.push(function(output) {
+            output.sum = Math.ceil(output.sum)
+        })
+        return this;
+    }
+    scaleX(value) {
         if (typeof value === "function") {
             this.sequence.push(function (output) {
                 let tech = value(output);
                 output.x /= tech;
-                output.y /= tech;
-                output.scale /= tech;
+                output.scaleX /= tech;
             })
         } else
         if (value instanceof Graph) {
             let ampa = function (output) {
                 let tech = value.create(output.x, output.y)
                 output.x /= tech.sum;
-                output.y /= tech.sum;
-                output.scale /= tech.sum;
+                output.scaleX /= tech.sum;
             }
             this.sequence.push(ampa);
         }
         else {
         this.sequence.push(function (output) {
             output.x /= value
-            output.y /= value
-            output.scale /= value;
+            output.scaleX /= value;
         })
         }
+        return this;
+    }
+    scaleY(value) {
+        if (typeof value === "function") {
+            this.sequence.push(function (output) {
+                let tech = value(output);
+                output.y /= tech;
+                output.scaleY /= tech;
+            })
+        } else
+        if (value instanceof Graph) {
+            let ampa = function (output) {
+                let tech = value.create(output.x, output.y)
+                output.y /= tech.sum;
+                output.scaleY /= tech.sum;
+            }
+            this.sequence.push(ampa);
+        }
+        else {
+        this.sequence.push(function (output) {
+            output.y /= value
+            output.scaleY /= value;
+        })
+        }
+        return this;
+    }
+    scaleXY(value, value2) {
+        value2 ??= value;
+        this.scaleX(value)
+        this.scaleY(value2)
         return this;
     }
     fractal(fn, octaves=1, persistance=.5, lacunarity=1) {
@@ -383,6 +448,24 @@ export class Graph {
             output.maxm = output.maxm ===undefined ? fn.max : output.maxm + fn.max;
         });
     }
+    sinm () {
+        this.sequence.push(function(output) {
+            let sum = inverseLerp(output.minm, output.maxm, output.sum) * Math.PI*2;
+            output.sum = Math.sin(sum)
+            output.minm = -1;
+            output.maxm = 1;
+        })
+        return this;
+    }
+    sin() {
+        this.sequence.push(function(output) {
+            output.sum = Math.sin(output.sum)
+            output.minm = -1;
+            output.maxm = 1
+        })
+        return this;
+    }
+
     constructor() {
         this.sequence = [];
     }

@@ -72,26 +72,29 @@ let noise31 = new NoiseGenerator({ offsetX:noise32, amp:.2, octaves:3, scale:15 
 noise31.init(createNoise2D(Alea(3)));
 let noise3 = new NoiseGenerator({ abs:true, offsetY:noise31, offsetX:noise32, name: "noise3", inverted:true, blend: [1,0], add:[[noise31, .1]], blendPower:5, octaves:1, scale:6, blendStyle: "recubic" })
 noise3.init(circlo, 0, 1)
-let visualize = function visualize(noise) {
+let visualize = function visualize(w,h, s, fn) {
     let time = 0;
 
     let map = []
     
-    for (let i = -45; i < 45; i++) {
+    for (let i = -w; i < w; i++) {
         map[i] = []
-        for (let o = -45; o < 45; o++) {
-            let n = noise.create(i,o);
+        for (let o = -h; o < h; o++) {
+            let gfn = fn; 
+            let n = gfn.create ? gfn.create (i,o): gfn(i,o);
+            if (n.sum !== undefined)
             map[i][o] = inverseLerp(n.minm, n.maxm, n.sum)
+            else map[i][o] = n;
         }
     }
     return { work:() => {
-        for (let i = -45; i < 45; i++) {
-            for (let o = -45; o < 45; o++) {
+        for (let i = -w; i < w; i++) {
+            for (let o = -h; o < h; o++) {
                 let n = map[i][o]
                 if (n === NaN) p.fill(255, 111,111); else p.fill((n)*255);
                 let x = (i * worldGrid.gridSize*.25);
                 let y = (o * worldGrid.gridSize*.25);
-                p.rect(x,y, worldGrid.gridSize*.25,worldGrid.gridSize*.25)
+                p.rect(x*s,y*s, worldGrid.gridSize*.25*s,worldGrid.gridSize*.25*s)
             }
         }
         return true
@@ -151,6 +154,7 @@ let hooki2 =n0.brain.do(visualize(fgraph))
 //hooki.name = "visualize noise map"
 //hooki2.name = "visualize noise map"
 */
+/*
 let roomCount = p.floor(p.random(2,5));
 
 let ro = new Map(), roro = [];
@@ -179,11 +183,12 @@ while (roro.length<=roomCount) {
 
 }
 console.log(roro)
-
+*/
 let xnf = {
     input: createNoise2D(Alea(5)),
     min: -1, max: 1
 }
+/*
 function roomSDF(cx,cy,s) {
     return {
         input: (x,y)=>{
@@ -289,25 +294,134 @@ for (const ro of roro) {
 
 let sia = 2
 let rooma = new Graph();
-let roomo = new Graph();
 let sinfz =new Graph().scaleXY(2*sia).fractal([xnf]).amp(.4);
-
-let dungeonG = new Graph();
-
 rooma.scaleXY(3*sia).offsetXY(sinfz, sinfz)
-roomo.copy(rooma);
 rooma.fractal(dungeonSDF(roro, 0,0, 2, .5))
-roomo.fractal([roomoSDF(roro, 0,0, .5)])
-rooma.pow(.2).threshold(.9);
-roomo.pow(.2).threshold(.9)
-roomo.invert();
-rooma.invert();
-//dungeonG.pow(.2).threshold(1);
-console.log(rooma.create(0, 0))
+rooma.pow(.2).threshold(.9).invert();
+*/
 
-let hooki2 =n0.brain.do(visualize(rooma))
+function vororoi(x, y, w) {
+    let rnd = createNoise2D(Alea("io"));
+    let baseCellX = Math.round(x);
+    let baseCellY = Math.round(y);
+    let minDistToCell = Infinity;
 
+    for (let i = -1; i <= 1; i++) {
+        for (let o = -1; o <= 1; o++) {
+            let cellX = baseCellX + i;
+            let cellY = baseCellY + o;
 
+            let rx = rnd(cellX+235, cellY+235);
+            let ry = rnd(cellX+253, cellY+253);
+            let cellPositionX = cellX + rx;
+            let cellPositionY = cellY + ry;
+
+            let toCellX = cellPositionX - x;
+            let toCellY = cellPositionY - y;
+            let distToCell = Math.sqrt(toCellX * toCellX + toCellY * toCellY);
+            if (distToCell < minDistToCell) {
+                minDistToCell = distToCell;
+            }
+        }
+    }
+
+    return minDistToCell;
+}
+function edgeVoronoiNoise(x, y, rngx, rngy) {
+    let rndx = rngx;
+    let rndy = rngy;
+    
+    let baseCellX = Math.round(x);
+    let baseCellY = Math.round(y);
+
+    let minDistToCell = Infinity;
+    let closestCellX, closestCellY;
+    let toClosestCellX, toClosestCellY;
+
+    for (let i = -1; i <= 1; i++) {
+        for (let o = -1; o <= 1; o++) {
+            let cellX = baseCellX + i;
+            let cellY = baseCellY + o;
+
+            let rx = rndx(cellX, cellY);
+            let ry = rndy(cellX, cellY); 
+            let cellPositionX = cellX + rx;
+            let cellPositionY = cellY + ry;
+
+            let toCellX = cellPositionX - x;
+            let toCellY = cellPositionY - y;
+
+            let distToCell = Math.sqrt(toCellX * toCellX + toCellY * toCellY);
+
+            if (distToCell < minDistToCell) {
+                minDistToCell = distToCell;
+                closestCellX = cellX;
+                closestCellY = cellY;
+                toClosestCellX = toCellX;
+                toClosestCellY = toCellY;
+            }
+        }
+    }
+
+    let random = rndx(closestCellX, closestCellY);
+
+    let minEdgeDistance = Infinity;
+
+    for (let i = -1; i <= 1; i++) {
+        for (let o = -1; o <= 1; o++) {
+            let cellX = baseCellX + i;
+            let cellY = baseCellY + o;
+
+            if (cellX !== closestCellX || cellY !== closestCellY) {
+                
+                let rx = rndx(cellX, cellY);
+                let ry = rndy(cellX, cellY);
+                let cellPositionX = cellX + rx;
+                let cellPositionY = cellY + ry;
+                let toCellX = cellPositionX - x;
+                let toCellY = cellPositionY - y;
+
+                let toCenterX = (toClosestCellX + toCellX) * 0.5;
+                let toCenterY = (toClosestCellY + toCellY) * 0.5;
+
+                let diffX = toCellX - toClosestCellX;
+                let diffY = toCellY - toClosestCellY;
+                let diffLen = Math.sqrt(diffX * diffX + diffY * diffY);
+
+                if (diffLen > 0) {
+                    let cellDifferenceX = diffX / diffLen;
+                    let cellDifferenceY = diffY / diffLen;
+                    let edgeDistance = toCenterX * cellDifferenceX + toCenterY * cellDifferenceY;
+                    minEdgeDistance = Math.min(minEdgeDistance, edgeDistance);
+                }
+            }
+        }
+    }
+
+    return [minDistToCell, random, minEdgeDistance];
+}
+
+let size = 24*2, vsize= size /2
+let sol = 4;
+let rngx = createNoise2D(Alea("iox"));
+let rngy = createNoise2D(Alea("ioy"));
+let vorin = {input(x,y){ return edgeVoronoiNoise(x,y, rngx, rngy)[2] } , min:0, max:1}
+let vorini = {input(x,y){ return edgeVoronoiNoise(x,y, rngx, rngy)[1] } , min:-1, max:1}
+
+let vogr = new Graph();
+let xxx = new Graph();
+xxx.scaleXY(sol).fractal([vorin, vorin], 3, 1, 2).bicubic([-1, 1])
+vogr.scaleXY(sol*2).offsetXY(xxx,xxx).fractal(vorini)
+
+let xna = new Graph();
+xna.scaleXY(35).fractal(xnf)//.posterize(1);
+xna.posterize(5).sinm()//.floor()
+n0.brain.do(visualize(size,size, 1, xna ))
+//n1.brain.do(visualize(size, size, 1, xxx))
+console.log("sanitycheck")
+//let hooki2 =n0.brain.do(visualize(rooma))
+
+/*
 let hooko = n0.brain.do("hook", ()=>{ 
     
     for (const r of roro) {
@@ -323,6 +437,7 @@ let hooko = n0.brain.do("hook", ()=>{
     }
 })
 hooko.name = "read map"
+*/
 
 let explorationProfiles = new Map()
 explorationProfiles.set("cunny", { 
