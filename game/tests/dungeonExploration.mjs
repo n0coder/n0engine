@@ -184,10 +184,7 @@ while (roro.length<=roomCount) {
 }
 console.log(roro)
 */
-let xnf = {
-    input: createNoise2D(Alea(5)),
-    min: -1, max: 1
-}
+
 /*
 function roomSDF(cx,cy,s) {
     return {
@@ -414,9 +411,15 @@ xxx.scaleXY(sol).fractal([vorin, vorin], 3, 1, 2).bicubic([-1, 1])
 vogr.scaleXY(sol*2).offsetXY(xxx,xxx).fractal(vorini)
 
 let xna = new Graph();
-xna.scaleXY(35).fractal(xnf)//.posterize(1);
-xna.posterize(5).sinm()//.floor()
-n0.brain.do(visualize(size,size, 1, xna ))
+let xnf = {
+    input: createNoise2D(Alea(5)),
+    min: -1, max: 1
+}
+xna.scaleXY(35).fractal(xnf).posterize(10);
+xna//.sin()//.floor()
+let xnb = new Graph().copy(xna)
+xnb.abs()//.anglize().cos();
+n0.brain.do(visualize(size,size, 1, xnb ))
 //n1.brain.do(visualize(size, size, 1, xxx))
 console.log("sanitycheck")
 //let hooki2 =n0.brain.do(visualize(rooma))

@@ -448,9 +448,18 @@ export class Graph {
             output.maxm = output.maxm ===undefined ? fn.max : output.maxm + fn.max;
         });
     }
+    anglize () {
+        this.sequence.push(function(output) {
+            let tau = Math.PI*2;
+            output.sum = inverseLerp(output.maxm, output.minm, output.sum) * tau;
+            output.minm = 0;
+            output.maxm = tau;
+        })
+        return this;
+    }
     sinm () {
         this.sequence.push(function(output) {
-            let sum = inverseLerp(output.minm, output.maxm, output.sum) * Math.PI*2;
+            let sum = inverseLerp(output.maxm, output.minm, output.sum) * Math.PI*2;
             output.sum = Math.sin(sum)
             output.minm = -1;
             output.maxm = 1;
@@ -465,17 +474,26 @@ export class Graph {
         })
         return this;
     }
-
+    cos() {
+        this.sequence.push(function(output) {
+            output.sum = Math.cos(output.sum)
+            output.minm = -1;
+            output.maxm = 1
+        })
+        return this;
+    }
     constructor() {
         this.sequence = [];
     }
     copy(graph) {
         this.sequence.unshift(...(graph.sequence))
+        return this;
     }
     import(input) {
         this.sequence.push(function(output){
             Object.assign(output, input)
         })
+        return this;
     }
     create(x,y) {
         let output = { x, y, sum:0, minm:0, maxm:0, scale:1 }
