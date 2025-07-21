@@ -4,45 +4,34 @@ import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../../FactorManager.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
-let c = worldGrid.chunkSize, chunks = 4
-export function drawChunks(nano) {
-    for (let xc = -chunks; xc <= chunks; xc++) {
-        for (let yc = -chunks; yc <= chunks; yc++) {
-            let nx = (xc * c) + nano.x, ny = (yc * c) + nano.y
+let c = worldGrid.chunkSize, chunkCount = 3
 
-            let dis =  Math.hypot(nano.x - nx, nano.y - ny)<nano.sightRadius
-            if (dis) {
-                let { x, y } = worldGrid.screenToChunkPoint(nx * worldGrid.gridSize, ny * worldGrid.gridSize)
-                drawChunk(x*c, y*c, nano.z)
-            }
-        }
+let chunks = []
+export function drawChunks(nano) {
+    //let nx = (cx * c) + nano.x, ny = (cy * c) + nano.y
+    //let dis =  Math.hypot(nano.x - nx, nano.y - ny)<nano.sightRadius
+    for (const chunk of chunks) {
+        drawChunk(chunk)
     }
 }
-function genTile5(xx, yy) { 
-    genTile(xx, yy+1)
-    genTile(xx, yy-1)
-    genTile(xx+1, yy)
-    genTile(xx-1, yy)
-    genTile(xx, yy)
+export function addChunk(cx,cy) {
+    let chunk = worldGrid.getChunk(cx,cy);
+    if (!Array.isArray(chunk)) 
+        chunk = worldGrid.createChunk(cx, cy, (i, o, wx, wy)=>{ 
+            let tile = genTile((worldGrid.chunkSize*cx)+i,(worldGrid.chunkSize*cy)+o)
+            tile.cx = worldGrid.chunkSize*cx, tile.cy = worldGrid.chunkSize*cy;
+            tile.wx = (worldGrid.chunkSize*cx)+i, tile.wy =(worldGrid.chunkSize*cy)+o;
+            return tile;
+        });
+    chunks.push(chunk);
 }
-export function drawChunk(x, y, z) {
-    
-
-    for (let xc = 0; xc < c; xc++) {
-        for (let yc = 0; yc < c; yc++) {
-            let xx = xc+x, yy = yc+y
-            //z = worldGrid.getTile(xx,yy)?.genCache?.get("elevation")
-            genTile5(xx, yy)
-            let tile = worldGrid.getTile(xx, yy);
-            if (tile && tile.biome) {
-                let color = tile.biome.colora(tile)
-                if(color) {
-                p.fill(color);
-                //let zz =z- tile.z
-                //p.fill(z*255)
-                p.rect(xx * worldGrid.gridSize, (yy) * worldGrid.gridSize, worldGrid.gridSize, worldGrid.gridSize)
-                }
-            }
+export function drawChunk(chunk) {
+    for (let x of chunk) {
+        for (let y of x) {
+            console.log(y);
+            let color = y.biome.colora(y)
+            if (color) p.fill(color);
+            p.rect(y.wx * worldGrid.tileSize, (y.wy) * worldGrid.tileSize, worldGrid.tileSize, worldGrid.tileSize)
         }
     }
 }

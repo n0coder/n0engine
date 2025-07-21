@@ -1,60 +1,81 @@
+import { mod } from "../core/Utilities/NumberUtils";
+import { Map2d } from "../n0math/map2d.mjs";
+
 export class WorldGrid {
     constructor() {
-        this.gridSize = 16;
+        this.tileSize = 16;
         this.chunkSize = 4;
-        this.x = 724 //-15 * this.chunkSize
-        this.y = 2375 //240 * this.chunkSize;
-        this.tiles = new Map();
+        this.chunkLog = Math.log2(this.chunkSize);
+        this.chunkMask = this.chunkSize - 1
+        this.x = 724;
+        this.y = 2375;
         this.chunks = new Map();
     }
-    setTile(x,y, obj) {
-        this.tiles.set(`${this.x+ x}, ${ this.y+ y}`, obj);
+    setTile(x,y, obj) { //tile space so we don't multiply by chunk size
+        let wx = x + this.x, wy = y + this.y;
+        let cx = wx>>this.chunkLog, cy = wy>>this.chunkLog;
+        let chunk = this.chunks.get(`${cx}, ${cy}`);
+        if (!Array.isArray(chunk)) 
+           chunk = this.createChunk(cx,cy)
+        let tx = wx & this.chunkMask, ty = wy & this.chunkMask;
+        chunk[tx][ty] = obj
     }
-    getTile(x,y) {
-        var xx = Math.floor(x), yy = Math.floor(y)
-        return this.tiles.get(`${this.x+xx}, ${this.y+yy}`)
+    getTile(x,y) { //tile space so we don't multiply by chunk size
+        let wx = x + this.x, wy = y + this.y;
+        //Math.floor(xx / this.chunkSize)
+        let cx = wx>>this.chunkLog, cy = wy>>this.chunkLog;
+        //((x%this.chunkSize)+this.chunkSize)%this.chunkSize
+        let tx = wx & this.chunkMask, ty = wy & this.chunkMask;
+        return this.chunks.get(`${cx}, ${cy}`)?.[tx]?.[ty];
+    }
+    createChunk(x,y, f) {
+        let wx = (x*this.chunkSize) + this.x, wy = (y *this.chunkSize)+ this.y;
+        //Math.floor(xx / this.chunkSize)
+        let cx = wx>>this.chunkLog, cy = wy>>this.chunkLog;
+        let chunk = new Array(this.chunkSize).fill(null).map((a, i) => new Array(this.chunkSize).fill(null).map((b, o)=>f?.(i, o, cx, cy) ?? {x:cx+i, y:cy+o}))
+        this.chunks.set(`${cx}, ${cy}`, chunk)
+        return chunk;
     }
     getChunk(x,y) {
-        var xx = Math.floor(x), yy = Math.floor(y)
-        let c = this.chunks.get(`${this.x+xx}, ${this.y+yy}`)
-        if (!c) {
-             c = {pos: [xx, yy]}
-            this.chunks.set(`${this.x+xx}, ${this.y+yy}`, c)
-        }
-        return c
+        //multiplied by chunk size to align with world grid, 
+        let wx = (x*this.chunkSize) + this.x, wy = (y *this.chunkSize)+ this.y;
+        //Math.floor(xx / this.chunkSize)
+        //floor world chunk coordinates to compress world coordinates into chunk space 
+        let cx = wx>>this.chunkLog, cy = wy>>this.chunkLog;
+        return this.chunks.get(`${cx}, ${cy}`);
     }
     get halfTileSize() {
-        return this.gridSize / 2
+        return this.tileSize / 2
     }
 
     screenToGridPoint(x, y) {
         return {
-            x: Math.floor(x / this.gridSize),
-            y: Math.floor(y / this.gridSize),
+            x: Math.floor(x / this.tileSize),
+            y: Math.floor(y / this.tileSize),
             screen(centered) {
                 return worldGrid.scaleGrid(this.x,this.y, centered)
             }
         };
     }
     scaleGrid(x, y, centered) {
-        x *=worldGrid.gridSize
-        x += centered ? (worldGrid.gridSize / 2) : 0
-        y *= worldGrid.gridSize
-        y += centered ? (worldGrid.gridSize / 2) : 0
+        x *=worldGrid.tileSize
+        x += centered ? (worldGrid.tileSize / 2) : 0
+        y *= worldGrid.tileSize
+        y += centered ? (worldGrid.tileSize / 2) : 0
 
         return { x, y }
     }
     screenToGridPointRaw(x, y) {
-        return { x: x / this.gridSize, y: y / this.gridSize };
+        return { x: x / this.tileSize, y: y / this.tileSize };
     }
     screenToChunkPoint(x, y) {
-        return { x: Math.floor(x / (this.gridSize * this.chunkSize)), y: Math.floor(y / (this.gridSize * this.chunkSize)) };
+        return { x: Math.floor(x / (this.tileSize * this.chunkSize)), y: Math.floor(y / (this.tileSize * this.chunkSize)) };
     }
     screenToGridBounds(x1, y1, x2, y2, pad = 0) {
-        let gx1 = Math.floor(x1 / this.gridSize);
-        let gy1 = Math.floor(y1 / this.gridSize);
-        let gx2 = Math.floor(x2 / this.gridSize)
-        let gy2 = Math.floor(y2 / this.gridSize)
+        let gx1 = Math.floor(x1 / this.tileSize);
+        let gy1 = Math.floor(y1 / this.tileSize);
+        let gx2 = Math.floor(x2 / this.tileSize)
+        let gy2 = Math.floor(y2 / this.tileSize)
         return {
             minX: Math.min(gx1, gx2) - pad,
             minY: Math.min(gy1, gy2) - pad,
@@ -72,10 +93,10 @@ export class WorldGrid {
     }
     screenToChunkBounds(x1, y1, x2, y2) {
         return {
-            minX: Math.floor(x1 / (this.gridSize * this.chunkSize)),
-            minY: Math.floor(y1 / (this.gridSize * this.chunkSize)),
-            maxX: Math.floor(x2 / (this.gridSize * this.chunkSize)),
-            maxY: Math.floor(y2 / (this.gridSize * this.chunkSize))
+            minX: Math.floor(x1 / (this.tileSize * this.chunkSize)),
+            minY: Math.floor(y1 / (this.tileSize * this.chunkSize)),
+            maxX: Math.floor(x2 / (this.tileSize * this.chunkSize)),
+            maxY: Math.floor(y2 / (this.tileSize * this.chunkSize))
         };
     }
     gridBounds(gx1, gy1, gx2, gy2, pad = 0) {
@@ -96,17 +117,17 @@ export class WorldGrid {
 
     }
     gridToScreenPoint(x, y) {
-        return { x: x * this.gridSize, y: y * this.gridSize };
+        return { x: x * this.tileSize, y: y * this.tileSize };
     }
     gridToChunkPoint(x, y) {
         return { x: Math.floor(x / this.chunkSize), y: Math.floor(y / this.chunkSize) };
     }
     gridToScreenBounds(minX, minY, maxX, maxY) {
         return {
-            x1: minX * this.gridSize,
-            y1: minY * this.gridSize,
-            x2: (maxX) * this.gridSize,
-            y2: (maxY) * this.gridSize
+            x1: minX * this.tileSize,
+            y1: minY * this.tileSize,
+            x2: (maxX) * this.tileSize,
+            y2: (maxY) * this.tileSize
         };
     }
     gridToChunkBounds(x1, y1, x2, y2) {
@@ -119,32 +140,32 @@ export class WorldGrid {
     }
     gridBoundsScreenSpace(x, y, w = 1, h = 1) {
         return {
-            x: x * this.gridSize,
-            y: y * this.gridSize,
-            w: w * this.gridSize,
-            h: h * this.gridSize
+            x: x * this.tileSize,
+            y: y * this.tileSize,
+            w: w * this.tileSize,
+            h: h * this.tileSize
         };
     }
     chunkToScreen(x, y) {
-        return { x: x * this.chunkSize * this.gridSize, y: y * this.chunkSize * this.gridSize };
+        return { x: x * this.chunkSize * this.tileSize, y: y * this.chunkSize * this.tileSize };
     }
     chunkToGrid(x, y) {
         return { x: x * this.chunkSize, y: y * this.chunkSize };
     }
     chunkToScreenBounds(minX, minY, maxX, maxY) {
         return {
-            x1: minX * this.gridSize * this.chunkSize,
-            y1: minY * this.gridSize * this.chunkSize,
-            x2: (maxX) * this.gridSize * this.chunkSize,
-            y2: (maxY) * this.gridSize * this.chunkSize
+            x1: minX * this.tileSize * this.chunkSize,
+            y1: minY * this.tileSize * this.chunkSize,
+            x2: (maxX) * this.tileSize * this.chunkSize,
+            y2: (maxY) * this.tileSize * this.chunkSize
         };
     }
     chunkToScreenBounds1(minX, minY, maxX, maxY) {
         return {
-            x1: minX * this.gridSize * this.chunkSize,
-            y1: minY * this.gridSize * this.chunkSize,
-            x2: (maxX + 1) * this.gridSize * this.chunkSize,
-            y2: (maxY + 1) * this.gridSize * this.chunkSize
+            x1: minX * this.tileSize * this.chunkSize,
+            y1: minY * this.tileSize * this.chunkSize,
+            x2: (maxX + 1) * this.tileSize * this.chunkSize,
+            y2: (maxY + 1) * this.tileSize * this.chunkSize
         };
     }
     chunkBoundsGridSpace(x, y, w, h) {
@@ -157,26 +178,26 @@ export class WorldGrid {
     }
     chunkBoundsScreenSpace(x, y, w, h) {
         return {
-            x: x * this.gridSize * this.chunkSize,
-            y: y * this.gridSize * this.chunkSize,
-            w: w * this.gridSize * this.chunkSize,
-            h: h * this.gridSize * this.chunkSize
+            x: x * this.tileSize * this.chunkSize,
+            y: y * this.tileSize * this.chunkSize,
+            w: w * this.tileSize * this.chunkSize,
+            h: h * this.tileSize * this.chunkSize
         };
     }
     alignPosition(x, y) {
         if (Array.isArray(x)) [x, y] = x;
 
         // Scale down to world space.
-        let worldX = x / this.gridSize;
-        let worldY = y / this.gridSize;
+        let worldX = x / this.tileSize;
+        let worldY = y / this.tileSize;
 
         // Floor the position to align with world position.
         worldX = Math.floor(worldX);
         worldY = Math.floor(worldY);
 
         // Scale back up to screen space.
-        let screenX = worldX * this.gridSize;
-        let screenY = worldY * this.gridSize;
+        let screenX = worldX * this.tileSize;
+        let screenY = worldY * this.tileSize;
 
         return [screenX, screenY];
     }
@@ -204,24 +225,24 @@ export class WorldGrid {
         if (Array.isArray(x)) [x, y] = x;
 
         // Scale down to world space.
-        let worldX = x / (this.chunkSize*this.gridSize);
-        let worldY = y / (this.chunkSize*this.gridSize);
+        let worldX = x / (this.chunkSize*this.tileSize);
+        let worldY = y / (this.chunkSize*this.tileSize);
 
         // Floor the position to align with world position.
         worldX = Math.round(worldX);
         worldY = Math.round(worldY);
 
         // Scale back up to screen space.
-        let screenX = worldX * this.chunkSize*this.gridSize;
-        let screenY = worldY * this.chunkSize*this.gridSize;
+        let screenX = worldX * this.chunkSize*this.tileSize;
+        let screenY = worldY * this.chunkSize*this.tileSize;
 
         return [screenX, screenY];
     }
 
     circleChunks(i,o) {
-        i=i*this.gridSize, o=o*this.gridSize
-        let ac = (x,y) => { var [xx,yy] = this.alignPositionChunk(x,y); return this.getChunk(xx/this.gridSize,yy/this.gridSize) }
-        let h = (this.gridSize/2);
+        i=i*this.tileSize, o=o*this.tileSize
+        let ac = (x,y) => { var [xx,yy] = this.alignPositionChunk(x,y); return this.getChunk(xx/this.tileSize,yy/this.tileSize) }
+        let h = (this.tileSize/2);
         return [ac(i+h,o), ac(i-h,o), ac(i,o+h),ac(i,o-h)].filter((o,i, a)=> a.findIndex(item => item === o) === i)
     }
     
