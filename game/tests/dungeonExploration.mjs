@@ -12,12 +12,18 @@ import { DebugCursor } from "../world/debugCursor.mjs";
 import { Graph } from "../world/noiseGen/graph.mjs"
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
+import { } from "./graphworker.mjs"
+import { Map2d } from "../../engine/n0math/map2d.mjs";
+import { drawChunk } from "../world/wave/worldGen/ChunkDrawer.mjs";
 let n0 = new Nanoai(`n0`, 2, 4)
-let n1 = new Nanoai(`n1`, 4, 4)
+let n1 = new Nanoai(`n1`, 7, 6)
 let n2 = new Nanoai(`n2`, 6, 4)
 globalThis.n0 = n0;
-//new DebugCursor()
-//new WorldGenerator(n0)
+
+n0.brain.do("walk", 0, 1000)
+n1.brain.do("follow", n0)
+new DebugCursor()
+new WorldGenerator(n0)
 worldGrid.x =0; 
 worldGrid.y= -0;
 camera.follow(n0);
@@ -72,35 +78,59 @@ let noise31 = new NoiseGenerator({ offsetX:noise32, amp:.2, octaves:3, scale:15 
 noise31.init(createNoise2D(Alea(3)));
 let noise3 = new NoiseGenerator({ abs:true, offsetY:noise31, offsetX:noise32, name: "noise3", inverted:true, blend: [1,0], add:[[noise31, .1]], blendPower:5, octaves:1, scale:6, blendStyle: "recubic" })
 noise3.init(circlo, 0, 1)
+/*
 let visualize = function visualize(w,h, s, fn) {
     let time = 0;
-
     let map = []
-    
-    for (let i = -w; i < w; i++) {
+    let workerpool = {
+        workers: [
+            new Worker("./game/tests/graphworker.mjs", {type:"module"}),
+            new Worker("./game/tests/graphworker.mjs", {type:"module"}),
+            new Worker("./game/tests/graphworker.mjs", {type:"module"}),
+            new Worker("./game/tests/graphworker.mjs", {type:"module"}) 
+        ], index: 0,
+        postMessage(o){
+            this.workers[this.index].postMessage(o);
+            this.index = (this.index + 1) % this.workers.length;
+        }
+    }
+    for (let w of workerpool.workers) w.onmessage = function(o) {
+        let d = o.data;        
+        for (const x of d.result) {
+            for (const y of x) {
+                let ox = y.ox, oy = y.oy;
+                if (map[ox] === undefined) map[ox] = [];
+                map[ox][oy] = y;//inverseLerp(y.minm, y.maxm, y.sum)
+                
+            }
+        }
+    }
+    function create(x,y, w ,h) { 
+        workerpool.postMessage({x,y,w,h})
+    }
+    let w2 = w/2;
+    for (let i = 0; i < w; i+=w2) {
         map[i] = []
-        for (let o = -h; o < h; o++) {
-            let gfn = fn; 
-            let n = gfn.create ? gfn.create (i,o): gfn(i,o);
-            if (n.sum !== undefined)
-            map[i][o] = inverseLerp(n.minm, n.maxm, n.sum)
-            else map[i][o] = n;
+        for (let o = 0; o < h; o+=w2) {
+            create(i,o, w2, w2)
         }
     }
     return { work:() => {
-        for (let i = -w; i < w; i++) {
-            for (let o = -h; o < h; o++) {
-                let n = map[i][o]
-                if (n === NaN) p.fill(255, 111,111); else p.fill((n)*255);
-                let x = (i * worldGrid.gridSize*.25);
-                let y = (o * worldGrid.gridSize*.25);
-                p.rect(x*s,y*s, worldGrid.gridSize*.25*s,worldGrid.gridSize*.25*s)
+        //console.log(map);
+        for (let i = 0; i < w; i++) {
+            for (let o = 0; o < h; o++) {
+                let n = map?.[i]?.[o] 
+                if (n === NaN || n===undefined) continue; else p.fill(n.biome.color)// p.fill((n)*255);
+                let x = (i * worldGrid.tileSize);
+                let y = (o * worldGrid.tileSize);
+                p.rect(x*s,y*s, worldGrid.tileSize*s,worldGrid.tileSize*s)
             }
         }
         return true
     }
     }
 }
+    */
 let inf = { 
     input: (x,y) => { return x },
     min: -1, max: 1
@@ -398,7 +428,12 @@ function edgeVoronoiNoise(x, y, rngx, rngy) {
     return [minDistToCell, random, minEdgeDistance];
 }
 
-let size = 24*2, vsize= size /2
+let a2d = new Map2d();
+a2d.set(0,0, { name: "hi" })
+
+console.log(a2d.get(0,0), a2d.has(0,0));
+
+let size = 16, vsize= size /2
 let sol = 4;
 let rngx = createNoise2D(Alea("iox"));
 let rngy = createNoise2D(Alea("ioy"));
@@ -415,11 +450,24 @@ let xnf = {
     input: createNoise2D(Alea(5)),
     min: -1, max: 1
 }
+
 xna.scaleXY(35).fractal(xnf).posterize(10);
 xna//.sin()//.floor()
+
 let xnb = new Graph().copy(xna)
-xnb.abs()//.anglize().cos();
-n0.brain.do(visualize(size,size, 1, xnb ))
+xnb.anglize().cos()//.sin();
+/*
+let gra = new Worker('./game/tests/graphworker.mjs', {type: 'module'})
+gra.onmessage = function(e) {
+//    console.log(e.data);
+}
+gra.onerror = function(e) { console.log (e) }
+gra.postMessage({x:3, y:3});
+*/
+
+
+console.log(xnb.create(3,3));
+//n0.brain.do(visualize(size,size, 1, xnb ))
 //n1.brain.do(visualize(size, size, 1, xxx))
 console.log("sanitycheck")
 //let hooki2 =n0.brain.do(visualize(rooma))
@@ -441,7 +489,7 @@ let hooko = n0.brain.do("hook", ()=>{
 })
 hooko.name = "read map"
 */
-
+n0.brain.do("hook", () => {})
 let explorationProfiles = new Map()
 explorationProfiles.set("cunny", { 
     create() { 

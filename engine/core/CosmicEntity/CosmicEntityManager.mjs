@@ -72,7 +72,7 @@ export class CosmicEntityManager {
 
     if (functionName === "draw") 
       entitiesWithFunction.sort((a,b)=>a.renderOrder - b.renderOrder)
-    console.warn("move sort to other function AND implement single object position finder (one item sort in array)")
+    //console.warn("move sort to other function AND implement single object position finder (one item sort in array)")
 
     entitiesWithFunction.forEach(entity => {
       if (typeof entity[functionName] === "function") {

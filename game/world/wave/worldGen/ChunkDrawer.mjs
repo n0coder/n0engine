@@ -12,7 +12,7 @@ export function drawChunks(nano) {
 
             let dis =  Math.hypot(nano.x - nx, nano.y - ny)<nano.sightRadius
             if (dis) {
-                let { x, y } = worldGrid.screenToChunkPoint(nx * worldGrid.gridSize, ny * worldGrid.gridSize)
+                let { x, y } = worldGrid.screenToChunkPoint(nx * worldGrid.tileSize, ny * worldGrid.tileSize)
                 drawChunk(x*c, y*c, nano.z)
             }
         }
@@ -40,7 +40,7 @@ export function drawChunk(x, y, z) {
                 p.fill(color);
                 //let zz =z- tile.z
                 //p.fill(z*255)
-                p.rect(xx * worldGrid.gridSize, (yy) * worldGrid.gridSize, worldGrid.gridSize, worldGrid.gridSize)
+                p.rect(xx * worldGrid.tileSize, (yy) * worldGrid.tileSize, worldGrid.tileSize, worldGrid.tileSize)
                 }
             }
         }
