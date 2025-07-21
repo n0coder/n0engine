@@ -25,9 +25,9 @@ export class Soil {
         this.crop?.grow?.(deltaTime*this.waterLevel)
         
     
-        let x = this.x *worldGrid.gridSize
-    let y = this.y *worldGrid.gridSize
-    let t = worldGrid.gridSize
+        let x = this.x *worldGrid.tileSize
+    let y = this.y *worldGrid.tileSize
+    let t = worldGrid.tileSize
     let r = lerp(this.colorDry[0], this.colorWet[0], this.waterLevel)
     let g = lerp(this.colorDry[1], this.colorWet[1],this.waterLevel)
     let b = lerp(this.colorDry[2], this.colorWet[2],this.waterLevel)

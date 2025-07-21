@@ -14,7 +14,7 @@ export function addBiomeFactors(map, factor, gens) {
         console.error(`${factor} could not be split into ranges. (please clarify this lol)`)
         return;
     } 
-    console.log(gen, factor);
+    //console.log(gen, factor);
     var ranges = map.exportRanges(factor, gen.minm, gen.maxm)
     
     ranges.forEach(r => {
@@ -24,23 +24,17 @@ export function addBiomeFactors(map, factor, gens) {
         biomeFactorMap.set(tag, obj)
         //console.log(r);
     })
-    console.log({ranges, biomeFactorMap, factor})
+    //console.log({ranges, biomeFactorMap, factor})
 }
-document.lutMissingMap = new Map()
+//document.lutMissingMap = new Map()
 export class Biome {
     constructor(name, colorName, color, tags, tiles) {
         this.name = name
         this.sugara=null;
         this.colorName = colorName;
-        if (!luts[0][colorName]) 
-            document.lutMissingMap.set(`0, ${colorName}`, true);
-           if (!luts[1][colorName]) 
-           document.lutMissingMap.set(`1, ${colorName}`, true);
-           if (!luts[2][colorName]) 
-           document.lutMissingMap.set(`2, ${colorName}`, true);
-        this.bitter = luts[0][colorName] || [255,0,255]
-        this.plain = luts[1][colorName]|| [255,0,255]
-        this.sugar = luts[2][colorName]|| [255,0,255]
+        this.bitter = luts[0][colorName] ?? [255,0,255]
+        this.plain = luts[1][colorName] ?? [255,0,255]
+        this.sugar = luts[2][colorName] ?? [255,0,255]
         this.sugarLevel = color;
         this.difficulty = 1;
         this.color = luts[1][colorName];

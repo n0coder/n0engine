@@ -1,4 +1,4 @@
-import { loadImg } from "../../../engine/core/Utilities/ObjectUtils.mjs";
+import { loadImg } from "../../../engine/core/Utilities/ImageUtils";
 import { waves } from "./waveImport.mjs";
 
 export class Tile {

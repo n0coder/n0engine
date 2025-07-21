@@ -496,7 +496,7 @@ export class Graph {
         return this;
     }
     create(x,y) {
-        let output = { x, y, sum:0, minm:0, maxm:0, scale:1 }
+        let output = { ox:x, oy: y, x, y, sum:0, minm:0, maxm:0, scale:1 }
         for (const fn of this.sequence) {
             fn(output);
         } 

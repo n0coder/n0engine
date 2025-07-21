@@ -1,11 +1,9 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { deltaTime, ticks } from "../../engine/core/Time/n0Time.mjs";
-import { addAnimationSet, atomicClone, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ObjectUtils.mjs";
+import { ticks } from "../../engine/core/Time/n0Time.mjs";
+import { addAnimationSet, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ImageUtils";
 import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { createCubicInterpolator, cubicBlendW, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
-import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";
 
@@ -27,7 +25,7 @@ export class Nanoai {
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
         this.z = z
-        this.fov = 180, this.sightRadius = worldGrid.gridSize*2.5; //reasonable fov
+        this.fov = 180, this.sightRadius = worldGrid.tileSize*2.5; //reasonable fov
         this.speed = 10;
         this.sugar = -4;
         this.lover = null;
@@ -57,10 +55,10 @@ export class Nanoai {
         ]) 
     }
     get visualX() {
-        return (this.x*worldGrid.gridSize)+(this.spriteX/2);
+        return (this.x*worldGrid.tileSize)+(this.spriteX/2);
     }
     get visualY() {
-        return (this.y*worldGrid.gridSize)-(this.spriteY/2)
+        return (this.y*worldGrid.tileSize)-(this.spriteY/2)
     }
     get spriteY() {
         return (this.img ? this.img.height : 0)
@@ -70,11 +68,11 @@ export class Nanoai {
     }
     //keeping track of an unknown x and y center is easier with this calculation function
     get centerX() {
-        return (this.img ? (this.x*worldGrid.gridSize) - this.img.width / 2 : this.x);
+        return (this.img ? (this.x*worldGrid.tileSize) - this.img.width / 2 : this.x);
     }
 
     get centerY() {
-        return ((this.img) ? (this.y*worldGrid.gridSize) - this.img.height : this.y);
+        return ((this.img) ? (this.y*worldGrid.tileSize) - this.img.height : this.y);
     }
 
     idle() {

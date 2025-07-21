@@ -27,9 +27,6 @@ export class Camera {
     }
     draw() {
         p.ellipse(gameW/2, gameH/2, 3, 3)
-        //update
-        //this is an issue, the smooth movement is annoying
-        //maybe i should do what phind said and just lerp
         var tx = this.ox
         var ty = this.oy;
         var vx = tx-this.x;

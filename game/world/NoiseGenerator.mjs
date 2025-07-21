@@ -1,5 +1,6 @@
 
 import { ValueDriver } from "../../engine/n0math/ValueDriver.mjs";
+import { Map2d } from "../../engine/n0math/map2d.mjs";
 import { blendw, clamp, createCubicInterpolator, cubicBlendW, inverseLerp, lerp, recubic } from "../../engine/n0math/ranges.mjs";
 
 //octaves control how detailed a section is
@@ -37,13 +38,12 @@ export class NoiseGenerator {
                 this.mapper = createCubicInterpolator(this.map);
             }
         }
-        this.pointCache = new Map()
+        this.pointCache = new Map2d()
         this.inited = false;
         this.mini =0; this.maxi =1;
     }
     clean( ) {
-        this.pointCache.clear();
-
+        this.pointCache.clearAll();
         this.offset.clean();
         this.offsetX.clean();
         this.offsetY.clean();
@@ -126,7 +126,7 @@ export class NoiseGenerator {
     //this would optimize the way we reuse the same generator
 
     getValue(x, y, minmaxsum=true) {
-        var value = this.pointCache.get(`${x}, ${y}`) //take from cache
+        var value = this.pointCache.get(x, y) //take from cache
         if (value) return value;
         var blendWeight = this.toValue(this.blendWeight, x, y)
         var blendPower = this.toValue(this.blendPower, x, y)
@@ -174,7 +174,7 @@ export class NoiseGenerator {
         value = minmaxsum ? minmax : minmax.sum
         this.mini = minmax.minm;
         this.maxi = minmax.maxm;
-        this.pointCache.set(`${x}, ${y}`, value)
+        this.pointCache.set(x, y, value)
         return value
     }
 

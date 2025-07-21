@@ -43,9 +43,9 @@ export class CraftingTable {
         return out
     }
     draw(){
-        let x = this.x *worldGrid.gridSize
-        let y = this.y *worldGrid.gridSize
-        let t = worldGrid.gridSize
+        let x = this.x *worldGrid.tileSize
+        let y = this.y *worldGrid.tileSize
+        let t = worldGrid.tileSize
             p.fill(255,255,255)
             p.rect(x, y, t, t)
     }

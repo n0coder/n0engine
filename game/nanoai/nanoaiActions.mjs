@@ -387,7 +387,7 @@ p.noLoopLoud = function() {
 }
 
 function processWalk(nano, obj, ox, oy, stopDirection, findaPath, magn = .5) {
-    p.ellipse(ox*worldGrid.gridSize, oy*worldGrid.gridSize, 8)
+    p.ellipse(ox*worldGrid.tileSize, oy*worldGrid.tileSize, 8)
 
     var vx = ox - nano.x;
     var vy = oy - nano.y;    

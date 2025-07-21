@@ -21,7 +21,7 @@ export class Seed {
     }
     draw() {
         p.fill(255)
-        p.ellipse(this.x * worldGrid.gridSize, this.y * worldGrid.gridSize, this.s)
+        p.ellipse(this.x * worldGrid.tileSize, this.y * worldGrid.tileSize, this.s)
     }
 }
 craftingRecipes.set("crop", (nano, crops)=>{
@@ -50,7 +50,7 @@ class Crop {
     }
 
     get heldPos() {
-        return this.held ? 0 : worldGrid.gridSize/2
+        return this.held ? 0 : worldGrid.tileSize/2
     }
     grow(amount) {
         if (this.growth <= 1) {
@@ -69,6 +69,6 @@ class Crop {
     }
     draw(){
         p.fill(255)
-        p.ellipse(this.x*worldGrid.gridSize+this.heldPos, this.y*worldGrid.gridSize+this.heldPos, this.growth*this.s)
+        p.ellipse(this.x*worldGrid.tileSize+this.heldPos, this.y*worldGrid.tileSize+this.heldPos, this.growth*this.s)
     }
 }
