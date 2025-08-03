@@ -1,12 +1,61 @@
+import { camera } from "../core/Camera/camera.mjs";
+
 export class WorldGrid {
     constructor() {
-        this.tileSize = 16;
-        this.chunkSize = 4;
+        this.setTileSize(16);
+        this.setChunkSize(4);
         this.x = 724 //-15 * this.chunkSize
         this.y = 2375 //240 * this.chunkSize;
         this.tiles = new Map();
         this.chunks = new Map();
     }
+    tileSize = 16;
+    chunkSize = 4;
+    setTileSize(a) {
+        a = Math.abs(a); // Silently convert negative to positive
+        if (a === 0) {
+            console.warn(`tileSize can not be 0: ${this.tileSize}`);
+            return; // Exit to avoid division by zero
+        }
+        
+        this.tileSize = a;
+        
+        // Check if a is a power of 2: n > 0 && (n & (n - 1)) === 0
+        if ((a & (a - 1)) === 0) {
+            this.tileLog = Math.log2(a);
+            this.tileMask = a - 1;
+            this.floorTile = x => x >> this.tileLog; // Bitwise shift
+            this.modTile = x => x & this.tileMask;   // Bitwise AND
+        } else {
+            this.tileLog = null;
+            this.tileMask = null;
+            this.floorTile = x => Math.floor(x / this.tileSize); // Standard division
+            this.modTile = x => ((x % this.tileSize) + this.tileSize) % this.tileSize; // Modulo with negative handling
+        }
+    }
+
+    setChunkSize(a) {
+        a = Math.abs(a); // Silently convert negative to positive
+        if (a === 0) {
+            console.warn(`chunkSize can not be 0: ${this.chunkSize}`);
+            return; // Exit to avoid division by zero
+        }
+        
+        this.chunkSize = a;
+        
+        if ((a & (a - 1)) === 0) {
+            this.chunkLog = Math.log2(a);
+            this.chunkMask = a - 1;
+            this.floorChunk = x => x >> this.chunkLog;
+            this.modChunk = x => x & this.chunkMask;
+        } else {
+            this.chunkLog = null;
+            this.chunkMask = null;
+            this.floorChunk = x => Math.floor(x / this.chunkSize);
+            this.modChunk = x => ((x % this.chunkSize) + this.chunkSize) % this.chunkSize;
+        }
+    }    
+
     setTile(x,y, obj) {
         this.tiles.set(`${this.x+ x}, ${ this.y+ y}`, obj);
     }
@@ -29,8 +78,8 @@ export class WorldGrid {
 
     screenToGridPoint(x, y) {
         return {
-            x: Math.floor(x / this.tileSize),
-            y: Math.floor(y / this.tileSize),
+            x: Math.floor((x-camera.rx) / this.tileSize),
+            y: Math.floor((y-camera.ry) / this.tileSize),
             screen(centered) {
                 return worldGrid.scaleGrid(this.x,this.y, centered)
             }
@@ -102,9 +151,10 @@ export class WorldGrid {
         return { x: Math.floor(x / this.chunkSize), y: Math.floor(y / this.chunkSize) };
     }
     gridToScreenBounds(minX, minY, maxX, maxY) {
+
         return {
-            x1: minX * this.tileSize,
-            y1: minY * this.tileSize,
+            x1: (minX * this.tileSize),
+            y1: (minY * this.tileSize),
             x2: (maxX) * this.tileSize,
             y2: (maxY) * this.tileSize
         };
@@ -224,6 +274,40 @@ export class WorldGrid {
         let h = (this.tileSize/2);
         return [ac(i+h,o), ac(i-h,o), ac(i,o+h),ac(i,o-h)].filter((o,i, a)=> a.findIndex(item => item === o) === i)
     }
+
+    tileLog = null;
+    tileMask = null;
+    
+    /**
+     * Floors a world coordinate to the tile coordinate it belongs to
+     * @param {number} a - World coordinate (e.g., pixel position)
+     * @returns {number} Tile coordinate
+     */
+    floorWorldTile(a) { /* Set by setTileSize */ }
+    
+    /**
+     * Gets the offset within a tile for a world coordinate
+     * @param {number} a - World coordinate (e.g., pixel position)
+     * @returns {number} Offset within the tile
+     */
+    modWorldTile(a) { /* Set by setTileSize */ }
+    
+    chunkLog = null;
+    chunkMask = null;
+    
+    /**
+     * Floors a tile coordinate to the chunk coordinate it belongs to
+     * @param {number} a - Tile coordinate
+     * @returns {number} Chunk coordinate
+     */
+    floorTileChunk(a) { /* Set by setChunkSize */ }
+    
+    /**
+     * Gets the offset within a chunk for a tile coordinate
+     * @param {number} a - Tile coordinate
+     * @returns {number} Offset within the chunk
+     */
+    modTileChunk(a) { /* Set by setChunkSize */ }
     
 }
 export const worldGrid = new WorldGrid(); 
