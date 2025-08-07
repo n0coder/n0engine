@@ -20,15 +20,18 @@ export class WorldGrid {
         
         this.tileSize = a;
         
-        if ((a & 1) === 0) { // a % 2
-            this.tileLog = Math.log2(a);
+        if ((a & (a - 1)) === 0) { // a % 2
+            this.tileLog   = Math.log2(a);
+            this.tileMask  = a - 1;  
             this.floorTile = x => x >> this.tileLog; // Bitwise shift
+            this.modTile   = x => x & this.tileMask;
         } else {
-            this.tileLog = null;
+            this.tileLog   = null;
+            this.tileMask  = null;  
             this.floorTile = x => Math.floor(x / this.tileSize); // Standard division
+            this.modTile   = x => ((x % this.tileSize) + this.tileSize) % this.tileSize;
         }
-        // & masking doesn't require power of 2
-        this.tileMask = a - 1;  
+        
     }
 
     setChunkSize(a) {
@@ -41,14 +44,17 @@ export class WorldGrid {
         this.chunkSize = a;
         
         if ((a & (a - 1)) === 0) {
-            this.chunkLog = Math.log2(a);
+            this.chunkLog   = Math.log2(a);
+            this.chunkMask  = a - 1;
             this.floorChunk = x => x >> this.chunkLog;
+            this.modTile    = x => x & this.chunkMask;
         } else {
-            this.chunkLog = null;
+            this.chunkLog   = null;
+            this.chunkMask  = null;
             this.floorChunk = x => Math.floor(x / this.chunkSize);
+            this.modChunk   = x => ((x % this.chunkSize) + this.chunkSize) % this.chunkSize;
         }
 
-        this.chunkMask = a - 1;
     }    
 
     setTile(x,y, obj) {
@@ -316,7 +322,7 @@ export class WorldGrid {
      * @param {number} a - World coordinate (e.g., pixel position)
      * @returns {number} Offset within the tile
      */
-    modTile(a) {  return a & this.tileMask; }
+    modTile(a) { /* Set by setTileSize */ }
     
     chunkLog = null;
     chunkMask = null;
@@ -333,7 +339,7 @@ export class WorldGrid {
      * @param {number} a - Tile coordinate
      * @returns {number} & mask varient of ((x % chunkSize) + chunkSize) % chunkSize;
      */
-    modChunk(a) { return x & this.chunkMask; }
+    modChunk(a) { /* Set by setChunkSize */ }
     
 }
 export const worldGrid = new WorldGrid(); 
