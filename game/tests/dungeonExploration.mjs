@@ -1,5 +1,5 @@
 import { createNoise2D } from "simplex-noise";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { Nanoai } from "../nanoai/nanoai.mjs";
 import { NoiseGenerator } from "../world/NoiseGenerator.mjs";
 import Alea from "alea";
@@ -16,15 +16,15 @@ import { } from "./graphworker.mjs"
 import { Map2d } from "../../engine/n0math/map2d.mjs";
 import { drawChunk } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
-let n0 = new Nanoai(`n0`, 2, 4)
+let n0 = new Nanoai(`n0`, 1, 4)
 let n1 = new Nanoai(`n1`, 7, 6)
 let n2 = new Nanoai(`n2`, 6, 4)
 globalThis.n0 = n0;
-
+n0.brain.do("walk", 15, 15)
 new DebugCursor()
 new WorldGenerator(n0)
-worldGrid.x =0; 
-worldGrid.y= -0;
+//worldGrid.x =0; 
+//worldGrid.y= -0;
 camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 

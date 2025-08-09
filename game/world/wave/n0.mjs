@@ -12,32 +12,41 @@ export const n0alea = Alea("n0");
 //
 
 export function buildn0Collapse(tile) {
-
     var x = tile.wx, y = tile.wy
+    console.log("is this running")
     let rules = tile.biome.tiles.filter(t => n0tiles.get(t))
-    if (rules.length === 0) return;
-    
+    if (rules.length === 0) {
+        console.log("no rules for n0 to collapse on", {biome:tile.biome, n0tiles: n0tiles.entries()})
+        return;
+    };
+    console.log("rules for n0 to collapse on", {biome:tile.biome, rules, n0tiles: n0tiles.entries()})
+
     if (!tile.n0fc) 
         tile.n0fc = new Cell(rules)      
     let n0fc = tile.n0fc;
     n0fc.v = 2; 
-    if (n0fc.option) return; 
+    if (n0fc.option) return;
+
     var options = [...n0fc.options];
     options = newCheckDir(x, y - 1, options, (a, b) => a.isUp(b))
     options = newCheckDir(x + 1, y, options, (a, b) => a.isRight(b))
     options = newCheckDir(x, y + 1, options, (a, b) => a.isDown(b))
     options = newCheckDir(x - 1, y, options, (a, b) => a.isLeft(b))
+
     /*
     options = newCheckDir(x - 1, y - 1, options, (a, b) => a.isUpLeft(b));   // Up-left
     options = newCheckDir(x + 1, y - 1, options, (a, b) => a.isUpRight(b));  // Up-right
     options = newCheckDir(x - 1, y + 1, options, (a, b) => a.isDownLeft(b)); // Down-left
     options = newCheckDir(x + 1, y + 1, options, (a, b) => a.isDownRight(b)); // Down-right
     */
+
     let later = []
     var myOptionvs = options.map(o => {
         var tvt = n0tiles.get(o);
+        
         if (!tvt) return null;
         let multiple = 1;
+
         for (var t of tvt.biases) {
             var factor = tile.genCache.get(t.factor)
             let wf = worldFactors.get(t.factor)
@@ -45,8 +54,6 @@ export function buildn0Collapse(tile) {
             
             var bias = inverseLerp(wf.mini, wf.maxi, factor)
             multiple *= lerp(-t.value, t.value, bias)
-
-
         }
         return { option: o, bias: multiple }
     })
@@ -54,20 +61,23 @@ export function buildn0Collapse(tile) {
         n0fc.noiseThresholdCondition(tile.genCache, option, bias)
     );
     let choice = weightedRandom(myOptionvs);
+
     n0fc.option = choice;
     n0fc.tile = n0tiles.get(choice);
+    console.log ("chose", choice, n0fc.tile)
     function newCheckDir(x, y, options, conditionFunc) {
-        var b = worldGrid.getTile(x, y)?.n0fc            
+
+        var b = worldGrid.getTile(x, y)?.n0fc
         let option = b?.option;
         if (option !== undefined) {
             let tileB = b.tile;
+            
             return options.filter(a => {
-                let tileA = n0tiles.get(a);
-                if (tileA !== undefined) {
-                    return conditionFunc(tileA, tileB)
-                }
-            })
-        } else return options;
+                const tileA = n0tiles.get(a);
+                return tileA && conditionFunc(tileA, tileB);
+            });
+        } 
+        return options;
     }
 }
 

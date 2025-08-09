@@ -62,63 +62,8 @@ n0loader.startLoading("categorization", (loaded) => {
 
 n0loader.startLoading("tiles", (loaded) => {
 
-    n0tiles.set('grass0', new Tile('assets/plains/grass.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass1', new Tile('assets/plains/grass2.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass2', new Tile('assets/plains/grass3.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 4, [], [{ factor: "humidity", value: 1 }]))
+    //loadImgArray("assets/wave/purple", 7, (a)=>{console.log("loaded", a)})
     /*
-    n0tiles.set('grass3', new Tile('assets/plains/grass4.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1.3 }]))
-    n0tiles.set('grass4', new Tile('assets/plains/grass5.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1.3 }]))
-    n0tiles.set('grass5', new Tile('assets/plains/grass6.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass6', new Tile('assets/plains/grass7.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass7', new Tile('assets/plains/grass8.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 1, [], [{ factor: "humidity", value: 1 }]))
-    n0tiles.set('grass8', new Tile('assets/plains/grass9.png', [[1, 1, 1], [1, 1, 1], [1, 1, 1], [1, 1, 1]], 10, [], [{ factor: "humidity", value: 3 }]))
-    */
-    let dirtWeight = 1 / 20
-    let humidityDirt = -.5//-((1/20)*50)
-    n0tiles.set('dirtGrass0', new Tile('assets/plains/dirtGrass0.png', [[0, 0, 0], [0, 0, 1], [1, 1, 1], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass1', new Tile('assets/plains/dirtGrass1.png', [[1, 1, 1], [1, 0, 0], [0, 0, 0], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass2', new Tile('assets/plains/dirtGrass2.png', [[1, 0, 0], [0, 0, 0], [1, 0, 0], [1, 1, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass3', new Tile('assets/plains/dirtGrass3.png', [[0, 0, 1], [1, 1, 1], [0, 0, 1], [0, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass4', new Tile('assets/plains/dirtGrass4.png', [[0, 0, 1], [1, 0, 0], [1, 0, 0], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass5', new Tile('assets/plains/dirtGrass5.png', [[1, 0, 0], [0, 0, 1], [0, 0, 1], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass6', new Tile('assets/plains/dirtGrass6.png', [[1, 0, 0], [0, 0, 0], [0, 0, 0], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass7', new Tile('assets/plains/dirtGrass7.png', [[0, 0, 1], [1, 0, 0], [0, 0, 0], [0, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass8', new Tile('assets/plains/dirtGrass8.png', [[0, 0, 0], [0, 0, 0], [1, 0, 0], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass9', new Tile('assets/plains/dirtGrass9.png', [[0, 0, 0], [0, 0, 1], [0, 0, 1], [0, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass10', new Tile('assets/plains/dirtGrass10.png', [[0, 0, 1], [1, 1, 1], [1, 1, 1], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass11', new Tile('assets/plains/dirtGrass11.png', [[0, 0, 0], [0, 0, 1], [1, 1, 1], [0, 0, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass12', new Tile('assets/plains/dirtGrass12.png', [[1, 0, 0], [0, 0, 1], [1, 1, 1], [1, 1, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass13', new Tile('assets/plains/dirtGrass13.png', [[0, 0, 1], [1, 1, 1], [0, 0, 1], [0, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass14', new Tile('assets/plains/dirtGrass14.png', [[1, 0, 0], [0, 0, 0], [1, 0, 0], [1, 1, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass15', new Tile('assets/plains/dirtGrass15.png', [[1, 1, 1], [1, 1, 1], [0, 0, 1], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass16', new Tile('assets/plains/dirtGrass16.png', [[1, 1, 1], [1, 0, 0], [0, 0, 0], [1, 0, 0]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-    n0tiles.set('dirtGrass17', new Tile('assets/plains/dirtGrass17.png', [[1, 1, 1], [1, 0, 0], [1, 0, 0], [1, 1, 1]], dirtWeight, [...grassFactors], [{ factor: "humidity", value: humidityDirt }]))
-
-    n0tiles.set('dirt0', new Tile('assets/plains/dirt.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 1, [], [{ factor: "humidity", value: humidityDirt * 2 }]))
-    n0tiles.set('dirt1', new Tile('assets/plains/dirt2.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 1, [], [{ factor: "humidity", value: humidityDirt * 2 }]))
-    n0tiles.set('dirt2', new Tile('assets/plains/dirt3.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 1, [], [{ factor: "humidity", value: humidityDirt * 2 }]))
-
-
-    let thresholds = {
-
-    }
-    /*
-    function addTiles(purple) {
-        for (let i = 0; i < purple.tiles.length; i++) {
-            let tile = purple.tiles[i]
-            n0tiles.set(`${purple.name}${tile.id}`, new Tile(`${purple.path}${tile.id}${purple.fileType}`, tile.sides, tile.weight, tile.thresholds, tile.biases))
-        }
-    }
-    let purple = {
-        name: "purple", path: 'assets/wave/purple/', fileType: ".png",
-        tiles: [{
-            id: 0, sides: [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], weight: 1,
-            thresholds:  [{ factor: "elevation", min: .4, max: .945 }, { factor: "elevation", min: 0, max: .4 }],
-            biases: [{ factor: "elevation", value: 0 }]
-        }]
-    }
-    addTiles(purple)
-    */
     n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .0, max: .945 }, { factor: "elevation", min: 0, max: .4 }]))
     n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }]))
     n0tiles.set('purple2', new Tile('assets/wave/purple/2.png', [[0, 1, 0], [0, 0, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
@@ -126,6 +71,7 @@ n0loader.startLoading("tiles", (loaded) => {
     n0tiles.set('purple4', new Tile('assets/wave/purple/4.png', [[0, 1, 0], [0, 1, 0], [0, 0, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
     n0tiles.set('purple5', new Tile('assets/wave/purple/5.png', [[0, 0, 0], [0, 1, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }], [{ factor: "elevation", value: .35 }]))
     n0tiles.set('purple6', new Tile('assets/wave/purple/6.png', [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]], 1))
+    
     n0tiles.set('green0', new Tile('assets/wave/green/0.png', [[2, 2, 2], [2, 3, 2], [2, 2, 2], [2, 3, 2]], 1, [{ factor: "elevation", min: -1, max: -.4 }]))
     n0tiles.set('green1', new Tile('assets/wave/green/1.png', [[2, 3, 2], [2, 2, 2], [2, 3, 2], [2, 2, 2]], 1, [{ factor: "elevation", min: -1, max: -.4 }]))
     n0tiles.set('green2', new Tile('assets/wave/green/2.png', [[2, 3, 2], [2, 2, 2], [2, 2, 2], [2, 3, 2]], 1, [{ factor: "elevation", min: -.95, max: -.5 }], [{ factor: "elevation", value: -.1 }]))
@@ -133,7 +79,8 @@ n0loader.startLoading("tiles", (loaded) => {
     n0tiles.set('green4', new Tile('assets/wave/green/4.png', [[2, 3, 2], [2, 3, 2], [2, 2, 2], [2, 2, 2]], 1, [{ factor: "elevation", min: -.95, max: -.5 }], [{ factor: "elevation", value: -.1 }]))
     n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]], 1, [{ factor: "elevation", min: -.95, max: -.5 }], [{ factor: "elevation", value: -.1 }]))
     n0tiles.set('green6', new Tile('assets/wave/green/6.png', [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]], 1))
-
+    */
+    /*
     n0jointtiles.set('green+purple', ['greenpurple0', 'greenpurple1', 'greenpurple2', 'greenpurple3',
         'greenpurple4', 'greenpurple5', 'greenpurple6', 'greenpurple7', 'greenpurple8', 'greenpurple9',
         'greenpurple10', 'greenpurple11'])
@@ -149,7 +96,7 @@ n0loader.startLoading("tiles", (loaded) => {
     n0tiles.set('greenpurple9', new Tile('assets/wave/greenpurple/9.png', [[0, 1, 0], [0, 4, 2], [2, 3, 2], [0, 4, 2]], .25))
     n0tiles.set('greenpurple10', new Tile('assets/wave/greenpurple/10.png', [[0, 4, 2], [2, 3, 2], [0, 4, 2], [0, 1, 0]], .25))
     n0tiles.set('greenpurple11', new Tile('assets/wave/greenpurple/11.png', [[2, 3, 2], [2, 4, 0], [0, 1, 0], [2, 4, 0]], .25))
-
+        */
 
     loaded()
 

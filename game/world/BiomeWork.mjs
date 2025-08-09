@@ -183,7 +183,7 @@ let purebitter = [ "purebitter"]
 let lut =neutrallut;
 
 var grassy = [
-    'dirt0', 'dirt1', 'dirt2', 'grass0', 'grass1', 'grass2', 'grass3', 'grass4', 'grass5', 'grass6', 'grass7', 'grass8'
+    'purple0', 'purple1', 'purple2', 'purple3', 'purple4', 'purple5', 'purple6'
 ]
 for (let aih = 0; aih <= 17; aih++) {
    //dirtGrass0

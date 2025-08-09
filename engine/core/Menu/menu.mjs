@@ -1,4 +1,4 @@
-import { p } from "../p5engine.mjs";
+import { p } from "../p5engine.ts";
 
 class Menu {
     constructor (selector) {

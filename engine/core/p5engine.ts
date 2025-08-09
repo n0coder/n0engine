@@ -2,15 +2,17 @@ import { cosmicEntityManager } from "./CosmicEntity/CosmicEntityManager.mjs";
 import { calculateDeltaTime, deltaTime, previousTime } from "./Time/n0Time.mjs";
 import { backgroundColor, gameH, gameW } from "../n0config.mjs";
 import { } from "./Utilities/MapUtils.mjs"
+import * as p5 from "p5";
 class P5engine {
+    p: p5;
     constructor(){
         this.p = new window.p5(this.p5);
     }
 
     p5(p) { 
-      p.preload = function (p) {
-          cosmicEntityManager.invoke("preload", p);
-      };
+        p.preload = function (p) {
+            cosmicEntityManager.invoke("preload", p);
+        };
   
       p.setup = function()  {
           window.p5.disableFriendlyErrors = true;
@@ -76,7 +78,7 @@ class P5engine {
     
 }
 export var p5engine = new P5engine();
-export const p = p5engine.p;
+export const p: p5 = p5engine.p;
 
 //this provides a way to call setup to generate a canvas after the engine is already created
 //this fixes the issue where loading the game, does not create a canvas

@@ -1,32 +1,39 @@
 import { loadImg } from "../../../engine/core/Utilities/ImageUtils";
-import { waves } from "./waveImport.mjs";
+//import {} from "./waveImport.mjs"
 
 export class Tile {
-    constructor(img, edges, weight, thresholds, biases, tintOn = true) {
-        if (Array.isArray(img)) {
-            this.img = [];
-            for (let ix = 0; ix < img.length; ix++) {                
-                loadImg(img[ix], (i) => this.img[ix] = i );
-            }
-        } else if (img) {
-            loadImg(img, (i) => this.img = i );
+    constructor(path) {
+        this.path = path;
+        console.log(`loading ${path}`)
+        loadImg(path, (i) => {
+            this.img = i 
+        });
+        
+    }
+        weight = .5;
+        biases = [];
+        thresholds = [];
+        setSides(sides) {
+            this.up = sides[0];
+            this.right = sides[1];
+            this.down = sides[2];
+            this.left = sides[3];
         }
-        
-        if (Array.isArray(edges))
-            var [up, right, down, left] = edges
-        else waves.get(edges)
-        this.tintOn = tintOn;
-        this.up = up;
-        this.right = right;
-        this.down = down;
-        this.left = left;
-        this.weight = weight
-        this.thresholds = thresholds || [];
-        this.biases = biases || [];
-    }
-    init() {
-        
-    }
+        setWeight(weight) {
+            this.weight = weight;
+        }
+        addThreshold(t = {factor: "blank", min: 0, max: 1}) {
+            this.thresholds.push(t)
+        }
+        addThresholds(ts) {
+            this.thresholds.push(...ts);
+        }
+        addBias(b = { factor:"blank", value: 0 }) {
+            this.biases.push(b)
+        }
+        addBiases(bs) {
+            this.biases.push(...bs);
+        }
     isLeft(tile) {
         var [a,b,c] = this.left
         var [i,o,p] = tile.right;
@@ -38,8 +45,7 @@ export class Tile {
         return (a===i&&b===o&&c===p);
     }
     isUp(tile) {
-        
-        var [a,b,c] = this.up
+        var [a,b,c] = this.up;
         var [i,o,p] = tile.down;
         return (a===i&&b===o&&c===p);
     }

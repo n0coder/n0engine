@@ -1,4 +1,4 @@
-import { p } from "../p5engine.mjs";
+
 
 //this is a function to deep copy something so hard it duplicates atoms
 export function atomicClone(oldObj) {

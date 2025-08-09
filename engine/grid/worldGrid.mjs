@@ -1,13 +1,14 @@
 import { camera } from "../core/Camera/camera.mjs";
+import { Sparse2dMap } from "./experiments/sparceMap";
 
 export class WorldGrid {
     constructor() {
-        this.setTileSize(16);
+        this.setTileSize(32);
         this.setChunkSize(4);
-        this.x = 724 //-15 * this.chunkSize
-        this.y = 2375 //240 * this.chunkSize;
-        this.tiles = new Map();
-        this.chunks = new Map();
+        this.x = 2_000_000_000 //-15 * this.chunkSize
+        this.y = 2_364_373_235 //240 * this.chunkSize;
+        this.tiles = new Sparse2dMap();
+        this.chunks = new Sparse2dMap();
     }
     tileSize = 16;
     chunkSize = 4;
@@ -59,20 +60,25 @@ export class WorldGrid {
 
     setTile(x,y, obj) {
         let xx = Math.floor(x), yy = Math.floor(y)
-        this.tiles.set(`${this.x+xx}, ${this.y+yy}`, obj);
+        this.tiles.set(xx, yy, obj)
+        //this.tiles.set(`${this.x+xx}, ${this.y+yy}`, obj);
     }
     getTile(x,y) {
         let xx = Math.floor(x), yy = Math.floor(y)
-        return this.tiles.get(`${this.x+xx}, ${this.y+yy}`)
+        return this.tiles.get(xx,yy)
+        //return this.tiles.get(`${this.x+xx}, ${this.y+yy}`)
     }
     getChunk(x,y) {
         let xx = Math.floor(x), yy = Math.floor(y)
-        let c = this.chunks.get(`${this.x+xx}, ${this.y+yy}`)
-        if (!c) {
-            c = {pos: [xx, yy]}
-            this.chunks.set(`${this.x+xx}, ${this.y+yy}`, c)
-        }
+        //let c = this.chunks.get(`${this.x+xx}, ${this.y+yy}`) 
+        //why are we adding world coordinates to chunk coordinates lol
+        let c = this.chunks.get(xx,yy)        
         return c
+    }
+    makeChunk(x, y, callback) {
+        let xx = Math.floor(x), yy = Math.floor(y)
+        let c = {pos: [xx, yy]}
+        this.chunks.set(xx,yy, c);
     }
     get halfTileSize() {
         return this.tileSize / 2

@@ -1,6 +1,6 @@
 import { deltaTime } from "../Time/n0Time.mjs";
 import { defaultScale, gameH, gameW } from "../../n0config.mjs";
-import { p } from "../p5engine.mjs";
+import { p } from "../p5engine.ts";
 
 export class Camera {
     constructor (x=0,y=0, s=-1) {

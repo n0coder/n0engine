@@ -4,12 +4,13 @@ import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { buildBiome } from "../../BiomeWork.mjs";
 import { buildFactors, worldFactors } from "../../FactorManager.mjs";
 import { buildn0Collapse } from "../n0.mjs";
+// import { buildn0Collapse } from "../n0.mjs";
 
 export function addSugar(tile) { //sugar data does not exist, make it using biome date
     
     if(tile.sugar && tile.pathDifficulty !== undefined){
         return tile;
-}
+    }
     if (tile.biome === null) {
         tile.broken = true;
         tile.pathDifficulty = 9;
@@ -40,7 +41,7 @@ export function genTile(x, y) {
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
         addSugar, //uss sugar and biome to set basic sugar level    
-        //buildn0Collapse
+        buildn0Collapse
     ])
     /*
     let t = tile.genCache.get("elevation")

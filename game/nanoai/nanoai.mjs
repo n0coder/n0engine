@@ -1,7 +1,7 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { ticks } from "../../engine/core/Time/n0Time.mjs";
 import { addAnimationSet, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ImageUtils";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
@@ -25,6 +25,8 @@ export class Nanoai {
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0
         this.z = z
+
+        //TODO: wierd constant for sight radius used
         this.fov = 180, this.sightRadius = worldGrid.tileSize*2.5; //reasonable fov
         this.speed = 10;
         this.sugar = -4;

@@ -1,4 +1,4 @@
-import { p } from "../p5engine.mjs";
+import { p } from "../p5engine.ts";
 
 export let maxDeltaTime = 0.5;
 export let deltaTime = 0;

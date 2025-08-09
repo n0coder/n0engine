@@ -1,0 +1,30 @@
+export class Sparse2dMap {
+    constructor() {
+        this.tiles = new Map();
+        this.offset = 2 ** 15;
+    }
+
+    set(x, y, tile) {
+        const key = this.getKey(x, y);
+        this.tiles.set(key, tile);
+    }
+
+    get(x, y) {
+        const key = this.getKey(x, y);
+        return this.tiles.get(key) || null;
+    }
+    getKey(x, y) {
+        const shiftedX = x + this.offset;
+        const shiftedY = y + this.offset;
+        return ((BigInt(shiftedX) & 0xFFFFFFFFn) << 32n) |
+               (BigInt(shiftedY)  & 0xFFFFFFFFn);
+    }
+
+  // Decode key back to x, y (optional, for debugging or iteration)
+    getCoords(key) {
+        const x = Number((key >> 32n)) - this.offset;
+        const y = Number(key & 0xFFFFFFFFn) - this.offset;
+        return { x, y };
+    }
+
+}

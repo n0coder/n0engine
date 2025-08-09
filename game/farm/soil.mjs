@@ -1,6 +1,6 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import {worldGrid} from "../../engine/grid/worldGrid.mjs"
 import { lerp } from "../../engine/n0math/ranges.mjs";
 import { pinga } from "../radio/linkingPings";

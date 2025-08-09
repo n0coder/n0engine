@@ -1,7 +1,7 @@
 //linking pings
 
 import { cosmicEntityManager, setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { sortArray, splitArray } from "../../engine/core/Utilities/ArrayUtils";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";

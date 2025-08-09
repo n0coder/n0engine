@@ -1,6 +1,6 @@
 import { t } from "../../engine/core/Time/n0Time.mjs";
 import { cloneAction as handleBefore } from "../../engine/core/Utilities/ObjectUtils.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { n0radio } from "../radio/n0radio.mjs";
 import { nanoaiActions } from "./nanoaiActions.mjs";
 

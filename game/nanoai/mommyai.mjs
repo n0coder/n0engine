@@ -1,7 +1,7 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { loadImg } from "../../engine/core/Utilities/ImageUtils";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
 import { NanoaiBrain } from "./nanoaiBrain.mjs";

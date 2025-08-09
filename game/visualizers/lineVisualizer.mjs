@@ -1,4 +1,4 @@
-import { p } from "../../engine/core/p5engine.mjs"
+import { p } from "../../engine/core/p5engine.ts"
 import { inverseLerp, lerp } from "../../engine/n0math/ranges.mjs"
 import { perpandicular } from "../../engine/n0math/vectorMath.mjs"
 

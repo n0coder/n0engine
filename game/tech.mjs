@@ -1,14 +1,20 @@
 //load loader
 //setup dependancies
-import { p } from "../engine/core/p5engine.mjs";
+import { p } from "../engine/core/p5engine.ts";
 import { n0loader } from "../engine/core/ResourceManagement/loader.mjs";
 
 n0loader.startLoading('world', (done) => {
-    import("./tests/dungeonExploration.mjs")
+    import("./tests/n0TileSolver.mjs")
+      .then(() => done())
+      .catch((e) => {
+        console.error("Failed to load n0TileSolver.mjs", e);
+        done(e);
+      })
     .then((script)=>{
         done();
     })
-}, ['tiles']);
+},['tiles']);
+
 n0loader.startLoading('assets', (done) => {
     import("./world/wave/waveImport.mjs")
     .then((script)=>{

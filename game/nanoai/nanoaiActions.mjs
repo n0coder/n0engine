@@ -1,6 +1,6 @@
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { n0radio } from "../radio/n0radio.mjs";

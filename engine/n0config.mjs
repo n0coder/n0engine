@@ -1,4 +1,4 @@
-export let gameH = 256;
+export let gameH = 512;
 export let gameW = gameH*1.77777;
 
 //global scene variables
