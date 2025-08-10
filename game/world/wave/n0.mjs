@@ -13,13 +13,13 @@ export const n0alea = Alea("n0");
 
 export function buildn0Collapse(tile) {
     var x = tile.wx, y = tile.wy
-    console.log("is this running")
+    //console.log("is this running")
     let rules = tile.biome.tiles.filter(t => n0tiles.get(t))
     if (rules.length === 0) {
-        console.log("no rules for n0 to collapse on", {biome:tile.biome, n0tiles: n0tiles.entries()})
+        //console.log("no rules for n0 to collapse on", {biome:tile.biome, n0tiles: n0tiles.entries()})
         return;
     };
-    console.log("rules for n0 to collapse on", {biome:tile.biome, rules, n0tiles: n0tiles.entries()})
+    //console.log("rules for n0 to collapse on", {biome:tile.biome, rules, n0tiles: n0tiles.entries()})
 
     if (!tile.n0fc) 
         tile.n0fc = new Cell(rules)      
@@ -64,7 +64,7 @@ export function buildn0Collapse(tile) {
 
     n0fc.option = choice;
     n0fc.tile = n0tiles.get(choice);
-    console.log ("chose", choice, n0fc.tile)
+    //console.log ("chose", choice, n0fc.tile)
     function newCheckDir(x, y, options, conditionFunc) {
 
         var b = worldGrid.getTile(x, y)?.n0fc

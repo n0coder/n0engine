@@ -28,11 +28,8 @@ function genTile5(xx, yy) {
     genTile(xx, yy)
 }
 
-export function drawTile(x,y, tile) {
-    
-
-
-    let n0fc = tile.n0fc?.option !== undefined ? n0tiles.get(tile.n0fc.option) : undefined;
+export function drawTile(x,y, tile) {    
+    let n0fc = null //tile.n0fc?.option !== undefined ? n0tiles.get(tile.n0fc.option) : undefined;
     if (n0fc?.img) {
         p.image(n0fc.img, x * worldGrid.tileSize, y * worldGrid.tileSize, worldGrid.tileSize, worldGrid.tileSize);
         return

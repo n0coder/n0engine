@@ -16,8 +16,7 @@ export class Sparse2dMap {
     getKey(x, y) {
         const shiftedX = x + this.offset;
         const shiftedY = y + this.offset;
-        return ((BigInt(shiftedX) & 0xFFFFFFFFn) << 32n) |
-               (BigInt(shiftedY)  & 0xFFFFFFFFn);
+        return (BigInt(shiftedX) << 32n) | BigInt(shiftedY & 0xFFFFFFFF);
     }
 
   // Decode key back to x, y (optional, for debugging or iteration)
