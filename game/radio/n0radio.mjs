@@ -92,16 +92,16 @@ let loverChannel = {
     }
 }
 class Radio {
-   addFriend(nano, friend) {
+    addFriend(nano, friend) {
     if (!this.friendsList.has(nano)) {
         this.friendsList.set(nano, new Set([nano]));
     }
     if (!this.friendsList.has(friend)) {
         this.friendsList.set(friend, new Set([friend]));
     }
-       this.friendsList.get(nano).add(friend);
-       this.friendsList.get(friend).add(nano);
-   }
+        this.friendsList.get(nano).add(friend);
+        this.friendsList.get(friend).add(nano);
+    }
     findItem(item, type, key) {
         for (const [ckey, channel] of this.channels) {
             if (channel.findItem != null) {
@@ -136,16 +136,15 @@ class Radio {
                     }
                 }
             } else  if (channel != null) {
-               let a = channel.items.hasItem(item, type);
+                let a = channel.items.hasItem(item, type);
                     if (a){ channel.items.remove(a);
                     return a;
                     }
-               
             }
         }
         return null;
-      }
-    findCreateChannel(channel, key) {
+        }
+    getCreateChannel(channel, key) {
         let c = this.channels.get(channel);
         if (c) {
             if (c instanceof Map) {
@@ -173,7 +172,7 @@ class Radio {
         }
 
     }
-    findChannel(channel, key) {
+    getChannel(channel, key) {
         let c = (channel instanceof Channel) ? channel : this.channels.get(channel);
         if (c && c instanceof Map) {
             return c.get(key);
@@ -182,10 +181,10 @@ class Radio {
         } else {
             return null; // Return null if the channel doesn't exist
         }
-     }
-     
+    }
+    
     postItem(channel, item, key) {
-        let c = this.findCreateChannel(channel, key);
+        let c = this.getCreateChannel(channel, key);
         if (c) {
             if (c.postItem) {
                 c.postItem(item, key)
@@ -199,7 +198,7 @@ class Radio {
         n0radio.nanosSearching.clear()
     }
     postJob(channel, job, key) {
-        let c = this.findCreateChannel(channel, key);
+        let c = this.getCreateChannel(channel, key);
         if (c) {
             //if c is a type with a custom post, we use that version instead of directly pushing to the channel list
             if (c.postJob) { 
@@ -219,7 +218,7 @@ class Radio {
     }
     removeJob(channel, job, key) {
 
-        let c = this.findChannel(channel, key);
+        let c = this.getChannel(channel, key);
         
         if (c) {
             
@@ -235,13 +234,13 @@ class Radio {
     
     nanosInChannel(channel, c) {
         let nanos = Array.from(this.nanosSearching.keys())
-        return nanos.filter((n) => (this.findChannel(channel, n) === this.findChannel(channel, c)));
+        return nanos.filter((n) => (this.getChannel(channel, n) === this.getChannel(channel, c)));
     }
     jobDone(job) {
         //console.log("job done", job)
-         for (const [key, channel] of job.keys) {
+        for (const [key, channel] of job.keys) {
             this.removeJob(channel, job, key)
-         } 
+        } 
         
         for (const nano of job.nanos) {
             this.nanosWorking.delete(nano)
@@ -285,8 +284,9 @@ class Radio {
         }
         */
         //console.log("(nano searching): nano is searching")
-       
+        
         function rateJobs(jobs, nano, channel) {
+            
             let jobScores = [];
             let best = bestSearch([nano], jobs, (n,j)=>{ return j.rateJob(n); } )
             if (best.size > 0)
@@ -296,11 +296,12 @@ class Radio {
         }
         
         let js =this.getResource("jobs", key, (jobs, channel, key)=>{
+            if (jobs === undefined) return false;
             return rateJobs(jobs, key, channel)
         })
 
         let jobScores
-         if (js) jobScores =js[0]
+        if (js) jobScores =js[0]
 
         if (!jobScores || jobScores.length === 0) {
             console.log("(nano searching): no jobs right now", key)
@@ -318,8 +319,17 @@ class Radio {
         this.nanosSearching = new Map();
         this.nanosWorking = new Map()
         this.channels = new Map();
+        this.channels.set("lover", loverChannel)
+        this.channels.set("friend", friendChannel)
         this.friendsList = new Map();
     }
 }
 export let n0radio = new Radio();
 globalThis.n0radio = n0radio
+
+let nanolover = { name: "abi" }
+let nano = { name: "n0" }
+nano.lover = nanolover, nanolover.lover = nano;
+
+let lover = n0radio.getCreateChannel("lover", nano);
+console.log(lover);

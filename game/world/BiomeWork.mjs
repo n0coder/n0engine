@@ -183,11 +183,12 @@ let purebitter = [ "purebitter"]
 let lut =neutrallut;
 
 var grassy = [
-    'purple0', 'purple1', 'purple2', 'purple3', 'purple4', 'purple5', 'purple6'
+    'purple0', 'purple1', 'purple2', 'purple3', 'purple4', 'purple5', 'purple6',
+    'green0', 'green1', 'green2', 'green3', 'green4', 'green5', 'green6'
 ]
 for (let aih = 0; aih <= 17; aih++) {
    //dirtGrass0
-   grassy.push(`dirtGrass${aih}`)
+    grassy.push(`dirtGrass${aih}`)
 }
 function formBiome(o) { //this is baking sugar into the generation... not ideal but it's ok.
     

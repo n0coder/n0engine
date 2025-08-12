@@ -86,7 +86,7 @@ addTiles({
     ],
     weight: .5,
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
-    biases: [{factor: "humidity", value: .2}]
+    biases: [{factor: "temperature", value: -1}]
 })
 
 addTiles({
@@ -98,7 +98,7 @@ addTiles({
     ],
     weight: .5,
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
-    biases: [{factor: "elevation", value: 1}]
+    biases: [{factor: "temperature", value: -1}]
 })
 
 addTiles({
@@ -109,8 +109,96 @@ addTiles({
     ],
     weight: .5,
     thresholds: [], 
-    biases: [{factor: "sugar", value: 5}]
+    biases: [{factor: "temperature", value: -1}]
 })
+
+//
+
+addTiles({
+    name: "green",
+    path: "/assets/wave/green", 
+    imgRules: [
+        [2, "2.png", [[0,1,0],[0,0,0],[0,0,0],[0,1,0]]],
+        [3, "3.png", [[0,0,0],[0,0,0],[0,1,0],[0,1,0]]],
+        [4, "4.png", [[0,1,0],[0,1,0],[0,0,0],[0,0,0]]],
+        [5, "5.png", [[0,0,0],[0,1,0],[0,1,0],[0,0,0]]],
+    ],
+    weight: .5,
+    thresholds: [{factor: "elevation", min: -1, max: 1}], 
+    biases: [{factor: "temperature", value: 1}]
+})
+
+addTiles({
+    name: "green",
+    path: "/assets/wave/green", 
+    imgRules: [
+        [0, "0.png", [[0,0,0],[0,1,0],[0,0,0],[0,1,0]]],
+        [1, "1.png", [[0,1,0],[0,0,0],[0,1,0],[0,0,0]]],
+    ],
+    weight: .5,
+    thresholds: [{factor: "elevation", min: -1, max: 1}], 
+    biases: [{factor: "temperature", value: 1}]
+})
+
+addTiles({
+    name: "green",
+    path: "/assets/wave/green", 
+    imgRules: [
+        [6, "6.png", [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]],
+    ],
+    weight: .5,
+    thresholds: [], 
+    biases: [{factor: "temperature", value: 1}]
+})
+
+function buildTiles(definition) {
+    let tiledef = {
+        overlayDef(def2) {
+            let tiledef2 = {}
+            for (const key in this) {
+                tiledef2[key] = this[key]; 
+            }
+            for (const key in def2) {
+                if (typeof def2[key] === "function")
+                    def2[key](this, key)
+                else
+                    tiledef2[key] = def2[key]; 
+            }
+            return tiledef2;
+        }
+    }
+    for (const key in definition) {
+        tiledef[key] = definition[key]; 
+    }
+    return tiledef;
+}
+
+let btiledef = {
+    name: "green",
+    path: "/assets/wave/green", 
+    imgRules: [
+        [6, "6.png", [[0,0,0],[0,0,0],[0,0,0],[0,0,0]]],
+    ],
+    weight: .5,
+    thresholds: [], 
+    biases: [{factor: "temperature", value: 1}]
+}
+
+let tileo = buildTiles(btiledef)
+
+//this creates a seperate definition, 
+let tileo2 = tileo.overlayDef({
+    //inherit name, path
+    imgRules: [ //overwrite img rules
+        [2, "2.png", [[0,1,0],[0,0,0],[0,0,0],[0,1,0]]]
+    ],
+    biases(def, key) { //modify using function
+        def[key].slice().push({factor: "temperature", value: 3})
+    },
+    weight:.6
+})
+
+console.log (tileo, tileo2);
 
 let tilevis = {
     draw(){

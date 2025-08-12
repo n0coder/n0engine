@@ -350,6 +350,7 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
 
         //would it be better to run the uniqueification here? 
         //i'm starting to think we could just implement it in the radio, since we do a similar tech in the nano rates jobs thing
+        
         let scores = bs.map(b => ({b, score:scoring(a, b)}));
         for (let {b, score} of scores) {
             if (!matches.has(a) || (fit?.(score, matches.get(a).score) ?? (score > matches.get(a).score)) ) {
@@ -359,7 +360,7 @@ export function bestSearch(as, bs, scoring, clean = false, fit) {
     }
     if (clean)
     for (let [key, value] of matches) {
-       matches.set(key, value.b)
+        matches.set(key, value.b)
     }
     return matches;
  }
