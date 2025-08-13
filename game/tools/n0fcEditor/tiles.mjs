@@ -2,7 +2,7 @@ import { leftMenu, rightMenu } from "../../../engine/core/Menu/menu.mjs";
 import { p } from "../../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { genTile } from "../../world/wave/worldGen/TileBuilder.mjs";
-import { tpos, tiles, tile, sideUI } from "../n0fcEditor.mjs";
+import { tpos, tiles, tile, sideUI } from "../n0tsEditor.mjs";
 
 function initTile(tile, img) {
     

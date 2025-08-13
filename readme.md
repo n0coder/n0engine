@@ -224,6 +224,164 @@ just like that we've covered the basics of nanoai systems, it only took 200 line
 
 ---
 
+# ![nano](./nanoai.png) n0ts (wave function collapse) ![nano](./nanoai.png)
+
+> ### procedural world generation
+
+the **n0ts system** generates infinite, coherent worlds through wave function collapse with environmental factor integration.
+
+<details>
+
+<summary>**multi-layered generation pipeline** creates worlds that feel alive and interconnected</summary>
+
+</br>
+
+the system works in phases:
+```js
+tile.build([
+    buildFactors,    // generate noise maps
+    buildBiome,      // categorize noise to biomes  
+    addSugar,        // overlay difficulty system
+    buildn0Collapse  // place coherent tiles
+])
+```
+
+**environmental factors** drive everything:
+- elevation, temperature, humidity interact naturally
+- rivers carve through landscapes based on elevation
+- biomes emerge from factor combinations
+- sugar zones add gameplay flavor to regions
+
+**wave function collapse** ensures visual coherence:
+- tiles constrain neighbors through edge matching
+- placeholder system gracefully handles conflicts
+- joint tiles create smooth biome transitions
+
+</details>
+
+---
+
+> ### factor system
+
+<details>
+<summary>composable noise generators create realistic environmental patterns</summary>
+
+</br>
+
+factors are built from **noise generators** with rich composition:
+```js
+var elevation = new NoiseGenerator({
+    scale: scale * 400, octaves: 3, persistance: .5, lacunarity: 2,
+    power: squish, blend: [-1, 1],
+    mapSpace: [0, 1.1], 
+    map: [
+        { "c": 0, "y": 0.01, "p": 3 }, 
+        { "c": .3, "y": .4 }, 
+        { "c": .72, "y": .85 }
+    ]
+});
+```
+
+factors influence each other:
+```js
+var humidity = new NoiseGenerator({
+    add: [[riverWorksR, -.2], [elevation, .25]],
+    blend: [-1,1]
+});
+```
+
+**graph-based approach** for cleaner composition:
+```js
+let elevation = new Graph()
+    .offsetXY(-8,8)
+    .scaleXY(15)
+    .fractal([circleNoise])
+    .abs().invert()
+    .lowClip(.01)
+```
+
+</details>
+
+---
+
+> ### biome classification
+
+<details>
+<summary>nested tag system maps environmental conditions to biomes with **bitter/neutral/sweet** variants</summary>
+
+</br>
+
+biomes are defined through **environmental constraints**:
+```js
+formBiome({
+    name: "forest",
+    plaintags: [surface, [["cold"], ["warm"], "moderate"], ["neutral", "moist"]],
+    sweettags: [surface, [["cold",...sweeta], ["warm",...sweeta]], ["neutral", "moist",...sweeta]],
+    bittertags: [surface, [["cold",...bittera], ["warm",...bittera]], ["neutral", "moist",...bittera]],
+    tiles: [...grassy],
+    difficulty: 2
+})
+```
+
+**three-tier system** creates regional variety:
+- **bitter zones**: higher difficulty, darker colors
+- **neutral zones**: balanced, standard appearance  
+- **sweet zones**: easier difficulty, brighter colors
+
+biomes **emerge naturally** from factor combinations - no manual placement needed.
+
+</details>
+
+---
+
+> ### tile placement
+
+<details>
+<summary>wave function collapse with **factor-based weighting** creates coherent, varied landscapes</summary>
+
+</br>
+
+**constraint satisfaction** through edge matching:
+```js
+tile.setSides([[0,1,0],[0,0,0],[0,0,0],[0,1,0]]);
+// tiles can only connect to compatible neighbors
+```
+
+**environmental influence** on tile selection:
+```js
+tile.addThreshold({factor: "elevation", min: -1, max: 1});
+tile.addBias({factor: "temperature", value: -1});
+// tiles appear based on environmental conditions
+```
+
+**graceful conflict resolution**:
+- placeholder tiles explain generation failures
+- joint tiles handle biome transitions
+- debug system shows constraint conflicts
+
+**modular tile definition**:
+```js
+addTiles({
+    name: "purple", path: "/assets/wave/purple",
+    imgRules: [
+        [2, "2.png", [[0,1,0],[0,0,0],[0,0,0],[0,1,0]]],
+        [3, "3.png", [[0,0,0],[0,0,0],[0,1,0],[0,1,0]]]
+    ],
+    weight: .5,
+    thresholds: [{factor: "elevation", min: -1, max: 1}],
+    biases: [{factor: "temperature", value: -1}]
+})
+```
+
+</details>
+
+---
+
+the **n0ts system** creates large opern worlds that feel **more naturally generated** - where every mountain, forest, and river emerges from the interaction of simple environmental rules.
+
+---
+
+
 > ## packages:
 
 https://www.npmjs.com/package/simplex-noise 

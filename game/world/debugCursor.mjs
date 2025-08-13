@@ -1,6 +1,7 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../engine/core/p5engine.ts";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { buildn0Collapse } from "./wave/n0.mjs";
 
 export class DebugCursor{
     constructor() {
@@ -16,7 +17,7 @@ export class DebugCursor{
         this.tile = worldGrid.getTile(isu.x, isu.y);
         
         //p.ellipse(p.mouseX, p.mouseY, 3,3);
-         p.fill(255)
+        p.fill(255)
         
         p.textSize(16);
         if (this.tile?.biome) {
@@ -32,6 +33,8 @@ export class DebugCursor{
         var wisu = worldGrid.gridToScreenBounds(isu.x, isu.y, 1, 1);
         //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
         let tile = worldGrid.getTile(isu.x, isu.y);
-        console.log({tile: tile, isu})
+
+        //buildn0Collapse(tile);
+        console.log({tile: tile, n0ts: tile.n0ts}, isu)
     }
 }

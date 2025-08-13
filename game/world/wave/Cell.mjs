@@ -12,6 +12,7 @@ export class Cell {
           this.options[i] = i;
         }
       }
+      this.sets = new Set();
     }
   noiseThresholdCondition(gencache, o, bias) {
     if (bias == NaN) bias = 0

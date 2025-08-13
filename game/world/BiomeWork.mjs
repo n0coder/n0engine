@@ -184,7 +184,10 @@ let lut =neutrallut;
 
 var grassy = [
     'purple0', 'purple1', 'purple2', 'purple3', 'purple4', 'purple5', 'purple6',
-    'green0', 'green1', 'green2', 'green3', 'green4', 'green5', 'green6'
+    'green0', 'green1', 'green2', 'green3', 'green4', 'green5', 'green6',
+    'greenpurple0','greenpurple1','greenpurple2','greenpurple3','greenpurple4',
+    'greenpurple5','greenpurple6','greenpurple7','greenpurple8','greenpurple9',
+    'greenpurple10', 'greenpurple11',
 ]
 for (let aih = 0; aih <= 17; aih++) {
    //dirtGrass0

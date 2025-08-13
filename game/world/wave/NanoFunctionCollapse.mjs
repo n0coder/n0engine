@@ -11,7 +11,7 @@ export class NanoFunctionCollapse {
         this.setActive(true)
         this.renderOrder = -5;
 
-        this.random = "n0fc";
+        this.random = "n0ts";
         this.alea = Alea(this.random)
 
         this.w = 28;

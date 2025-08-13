@@ -4,7 +4,7 @@ import { p } from "../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { worldFactors } from "../world/FactorManager.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
-import { createTile } from "./n0fcEditor/tiles.mjs";
+import { createTile } from "./n0tsEditor/tiles.mjs";
 import { DebugCursor } from "../world/debugCursor.mjs";
 
 export let tile = null, tpos = null;
@@ -13,7 +13,7 @@ let mc = new DebugCursor();
 worldGrid.gridSize=8
 worldGrid.x= 227210
 worldGrid.y= 117111
-class n0fcEditor {
+class n0tsEditor {
     constructor(){
        this.setActive = setActive, this.renderOrder = -5;
        this.setActive(true)
@@ -25,7 +25,7 @@ class n0fcEditor {
         var { x, y } =worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
         p.scale(this.scale)
         for (const [_, t] of worldGrid.tiles) {
-            var {wfc,n0fc, biome, pos}=t
+            var {wfc,n0ts, biome, pos}=t
             if (biome) {
                 let color = biome.colorsugar(t)
                 p.fill(color);
@@ -34,8 +34,8 @@ class n0fcEditor {
             if (wfc) {
                 p.image(wfc.img, pos.x, pos.y)
             }
-            if (n0fc) {
-                let i = n0fc?.tile?.img
+            if (n0ts) {
+                let i = n0ts?.tile?.img
                 if(i) {
                 p.image(i, pos.x, pos.y-i.height+worldGrid.gridSize)
                 }
@@ -261,7 +261,7 @@ function drawUI(t) {
     biasesUI(wfc.shared, tileUi);
     thresholdsUI(wfc.shared, tileUi);
 }
-let editor = new n0fcEditor()
+let editor = new n0tsEditor()
 
 function biasesUI(tile, div) {
     let biases = tile.biases;
