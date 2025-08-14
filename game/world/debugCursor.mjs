@@ -11,8 +11,8 @@ export class DebugCursor{
         this.tile = null;
     }
     draw() {
-        var isu = worldGrid.screenToGridPoint(p.mouseX, p.mouseY);
-        var wisu = worldGrid.gridToScreenBounds(isu.x, isu.y, 1,1);
+        var isu = worldGrid.screenToTile(p.mouseX, p.mouseY);
+        var wisu = worldGrid.tileToScreenBounds(isu.x, isu.y, 1,1);
         //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
         this.tile = worldGrid.getTile(isu.x, isu.y);
         
@@ -29,12 +29,12 @@ export class DebugCursor{
         }
     } 
     mouseClicked() {
-        var isu = worldGrid.screenToGridPoint(p.mouseX, p.mouseY);
-        var wisu = worldGrid.gridToScreenBounds(isu.x, isu.y, 1, 1);
+        var isu = worldGrid.screenToTile(p.mouseX, p.mouseY);
+        var wisu = worldGrid.tileToScreenBounds(isu.x, isu.y, 1, 1);
         //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
         let tile = worldGrid.getTile(isu.x, isu.y);
 
         //buildn0Collapse(tile);
-        console.log({tile: tile, n0ts: tile.n0ts}, isu)
+        console.log({tile: tile, n0ts: tile?.n0ts}, isu)
     }
 }

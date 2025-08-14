@@ -1,6 +1,6 @@
 import { camera } from "../core/Camera/camera.mjs";
 import { Sparse2dMap } from "./experiments/sparceMap";
-
+import { p } from "../core/p5engine";
 export class WorldGrid {
     constructor() {
         this.setTileSize(32);
@@ -83,23 +83,28 @@ export class WorldGrid {
     get halfTileSize() {
         return this.tileSize / 2
     }
-
-    screenToGridPoint(x, y) {
+    get mouseTile(){
+        return  worldGrid.screenToTile(p.mouseX, p.mouseY).screen()
+    }
+    screenToTile(x, y) {
         return {
-            x: this.floorTile(x-camera.rx),
-            y: this.floorTile(y-camera.ry),
+            x: worldGrid.floorTile(x-(camera.rx??0)),
+            y: worldGrid.floorTile(y-(camera.ry??0)),
             screen(centered) {
-                return worldGrid.scaleByGridCentered (this.x,this.y)
+                if (centered)
+                    return worldGrid.scaleByTileCentered (this.x,this.y);
+                else 
+                    return worldGrid.scaleByTile(this.x, this.y);
             }
         };
     }
-    scaleByGrid(x, y, c) {
+    scaleByTile(x, y, c) {
         if (c) console.error("btw center used here") //todo: remove this lol
         x *= this.tileSize
         y *= this.tileSize
         return { x, y }
     }
-    scaleByGridCentered(x, y) {
+    scaleByTileCentered(x, y) {
         x *= this.tileSize
         x += (worldGrid.tileSize / 2)
         y *= worldGrid.tileSize
@@ -107,7 +112,7 @@ export class WorldGrid {
 
         return { x, y }
     }
-    screenToGridPointRaw(x, y) {
+    screenToTileRaw(x, y) {
         return { 
             x: x / this.tileSize, 
             y: y / this.tileSize 
@@ -120,7 +125,7 @@ export class WorldGrid {
             y: Math.floor(y / tilechunk) 
         };
     }
-    screenToGridBounds(x1, y1, x2, y2, pad = 0) {
+    screenToTileBounds(x1, y1, x2, y2, pad = 0) {
         let gridX1 = this.floorTile(x1), gridY1 = this.floorTile(y1);
         let gridX2 = this.floorTile(x2), gridY2 = this.floorTile(y2);
         return {
@@ -147,7 +152,7 @@ export class WorldGrid {
             maxY: Math.floor(y2 / tilechunk)
         };
     }
-    gridBounds(gx1, gy1, gx2, gy2, pad = 0) {
+    tileBounds(gx1, gy1, gx2, gy2, pad = 0) {
         return {
             minX: Math.min(gx1, gx2) - pad,
             minY: Math.min(gy1, gy2) - pad,
@@ -164,19 +169,19 @@ export class WorldGrid {
         };
 
     }
-    gridToScreenPoint(x, y) {
+    tileToScreenPoint(x, y) {
         return { 
             x: x * this.tileSize, 
             y: y * this.tileSize 
         };
     }
-    gridToChunkPoint(x, y) {
+    tileToChunkPoint(x, y) {
         return { 
             x: this.floorChunk(x), 
             y: this.floorChunk(y)
         };
     }
-    gridToScreenBounds(minX, minY, maxX, maxY) {
+    tileToScreenBounds(minX, minY, maxX, maxY) {
 
         return {
             x1: (minX * this.tileSize),
@@ -185,7 +190,7 @@ export class WorldGrid {
             y2: (maxY) * this.tileSize
         };
     }
-    gridToChunkBounds(x1, y1, x2, y2) {
+    tileToChunkBounds(x1, y1, x2, y2) {
         return {
             minX: this.floorChunk(x1),
             minY: this.floorChunk(y1),
@@ -193,7 +198,7 @@ export class WorldGrid {
             maxY: this.floorChunk(y2)
         };
     }
-    gridBoundsScreenSpace(x, y, w = 1, h = 1) {
+    tileBoundsScreenSpace(x, y, w = 1, h = 1) {
         return {
             x: x * this.tileSize,
             y: y * this.tileSize,
@@ -206,7 +211,7 @@ export class WorldGrid {
         let chunktile = this.chunkSize*this.tileSize;
         return { x: x *chunktile, y: y * chunktile };
     }
-    chunkToGrid(x, y) {
+    chunkToTile(x, y) {
         return { x: x * this.chunkSize, y: y * this.chunkSize };
     }
     chunkToScreenBounds(minX, minY, maxX, maxY) {
@@ -228,7 +233,7 @@ export class WorldGrid {
             y2: (maxY + 1) * chunktile
         };
     }
-    chunkBoundsGridSpace(x, y, w, h) {
+    chunkBoundsTileSpace(x, y, w, h) {
         return {
             x: chunkX * this.chunkSize,
             y: chunkY * this.chunkSize,
@@ -261,9 +266,6 @@ export class WorldGrid {
         let screenY = worldY * this.tileSize;
 
         return [screenX, screenY];
-    }
-    alignGridPosition(x,y) {
-        return [Math.floor(x), Math.floor(y)]
     }
     alignPositionChunk(x, y) {
         if (Array.isArray(x)) [x, y] = x;

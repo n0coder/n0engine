@@ -1,6 +1,6 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { worldFactors } from "../world/FactorManager.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
@@ -10,19 +10,21 @@ import { DebugCursor } from "../world/debugCursor.mjs";
 export let tile = null, tpos = null;
 export let tiles = [], edges = []
 let mc = new DebugCursor();
-worldGrid.gridSize=8
+worldGrid.gridSize=16
 worldGrid.x= 227210
 worldGrid.y= 117111
+
 class n0tsEditor {
     constructor(){
         this.setActive = setActive, this.renderOrder = -5;
         this.setActive(true)
         this.state = "add"
-        this.scale = 4;
+        this.scale = 1;
+
     }
     draw(){
-        var { x, y } =worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
-        p.scale(this.scale)
+        var { x, y } =worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale).screen()
+        //p.scale(this.scale)
         for (const [_, t] of worldGrid.tiles) {
             var {wfc,n0ts, biome, pos}=t
             if (biome) {
@@ -103,7 +105,7 @@ class n0tsEditor {
     }
     mousePressed() {
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
-            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale);
+            let { x, y } = tpos = worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale);
             let wtile = worldGrid.getTile(x, y);
 
             if (this.state === "add") {
@@ -119,7 +121,7 @@ class n0tsEditor {
 
     mouseDragged() {
         if (this.state === "paint" && this.isPainting) {
-            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale);
+            let { x, y } = tpos = worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale);
             let wtile = worldGrid.getTile(x, y);
             if (!wtile) { // Only paint if there's no tile already
                 this.paintTile(x, y);
@@ -135,12 +137,12 @@ class n0tsEditor {
 
     paintTile(x, y) {
         let ti = genTile(x, y);
-        ti.pos = worldGrid.gridToScreenPoint(x, y);
+        ti.pos = worldGrid.tileToScreenPoint(x, y);
     }
 
     doubleClicked(){
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
-            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
+            let { x, y } = tpos = worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale)
 
         let wtile = worldGrid.getTile(x,y)
         if(this.state ==="add")

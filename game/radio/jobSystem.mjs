@@ -314,7 +314,7 @@ function scoreTask(task, nano, relationshipModifier = 1) {
     } else {
         var vx = nano.x - task.pos[0];
         var vy = nano.y - task.pos[1];
-        let {x,y} =worldGrid.screenToGridPointRaw(vx,vy);
+        let {x,y} =worldGrid.screenToTileRaw(vx,vy);
         let vis = Math.abs((x * x) + (y * y));
         var mag = Math.sqrt(vis < .1 ? .1 : vis) * .1;
         let fin = Math.pow(score, 2.4) / (Math.pow(mag, 1.2));

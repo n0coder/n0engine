@@ -11,12 +11,14 @@ class NN {
         this.setActive(true)
         this.state = "add"
         this.scale = 1;
+
+        this.tiles = new Map()
     }
     draw(){
         var { x, y } = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
         p.scale(this.scale)
         p.fill(255,255,255)
-        for (const [_, {v, pos}] of worldGrid.tiles) {
+        for (const [_, {v, pos}] of this.tiles) {
             p.fill(v*128)
             p.rect(pos.x, pos.y, worldGrid.gridSize, worldGrid.gridSize)
             
@@ -43,7 +45,7 @@ class NN {
     }
     mousePressed() {
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
-            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
+            let { x, y } = tpos = worldGrid. screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
 
         let wtile = worldGrid.getTile(x,y)
         if (!wtile) {

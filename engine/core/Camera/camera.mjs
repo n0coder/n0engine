@@ -11,10 +11,13 @@ export class Camera {
         this.target = null;
         this.renderOrder = -25;
         this.s = s==-1?defaultScale:s;
+        this.enabled = false;
     }
-    follow(o) { 
+    follow(o, turnOn=true) { 
         this.target = o;
         this.x=this.ox; this.y = this.oy;
+        if (turnOn)
+        this.enabled = true;
     }
     get ox() {
         let x = this.target?.visualX ?? 0
@@ -25,6 +28,7 @@ export class Camera {
         return gameH/2 - y
     }
     draw() {
+        if (!this.enabled) return;
         p.ellipse(gameW/2, gameH/2, 3, 3)
         var tx = this.ox
         var ty = this.oy;

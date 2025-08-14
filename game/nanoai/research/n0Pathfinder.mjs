@@ -29,7 +29,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
     let endoX = endX - minax;
     let endoY = endY - minay;
 
-    var a = worldGrid.gridBounds(cx, cy, endX, endY, pad);
+    var a = worldGrid.tileBounds(cx, cy, endX, endY, pad);
     var ar = a.toRect();
     //console.log({ar,cx,cy,tx,ty}) //bounds
     
@@ -82,7 +82,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
             //draw path to graphics buffer
 
             var points = path.map(p => {
-                let world = worldGrid.gridToScreenPoint(a.minX + p.x, a.minY + p.y)
+                let world = worldGrid.tileToScreenPoint(a.minX + p.x, a.minY + p.y)
                 return { x: world.x + worldGrid.halfTileSize, y: world.y + worldGrid.halfTileSize }
             })
 

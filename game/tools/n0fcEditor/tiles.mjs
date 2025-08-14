@@ -1,8 +1,6 @@
-import { leftMenu, rightMenu } from "../../../engine/core/Menu/menu.mjs";
-import { p } from "../../../engine/core/p5engine.mjs";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { genTile } from "../../world/wave/worldGen/TileBuilder.mjs";
-import { tpos, tiles, tile, sideUI } from "../n0tsEditor.mjs";
+import { tpos, tiles, tile, sideUI } from "../n0fcEditor.mjs";
 
 function initTile(tile, img) {
     
@@ -37,7 +35,7 @@ export function createTile(img, gen){
     let left = worldGrid.getTile(tpos.x - 1, tpos.y)?.wfc
     let tile = gen ? genTile(tpos.x, tpos.y) : {}
     //tile.pos = tpos;
-     initTile(tile, img)
+    initTile(tile, img)
     function createSide(dir, sdir, cdir) {
         if (!img?.shared) {  // Check if img exists and has sides
             if (dir?.shared.sides?.[sdir]) {  // Check if dir and its sides exist
