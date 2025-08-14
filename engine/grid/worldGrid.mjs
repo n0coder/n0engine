@@ -89,7 +89,7 @@ export class WorldGrid {
             x: this.floorTile(x-camera.rx),
             y: this.floorTile(y-camera.ry),
             screen(centered) {
-                return worldGrid.scaleGrid(this.x,this.y, centered)
+                return worldGrid.scaleByGridCentered (this.x,this.y)
             }
         };
     }

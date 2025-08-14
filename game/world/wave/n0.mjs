@@ -34,11 +34,13 @@ export function buildn0Collapse(tile, joints) {
     n0ts.v = 2; 
     if (n0ts.option) return;
 
+    n0ts.sideConnection = []
+
     var options = [...n0ts.options];
-    options = newCheckDir(0, 1, options, (a, b) => a.isUp(b))
-    options = newCheckDir(1, 0, options, (a, b) => a.isRight(b))
-    options = newCheckDir(0, -1, options, (a, b) => a.isDown(b))
-    options = newCheckDir(-1, 0, options, (a, b) => a.isLeft(b))
+    options = newCheckDir(0, -1, options, (a) => a.getUp())
+    options = newCheckDir(1, 0, options, (a) => a.getRight())
+    options = newCheckDir(0, 1, options, (a) => a.getDown())
+    options = newCheckDir(-1, 0, options, (a) => a.getLeft())
     /*
     options = newCheckDir(x - 1, y - 1, options, (a, b) => a.isUpLeft(b));   // Up-left
     options = newCheckDir(x + 1, y - 1, options, (a, b) => a.isUpRight(b));  // Up-right
@@ -51,11 +53,12 @@ export function buildn0Collapse(tile, joints) {
         if (n0ts.sets.size > 1) {
             n0ts.placeholder.state = "tileset neighbor conflict";
             n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates, n0ts.sets];
+            n0ts.placeholder.image = "missingJoint";
         } else {
             n0ts.placeholder.state =  "neighbor conflict";
             n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
+            n0ts.placeholder.image = "missing";
         }
-        n0ts.placeholder.image = "missing";
         return;
     }
 
@@ -80,10 +83,10 @@ export function buildn0Collapse(tile, joints) {
         n0ts.noiseThresholdCondition(tile.genCache, option, bias)
     );
 
-    if (options.length === 0) {
+    if (myOptionvs.length === 0) {
         if (!n0ts.placeholder) n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
         n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
-        n0ts.placeholder.image = "unfinished"; 
+        n0ts.placeholder.image = "filtered"; 
         return;
     }
     
@@ -95,27 +98,38 @@ export function buildn0Collapse(tile, joints) {
         neighbor?.tile?.n0ts?.placeholder?.neighborCollapsed(tile, neighbor)
     }
 
-    function newCheckDir(dx, dy, options, conditionFunc) {
+    function newCheckDir(dx, dy, options, dirFunction) {
         let neighbor = worldGrid.getTile(x+dx, y+dy);
-        if (neighbor === undefined) return options;
+        if (neighbor === undefined) {
+            n0ts.sideConnection.push(null)
+            return options;
+        }
 
+        let n = `${dx}, ${dy}`;
         let b = neighbor?.n0ts;
-        if (!n0ts.neighborStates.get(`${dx}, ${dy}`))
-            n0ts.neighborStates.set(`${dx}, ${dy}`, {
+        if (!n0ts.neighborStates.get(n))
+            n0ts.neighborStates.set(n, {
                 dx, dy, tile: neighbor
             })
 
         let option = b?.option;
-        if (b?.placeholder !==undefined) return options; //ignore placeholders
+        if (b?.placeholder !==undefined) {
+            n0ts.sideConnection.push(null)
+            return options; //ignore placeholders
+        }
         if (option !== undefined) {
             let tileB = b.tile;
+            let dir = dirFunction(tileB)
+            n0ts.sideConnection.push(dir.connection)
 
             n0ts.sets.add(tileB.set);
             return options.filter(a => {
                 const tileA = n0tiles.get(a);
-                return tileA && conditionFunc(tileA, tileB);
+                return tileA && dir.connects(tileA);
             });
-        } 
+        } else [
+            n0ts.sideConnection.push('?')
+        ]
         return options;
     }
 }

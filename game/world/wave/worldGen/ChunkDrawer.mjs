@@ -37,7 +37,7 @@ export function drawTile(x,y, tile) {
         p.rect(x * worldGrid.tileSize, y * worldGrid.tileSize, worldGrid.tileSize, worldGrid.tileSize)
     }
     let n0ts = tile.n0ts?.option !== undefined ? n0tiles.get(tile.n0ts.option) : undefined;
-    let vx = 5
+    let vx = 0
     let img = n0ts?.img ?? tile.n0ts?.placeholder?.[tile.n0ts.placeholder.image];
 
     if (img) {

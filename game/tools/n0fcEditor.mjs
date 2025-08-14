@@ -15,11 +15,10 @@ worldGrid.x= 227210
 worldGrid.y= 117111
 class n0tsEditor {
     constructor(){
-       this.setActive = setActive, this.renderOrder = -5;
-       this.setActive(true)
-       this.state = "add"
-       this.scale = 4;
-
+        this.setActive = setActive, this.renderOrder = -5;
+        this.setActive(true)
+        this.state = "add"
+        this.scale = 4;
     }
     draw(){
         var { x, y } =worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
@@ -87,7 +86,7 @@ class n0tsEditor {
                 p.text(side.get()[0], tile.pos.x + hgrid + x, tile.pos.y + hgrid + y)
                 p.text(side.get()[1], tile.pos.x + hgrid + x2, tile.pos.y + hgrid + y2)
                 p.text(side.get()[2], tile.pos.x + hgrid + x3, tile.pos.y + hgrid + y3)
-               
+                
             }
 
             p.textSize(16/this.scale)
@@ -193,7 +192,7 @@ let fileInput =  p.createFileInput((file)=>{
             ti.pos =tpos.screen();
             setTile(ti)
             
-          });
+        });
         imgdom.parent(tilesDiv)
         leftMenu.show()
     }

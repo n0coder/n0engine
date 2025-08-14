@@ -36,30 +36,48 @@ export class Tile {
         addBiases(bs) {
             this.biases.push(...bs);
         }
-    isLeft(tile) {
-        let x = this.left;
-        let y = tile.right;
-        let yes = x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
-        return yes
-    }
-    isRight(tile) {
-        let x = this.right;
-        let y = tile.left;
-        let yes = x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
-        return yes
-    }
-    isUp(tile) {
-        let x = tile.up;
-        let y = this.down;
-        let yes = x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
-        return yes
-    }
-    isDown(tile) {
-        let x = tile.down;
-        let y = this.up;
-        let yes = x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
-        return yes
-    }
+
+        // used to describe newly generating tiles connection requirements
+        getRight() { 
+            let x = this.left;
+            return { 
+                connection: x,
+                connects(tile) {
+                    let y = tile.right;
+                    return x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
+                }
+            };
+        }
+        getLeft() {
+            let x = this.right;
+            return { 
+                connection: x,
+                connects(tile) {
+                    let y = tile.left;
+                    return x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2]
+                }
+            };
+        }
+        getUp() {
+            let x = this.down;
+            return { 
+                connection: x,
+                connects(tile) {
+                    let y = tile.up;
+                    return x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
+                }
+            };
+        }
+        getDown() {
+            let x = this.up;
+            return {
+                connection: x,
+                connects(tile) {
+                    let y = tile.down;
+                    return x[0]===y[0]&&x[1]===y[1]&&x[2]===y[2];
+                }
+            };
+        }
 }
 
 export class PlaceholderTile {
@@ -77,6 +95,9 @@ export class PlaceholderTile {
         });
         loadImg("/assets/wave/unfinished.png", (i) => {
             this.unfinished = i 
+        });
+        loadImg("/assets/wave/filtered.png", (i) => {
+            this.filtered = i 
         });
     }
     neighborCollapsed(tile, direction) {
@@ -96,9 +117,10 @@ export class PlaceholderTile {
         //one more attempt to build tile with normal tileset
         if (ns === 4) {
             buildn0Collapse(this.tile);
-            if (this.n0ts.option !== undefined) {
-                this.placeholder = undefined;
-                console.log("deleted placeholder")
+            if (this.n0ts.option !== null) {
+                console.log(this.n0ts.option)
+                this.n0ts.placeholder = undefined;
+                console.log("deleted placeholder", this, this.n0ts);
                 return;
             }
             //console.log("2nd try build:", this.n0ts)
@@ -110,14 +132,14 @@ export class PlaceholderTile {
             let jointKey = setNames.join(''); 
             let jointTiles = n0jointtiles.get(jointKey);
             if (jointTiles === undefined || jointTiles.length === 0 ) {
-                console.error(`no joint tiles in ${jointKey}`)
+                console.error(`no joint tiles in ${jointKey}`, this.n0ts)
                 this.state = `missing ${jointKey} tiles`;
                 this.reason = [this.state, jointKey, n0jointtiles]
                 return;
             }
             buildn0Collapse(this.tile, jointTiles);
-            if (this.n0ts.option !== undefined) {
-                this.placeholder = undefined;
+            if (this.n0ts.option !== null) {
+                this.n0ts.placeholder = undefined;
                 console.log("deleted placeholder")
             }
         }

@@ -1,5 +1,5 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine";
 import { t } from "../../engine/core/Time/n0Time.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 
@@ -7,11 +7,10 @@ let tile = null,tpos = null
 worldGrid.gridSize=32
 class NN {
     constructor(){
-       this.setActive = setActive, this.renderOrder = -5;
-       this.setActive(true)
-       this.state = "add"
-       this.scale = 1;
-       
+        this.setActive = setActive, this.renderOrder = -5;
+        this.setActive(true)
+        this.state = "add"
+        this.scale = 1;
     }
     draw(){
         var { x, y } = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
@@ -84,7 +83,7 @@ function makeTileArcValidation(x,y, tpos) {
             down?.pop(tile, count-1)
             left?.pop(tile,count-1)
             }
-           
+            
     
         }
     }
