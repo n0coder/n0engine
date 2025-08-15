@@ -2,10 +2,11 @@
 
 //n0ts.
 
+import { Camera } from "../../engine/core/Camera/camera.mjs";
 import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs"
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine"
-import { worldGrid } from "../../engine/grid/worldGrid.mjs"
+import { WorldGrid, worldGrid } from "../../engine/grid/worldGrid.mjs"
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { drawChunks } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
@@ -45,9 +46,42 @@ addTiles({
 })
 
 */
-
+let editorState = "add", state = "add";
 let selectedPos = null;
 let selectedTile = null, editingTile = null;
+let selectedTileset = null;
+
+let states = new Map();
+
+let tilesetWindow = {
+    x:512-64, y:64, w: 512-128, h: 512-128,
+    state: "tileset", grid: new WorldGrid(16, 4),
+    selectedPos:null,
+    draw(){
+        p.fill(44,44,44);
+        p.rect(this.x, this.y, this.w, this.h)
+    },
+    hover() {
+        if (this.grid.mouseInRect(this.x,this.y,this.w,this.h)) {
+            p.ellipse(this.x, this.y, 32, 32)
+
+            let mouse = this.grid.mouseTilePos.screen()
+            p.fill(255, 0,0);
+            p.rect(mouse.x, mouse.y, this.grid.tileSize, this.grid.tileSize)
+
+            if (this.selectedPos) {
+                p.fill(255, 0,0);
+                p.rect(this.selectedPos.x, this.selectedPos.y, this.grid.tileSize, this.grid.tileSize)
+            }
+        }
+    },
+    click(){
+        this.selectedPos = this.grid.mouseTilePos.screen();
+        this.camera.enabled=true;
+        this.camera.follow(this.selectedPos)
+    }
+}
+states.set("tileset", tilesetWindow)
 
 function editTile (tile) {
     if (tile === editingTile) return;
@@ -58,7 +92,6 @@ function editTile (tile) {
 }
 
 
-let states = new Map();
 states.set("add", {
     click(pos) {
         
@@ -78,6 +111,38 @@ states.set("add", {
             console.log(ts)
             let tileJson = JSON.stringify(ts)
             console.log(tileJson)
+
+            let ideally = {
+                name: "purple",
+                path: "/assets/wave/purple", 
+                imgRules: [
+                    [2, "2.png", [[0,1,0],[0,0,0],[0,0,0],[0,1,0]]],
+                    [3, "3.png", [[0,0,0],[0,0,0],[0,1,0],[0,1,0]]],
+                    [4, "4.png", [[0,1,0],[0,1,0],[0,0,0],[0,0,0]]],
+                    [5, "5.png", [[0,0,0],[0,1,0],[0,1,0],[0,0,0]]],
+                ],
+                weight: .5,
+                thresholds: [{factor: "elevation", min: -1, max: 1}], 
+                biases: [{factor: "temperature", value: -1}]
+            }
+            tileJson = JSON.stringify(ideally)
+            console.log(tileJson)
+
+        }
+    },
+    hover() {
+        let mouse = worldGrid.mouseTilePos.screen();
+        p.noFill();
+        p.stroke(127,127,127)
+        p.strokeWeight(.5)
+        p.rect(mouse.x, mouse.y, worldGrid.tileSize, worldGrid.tileSize)
+
+        if (selectedPos) {
+            p.noFill();
+            p.stroke(127,127,127)
+            p.strokeWeight(.5)
+            let tile = selectedPos.screen()
+            p.rect(tile.x, tile.y, worldGrid.tileSize, worldGrid.tileSize)
         }
     }
 });
@@ -110,35 +175,32 @@ let nano = { x: 4, y:4, sightRadius: worldGrid.tileSize*4 }
 
 let visualizer = { 
     draw(){
-        let mouse = worldGrid.mouseTilePos.screen()
-
         drawChunks(nano, false);
-
-        p.noFill();
-        p.stroke(127,127,127)
-        p.strokeWeight(.5)
-        p.rect(mouse.x, mouse.y, worldGrid.tileSize, worldGrid.tileSize)
-
-        if (selectedPos) {
-            p.noFill();
-            p.stroke(127,127,127)
-            p.strokeWeight(.5)
-            let tile = selectedPos.screen()
-            p.rect(tile.x, tile.y, worldGrid.tileSize, worldGrid.tileSize)
-        }
+        
+        tilesetWindow.draw();
+        let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
+        if (inWindow) 
+            state = tilesetWindow.state;
+        else
+            state = editorState
+        states.get(state)?.hover?.();
+    },
+    hover() {
+        let mouse = worldGrid.mouseTilePos.screen()
+        states.get(state)?.hover?.();
     },
     mousePressed() {
         if (!worldGrid.mouseOnScreen) return;
         let pos = worldGrid.mouseTilePos;
-        states.get("add").click?.(pos)
+        states.get(state)?.click?.(pos)
     },
     mouseDragged() {
         if (!worldGrid.mouseOnScreen) return;
         let pos = worldGrid.mouseTilePos;
-        states.get("add").drag?.(pos);
+        states.get(state)?.drag?.(pos);
     },
     mouseReleased(){
-        states.get("add").release?.();
+        states.get(state)?.release?.();
     },
     doubleClicked() {
         if (!worldGrid.mouseOnScreen) return;        
@@ -446,9 +508,6 @@ let tiles = {
         let tile = worldGrid.getTile(selectedPos.x, selectedPos.y);
         tile ??= gen ? genTile(selectedPos.x, selectedPos.y, false) : {}
         
-        //tile.n0tsEditorTile = 
-        console.log ("up")
-
         let n0tsEditorTile = {
             img,
             shared: {

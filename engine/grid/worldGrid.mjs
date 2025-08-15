@@ -2,13 +2,14 @@ import { camera } from "../core/Camera/camera.mjs";
 import { Sparse2dMap } from "./experiments/sparceMap";
 import { p } from "../core/p5engine";
 export class WorldGrid {
-    constructor() {
-        this.setTileSize(32);
-        this.setChunkSize(4);
+    constructor(tileSize, chunkSize, camera) {
+        this.setTileSize(tileSize);
+        this.setChunkSize(chunkSize);
         this.x = 2_000_000_000 //-15 * this.chunkSize
         this.y = 2_364_373_235 //240 * this.chunkSize;
         this.tiles = new Sparse2dMap();
         this.chunks = new Sparse2dMap();
+        this.camera = camera
     }
     tileSize = 16;
     chunkSize = 4;
@@ -84,20 +85,24 @@ export class WorldGrid {
         return this.tileSize / 2
     }
     get mouseTilePos(){
-        return  worldGrid.screenToTile(p.mouseX, p.mouseY)
+        return  this.screenToTile(p.mouseX, p.mouseY)
     }
     get mouseOnScreen() {
         return (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height)
     }
+    mouseInRect(x,y,w,h) {
+        return (p.mouseX > x && p.mouseX < x+w && p.mouseY > y && p.mouseY < y+h)
+    }
     screenToTile(x, y) {
+        let grid = this;
         return {
-            x: worldGrid.floorTile(x-(camera.rx??0)),
-            y: worldGrid.floorTile(y-(camera.ry??0)),
+            x: grid.floorTile(x-(camera.rx??0)),
+            y: grid.floorTile(y-(camera.ry??0)),
             screen(centered) {
                 if (centered)
-                    return worldGrid.scaleByTileCentered (this.x,this.y);
+                    return grid.scaleByTileCentered (this.x,this.y);
                 else 
-                    return worldGrid.scaleByTile(this.x, this.y);
+                    return grid.scaleByTile(this.x, this.y);
             }
         };
     }
@@ -109,9 +114,9 @@ export class WorldGrid {
     }
     scaleByTileCentered(x, y) {
         x *= this.tileSize
-        x += (worldGrid.tileSize / 2)
-        y *= worldGrid.tileSize
-        y += (worldGrid.tileSize / 2)
+        x += (this.tileSize / 2)
+        y *= this.tileSize
+        y += (this.tileSize / 2)
 
         return { x, y }
     }
@@ -353,4 +358,4 @@ export class WorldGrid {
     modChunk(a) { /* Set by setChunkSize */ }
     
 }
-export const worldGrid = new WorldGrid(); 
+export const worldGrid = new WorldGrid(32,4,camera); 
