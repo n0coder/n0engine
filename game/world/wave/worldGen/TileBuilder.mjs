@@ -22,7 +22,7 @@ export function addSugar(tile) { //sugar data does not exist, make it using biom
     tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9;
 }
 
-export function genTile(x, y) {
+export function genTile(x, y, n0=true) {
     let w = worldGrid;
     var tilet = w.getTile(x, y), tile
     if (!tilet)
@@ -41,7 +41,7 @@ export function genTile(x, y) {
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
         addSugar, //uss sugar and biome to set basic sugar level    
-        buildn0Collapse
+        n0 ? buildn0Collapse : undefined
     ])
     /*
     let t = tile.genCache.get("elevation")

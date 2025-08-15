@@ -453,11 +453,13 @@ export function buildBiome(tile) {
     
     if (tile.biome) return tile;
     let biomex = [];
+    /*
     tile.biomeFactors = biomes.map(b => {
         return {name: b.name, factors: b.factors.map(f => {
             return {factorcache: tile.genCache.get(f.factor), factorName: f.factor, factor: f}
         })}
     })
+    */
     for (const b of biomes) {
         //console.log(b.factors.map(f=>f.factor))
         const mappedBiome = mapBiome(b.factors, s => {

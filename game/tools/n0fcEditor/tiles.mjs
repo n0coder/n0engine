@@ -60,7 +60,7 @@ export function createTile(img, gen){
                         }
                     }
                     if (noMatch) return null;
-                   return true
+                    return true
                 } else {
                     protectNeighbor(dir, sdir, cdir);
                     return true;

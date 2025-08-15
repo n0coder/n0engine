@@ -83,8 +83,11 @@ export class WorldGrid {
     get halfTileSize() {
         return this.tileSize / 2
     }
-    get mouseTile(){
-        return  worldGrid.screenToTile(p.mouseX, p.mouseY).screen()
+    get mouseTilePos(){
+        return  worldGrid.screenToTile(p.mouseX, p.mouseY)
+    }
+    get mouseOnScreen() {
+        return (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height)
     }
     screenToTile(x, y) {
         return {

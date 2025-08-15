@@ -35,6 +35,7 @@ export class DebugCursor{
         let tile = worldGrid.getTile(isu.x, isu.y);
 
         //buildn0Collapse(tile);
+        if (tile !== undefined)
         console.log({tile: tile, n0ts: tile?.n0ts}, isu)
     }
 }

@@ -23,7 +23,7 @@ class n0tsEditor {
 
     }
     draw(){
-        var { x, y } =worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale).screen()
+        var { x, y } =worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale).screen()
         //p.scale(this.scale)
         for (const [_, t] of worldGrid.tiles) {
             var {wfc,n0ts, biome, pos}=t
@@ -105,7 +105,7 @@ class n0tsEditor {
     }
     mousePressed() {
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
-            let { x, y } = tpos = worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale);
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale);
             let wtile = worldGrid.getTile(x, y);
 
             if (this.state === "add") {
@@ -121,7 +121,7 @@ class n0tsEditor {
 
     mouseDragged() {
         if (this.state === "paint" && this.isPainting) {
-            let { x, y } = tpos = worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale);
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale);
             let wtile = worldGrid.getTile(x, y);
             if (!wtile) { // Only paint if there's no tile already
                 this.paintTile(x, y);
@@ -137,12 +137,12 @@ class n0tsEditor {
 
     paintTile(x, y) {
         let ti = genTile(x, y);
-        ti.pos = worldGrid.tileToScreenPoint(x, y);
+        ti.pos = worldGrid.gridToScreenPoint(x, y);
     }
 
     doubleClicked(){
         if (p.mouseX > 0 && p.mouseX < p.width && p.mouseY > 0 && p.mouseY < p.height) {
-            let { x, y } = tpos = worldGrid.screenToTile(p.mouseX / this.scale, p.mouseY / this.scale)
+            let { x, y } = tpos = worldGrid.screenToGridPoint(p.mouseX / this.scale, p.mouseY / this.scale)
 
         let wtile = worldGrid.getTile(x,y)
         if(this.state ==="add")
