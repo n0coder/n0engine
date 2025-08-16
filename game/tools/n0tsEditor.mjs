@@ -46,12 +46,17 @@ addTiles({
 })
 
 */
+
+let tilesets = new Map();
+let selectedTileset = null;
+
 let editorState = "add", state = "add";
 let selectedPos = null;
 let selectedTile = null, editingTile = null;
-let selectedTileset = null;
+
 
 let states = new Map();
+
 
 let tilesetWindow = {
     x:512-64, y:64, w: 512-128, h: 512-128,
@@ -216,8 +221,7 @@ let ui = {
     show(tile) {
         if (tile) 
             rightMenu.show();
-        else
-            rightMenu.hide();
+            //rightMenu.hide();
         
         this.drawUI(tile);
     },
@@ -579,7 +583,11 @@ let tiles = {
         }
     }
 }
-leftMenu.add(tiles.div);
+
+let tilesetdiv = p.createDiv("tileset")
+leftMenu.add(tilesetdiv);
+tiles.div.parent(tilesetdiv);
+leftMenu.show();
 
 let files = {
     input: p.createFileInput((file) => {
