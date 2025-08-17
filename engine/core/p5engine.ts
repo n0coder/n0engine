@@ -3,6 +3,7 @@ import { calculateDeltaTime, deltaTime, previousTime } from "./Time/n0Time.mjs";
 import { backgroundColor, gameH, gameW } from "../n0config.mjs";
 import { } from "./Utilities/MapUtils.mjs"
 import * as p5 from "p5";
+export let canvas: Element //give TS the type... idk why js and ts are like this
 class P5engine {
     p: p5;
     constructor(){
@@ -13,69 +14,68 @@ class P5engine {
         p.preload = function (p) {
             cosmicEntityManager.invoke("preload", p);
         };
-  
-      p.setup = function()  {
-          window.p5.disableFriendlyErrors = true;
-
-          document.getElementById('loading').style.display = 'none';
-          p.createCanvas(gameW, gameH).parent("sketch-holder");
-          cosmicEntityManager.invoke("setup");
-          canvasSetup=true;
-      };
-  
-      p.draw = function()  {
-          p.background(backgroundColor);
-          p.noStroke();
-          calculateDeltaTime();
-          cosmicEntityManager.invoke("draw", deltaTime);
-      };
-  
-      p.mouseClicked = function()  {
-          cosmicEntityManager.invoke("mouseClicked");
-      };
-  
-      p.mouseDragged = function()  {
-          cosmicEntityManager.invoke("mouseDragged");
-      };
-  
-      p.mouseMoved = function()  {
-          cosmicEntityManager.invoke("mouseMoved");
-      };
-  
-      p.mousePressed = function()  {
-          cosmicEntityManager.invoke("mousePressed");
-      };
-  
-      p.mouseReleased = function()  {
-          cosmicEntityManager.invoke("mouseReleased");
-      };
-  
-      p.mouseWheel = function(event)  {
-          cosmicEntityManager.invoke("mouseWheel", event);
-      };
-  
-      p.doubleClicked = function()  {
-          cosmicEntityManager.invoke("doubleClicked");
-      };
-  
-      p.windowResized = function()  {
-          cosmicEntityManager.invoke("windowResized");
-      };
-  
-      p.keyPressed = function(key, keyCode)  {
-          cosmicEntityManager.invoke("keyPressed", key, keyCode);
-      };
-  
-      p.keyReleased = function(key, keyCode)  {
-          cosmicEntityManager.invoke("keyReleased", key, keyCode);
-      };
-  
-      p.keyTyped = function(key, keyCode)  {
-          cosmicEntityManager.invoke("keyTyped", key, keyCode);
-      };
-  }
-  
     
+        p.setup = function()  {
+        window.p5.disableFriendlyErrors = true;
+
+        document.getElementById('loading').style.display = 'none';
+        canvas = p.createCanvas(gameW, gameH).parent("sketch-holder");
+        cosmicEntityManager.invoke("setup");
+        canvasSetup=true;
+    };
+
+    p.draw = function()  {
+        p.background(backgroundColor);
+        p.noStroke();
+        calculateDeltaTime();
+        cosmicEntityManager.invoke("draw", deltaTime);
+    };
+
+    p.mouseClicked = function()  {
+        cosmicEntityManager.invoke("mouseClicked");
+    };
+
+    p.mouseDragged = function()  {
+        cosmicEntityManager.invoke("mouseDragged");
+    };
+
+    p.mouseMoved = function()  {
+        cosmicEntityManager.invoke("mouseMoved");
+    };
+
+    p.mousePressed = function()  {
+        cosmicEntityManager.invoke("mousePressed");
+    };
+
+    p.mouseReleased = function()  {
+        cosmicEntityManager.invoke("mouseReleased");
+    };
+
+    p.mouseWheel = function(event)  {
+        cosmicEntityManager.invoke("mouseWheel", event);
+    };
+
+    p.doubleClicked = function()  {
+        cosmicEntityManager.invoke("doubleClicked");
+    };
+
+    p.windowResized = function()  {
+        cosmicEntityManager.invoke("windowResized");
+    };
+
+    p.keyPressed = function(key, keyCode)  {
+        cosmicEntityManager.invoke("keyPressed", key, keyCode);
+    };
+
+    p.keyReleased = function(key, keyCode)  {
+        cosmicEntityManager.invoke("keyReleased", key, keyCode);
+    };
+
+    p.keyTyped = function(key, keyCode)  {
+        cosmicEntityManager.invoke("keyTyped", key, keyCode);
+    };
+}
+
 }
 export var p5engine = new P5engine();
 export const p: p5 = p5engine.p;
@@ -83,8 +83,10 @@ export const p: p5 = p5engine.p;
 //this provides a way to call setup to generate a canvas after the engine is already created
 //this fixes the issue where loading the game, does not create a canvas
 export var canvasSetup = false;
-document.addEventListener('visibilitychange', function() {
-  if (!document.hidden && !canvasSetup) {
-      p.setup();
-  }
-});
+document.addEventListener('visibilitychange', 
+    function() {
+        if (!document.hidden && !canvasSetup) {
+            p.setup();
+        }
+    }
+);

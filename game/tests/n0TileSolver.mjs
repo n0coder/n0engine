@@ -19,7 +19,7 @@ camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 new DebugCursor()
 
-//n0.brain.do("walk", -0, -100)
+n0.brain.do("walk", -0, -100)
 //worldGrid.x -= 10000000
 //n0.setActive(false); 
 // spawn the character but it's just the raw state, the loop and rendering is disabled
@@ -223,7 +223,7 @@ let tileo2 = tileo.overlayDef({
 
 let tilevis = {
     draw(){
-        drawChunks(n0)
+        drawChunks(n0, true)
     }
 }
 

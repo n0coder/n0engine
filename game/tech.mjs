@@ -4,10 +4,10 @@ import { p } from "../engine/core/p5engine.ts";
 import { n0loader } from "../engine/core/ResourceManagement/loader.mjs";
 
 n0loader.startLoading('world', (done) => {
-    import("./tools/n0tsEditor.mjs")
+    import("./tests/UItechs.mjs")
       .then(() => done())
       .catch((e) => {
-        console.error("Failed to load n0TileSolver.mjs", e);
+        console.error("Failed to load world", e);
         done(e);
       })
     .then((script)=>{

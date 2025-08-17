@@ -118,7 +118,7 @@ export class PlaceholderTile {
         if (ns === 4) {
             buildn0Collapse(this.tile);
             if (this.n0ts.option !== null) {
-                console.log(this.n0ts.option)
+                //console.log(this.n0ts.option)
                 this.n0ts.placeholder = undefined;
                 console.log("deleted placeholder", this, this.n0ts);
                 return;
@@ -132,7 +132,7 @@ export class PlaceholderTile {
             let jointKey = setNames.join(''); 
             let jointTiles = n0jointtiles.get(jointKey);
             if (jointTiles === undefined || jointTiles.length === 0 ) {
-                console.error(`no joint tiles in ${jointKey}`, this.n0ts)
+                //console.error(`no joint tiles in ${jointKey}`, this.n0ts)
                 this.state = `missing ${jointKey} tiles`;
                 this.reason = [this.state, jointKey, n0jointtiles]
                 return;
