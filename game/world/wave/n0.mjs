@@ -117,7 +117,7 @@ export function buildn0Collapse(tile, joints) {
             n0ts.sideConnection.push(null)
             return options; //ignore placeholders
         }
-        if (option !== undefined) {
+        if (option !== null) {
             let tileB = b.tile;
             let dir = dirFunction(tileB)
             n0ts.sideConnection.push(dir.connection)
@@ -127,9 +127,9 @@ export function buildn0Collapse(tile, joints) {
                 const tileA = n0tiles.get(a);
                 return tileA && dir.connects(tileA);
             });
-        } else [
+        } else {
             n0ts.sideConnection.push('?')
-        ]
+        }
         return options;
     }
 }

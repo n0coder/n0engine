@@ -5,15 +5,9 @@ import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { loadImg } from "../../engine/core/Utilities/ImageUtils";
 
 let invdiv = p.createDiv().class("invisible").hide();
-let setsMenu = p.createDiv().class("sets-menu");
-let jointSetsMenu = p.createDiv().class("joint-sets-menu");
-let div = p.createDiv().class("sets").parent(setsMenu);
-let jointDiv = p.createDiv().class("sets joint").parent(jointSetsMenu);
-leftMenu.add(setsMenu)
-leftMenu.add(jointSetsMenu)
 
 let imgs = [];
-let tileSets = [], jointSets = [];
+let tileSets = [], secondarySets = [], jointSets = [];
 let setsv = []
 
 let currentSet = { 
@@ -26,9 +20,24 @@ let currentSet = {
     }
 };
 
-function addSetGroup(set) {
+function addSetGroup(set, name, cls) {
+    let menu = p.createDiv().class(cls); 
+    let title = p.createDiv(name).class("group-title").parent(menu)
+    let div = p.createDiv().class("sets").parent(menu);
     let group = {
+        menu, title, div,
         set, spaces:[],
+        rebuild() {
+            var itemsa = Array.from(div.elt.children);
+            for (const node of itemsa) {
+                invdiv.elt.appendChild(node);
+            }
+            for (let i = 0; i < this.set.length; i++) {
+            createSpace(this, i).div.parent(div);
+            this.set[i].div.parent(div)
+        }
+        createSpace(this, this.set.length).div.parent(div);
+        },
         add(tile) {
             tile.set = this;
             this.set.push(tile);
@@ -61,9 +70,15 @@ function addSetGroup(set) {
     }
 
     setsv.push(group);
+    return group;
 }
-addSetGroup(tileSets);
-addSetGroup(jointSets)
+let tsm = addSetGroup(tileSets, "sets", "sets-menu");
+leftMenu.add(tsm.menu)
+let jsm = addSetGroup(secondarySets, "secondary sets", "sets-menu");
+leftMenu.add(jsm.menu)
+let tsk = addSetGroup(jointSets, "joint sets", "joint-sets-menu");
+leftMenu.add(tsk.menu)
+
 let src = null, target = null, dragging = undefined;
 
 
@@ -96,14 +111,18 @@ function createSpace(set, index) {
     }
     space.div.elt.index = index;
     space.div.elt.move = (a) => {
-        if (a.set === set) 
-            set.move(a, index);        
-        else {
+        let aset = a.set;
+        if (a.set === set) {
+            set.move(a, index);
+            set.rebuild()
+        } else {
             a.set.remove(a);
             set.insert(index, a);
+            
+            aset.rebuild();
+            set.rebuild();
         }
-
-        rebuildMenu();
+;
 
         
     }
@@ -175,6 +194,8 @@ set1.imgsdiv.elt.add = (a) => {
 let move = (other) => {
     if (set1.set === other.set) {
         set1.set.swap(set1, other)
+
+        set1.set.rebuild();
     } else {
         let a = set1.set;
         let b = other.set;
@@ -185,9 +206,11 @@ let move = (other) => {
         b.remove(other);
         a.insert(si, other);
         b.insert(oi, set1);
+
+        a.rebuild();
+        b.rebuild();
     }
     
-    rebuildMenu();
 }
 set1.imgsdiv.elt.move = move;
 set1.titlediv.elt.move = move;
@@ -243,35 +266,10 @@ currentSet.select(set1);
 createSet(setsv[0],"2");
 createSet(setsv[0], "3");
 
-createSet(setsv[1],"4");
-createSet(setsv[1], "5");
 
-function rebuildMenu() {
-    var itemsa = Array.from(div.elt.children);
-    for (const node of itemsa) {
-        invdiv.elt.appendChild(node);
-    }
-    var itemsa = Array.from(jointDiv.elt.children);
-    for (const node of itemsa) {
-        invdiv.elt.appendChild(node);
-    }
-
-    let ts = setsv[0];
-    for (let i = 0; i < ts.set.length; i++) {
-        createSpace(ts, i).div.parent(div);
-        console.log({ts, set:ts.set[i] })
-        ts.set[i].div.parent(div)
-    }
-    createSpace(ts, ts.set.length).div.parent(div);
-
-    let js = setsv[1];
-    for (let i = 0; i < js.set.length; i++) {
-        createSpace(js, i).div.parent(jointDiv);
-        js.set[i].div.parent(jointDiv)
-    }
-    createSpace(js, js.set.length).div.parent(jointDiv);
+for (const set of setsv) {
+    set.rebuild();
 }
-rebuildMenu()
 
 //createSpace();
 
