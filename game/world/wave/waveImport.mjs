@@ -2,7 +2,7 @@ import { n0loader } from "../../../engine/core/ResourceManagement/loader.mjs";
 import { t } from "../../../engine/core/Time/n0Time.mjs";
 import { loadImgArray } from "../../../engine/core/Utilities/ImageUtils";
 import { Tile } from "./Tile.mjs"
-import { n0jointtiles, n0tiles } from "./n0FunctionCollapse.mjs"
+import { n0jointtiles, n0tiles } from "./n0.mjs"
 
 let grassFactors = [{ factor: "temperature", min: -.5, max: .5 }, { factor: "humidity", min: -.18, max: 1 }]
 //this can't happen under the current load model

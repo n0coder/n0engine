@@ -4,8 +4,6 @@ import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { Cell } from "./Cell.mjs";
 export var n0grid = new Map();
-export var n0tiles = new Map();
-export var n0jointtiles = new Map();
 
 document.an0FailedTiles = [];
 export const n0alea = Alea("n0");

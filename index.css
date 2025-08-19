@@ -150,6 +150,7 @@ body::before {
     background-color: #2a2a2a;
     border-radius: 8px;
   /*padding: 10px;*/
+    max-height: 80%;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -227,6 +228,10 @@ body::before {
     align-items: flex-start;
 }
 
+.set img {
+  max-height: 128px;
+}
+
 .dragging {
   opacity: 50%;
   
@@ -273,7 +278,22 @@ body::before {
   color:  var(--primary-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
-
+.group-title {
+  position: relative;
+  width: 100%;
+  height: 10px;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 10px;
+  vertical-align:top;
+  text-align: left;
+  line-height: 100%;
+  background-color: var(--primary-background-color);
+  border-bottom: 2px dotted var(--primary-color);
+  font-weight: bold;
+  color:  var(--primary-color);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
 .card-title input {
   all: unset;
   height: auto;

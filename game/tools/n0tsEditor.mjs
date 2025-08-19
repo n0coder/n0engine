@@ -10,6 +10,7 @@ import { WorldGrid, worldGrid } from "../../engine/grid/worldGrid.mjs"
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { drawChunks } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
+import { n0TileEditorMenu } from "./n0tilesystem/n0tseditorUI.mjs";
 
 let cursor = new DebugCursor()
 
@@ -46,9 +47,6 @@ addTiles({
 })
 
 */
-
-let tilesets = new Map();
-let selectedTileset = null;
 
 let editorState = "add", state = "add";
 let selectedPos = null;
@@ -501,7 +499,8 @@ let tiles = {
             editTile(tile)
         }
         imgdom.mousePressed(clicked);
-        imgdom.parent(tiles.div);
+        n0TileEditorMenu.addImage(imgdom)
+        //imgdom.parent(tiles.div);
     },
     createTile(img, gen) {
         let up = worldGrid.getTile(selectedPos.x, selectedPos.y - 1)

@@ -2,7 +2,7 @@ import { p } from "../../../../engine/core/p5engine.ts";
 import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../../FactorManager.mjs";
-import { n0tiles } from "../n0FunctionCollapse.mjs";
+import { n0tiles } from "../n0.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
 let c = worldGrid.chunkSize, chunks = 4

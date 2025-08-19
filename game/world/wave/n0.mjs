@@ -1,5 +1,4 @@
 import Alea from "alea";
-import { n0tiles } from "./n0FunctionCollapse.mjs";
 import { Cell } from "./Cell.mjs";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
@@ -7,7 +6,9 @@ import { worldFactors } from "../FactorManager.mjs";
 import { PlaceholderTile } from "./Tile.mjs";
 
 export const n0alea = Alea("n0");
-
+export var n0tiles = new Map();
+export var n0secondarytiles = new Map();
+export var n0jointtiles = new Map();
 //generate tile
 //gather tiles from biome
 //

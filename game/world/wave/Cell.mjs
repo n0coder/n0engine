@@ -1,5 +1,5 @@
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
-import { n0tiles } from "./n0FunctionCollapse.mjs";
+import { n0tiles } from "./n0.mjs"
 
 export class Cell {
     constructor(value) {

@@ -1,6 +1,5 @@
 import { loadImg } from "../../../engine/core/Utilities/ImageUtils";
-import { buildn0Collapse } from "./n0.mjs";
-import { n0jointtiles } from "./n0FunctionCollapse.mjs";
+import { n0jointtiles, buildn0Collapse } from "./n0.mjs";
 //import {} from "./waveImport.mjs"
 
 export class Tile {
@@ -114,9 +113,9 @@ export class PlaceholderTile {
             if (neighbor.tile) ns++;
         }
 
-        //one more attempt to build tile with normal tileset
+        //one more attempt to build tile with a secondary tileset
         if (ns === 4) {
-            buildn0Collapse(this.tile);
+            buildn0Collapse(this.tile, secondaryTiles);
             if (this.n0ts.option !== null) {
                 //console.log(this.n0ts.option)
                 this.n0ts.placeholder = undefined;

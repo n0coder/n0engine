@@ -85,8 +85,8 @@ export function recubic(points, x, p=1) {
     return a + b;
 }
 
-var b = [0].map((a)=>recubic([0,1], a, 1));
-console.log(b);
+//var b = [0].map((a)=>recubic([0,1], a, 1));
+//console.log(b);
 
 //var b = [0, .5, 1].map((a)=>recubic([0,1], a, 1));
 //console.log(b);
@@ -111,8 +111,9 @@ export function cubicBlendW(points, x, p = 2) {
     return null;
 }
 
-var b = [0, 0.25, .5, .75, 1].map((a)=>cubicBlendW([0,3,1], a, 1));
-console.log(b);
+//var b = [0, 0.25, .5, .75, 1].map((a)=>cubicBlendW([0,3,1], a, 1));
+//console.log(b);
+
 export function createCubicInterpolator(points) {
     points.sort((a, b) => a.c - b.c);
     return function (x) {

@@ -9,7 +9,7 @@ import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Nanoai } from "../nanoai/nanoai.mjs";
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { buildn0Collapse } from "../world/wave/n0.mjs";
-import { n0jointtiles, n0tiles } from "../world/wave/n0FunctionCollapse.mjs";
+import { n0jointtiles, n0tiles } from "../world/wave/n0.mjs";
 import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks, drawTile } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";

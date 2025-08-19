@@ -29,6 +29,8 @@ export class DebugCursor{
         }
     } 
     mouseClicked() {
+        
+        if (!worldGrid.mouseOnScreen) return;
         var isu = worldGrid.screenToTile(p.mouseX, p.mouseY);
         var wisu = worldGrid.tileToScreenBounds(isu.x, isu.y, 1, 1);
         //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
