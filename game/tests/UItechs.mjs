@@ -14,8 +14,18 @@ leftMenu.add(jointSetsMenu)
 
 let imgs = [];
 let tileSets = [], jointSets = [];
-let setsv = [
-]
+let setsv = []
+
+let currentSet = { 
+    set: null,
+    select(tileset) {
+        console.log(tileset)
+        if (this.set) this.set.div.removeClass("selected");
+        this.set = tileset;
+        this.set.div.addClass("selected");
+    }
+};
+
 function addSetGroup(set) {
     let group = {
         set, spaces:[],
@@ -26,6 +36,9 @@ function addSetGroup(set) {
         insert(index, tile) {
             this.set.splice(index, 0, tile);
             tile.set = this;
+        },
+        indexOf(tile){
+            return this.set.indexOf(tile);
         },
         swap(tile1, tile2) {
             if (tile1.set !== tile2.set) 
@@ -132,6 +145,11 @@ function createSet(sets, title= "title") {
         set1.title = titlebox.value();
         // Optional: trigger any live preview updates here
     });
+
+    tit.mouseClicked(() =>{
+        currentSet.select(set1);
+    })
+
 set1.div.attribute('draggable', 'true');
 set1.div.elt.addEventListener('dragstart', (e) => {
     if (src === null) {
@@ -160,11 +178,13 @@ let move = (other) => {
     } else {
         let a = set1.set;
         let b = other.set;
-        
+        let si = a.indexOf(set1);
+        let oi = b.indexOf(other);
+
         a.remove(set1);
         b.remove(other);
-        a.add(other);
-        b.add(set1);
+        a.insert(si, other);
+        b.insert(oi, set1);
     }
     
     rebuildMenu();
@@ -177,7 +197,7 @@ let drop = () => { if (set1 !== src) set1.div.removeClass("moveover")  }
     adddrag(set1.div, () => { if (set1 !== src) set1.div.addClass("moveover")  }, drop, drop)
 
     sets.add(set1);
-return set1;
+    return set1;
 }
 
 let elta = {
@@ -219,6 +239,7 @@ let adddrag = (div, over, leave, end) => {
 adddrag(canvas)
 
 let set1 = createSet(setsv[0], "1");
+currentSet.select(set1);
 createSet(setsv[0],"2");
 createSet(setsv[0], "3");
 
@@ -255,7 +276,6 @@ rebuildMenu()
 //createSpace();
 
 
-let currentSet = set1;
 //let imgdiv = p.createImg(img.img.canvas.toDataURL()).class("img").parent(setdiv);
 
 let emptyImg = new Image();
@@ -283,9 +303,9 @@ let addImg = (img)=>{
             dragging = undefined;
         }
     });
-
-    currentSet.imgs.push(imgdiv);
-    imgdiv.parent(currentSet.imgsdiv);
+    console.log(currentSet.set)
+    currentSet.set.imgs.push(imgdiv);
+    imgdiv.parent(currentSet.set.imgsdiv);
 }
 loadImg("/assets/wave/green/0.png", addImg)
 loadImg("/assets/wave/green/1.png", addImg)

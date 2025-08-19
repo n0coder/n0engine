@@ -153,6 +153,11 @@ body::before {
     overflow-y: auto;
     overflow-x: hidden;
 }
+.sets-menu .selected {
+    --primary-color: #fc6e64;
+    --primary-background-color: #211715;
+}
+
 .joint-sets-menu {
     --primary-color: #1150da;
     --primary-background-color: #161521;
@@ -162,6 +167,11 @@ body::before {
   /*padding: 10px;*/
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.joint-sets-menu .selected {
+    --primary-color: #64abfc;
+    --primary-background-color: #151b21;
 }
 /* Custom scrollbar for webkit browsers (Chrome, Safari, Edge) */
 .sets-menu::-webkit-scrollbar {
