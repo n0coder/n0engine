@@ -9,21 +9,28 @@ export const n0alea = Alea("n0");
 export var n0tiles = new Map();
 export var n0secondarytiles = new Map();
 export var n0jointtiles = new Map();
-//generate tile
-//gather tiles from biome
-//
+export var n0TileModules = new Map();
 
-export function buildn0Collapse(tile, joints) {
-    var x = tile.wx, y = tile.wy
-    let map = joints ? joints : n0tiles
-    let rules = tile.biome.tiles.filter(t => map.get(t))
+export function buildn0ts(tile, sets, source) {
+    let tileset = sets ? sets : n0tiles
+    let tiles = source ? source : tile.biome.tiles;
+    // keep only tiles that have exists 
+    let modules = new Set();
+    let rules = tiles.filter(t =>{ 
+        let valid = tileset.get(t);
+        if (valid) {
+            //why does this read so well
+            for (const module of valid.modules) { 
+                modules.add(module);
+            }
+        }    
+        return valid;  
+    })
 
-    let n0ts = new Cell(rules);
-    if (!tile.n0ts) tile.n0ts = new Cell(rules);
+    let n0ts = new Cell();
+    if (!tile.n0ts) tile.n0ts = new Cell(rules, tileset);
     n0ts = tile.n0ts;
-
-    if (n0ts.neighborStates === undefined) 
-        n0ts.neighborStates = new Map();
+    tile.n0ts = n0ts;
 
     if (rules.length === 0) {
         if (!n0ts.placeholder) n0ts.placeholder = new PlaceholderTile(tile)  //createPlaceholder(tile, neighborStates);
@@ -32,106 +39,20 @@ export function buildn0Collapse(tile, joints) {
         n0ts.placeholder.image = "unfinished"; 
         return;
     };
-    n0ts.v = 2; 
-    if (n0ts.option) return;
 
-    n0ts.sideConnection = []
-
-    var options = [...n0ts.options];
-    options = newCheckDir(0, -1, options, (a) => a.getUp())
-    options = newCheckDir(1, 0, options, (a) => a.getRight())
-    options = newCheckDir(0, 1, options, (a) => a.getDown())
-    options = newCheckDir(-1, 0, options, (a) => a.getLeft())
-    /*
-    options = newCheckDir(x - 1, y - 1, options, (a, b) => a.isUpLeft(b));   // Up-left
-    options = newCheckDir(x + 1, y - 1, options, (a, b) => a.isUpRight(b));  // Up-right
-    options = newCheckDir(x - 1, y + 1, options, (a, b) => a.isDownLeft(b)); // Down-left
-    options = newCheckDir(x + 1, y + 1, options, (a, b) => a.isDownRight(b)); // Down-right
-    */
-    if (options.length === 0) {
-        if (!n0ts.placeholder) 
-            n0ts.placeholder = new PlaceholderTile(tile)  //createPlaceholder(tile, neighborStates);
-        if (n0ts.sets.size > 1) {
-            n0ts.placeholder.state = "tileset neighbor conflict";
-            n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates, n0ts.sets];
-            n0ts.placeholder.image = "missingJoint";
-        } else {
-            n0ts.placeholder.state =  "neighbor conflict";
-            n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
-            n0ts.placeholder.image = "missing";
-        }
-        return;
-    }
-
-    let later = []
-    var myOptionvs = options.map(o => {
-        var tvt = n0tiles.get(o);
-        
-        if (!tvt) return null;
-        let multiple = 1;
-
-        for (var t of tvt.biases) {
-            var factor = tile.genCache.get(t.factor)
-            let wf = worldFactors.get(t.factor)
-            if (!factor) continue; //if the factor doesn't exist don't use it
-            
-            var bias = inverseLerp(wf.mini, wf.maxi, factor)
-            multiple *= lerp(-t.value, t.value, bias)
-        }
-        return { option: o, bias: multiple }
-    })
-    myOptionvs = myOptionvs.filter(({ option, bias }) => 
-        n0ts.noiseThresholdCondition(tile.genCache, option, bias)
-    );
-
-    if (myOptionvs.length === 0) {
-        if (!n0ts.placeholder) n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
-        n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
-        n0ts.placeholder.image = "filtered"; 
-        return;
+    for (const key of modules) {
+        let module = n0TileModules.get(key)
+        module?.mod?.(tile);
     }
     
-    let choice = weightedRandom(myOptionvs);
-    n0ts.option = choice;
-    n0ts.tile = n0tiles.get(choice);
-    
-    for (const [_, neighbor] of n0ts.neighborStates) {
-        neighbor?.tile?.n0ts?.placeholder?.neighborCollapsed(tile, neighbor)
-    }
+    let option = weightedRandom( n0ts.optionBiases ?? n0ts.options.map(o=>{ return { option: o, bias: 1 } }  ) );
+    n0ts.option = option;
+    n0ts.tile = n0tiles.get(option);
 
-    function newCheckDir(dx, dy, options, dirFunction) {
-        let neighbor = worldGrid.getTile(x+dx, y+dy);
-        if (neighbor === undefined) {
-            n0ts.sideConnection.push(null)
-            return options;
-        }
-
-        let n = `${dx}, ${dy}`;
-        let b = neighbor?.n0ts;
-        if (!n0ts.neighborStates.get(n))
-            n0ts.neighborStates.set(n, {
-                dx, dy, tile: neighbor
-            })
-
-        let option = b?.option;
-        if (b?.placeholder !==undefined) {
-            n0ts.sideConnection.push(null)
-            return options; //ignore placeholders
-        }
-        if (option !== null) {
-            let tileB = b.tile;
-            let dir = dirFunction(tileB)
-            n0ts.sideConnection.push(dir.connection)
-
-            n0ts.sets.add(tileB.set);
-            return options.filter(a => {
-                const tileA = n0tiles.get(a);
-                return tileA && dir.connects(tileA);
-            });
-        } else {
-            n0ts.sideConnection.push('?')
-        }
-        return options;
+    if (option != undefined)
+    for (const key of modules) {
+        let module = n0TileModules.get(key)
+        module?.collapsed?.(tile);
     }
 }
 

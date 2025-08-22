@@ -2,7 +2,7 @@ import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { n0tiles } from "./n0.mjs"
 
 export class Cell {
-    constructor(value) {
+    constructor(value, tileset) {
       if (value instanceof Array) {
         this.options = value;
         this.option = null
@@ -12,8 +12,11 @@ export class Cell {
           this.options[i] = i;
         }
       }
+      this.tileset = tileset;
       this.sets = new Set();
       this.filtered = new Set();
+      this.neighborStates = new Map();
+      this.sideConnection = [];
     }
   noiseThresholdCondition(gencache, o, bias) {
     if (bias == NaN) bias = 0

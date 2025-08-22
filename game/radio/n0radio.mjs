@@ -304,7 +304,7 @@ class Radio {
         if (js) jobScores =js[0]
 
         if (!jobScores || jobScores.length === 0) {
-            console.log("(nano searching): no jobs right now", key)
+            //console.log("(nano searching): no jobs right now", key)
             return;
         }
         let job = jobScores[0].get(key).b
@@ -332,4 +332,4 @@ let nano = { name: "n0" }
 nano.lover = nanolover, nanolover.lover = nano;
 
 let lover = n0radio.getCreateChannel("lover", nano);
-console.log(lover);
+//console.log(lover);

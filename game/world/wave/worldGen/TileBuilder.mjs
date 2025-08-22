@@ -3,7 +3,7 @@ import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { buildBiome } from "../../BiomeWork.mjs";
 import { buildFactors, worldFactors } from "../../FactorManager.mjs";
-import { buildn0Collapse } from "../n0.mjs";
+import { buildn0ts } from "../n0.mjs";
 // import { buildn0Collapse } from "../n0.mjs";
 
 export function addSugar(tile) { //sugar data does not exist, make it using biome date
@@ -41,7 +41,7 @@ export function genTile(x, y, n0=true) {
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
         addSugar, //uss sugar and biome to set basic sugar level    
-        n0 ? buildn0Collapse : undefined
+        n0 ? buildn0ts : undefined
     ])
     /*
     let t = tile.genCache.get("elevation")

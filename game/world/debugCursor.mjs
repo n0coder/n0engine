@@ -1,7 +1,7 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../engine/core/p5engine.ts";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
-import { buildn0Collapse } from "./wave/n0.mjs";
+import { buildn0ts } from "./wave/n0.mjs";
 
 export class DebugCursor{
     constructor() {

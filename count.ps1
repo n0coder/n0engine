@@ -16,11 +16,11 @@ function Process-Directory($path) {
             $script:totalCharacters += $characters
             $script:scriptCount += 1
             # Output file details
-            Write-Host "File: $($_.FullName)"
-            Write-Host "Last Modified: $modifiedDate"
-            Write-Host "Total lines: $lines ($($script:totalLines))"
-            Write-Host "Total characters: $characters ($($script:totalCharacters))"
-            Write-Host ""
+            Write-Host "File: $($_.FullName) - $lines lines and $characters chars"
+            #Write-Host "Last Modified: $modifiedDate"
+            #Write-Host "Total lines: $lines ($($script:totalLines))"
+            #Write-Host "Total characters: $characters ($($script:totalCharacters))"
+            #Write-Host ""
         } catch {
             Write-Warning "Error processing $($_.FullName): $_"
         }

@@ -8,7 +8,7 @@ import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { Nanoai } from "../nanoai/nanoai.mjs";
 import { DebugCursor } from "../world/debugCursor.mjs";
-import { buildn0Collapse } from "../world/wave/n0.mjs";
+import { buildn0ts } from "../world/wave/n0.mjs";
 import { n0jointtiles, n0tiles } from "../world/wave/n0.mjs";
 import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks, drawTile } from "../world/wave/worldGen/ChunkDrawer.mjs";
@@ -19,7 +19,7 @@ camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 new DebugCursor()
 
-n0.brain.do("walk", -0, -100)
+//n0.brain.do("walk", -0, -100)
 //worldGrid.x -= 10000000
 //n0.setActive(false); 
 // spawn the character but it's just the raw state, the loop and rendering is disabled
@@ -78,7 +78,7 @@ function addTiles(def) {
     }
 }
 
-
+/*
 addTiles({
     name: "purple",
     path: "/assets/wave/purple", 
@@ -104,7 +104,7 @@ addTiles({
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
     biases: [{factor: "temperature", value: -1}]
 })
-
+*/
 addTiles({
     name: "purple",
     path: "/assets/wave/purple", 
@@ -146,7 +146,7 @@ addTiles({
     n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]], 1, [{ factor: "elevation", min: -.95, max: -.5 }], [{ factor: "elevation", value: -.1 }]))
     n0tiles.set('green6', new Tile('assets/wave/green/6.png', [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]], 1))
     */
-
+/*
 addTiles({
     name: "green",
     path: "/assets/wave/green", 
@@ -172,7 +172,7 @@ addTiles({
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
     biases: [{factor: "temperature", value: 1}]
 })
-
+*/
 addTiles({
     name: "green",
     path: "/assets/wave/green", 

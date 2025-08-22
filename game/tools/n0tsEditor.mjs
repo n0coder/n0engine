@@ -484,7 +484,7 @@ let tiles = {
             }
         }        
         let imgdom = p.createImg(file.data, '', undefined, created);
-
+        console.log(imgdom, file)
         let clicked = () => {
             console.log({imgdom, ti: this})
             let tile = this.createTile(imgdom, true)

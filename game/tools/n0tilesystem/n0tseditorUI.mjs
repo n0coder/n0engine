@@ -5,6 +5,36 @@ import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
 
 
 export let invdiv = p.createDiv().class("invisible").hide();
+
+let buttons = new Map();
+let addButton = (cls, path)=> {
+    let btn = buttons.get(cls);
+    if (btn !== undefined) return btn;
+    btn = {
+        cls,
+        path
+    }
+    buttons.set(cls, btn);
+    return btn;
+}
+
+function summonSvg(svgId, size= 32 ) {
+    let original = p.select(`#${svgId}`);
+    if (!original) return;
+    
+    let clone = original.elt.cloneNode(true);
+    clone.setAttribute('width', size);
+    clone.setAttribute('height', size);
+    //console.log(original, clone)
+    
+    let wrapper = p.createDiv().class(svgId);
+    wrapper.child(clone);
+    
+    return wrapper;
+}
+
+
+addButton("add-tileset", "/assets/editor/addgroup.png")
 export let n0TileEditorMenu = {
     sets: [], imgs: [],
     src: null, target: null, dragging: undefined,
@@ -19,10 +49,20 @@ export let n0TileEditorMenu = {
     addSetGroup(name, cls) {
         let set = [];
         let menu = p.createDiv().class(cls);
-        let titlebar = p.createDiv().class("group-titlebar").parent(menu)
+        let titlebar = p.createDiv().class("titlebar").parent(menu)
         let title = p.createDiv().class("group-title").parent(titlebar);
         p.createSpan(name).parent(title);
-        p.createButton("add set").class("add").parent(title);
+        let buttons = p.createDiv().class("group-buttons").parent(titlebar)
+        let svg = summonSvg('icon-plus', 32).parent(buttons)
+        svg.mouseClicked(() => {
+            console.log("implement add tileset")
+        })
+
+        //let btn = addButton("add-tileset", "/assets/editor/addgroup.png")
+        //let img = p.createDiv().class(btn.cls).parent(buttons);
+        //console.log({btn, img})
+        
+        //p.createButton("add set").class("group-add").parent(buttons);
         let div = p.createDiv().class("sets").parent(menu);
         let createSpace = this.createSpace;
         let group = {
@@ -112,14 +152,20 @@ export let n0TileEditorMenu = {
 
         //createSpace();
         let dib = p.createDiv().class("card").parent(invdiv);
-        let tit = p.createDiv().class("card-title").parent(dib);
+        let titlebar = p.createDiv().class("titlebar").parent(dib);
         //p.createSpan(title).parent(tit);
-        let titlebox = p.createInput(title).class("title-box").parent(tit);
+        let titlebox = p.createInput(title).class("title-box").parent(titlebar);
+        let grab = p.createDiv("⋮⋮").class("grab").parent(titlebar);
+        let buttons = p.createDiv().class("group-buttons").parent(titlebar)
+        let svg = summonSvg('icon-plus', 32).parent(buttons)
+        svg.mouseClicked(() => {
+            console.log("implement add image")
+        })
 
         let div = p.createDiv().class("set").parent(dib);
         let set1 = {
             title,
-            titlediv: tit, titlebox,
+            titlediv: titlebar, titlebox,
             div: dib,
             imgsdiv: div,
             imgs: []
@@ -129,10 +175,11 @@ export let n0TileEditorMenu = {
             set1.title = titlebox.value();
             // Optional: trigger any live preview updates here
         });
-
-        tit.mouseClicked(() => {
-            currentSet.select(set1);
-        })
+        let selecti = () => {
+            this.currentSet.select(set1);
+        }
+        titlebox.mouseClicked(selecti) 
+        grab.mouseClicked(selecti)
 
         set1.div.attribute('draggable', 'true');
         set1.div.elt.addEventListener('dragstart', (e) => {
@@ -220,6 +267,7 @@ export let n0TileEditorMenu = {
             }
         });
         this.currentSet.set.imgs.push(imgdiv);
+
         imgdiv.parent(this.currentSet.set.imgsdiv);
     },
     rebuild() {

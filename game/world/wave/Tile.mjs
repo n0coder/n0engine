@@ -1,16 +1,123 @@
 import { loadImg } from "../../../engine/core/Utilities/ImageUtils";
-import { n0jointtiles, buildn0Collapse } from "./n0.mjs";
+import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
+import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
+import { worldFactors } from "../FactorManager.mjs";
+import { n0jointtiles, buildn0ts, n0TileModules } from "./n0.mjs";
 //import {} from "./waveImport.mjs"
 
+n0TileModules.set("4sides", {
+    mod(tile) {
+        let n0ts = tile.n0ts;
+        n0ts.neighborStates = new Map();
+        n0ts.sideConnection = [];
+        this.newCheckDir(0, -1, tile, (a) => a.getUp())
+        this.newCheckDir(1, 0, tile, (a) => a.getRight())
+        this.newCheckDir(0, 1, tile, (a) => a.getDown())
+        this.newCheckDir(-1, 0, tile, (a) => a.getLeft())
+
+
+        if (n0ts.options.length === 0) {
+        if (!n0ts.placeholder) 
+            n0ts.placeholder = new PlaceholderTile(tile)  //createPlaceholder(tile, neighborStates);
+        if (n0ts.sets.size > 1) {
+            n0ts.placeholder.state = "tileset neighbor conflict";
+            n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates, n0ts.sets];
+            n0ts.placeholder.image = "missingJoint";
+        } else {
+            n0ts.placeholder.state =  "neighbor conflict";
+            n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
+            n0ts.placeholder.image = "missing";
+        }
+        return;
+        }
+    },
+    collapsed(tile){
+        for (const [_, neighbor] of tile.n0ts.neighborStates) {
+            neighbor?.tile?.n0ts?.placeholder?.neighborCollapsed(tile, neighbor)
+        }
+    },
+    newCheckDir(dx, dy, tile, dirFunction) {
+        
+        
+        let neighbor = worldGrid.getTile(tile.wx + dx, tile.wy + dy);
+        if (neighbor === undefined) {
+            tile.n0ts.sideConnection.push(null)
+            return;
+        }
+
+        let n = `${dx}, ${dy}`;
+        let b = neighbor?.n0ts;
+        if (!tile.n0ts.neighborStates.get(n))
+            tile.n0ts.neighborStates.set(n, {
+                dx, dy, tile: neighbor
+            })
+
+        let option = b?.option;
+        if (b?.placeholder !== undefined) {
+            tile.n0ts.sideConnection.push(null)
+            return tile.n0ts.options; //ignore placeholders
+        }
+        //this never should be set null, option may be null, but b is undefined and so option is missing.
+        if (option !== undefined) {
+            let tileB = b.tile;
+            let dir = dirFunction(tileB)
+            tile.n0ts.sideConnection.push(dir.connection)
+
+            tile.n0ts.sets.add(tileB.set);
+            let opts = tile.n0ts.options.filter(a => {
+                const tileA = tile.n0ts.tileset.get(a);
+                return tileA && dir.connects(tileA);
+            });
+            tile.n0ts.options = opts;
+            return opts
+        } else {
+            tile.n0ts.sideConnection.push('?')
+        }
+        return tile.n0ts.options;
+    }
+})
+
+n0TileModules.set("noiseBiases", {
+    mod(tile) {
+        let optionBiases = tile.n0ts.options.map(o => {
+            var tvt = tile.n0ts.tileset.get(o);
+
+            if (!tvt) return null;
+            let multiple = 1;
+
+            for (var t of tvt.biases) {
+                var factor = tile.genCache.get(t.factor)
+                let wf = worldFactors.get(t.factor)
+                if (!factor) continue; //if the factor doesn't exist don't use it
+
+                var bias = inverseLerp(wf.mini, wf.maxi, factor)
+                multiple *= lerp(-t.value, t.value, bias)
+            }
+            return { option: o, bias: multiple }
+        })
+        tile.n0ts.optionBiases = optionBiases.filter(({ option, bias }) => 
+            tile.n0ts.noiseThresholdCondition(tile.genCache, option, bias)
+        );
+
+        if ( tile.n0ts.optionBiases.length === 0 ) {
+            if (!tile.n0ts.placeholder) tile.n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
+            tile.n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
+            tile.n0ts.placeholder.image = "filtered"; 
+        }
+    }
+})
+
+
+
 export class Tile {
-    constructor(path, set) {
+    constructor(path) {
         this.path = path;
         //console.log(`loading ${path}`)
             loadImg(path, (i) => {
                 this.img = i 
             });
-            this.set = set;
         }
+        modules = new Set();
         weight = .5;
         biases = [];
         thresholds = [];
@@ -19,6 +126,7 @@ export class Tile {
             this.right = sides[1];
             this.down = sides[2];
             this.left = sides[3];
+            this.modules.add("4sides");
         }
         setWeight(weight) {
             this.weight = weight;
@@ -31,9 +139,11 @@ export class Tile {
         }
         addBias(b = { factor:"blank", value: 0 }) {
             this.biases.push(b)
+            this.modules.add("noiseBiases")
         }
         addBiases(bs) {
             this.biases.push(...bs);
+            this.modules.add("noiseBiases")
         }
 
         // used to describe newly generating tiles connection requirements
@@ -115,8 +225,11 @@ export class PlaceholderTile {
 
         //one more attempt to build tile with a secondary tileset
         if (ns === 4) {
-            buildn0Collapse(this.tile, secondaryTiles);
-            if (this.n0ts.option !== null) {
+            //secondarytiles
+            console.log(this.tile.biome);
+            buildn0ts(this.tile, undefined, this.tile.biome.secondaryTiles);
+            if (this.n0ts.option !== undefined) {
+                console.log(this.n0ts)
                 //console.log(this.n0ts.option)
                 this.n0ts.placeholder = undefined;
                 console.log("deleted placeholder", this, this.n0ts);
@@ -136,7 +249,7 @@ export class PlaceholderTile {
                 this.reason = [this.state, jointKey, n0jointtiles]
                 return;
             }
-            buildn0Collapse(this.tile, jointTiles);
+            buildn0ts(this.tile, jointTiles);
             if (this.n0ts.option !== null) {
                 this.n0ts.placeholder = undefined;
                 console.log("deleted placeholder")
