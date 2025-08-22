@@ -5,7 +5,115 @@ import { worldFactors } from "../FactorManager.mjs";
 import { n0jointtiles, buildn0ts, n0TileModules } from "./n0.mjs";
 //import {} from "./waveImport.mjs"
 
-n0TileModules.set("4sides", {
+function directionFailure(tile) {
+    let n0ts = tile.n0ts;
+    if (!n0ts.placeholder)
+        n0ts.placeholder = new PlaceholderTile(tile)  //createPlaceholder(tile, neighborStates);
+    if (n0ts.sets.size > 1) {
+        n0ts.placeholder.state = "tileset neighbor conflict";
+        n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates, n0ts.sets];
+        n0ts.placeholder.image = "missingJoint";
+    } else {
+        n0ts.placeholder.state = "neighbor conflict";
+        n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
+        n0ts.placeholder.image = "missing";
+    }
+}
+
+let dir = (dir, fn) => {
+    n0TileModules.set(dir, {
+        mod(tile, option) {
+            return fn(tile, option);
+        },
+        post(tile) {
+            //tile.n0ts.options = tile.n0ts.options2
+            //tile.n0ts.options2 = undefined;
+            console.log("post tile", tile)
+            
+            if (tile.n0ts.options.length === 0) {
+                
+                console.log(tile.n0ts.options)
+                directionFailure(tile)
+                return;
+            }
+            
+        },
+        collapsed(tile) {
+            for (const [_, neighbor] of tile.n0ts.neighbors) {
+                neighbor?.tile?.n0ts?.placeholder?.neighborCollapsed(tile, neighbor)
+            }
+        },
+        failed(tile) {
+            directionFailure(tile);
+        }
+    })
+}
+
+dir("up",(tile, option)=>dirCheck(0, -1, tile, option, (a) => a.getUp()))
+dir("right",(tile, option)=>dirCheck(1, 0, tile, option, (a) => a.getRight()))
+dir("down",(tile, option)=>dirCheck(0, 1, tile, option, (a) => a.getDown()))
+dir("left",(tile, option)=>dirCheck(-1, 0, tile, option, (a) => a.getLeft()))
+
+
+function dirCheck(dx, dy, tile, option, dirFunction) {
+    let n0ts = tile.n0ts;
+    let n = `${dx}, ${dy}`;
+
+    if (n0ts.neighbors===undefined ) 
+        n0ts.neighbors = new Map();
+    let neighbor = n0ts.neighbors.get(n);
+    if (!neighbor) {
+        let nn = worldGrid.getTile(tile.wx+dx, tile.wy+dy);
+        neighbor = {
+            dx, dy, tile: nn, 
+            fn: null,
+        };
+        n0ts.neighbors.set(n, neighbor);
+    }
+    let b = neighbor.tile?.n0ts;
+    if (neighbor.fn) {
+        return neighbor.fn(tile, option);
+    }
+    
+    if (neighbor.tile === null) {
+        tile.n0ts.sideConnection.push(null)
+        return;
+    }
+
+    let boption = b?.option;
+    if (b?.placeholder !== undefined) {
+        tile.n0ts.sideConnection.push(null)
+        return true; //ignore placeholders
+    }
+
+    if (boption !== undefined) {
+        let tileB = b.tile;
+        let dir = dirFunction(tileB)
+        tile.n0ts.sideConnection.push(dir.connection)
+        tile.n0ts.sets.add(tileB.set);
+        let neighborfn = (tile, option)=>{
+            let opt = tile.n0ts.tileset.get(option)
+            
+            return dir.connects(opt);
+        }
+        neighbor.fn = neighborfn;
+        return neighborfn(tile, option);
+    } else {
+        tile.n0ts.sideConnection.push('?')
+    }
+    
+    return true;
+
+    
+   
+    
+    
+    //originally we filtered out a set of tiles
+
+
+}
+
+n0TileModules.set("*4sides*", {
     mod(tile) {
         let n0ts = tile.n0ts;
         n0ts.neighborStates = new Map();
@@ -78,7 +186,8 @@ n0TileModules.set("4sides", {
 })
 
 n0TileModules.set("noiseBiases", {
-    mod(tile) {
+    post(tile) {
+        console.log("post biases")
         let optionBiases = tile.n0ts.options.map(o => {
             var tvt = tile.n0ts.tileset.get(o);
 
@@ -126,7 +235,11 @@ export class Tile {
             this.right = sides[1];
             this.down = sides[2];
             this.left = sides[3];
-            this.modules.add("4sides");
+
+            this.modules.add("up");
+            this.modules.add("right");
+            this.modules.add("down");
+            this.modules.add("left");
         }
         setWeight(weight) {
             this.weight = weight;
@@ -216,10 +329,15 @@ export class PlaceholderTile {
         //console.log("neighbor collapsed around placeholder")
         
         let dx = -direction.dx, dy = -direction.dy; //invert direction offset
-        this.n0ts.neighborStates.set(`${dx}, ${dy}`, { dx, dy, tile })
+        let key = `${dx}, ${dy}`;
+        let nei = this.n0ts.neighbors.get(key)
+        if (!nei) {
+            nei = { dx, dy, tile };
+            this.n0ts.neighbors.set(key, nei)
+        }
 
         let ns = 0;
-        for (const [_, neighbor] of this.n0ts.neighborStates) {
+        for (const [_, neighbor] of this.n0ts.neighbors) {
             if (neighbor.tile) ns++;
         }
 

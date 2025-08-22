@@ -16,16 +16,7 @@ export function buildn0ts(tile, sets, source) {
     let tiles = source ? source : tile.biome.tiles;
     // keep only tiles that have exists 
     let modules = new Set();
-    let rules = tiles.filter(t =>{ 
-        let valid = tileset.get(t);
-        if (valid) {
-            //why does this read so well
-            for (const module of valid.modules) { 
-                modules.add(module);
-            }
-        }    
-        return valid;  
-    })
+    let rules = tiles.filter(t => tileset.get(t))
 
     let n0ts = new Cell();
     if (!tile.n0ts) tile.n0ts = new Cell(rules, tileset);
@@ -40,18 +31,34 @@ export function buildn0ts(tile, sets, source) {
         return;
     };
 
-    for (const key of modules) {
-        let module = n0TileModules.get(key)
-        module?.mod?.(tile);
+    n0ts.options = n0ts.options.filter(optionKey => {
+        let option = tileset.get(optionKey); 
+        if (!option) return false;
+        
+        for (const moduleKey of option.modules) { 
+            let module = n0TileModules.get(moduleKey);
+            if (module) modules.add(module);
+            
+            //undefined does NOT mean false.
+            if (module?.mod !== undefined && !module.mod?.(tile, optionKey)) { 
+
+                return false;  
+            } 
+                
+        }
+        return true;
+    });
+
+    for (const module of modules) {
+        module?.post?.(tile);
     }
-    
+
     let option = weightedRandom( n0ts.optionBiases ?? n0ts.options.map(o=>{ return { option: o, bias: 1 } }  ) );
     n0ts.option = option;
     n0ts.tile = n0tiles.get(option);
 
     if (option != undefined)
-    for (const key of modules) {
-        let module = n0TileModules.get(key)
+    for (const module of modules) {
         module?.collapsed?.(tile);
     }
 }

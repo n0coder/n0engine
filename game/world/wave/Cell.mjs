@@ -15,7 +15,6 @@ export class Cell {
       this.tileset = tileset;
       this.sets = new Set();
       this.filtered = new Set();
-      this.neighborStates = new Map();
       this.sideConnection = [];
     }
   noiseThresholdCondition(gencache, o, bias) {

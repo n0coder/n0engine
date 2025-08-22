@@ -78,7 +78,7 @@ function addTiles(def) {
     }
 }
 
-/*
+
 addTiles({
     name: "purple",
     path: "/assets/wave/purple", 
@@ -104,7 +104,7 @@ addTiles({
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
     biases: [{factor: "temperature", value: -1}]
 })
-*/
+
 addTiles({
     name: "purple",
     path: "/assets/wave/purple", 
@@ -146,7 +146,7 @@ addTiles({
     n0tiles.set('green5', new Tile('assets/wave/green/5.png', [[2, 2, 2], [2, 3, 2], [2, 3, 2], [2, 2, 2]], 1, [{ factor: "elevation", min: -.95, max: -.5 }], [{ factor: "elevation", value: -.1 }]))
     n0tiles.set('green6', new Tile('assets/wave/green/6.png', [[2, 2, 2], [2, 2, 2], [2, 2, 2], [2, 2, 2]], 1))
     */
-/*
+
 addTiles({
     name: "green",
     path: "/assets/wave/green", 
@@ -172,7 +172,7 @@ addTiles({
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
     biases: [{factor: "temperature", value: 1}]
 })
-*/
+
 addTiles({
     name: "green",
     path: "/assets/wave/green", 

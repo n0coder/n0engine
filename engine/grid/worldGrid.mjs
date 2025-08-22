@@ -1,5 +1,5 @@
 import { camera } from "../core/Camera/camera.mjs";
-import { Sparse2dMap } from "./experiments/sparceMap";
+import { Sparse2dMap } from "./experiments/sparceMap.mjs";
 import { p } from "../core/p5engine";
 export class WorldGrid {
     constructor(tileSize, chunkSize, camera) {

@@ -11,7 +11,7 @@ export class Sparse2dMap {
 
     get(x, y) {
         const key = this.getKey(x, y);
-        return this.tiles.get(key) || null;
+        return this.tiles.get(key);
     }
     getKey(x, y) {
         const shiftedX = x + this.offset;
