@@ -5,7 +5,151 @@ import { worldFactors } from "../FactorManager.mjs";
 import { n0jointtiles, buildn0ts, n0TileModules } from "./n0.mjs";
 //import {} from "./waveImport.mjs"
 
-n0TileModules.set("4sides", {
+
+function directionFailure(tile) {
+    let n0ts = tile.n0ts;
+    if (!n0ts.placeholder)
+        n0ts.placeholder = new PlaceholderTile(tile)  //createPlaceholder(tile, neighborStates);
+    if (n0ts.sets.size > 1) {
+        n0ts.placeholder.state = "tileset neighbor conflict";
+        n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates, n0ts.sets];
+        n0ts.placeholder.image = "missingJoint";
+    } else {
+        n0ts.placeholder.state = "neighbor conflict";
+        n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
+        n0ts.placeholder.image = "missing";
+    }
+}
+let dir = (dir, fn) => {
+    n0TileModules.set(dir, {
+        mod(tile, option) {
+            fn(tile, option);
+        },
+        post(tile) {
+            //tile.n0ts.options = tile.n0ts.options2
+            //tile.n0ts.options2 = undefined;
+            
+            /*
+            if (tile.n0ts.options2 === undefined) {
+                directionFailure(tile)
+                return;
+            }
+            */
+        },
+        collapsed(tile) {
+            for (const [_, neighbor] of tile.n0ts.neighborStates) {
+                neighbor?.tile?.n0ts?.placeholder?.neighborCollapsed(tile, neighbor)
+            }
+        }
+    })
+}
+
+dir("up",(tile, option)=>dirCheck(0, -1, tile, option, (a) => a.getUp()))
+dir("right",(tile, option)=>dirCheck(1, 0, tile, option, (a) => a.getRight()))
+dir("down",(tile, option)=>dirCheck(0, 1, tile, option, (a) => a.getDown()))
+dir("left",(tile, option)=>dirCheck(-1, 0, tile, option, (a) => a.getLeft()))
+
+
+function dirCheck(dx, dy, tile, option, dirFunction) {
+    
+    let n = `${dx}, ${dy}`;
+    if (tile.n0ts.neighbors === undefined) 
+        tile.n0ts.neighbors = new Map();
+
+     //if (tile.n0ts.options2 === undefined) 
+        //tile.n0ts.options2 = [];
+
+    let fn = tile.n0ts.neighbors.get(n)
+    if (fn !== undefined) { 
+        fn(tile, option);
+        return;
+    }
+
+    let neighbor = worldGrid.getTile(tile.wx + dx, tile.wy + dy);
+    if (neighbor === null) {
+        tile.n0ts.sideConnection.push(null)
+        tile.n0ts.neighbors.set(dir, null)
+        return;
+    }
+
+    let b = neighbor?.n0ts;
+    if (!tile.n0ts.neighborStates.get(n))
+        tile.n0ts.neighborStates.set(n, {
+            dx, dy, tile: neighbor
+        })
+    let boption = b?.option;
+    if (b?.placeholder !== undefined) {
+        tile.n0ts.sideConnection.push(null)
+        return tile.n0ts.options; //ignore placeholders
+    }
+    
+    if (boption !== undefined) {
+        let tileB = b.tile;
+        let dir = dirFunction(tileB)
+        tile.n0ts.sideConnection.push(dir.connection)
+        tile.n0ts.sets.add(tileB.set);
+        let neighborfn = (tile, option)=>{
+            let opt = tile.n0ts.tileset.get(option)
+            //console.log("tile ready to be checked", {cell:tile,n, option, tileB})
+            if (!dir.connects(opt)) {
+                
+                let index = tile.n0ts.options.indexOf(option)
+                tile.n0ts.options.splice(index, 1);
+
+                //tile.n0ts.options2.push(option);
+            }
+
+            /*
+            tile.n0ts.options = tile.n0ts.options.filter(a => {
+                const tileA = tile.n0ts.tileset.get(a);
+                return tileA && dir.connects(tileA);
+            });;
+            */
+        }
+        neighborfn(tile, option);
+        tile.n0ts.neighbors.set(n, neighborfn)
+    } else {
+        tile.n0ts.neighbors.set(n, null)
+        tile.n0ts.sideConnection.push('?')
+    }
+    return option
+    //originally we filtered out a set of tiles
+
+
+}
+
+n0TileModules.set("noiseBiases", {
+    post(tile) {
+        console.log(tile.n0ts)
+        let optionBiases = tile.n0ts.options.map(o => {
+            var tvt = tile.n0ts.tileset.get(o);
+
+            if (!tvt) return null;
+            let multiple = 1;
+
+            for (var t of tvt.biases) {
+                var factor = tile.genCache.get(t.factor)
+                let wf = worldFactors.get(t.factor)
+                if (!factor) continue; //if the factor doesn't exist don't use it
+
+                var bias = inverseLerp(wf.mini, wf.maxi, factor)
+                multiple *= lerp(-t.value, t.value, bias)
+            }
+            return { option: o, bias: multiple }
+        })
+        tile.n0ts.optionBiases = optionBiases.filter(({ option, bias }) => 
+            tile.n0ts.noiseThresholdCondition(tile.genCache, option, bias)
+        );
+
+        if ( tile.n0ts.optionBiases.length === 0 ) {
+            if (!tile.n0ts.placeholder) tile.n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
+            tile.n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
+            tile.n0ts.placeholder.image = "filtered"; 
+        }
+    }
+})
+
+n0TileModules.set("*4sides*", { //modified the string to disable the tech
     mod(tile) {
         let n0ts = tile.n0ts;
         n0ts.neighborStates = new Map();
@@ -77,7 +221,7 @@ n0TileModules.set("4sides", {
     }
 })
 
-n0TileModules.set("noiseBiases", {
+n0TileModules.set("*noiseBiases*", { //modified the string to disable the tech
     mod(tile) {
         let optionBiases = tile.n0ts.options.map(o => {
             var tvt = tile.n0ts.tileset.get(o);
@@ -126,7 +270,11 @@ export class Tile {
             this.right = sides[1];
             this.down = sides[2];
             this.left = sides[3];
-            this.modules.add("4sides");
+            //add directions
+            this.modules.add("up");
+            this.modules.add("right");
+            this.modules.add("down");
+            this.modules.add("left");
         }
         setWeight(weight) {
             this.weight = weight;
