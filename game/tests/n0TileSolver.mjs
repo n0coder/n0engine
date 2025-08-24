@@ -6,7 +6,10 @@ import { p } from "../../engine/core/p5engine.ts";
 import { loadImg } from "../../engine/core/Utilities/ImageUtils.ts";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { Chest } from "../farm/chest.ts";
 import { Nanoai } from "../nanoai/nanoai.mjs";
+import { jobTasksa } from "../radio/jobSystem.mjs";
+import { n0pingJobs, pinga } from "../radio/linkingPings.ts";
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { buildn0ts } from "../world/wave/n0.mjs";
 import { n0jointtiles, n0tiles } from "../world/wave/n0.mjs";
@@ -14,7 +17,40 @@ import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks, drawTile } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
 
-let n0 = new Nanoai(`n0`, 30, 15)
+
+let error = new Map();
+n0pingJobs.set("error", error)
+error.set("insert",  {
+    create: (a, itema, pos)=>{ 
+        console.log("creating error insert job")
+        let tasks = a.map((a,i)=>{return {crop: a.a.resource, chest: a.b.resource, itema}}) 
+        //console.log(tasks)
+        let job = createJobu(splitArray(tasks,1),  "error-insert", itema, pos); 
+        //console.log(job)
+        n0radio.postJob("nano", job); 
+    },
+    canLink: (error, insert) => {
+        //nano owns crops and chest? ok job made :)
+        return true; //error.owner === insert.owner
+    }
+})
+//console.log(splitArray([1,2,3,4,5],2))
+jobTasksa.set("error-insert", function(a, itema, pos) {
+//console.log("harvest insert", a)
+console.log(pos)
+let {crop} = a[0]
+    return {
+        name: "error-insert", item:null, pos:[crop.x, crop.y],
+        interactions: [["harvesting"]],
+        work: function(job, nano) {
+            nano.brain.do(createJobu(a,  "insert", "harvest"))
+        }
+    }
+});
+
+
+let n0 = new Nanoai(`n0`, 0, 0)
+//let chest = new Chest(0, 0, 15, "error");
 camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 new DebugCursor()
@@ -172,7 +208,6 @@ addTiles({
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
     biases: [{factor: "temperature", value: 1}]
 })
-
 addTiles({
     name: "green",
     path: "/assets/wave/green", 

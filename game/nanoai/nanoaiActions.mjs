@@ -165,7 +165,6 @@ export const nanoaiActions = new Map([
         before: ["follow"],
         work: function (nano) {
             soil.harvest(nano, harvested);
-           
         },
         
    }}],

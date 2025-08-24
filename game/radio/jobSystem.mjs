@@ -233,9 +233,14 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
             }
         }
         let key = currentTask.key;
-         
+        
         if(base) { //if it has a base, the base will need to access it's output
-            let item = resourceMap.getSet(key, {}); 
+            let item = resourceMap.get(key)
+            
+            if (item === undefined) {
+                item = {}
+                resourceMap.set(key, item);
+            }
             task.item = item;
             if  (base.items) base.items.push(item);
             else base.items = [item]; 
@@ -264,9 +269,16 @@ let depthStack =tasks.map((a)=>{return{task: a, depth: 0, base: null}})
     return stages.reverse();
     function generateKey(template, objectMap) {
         return template.map(item => {
-            if (typeof item === 'object') 
-                return objectMap.getSet(item, objectMap.size + 1);
-            else 
+            if (typeof item === 'object') {
+                let o = objectMap.get(item);
+
+                if (o === undefined) {
+                    o = objectMap.size+1
+                    objectMap.set(item, o);
+                } 
+
+                return o
+            } else 
                 return item;        
         }).join('');
     }
@@ -325,7 +337,8 @@ function scoreTask(task, nano, relationshipModifier = 1) {
 //this is how we can get the nanos relationship info
 function getRelationshipModifer(stage, nano) {
     let relationshipModifier = 1;
-    console.warn("we need to set up relationships in nano identities here")
+    
+    // TODO: console.warn("we need to set up relationships in nano identities here")
     let relationships = nano.identity.relationships;
 
     for (const [worker, work] of stage.workIndex) {

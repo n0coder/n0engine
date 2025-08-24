@@ -3,6 +3,8 @@ import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../FactorManager.mjs";
 import { n0jointtiles, buildn0ts, n0TileModules } from "./n0.mjs";
+import { pinga } from "../../radio/linkingPings"
+import { p } from "../../../engine/core/p5engine";
 //import {} from "./waveImport.mjs"
 
 function directionFailure(tile) {
@@ -18,6 +20,7 @@ function directionFailure(tile) {
         n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
         n0ts.placeholder.image = "missing";
     }
+    //pinga.ping("harvest", n0ts.placeholder, "error", false);
 }
 
 let dir = (dir, fn) => {
@@ -28,11 +31,11 @@ let dir = (dir, fn) => {
         post(tile) {
             //tile.n0ts.options = tile.n0ts.options2
             //tile.n0ts.options2 = undefined;
-            console.log("post tile", tile)
+            //console.log("post tile", tile)
             
             if (tile.n0ts.options.length === 0) {
                 
-                console.log(tile.n0ts.options)
+                //console.log(tile.n0ts.options)
                 directionFailure(tile)
                 return;
             }
@@ -136,6 +139,8 @@ n0TileModules.set("*4sides*", {
             n0ts.placeholder.reason = ["neighbor conflict", n0ts.neighborStates]
             n0ts.placeholder.image = "missing";
         }
+        //pinga.ping("harvest", tile.n0ts.placeholder, "error", false);
+
         return;
         }
     },
@@ -187,7 +192,6 @@ n0TileModules.set("*4sides*", {
 
 n0TileModules.set("noiseBiases", {
     post(tile) {
-        console.log("post biases")
         let optionBiases = tile.n0ts.options.map(o => {
             var tvt = tile.n0ts.tileset.get(o);
 
@@ -212,6 +216,7 @@ n0TileModules.set("noiseBiases", {
             if (!tile.n0ts.placeholder) tile.n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
             tile.n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
             tile.n0ts.placeholder.image = "filtered"; 
+            //pinga.ping("harvest", tile.n0ts.placeholder, "error", false);
         }
     }
 })
@@ -308,6 +313,9 @@ export class PlaceholderTile {
         this.n0ts = tile.n0ts;
         this.state = state;
         this.reason = [];
+        //this.x = tile.wx;
+        //this.y = tile.wy;
+        //this.harvest = () => { p.ellipse(this.x, this.y, 30, 30);  return true; }
 
         loadImg("/assets/wave/missing.png", (i) => {
             this.missing = i 
@@ -345,7 +353,7 @@ export class PlaceholderTile {
         if (ns === 4) {
             //secondarytiles
             console.log(this.tile.biome);
-            buildn0ts(this.tile, undefined, this.tile.biome.secondaryTiles);
+            buildn0ts(this.tile, this.tile.biome.secondaryTiles);
             if (this.n0ts.option !== undefined) {
                 console.log(this.n0ts)
                 //console.log(this.n0ts.option)
@@ -367,7 +375,7 @@ export class PlaceholderTile {
                 this.reason = [this.state, jointKey, n0jointtiles]
                 return;
             }
-            buildn0ts(this.tile, jointTiles);
+            buildn0ts(this.tile, undefined, jointTiles);
             if (this.n0ts.option !== null) {
                 this.n0ts.placeholder = undefined;
                 console.log("deleted placeholder")

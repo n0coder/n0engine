@@ -5,8 +5,8 @@ export class WorldGrid {
     constructor(tileSize, chunkSize, camera) {
         this.setTileSize(tileSize);
         this.setChunkSize(chunkSize);
-        this.x = 2_000_000_000 //-15 * this.chunkSize
-        this.y = 2_364_373_235 //240 * this.chunkSize;
+        this.x = 1_000_000_000 //-15 * this.chunkSize
+        this.y = 1_164_373_235 //240 * this.chunkSize;
         this.tiles = new Sparse2dMap();
         this.chunks = new Sparse2dMap();
         this.camera = camera
@@ -95,6 +95,7 @@ export class WorldGrid {
     }
     screenToTile(x, y) {
         let grid = this;
+        
         return {
             x: grid.floorTile(x-(camera.rx??0)),
             y: grid.floorTile(y-(camera.ry??0)),

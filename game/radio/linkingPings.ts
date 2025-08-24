@@ -15,7 +15,7 @@ import { WorldGenerator } from "../world/wave/worldGen/worldGenerator.mjs";
 import { createJobu, jobTasksa } from "./jobSystem.mjs";
 
 
-let n0pingJobs = new Map()
+export let n0pingJobs = new Map()
 let harvest = new Map()
 n0pingJobs.set("harvest", harvest)
 harvest.set("insert",  {

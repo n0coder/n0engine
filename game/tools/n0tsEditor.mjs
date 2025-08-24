@@ -187,6 +187,45 @@ let visualizer = {
         else
             state = editorState
         states.get(state)?.hover?.();
+        // TODO: reimplement side visualization
+        /*
+if (this.state==="add")
+        if (tile?.wfc && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
+            let size = worldGrid.gridSize / 3, hsize = size / 2, hgrid = worldGrid.gridSize / 2
+
+            p.strokeWeight(.5)
+            p.textAlign(p.CENTER, p.CENTER)
+            
+
+            //move to rotational style
+            //so we can work on sixe vizualization tech
+
+            var x = -size, y = -size * 2.5
+            var x2 = 0, y2 = y, x3 = -x, y3 = y
+
+            let drawSide = (i) => {
+                var side = tile.wfc.shared.sides[i]
+                p.fill(side.protected ? 255 : 127)
+                p.text(side.get()[0], tile.pos.x + hgrid + x, tile.pos.y + hgrid + y)
+                p.text(side.get()[1], tile.pos.x + hgrid + x2, tile.pos.y + hgrid + y2)
+                p.text(side.get()[2], tile.pos.x + hgrid + x3, tile.pos.y + hgrid + y3)
+                
+            }
+
+            p.textSize(16/this.scale)
+            drawSide(0)
+            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
+            drawSide(1)
+            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
+            drawSide(2)
+            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
+            drawSide(3)
+        
+        
+        }
+        */
+
+
     },
     hover() {
         let mouse = worldGrid.mouseTilePos.screen()

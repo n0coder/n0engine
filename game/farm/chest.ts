@@ -38,11 +38,11 @@ export class Chest extends Inventory{
         }
     }
     setActive
-    constructor(slots:number, x:number, y:number) {
+    constructor(slots:number, x:number, y:number, item) {
         super(slots)
         this.x =x;
         this.y =y;
-        pinga.ping("insert", this, "crop", true)
+        pinga.ping("insert", this, item, true)
         this.setActive = setActive; 
         this.setActive(true);
     }
@@ -52,6 +52,6 @@ export class Chest extends Inventory{
                 let y = this.y *worldGrid.tileSize
                 let t = worldGrid.tileSize
                 p.fill(255,255,255)
-               p.rect(x, y, t, t)
+                p.rect(x, y, t, t)
         }
 }

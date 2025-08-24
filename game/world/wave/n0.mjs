@@ -11,7 +11,7 @@ export var n0secondarytiles = new Map();
 export var n0jointtiles = new Map();
 export var n0TileModules = new Map();
 
-export function buildn0ts(tile, sets, source) {
+export function buildn0ts(tile, source, sets ) {
     let tileset = sets ? sets : n0tiles
     let tiles = source ? source : tile.biome.tiles;
     // keep only tiles that have exists 
@@ -26,7 +26,7 @@ export function buildn0ts(tile, sets, source) {
     if (rules.length === 0) {
         if (!n0ts.placeholder) n0ts.placeholder = new PlaceholderTile(tile)  //createPlaceholder(tile, neighborStates);
         n0ts.placeholder.state = "no rules";
-        n0ts.placeholder.reason = ["no rules", tile.biome.rules ]
+        n0ts.placeholder.reason = ["no rules for this tile", tile.biome.rules ]
         n0ts.placeholder.image = "unfinished"; 
         return;
     };

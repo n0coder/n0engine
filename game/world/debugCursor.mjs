@@ -11,6 +11,29 @@ export class DebugCursor{
         this.tile = null;
     }
     draw() {
+
+        let tilePos = worldGrid.mouseTilePos, size = worldGrid.tileSize;
+        let pos = tilePos.screen();
+        let tile = worldGrid.getTile(tilePos.x, tilePos.y);
+        p.fill(255) //white inside
+        p.textSize(16) 
+        p.strokeWeight(5)
+        if (tile?.biome) {
+            p.stroke(tile.biome.colorsugar (tile))
+            var txt = tile.layers?.[tile.layers.length-1]?.name
+            txt ??= tile.biome.name
+            p.text( txt, pos.x + (size*1.5), pos.y+(size));
+        }
+        if (tile?.n0ts?.placeholder) {
+            p.stroke("#e02251ff")
+            p.text(tile.n0ts.placeholder.reason[0], pos.x+(size*1.5), pos.y+(15+size))
+            p.noFill()
+            p.strokeWeight(5)
+            p.rect( pos.x, pos.y, worldGrid.tileSize, worldGrid.tileSize)
+        }
+
+        return;
+        /*
         var isu = worldGrid.screenToTile(p.mouseX, p.mouseY);
         var wisu = worldGrid.tileToScreenBounds(isu.x, isu.y, 1,1);
         //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
@@ -25,8 +48,17 @@ export class DebugCursor{
         p.strokeWeight(5)
         let txt =  (this.tile.layers.length > 0) ? this.tile.layers[this.tile.layers.length-1].name : this.tile.biome.name
         p.text( this.tile != null ? txt : ":(", wisu.x1+(wisu.x2*1.5), wisu.y1+wisu.y2);
-        
+        if (this.tile.n0ts.placeholder) {
+            p.stroke("#e02251ff")
+            p.text(this.tile.n0ts.placeholder.reason[0], wisu.x1+(wisu.x2*1.5), wisu.y1+15+wisu.y2)
+            p.noFill()
+            p.strokeWeight(5)
+            p.rect( wisu.x1, wisu.y1, worldGrid.tileSize, worldGrid.tileSize)
         }
+        
+
+        }
+       */
     } 
     mouseClicked() {
         

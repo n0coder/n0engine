@@ -20,7 +20,7 @@ export function addBiomeFactors(map, factor, gens) {
     ranges.forEach(r => {
         var [tag, fact, min, max] = r;
         var obj = { factor: fact, min: min, max: max }
-       
+    
         biomeFactorMap.set(tag, obj)
         //console.log(r);
     })
