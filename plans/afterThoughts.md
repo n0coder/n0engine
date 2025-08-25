@@ -17,7 +17,7 @@ for example basic activites: (used like this nano.brain.do("walk", 245, 22);)
     ["eat", {
         args: [],work: function(nano) { 
                if (nano.inventory.has(this.args[0])) {
-                if (this.args[0].eaten) console.log("eatened alreaddy")
+                if (this.args[0].eaten) console.logp("eatened alreaddy")
                 this.args[0]?.onEat?.(nano)
                 nano.sugar += this.args[0].sugar      
                 nano.inventory.remove(this.args[0]);  
@@ -30,7 +30,7 @@ for example basic activites: (used like this nano.brain.do("walk", 245, 22);)
     ["read", {
         args: [],
         work: function(nano) { 
-            console.log(this.args)
+            console.logp(this.args)
             let a = this.args[0][this.args[1]];
             this.args[2](a);
             return false;
@@ -48,10 +48,10 @@ they are created like this: (createJob([item1, item2], "smile", "any bonus args.
             requires: [["hold", args[0]]],
             interactions: [["smiling"]], 
             work: function(nano, done) {
-                console.log(done)
+                console.logp(done)
                 if (this.working) return true;
                 this.working = true;
-                console.log(`${nano.name} smiling`, args, this.items);
+                console.logp(`${nano.name} smiling`, args, this.items);
                 done(this);
             }
         }
@@ -62,12 +62,12 @@ they are created like this: (createJob([item1, item2], "smile", "any bonus args.
             args, working: false, job:null, pos: [args[0].x, args[0].y], //?
             interactions: [["walking"],["pickup", "item", args[0]]], 
             work: function(nano, done) {
-                console.log(this.args)
+                console.logp(this.args)
                 if (this.working) return true;
                 this.working = true;
                 this.item.item = this.args[1];
                 nano.brain.do("pickup", this.item.item, null, (a)=>{
-                    console.log("picked up", a);
+                    console.logp("picked up", a);
                     this.args[0](this);
                 })
                 

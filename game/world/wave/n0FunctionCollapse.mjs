@@ -101,7 +101,7 @@ export class n0FunctionCollapse {
                 var co = this.collapseTile(a[0], a[1]);
                 if (co) {
                     if (!co.tile) {
-                        console.log(a)
+                        console.logp(a)
                     }
                     if (!co.later) {
                         later.shift();

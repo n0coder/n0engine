@@ -22,11 +22,11 @@ let error = new Map();
 n0pingJobs.set("error", error)
 error.set("insert",  {
     create: (a, itema, pos)=>{ 
-        console.log("creating error insert job")
+        console.logp("creating error insert job")
         let tasks = a.map((a,i)=>{return {crop: a.a.resource, chest: a.b.resource, itema}}) 
-        //console.log(tasks)
+        //console.logp(tasks)
         let job = createJobu(splitArray(tasks,1),  "error-insert", itema, pos); 
-        //console.log(job)
+        //console.logp(job)
         n0radio.postJob("nano", job); 
     },
     canLink: (error, insert) => {
@@ -34,10 +34,10 @@ error.set("insert",  {
         return true; //error.owner === insert.owner
     }
 })
-//console.log(splitArray([1,2,3,4,5],2))
+//console.logp(splitArray([1,2,3,4,5],2))
 jobTasksa.set("error-insert", function(a, itema, pos) {
-//console.log("harvest insert", a)
-console.log(pos)
+//console.logp("harvest insert", a)
+console.logp(pos)
 let {crop} = a[0]
     return {
         name: "error-insert", item:null, pos:[crop.x, crop.y],
@@ -94,7 +94,7 @@ let tile = new Tile("../../assets/wave/purple/2.png")
 tile.setSides([[0,1,0],[0,0,0],[0,1,0],[0,0,0]]);
 let tile2 =new Tile("../../assets/wave/purple/2.png")
 tile2.setSides([[0,1,0],[0,0,0],[0,0,0],[0,1,0]]);
-console.log({tile, tile2, up: tile.isUp(tile2), right: tile.isRight(tile2), down: tile.isDown(tile2), left: tile.isLeft(tile2) })
+console.logp({tile, tile2, up: tile.isUp(tile2), right: tile.isRight(tile2), down: tile.isDown(tile2), left: tile.isLeft(tile2) })
 n0tiles.set("purple0", tile);
 n0tiles.set("purple1", tile2);
 */
@@ -256,7 +256,7 @@ let tileo2 = tileo.overlayDef({
     weight:.6
 })
 */
-//console.log (tileo, tileo2);
+//console.logp (tileo, tileo2);
 
 let tilevis = {
     draw(){

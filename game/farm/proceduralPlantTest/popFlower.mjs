@@ -55,7 +55,7 @@ return this.growaSpeed * (this.count);
         var vlength = 10*this.s*(remap(-1,1, .5, 1, Math.sin(this.t)));
         var hlength = 8*this.s;
         var pluses =this.count;
-        //console.log([radians, pluses, radians*pluses])
+        //console.logp([radians, pluses, radians*pluses])
         var angleSegments = this.angle/this.lineSegments
         var lengthSegments = this.length/this.lineSegments
         var startX = this.pos.x;

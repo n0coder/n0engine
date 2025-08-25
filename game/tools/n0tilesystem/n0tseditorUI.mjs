@@ -25,7 +25,7 @@ function summonSvg(svgId, size= 32 ) {
     let clone = original.elt.cloneNode(true);
     clone.setAttribute('width', size);
     clone.setAttribute('height', size);
-    //console.log(original, clone)
+    //console.logp(original, clone)
     
     let wrapper = p.createDiv().class(svgId);
     wrapper.child(clone);
@@ -55,12 +55,12 @@ export let n0TileEditorMenu = {
         let buttons = p.createDiv().class("group-buttons").parent(titlebar)
         let svg = summonSvg('icon-plus', 32).parent(buttons)
         svg.mouseClicked(() => {
-            console.log("implement add tileset")
+            console.logp("implement add tileset")
         })
 
         //let btn = addButton("add-tileset", "/assets/editor/addgroup.png")
         //let img = p.createDiv().class(btn.cls).parent(buttons);
-        //console.log({btn, img})
+        //console.logp({btn, img})
         
         //p.createButton("add set").class("group-add").parent(buttons);
         let div = p.createDiv().class("sets").parent(menu);
@@ -159,7 +159,7 @@ export let n0TileEditorMenu = {
         let buttons = p.createDiv().class("group-buttons").parent(titlebar)
         let svg = summonSvg('icon-plus', 32).parent(buttons)
         svg.mouseClicked(() => {
-            console.log("implement add image")
+            console.logp("implement add image")
         })
 
         let div = p.createDiv().class("set").parent(dib);
@@ -189,7 +189,7 @@ export let n0TileEditorMenu = {
         });
         set1.div.elt.addEventListener('dragend', (e) => {
             if (this.src === set1) {
-                //console.log (src, target);
+                //console.logp (src, target);
                 this.target.move?.(this.src);
                 set1.div.removeClass("dragging")
                 this.src = null;
@@ -197,7 +197,7 @@ export let n0TileEditorMenu = {
             }
         });
         set1.imgsdiv.elt.add = (a) => {
-            console.log(a);
+            console.logp(a);
             a.img.parent(set1.imgsdiv)
         }
 

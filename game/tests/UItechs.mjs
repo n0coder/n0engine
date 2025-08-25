@@ -19,9 +19,9 @@ let tiles = addTiles({
     biases: [{factor: "temperature", value: -1}]
 })[0]
 
-console.log(tiles);     
+console.logp(tiles);     
 
 let nano = new Nanoai();
 nano.brain.do("walk", 3, 3);
-//nano.brain.do("ping", () => console.log("nano time??"));
+nano.brain.do("ping", () => console.logp("nano time??"));
 13

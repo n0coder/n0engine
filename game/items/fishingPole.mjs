@@ -26,7 +26,7 @@ export class FishingPole {
         this.t += deltaTime;
         //this here tests fishing item drops, and activity completion
         if (this.t>5) {
-            //console.log(this.bobv)
+            //console.logp(this.bobv)
             let fish = new Fish();
             var added = this.bobv.nanoai.inventory.add(fish)
             if (!added) {

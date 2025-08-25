@@ -32,11 +32,11 @@ let dir = (dir, fn) => {
         post(tile) {
             //tile.n0ts.options = tile.n0ts.options2
             //tile.n0ts.options2 = undefined;
-            //console.log("post tile", tile)
+            //console.logp("post tile", tile)
             
             if (tile.n0ts.options.length === 0) {
                 
-                //console.log(tile.n0ts.options)
+                //console.logp(tile.n0ts.options)
                 directionFailure(tile)
                 return;
             }
@@ -58,7 +58,7 @@ let dir = (dir, fn) => {
         },
         div: undefined, inputs: [], buildUI(currentTile) {
             let n0ts = currentTile.n0tsEditorTile;
-            console.log(n0ts);
+            console.logp(n0ts);
             if (this.div === undefined) 
                 this.div = p.createDiv().class("side").parent(invdiv);
             
@@ -66,7 +66,7 @@ let dir = (dir, fn) => {
             for (let i = 0; i < 3; i++) {
                 if (!this.inputs[i]) 
                 this.inputs[i] = p.createInput().addClass("value").parent(this.div);
-                console.log(n0ts)
+                console.logp(n0ts)
                 this.inputs[i].value(n0ts[dir][i])
                 if (this.inputs[i].currentFN)
                 this.inputs[i].elt.removeEventListener('input', this.inputs[i].currentFN);
@@ -275,7 +275,7 @@ export class Tile {
     constructor(path) {
         if (path !== undefined) {
             this.path = path;
-            //console.log(`loading ${path}`)
+            //console.logp(`loading ${path}`)
             loadImg(path, (i) => {
                 this.img = i 
             });
@@ -385,7 +385,7 @@ export class PlaceholderTile {
         if (this.state === "no rules") {
             return; //no reason to set direction if there's no rules to 
         }
-        //console.log("neighbor collapsed around placeholder")
+        //console.logp("neighbor collapsed around placeholder")
         
         let dx = -direction.dx, dy = -direction.dy; //invert direction offset
         let key = `${dx}, ${dy}`;
@@ -403,16 +403,16 @@ export class PlaceholderTile {
         //one more attempt to build tile with a secondary tileset
         if (ns === 4) {
             //secondarytiles
-            console.log(this.tile.biome);
+            console.logp(this.tile.biome);
             buildn0ts(this.tile, this.tile.biome.secondaryTiles);
             if (this.n0ts.option !== undefined) {
-                console.log(this.n0ts)
-                //console.log(this.n0ts.option)
+                console.logp(this.n0ts)
+                //console.logp(this.n0ts.option)
                 this.n0ts.placeholder = undefined;
-                console.log("deleted placeholder", this, this.n0ts);
+                console.logp("deleted placeholder", this, this.n0ts);
                 return;
             }
-            //console.log("2nd try build:", this.n0ts)
+            //console.logp("2nd try build:", this.n0ts)
         }
          //get joint tiles and then 
         if (this.n0ts.sets.size > 1) {
@@ -429,7 +429,7 @@ export class PlaceholderTile {
             buildn0ts(this.tile, undefined, jointTiles);
             if (this.n0ts.option !== null) {
                 this.n0ts.placeholder = undefined;
-                console.log("deleted placeholder")
+                console.logp("deleted placeholder")
             }
         }
     }

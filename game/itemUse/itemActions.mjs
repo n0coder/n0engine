@@ -12,7 +12,7 @@ export function useItems(nanoai, origin, actions) {
 
     var nanosItems = workProfile.get(nanoai);
     if (nanosItems) {
-        //console.log([`loaded profile for ${nanoai.name}`,  nanosItems])
+        //console.logp([`loaded profile for ${nanoai.name}`,  nanosItems])
         for (let i = 0; i < Math.min(nanoai.inventory.list.length, nanoai.inventory.offsets.length); i++) {
             var item = nanoai.inventory.list[i]
             var itemProfile = nanosItems.get(item.constructor.name)

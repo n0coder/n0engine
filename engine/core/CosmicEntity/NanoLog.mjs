@@ -8,7 +8,7 @@ export class NanoLog {
     }
 
     log(...args) {
-        console.log(
+        console.logp(
             `%c[${this.phase()} time]`,
             this.phase() === 'init' ? 'color: orange' : 'color: cyan',
             ...args

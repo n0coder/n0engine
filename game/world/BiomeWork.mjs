@@ -20,7 +20,7 @@ var midland = ["high", "rolling"]
 var allland = [[["high"], ["cloud"]], [["flat"], ["folds"]]]
 var surface = "surface";// [[inland], [midland], [allland]];
 
-//console.log(pop([true, false]))
+//console.logp(pop([true, false]))
 
 var temp = new RangeMap(0, 1)
 temp.add("frozen", 1).add("cold", 1).add("neutral", 1)
@@ -175,7 +175,7 @@ let bitterlut = {
 export let luts = {
     0: bitterlut, 1: neutrallut, 2:sweetlut
 }
-//console.log(luts);
+//console.logp(luts);
 let sweet = ["sweet"];
 let puresweet = [ "puresweet"];
 let bitter = ["bitter"]
@@ -461,23 +461,23 @@ export function buildBiome(tile) {
     })
     */
     for (const b of biomes) {
-        //console.log(b.factors.map(f=>f.factor))
+        //console.logp(b.factors.map(f=>f.factor))
         const mappedBiome = mapBiome(b.factors, s => {
-            //console.log({b, s});
+            //console.logp({b, s});
             if (s == null) return false;
             var factor = tile.genCache.get(s.factor)
             if (!factor) {
                 return false;
             }
             var sum = factor;// inverseLerp(factor.minm, factor.maxm, factor.sum)
-            //console.log(sum, s)
+            //console.logp(sum, s)
             return sum >= s.min && sum <= s.max;
         });
         if (pop(mappedBiome)) biomex.push(b);
     }
     tile.biome = biomex.length > 0 ? biomex[0] : null
 
-    //console.log(tile)
+    //console.logp(tile)
 }
 export function getABiome(vx, vy) {
     let genCache = new Map();

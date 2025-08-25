@@ -239,7 +239,7 @@ export class Graph {
                     //var max = cubicBlendW(maxes, i, blendPower);
                     // sums.push(min);
                     // sums.push(max);
-                    //console.log({sums, nvu, mins, min, maxes, max})
+                    //console.logp({sums, nvu, mins, min, maxes, max})
                     return { sums, nvu };
         }
     }
@@ -439,7 +439,7 @@ export class Graph {
     } 
     sdf(fn) {
         this.sequence.push(function(output) {
-            //console.log(fn)
+            //console.logp(fn)
             let value = fn.input(output.x, output.y);
             if (output.sum === undefined) output.sum = fn.max;
             output.sum = Math.min(output.sum, value);
@@ -506,7 +506,7 @@ export class Graph {
         let o = this, xz=x, xy=y;
         return function* () {
             let output = { x:xz, y:xy }
-            console.log({o,xz,xy})
+            console.logp({o,xz,xy})
         for (const fn of o.sequence) {
             fn(output);
             yield output

@@ -44,7 +44,7 @@ class Crop {
         this.growth = 0
         this.grown = false;
         this.name = "crop"
-        pinga.pingChunk("harvest", this, "crop", ()=>{if(this.grown)return this;}, ()=>{  console.log("hi"); return pinga.ping("harvest", this, "crop") })
+        pinga.pingChunk("harvest", this, "crop", ()=>{if(this.grown)return this;}, ()=>{  console.logp("hi"); return pinga.ping("harvest", this, "crop") })
         this.setActive = setActive;
         this.setActive(true)
     }

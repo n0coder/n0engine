@@ -65,14 +65,14 @@ export class Loader {
     }
 
     loaded(item) {
-        //console.log("loaded item", item);
+        //console.logp("loaded item", item);
     }
 }
 
 export let n0loader = new Loader();
 // Phase-aware logging
 console.logp = (...args) => {
-    console.log(console, `%c[${n0loader.phase} time]`, 
+    console.log.call(console, `%c[${n0loader.phase} time]`, 
         n0loader.phase === 'init' ? 'color: orange' : 'color: cyan', 
         ...args
     );
@@ -80,6 +80,6 @@ console.logp = (...args) => {
 /*
 // Optional: react instantly when phase flips
 n0loader.onPhaseChange((phase) => {
-    console.log(`Phase changed to: ${phase}`);
+    console.logp(`Phase changed to: ${phase}`);
 });
 */

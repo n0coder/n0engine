@@ -70,7 +70,7 @@ buildObject(obj, builders) {
                 if (tile.biome === null) {
                     tile.broken = true;
                     biome.pathDifficulty = 9;
-                    console.log(tile)
+                    console.logp(tile)
                     continue
                 }
                 let sugar = tile.genCache.get("sugarzone");
@@ -194,7 +194,7 @@ buildObject(obj, builders) {
                         let r = lerp((color[0]/3)-10, color[0], cinv);
                         let g = lerp(color[1]/3, color[1], cinv);
                         let b = lerp(color[0]/3, color[2], cinv );
-                        //console.log({r,g,b})
+                        //console.logp({r,g,b})
                         //p.noLoop();
                         p.fill(r, g, b);
                         //p.fill(color);

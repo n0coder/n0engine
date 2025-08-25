@@ -31,7 +31,7 @@ export class NanoFunctionCollapse {
             var r = fla.splice(Math.floor(this.alea()*fla.length),1)
             this.nano.brain.do("harvest",r[0])
         }
-        console.log(this.nano.brain)
+        console.logp(this.nano.brain)
         */
         this.nano.brain.do("harvest",this.board[0][2])
         this.nano.brain.doLater("harvest", function (q) { return Array.isArray(q.choices)},this.board[0][2])

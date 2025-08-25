@@ -92,7 +92,7 @@ n0loader.startLoading("tiles", (loaded) => {
         let rightdown = n0tiles.get("vedgamo");
         let leftdown = n0tiles.get("ledgamo");
         
-        console.log(leftdown, leftdown?.isUp(rightdown))
+        console.logp(leftdown, leftdown?.isUp(rightdown))
 
     //n0tiles.set('grass0', new Tile('assets/grass0.png',  [[0,0,0],[0,0,0],[0,0,0],[0,0,0]], 2, [...grassFactors], [{ factor: "humidity", value: 1 }]))
     

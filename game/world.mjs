@@ -76,7 +76,7 @@ jobTasksa.set("getSeeds", function() {
             this.item.item = new Seed(2,2)
             this.item.nano = nano
             nano.brain.do("pickup", this.item.item)
-            console.log(`${nano.name} gathering seeds`);
+            console.logp(`${nano.name} gathering seeds`);
         }
     }
 });
@@ -87,9 +87,9 @@ jobTasksa.set("plantSeeds", function(crop) {
         name: "plantSeeds", crop,
         requires: [["getSeeds", {}, true]],
         work: function(job, nano) {
-            console.log(this)
+            console.logp(this)
             nano.brain.do("plant", crop, this.items[0].item)
-            console.log(`${nano.name} planting seeds`, this);
+            console.logp(`${nano.name} planting seeds`, this);
         }
     }
 });
@@ -124,7 +124,7 @@ n1.brain.do(plantJob2)
 n2.brain.do(plantJob3)
 */
 let nanos = n0radio.nanosInChannel("nano", n0)
-console.log(nanos)
+console.logp(nanos)
 //plantJob.hireNano(n0)
 /*
 plant(1);
@@ -144,8 +144,8 @@ plant(2); plant(4);
 n0.brain.do("wait", (n, t) => {
     return soils.some(s=>s.crop&&s.crop.growth < 1)
 })
-console.log(new Set([[234,456]]))
-n0.brain.do("ping", ()=>console.log(JSON.stringify(cosmicEntityManager)))
+console.logp(new Set([[234,456]]))
+n0.brain.do("ping", ()=>console.logp(JSON.stringify(cosmicEntityManager)))
 let zzz = [0,1,2,4]
 zzz.map((a)=>n0.brain.do("harvest", soils[a]))
 let pop3 = n0.brain.do("ping", (nano)=>{
@@ -184,7 +184,7 @@ n0.brain.doBefore(marker, "ping", (nano)=>{
     
     n0.brain.doBefore(marker, "ping", (n) =>{
         harvests = soils.filter(s=>(s.crop))
-        console.log(harvests)
+        console.logp(harvests)
         for (let h = 0; h <Math.max(harvests.length, maxHarvest); h++) {
             n0.brain.doBefore(marker, "harvest", harvests[h])
         }

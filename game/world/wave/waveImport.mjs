@@ -62,7 +62,7 @@ n0loader.startLoading("categorization", (loaded) => {
 
 n0loader.startLoading("tiles", (loaded) => {
 
-    //loadImgArray("assets/wave/purple", 7, (a)=>{console.log("loaded", a)})
+    //loadImgArray("assets/wave/purple", 7, (a)=>{console.logp("loaded", a)})
     /*
     n0tiles.set('purple0', new Tile('assets/wave/purple/0.png', [[0, 0, 0], [0, 1, 0], [0, 0, 0], [0, 1, 0]], 1, [{ factor: "elevation", min: .0, max: .945 }, { factor: "elevation", min: 0, max: .4 }]))
     n0tiles.set('purple1', new Tile('assets/wave/purple/1.png', [[0, 1, 0], [0, 0, 0], [0, 1, 0], [0, 0, 0]], 1, [{ factor: "elevation", min: .0, max: .875 }]))
