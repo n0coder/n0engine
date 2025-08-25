@@ -4,8 +4,11 @@ import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../FactorManager.mjs";
 import { PlaceholderTile } from "./Tile.mjs";
+import { RangeMap } from "../../../engine/collections/RangeMap.mjs";
 
 export const n0alea = Alea("n0");
+n0alea.min = 0.000008401228114962578
+n0alea.max = 1-n0alea.min
 export var n0tiles = new Map();
 export var n0secondarytiles = new Map();
 export var n0jointtiles = new Map();
@@ -52,22 +55,33 @@ export function buildn0ts(tile, source, sets ) {
     for (const module of modules) {
         module?.post?.(tile);
     }
-
-    let option = weightedRandom( n0ts.optionBiases ?? n0ts.options.map(o=>{ return { option: o, bias: 1 } }  ) );
+    let rm = new RangeMap();
+    if (n0ts.optionBiases) {
+        for (const bias of n0ts.optionBiases) {
+            rm.add(bias.option, 1+bias.bias);
+        }
+    }
+    else
+    for (const bias of n0ts.options) {
+        rm.add(bias, bias.weight);
+    }
+    let option = rm.random(n0alea);
     n0ts.option = option;
-    n0ts.tile = n0tiles.get(option);
+    n0ts.tile = tileset.get(option);
 
     if (option != undefined)
     for (const module of modules) {
         module?.collapsed?.(tile);
     }
 }
-
 function weightedRandom(items) {
     items = items.filter(a => a != null && n0tiles.get(a.option) != null)
+    let rm = new RangeMap();
 
-    var totalWeight = items.reduce((total, item) => total + (n0tiles.get(item.option).weight + (item.bias || 0) || 1), 0);
+    var totalWeight = items.reduce((total, item) => total + ((n0tiles.get(item.option)?.weight ?? 1)  + (item.bias || 0) || 1), 0);
+    rm.total = totalWeight;
     var random = n0alea() * totalWeight;
+
     var cumulativeWeight = 0;
     for (var i = 0; i < items.length; i++) {
         cumulativeWeight += n0tiles.get(items[i].option).weight + (items[i].bias || 0) || 1;

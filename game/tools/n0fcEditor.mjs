@@ -222,6 +222,9 @@ function setTile(t) {
     tile=t
     drawUI(t)
 }
+
+
+/*
 function drawUI(t) {
     if (t) { rightMenu.show() } else { rightMenu.hide() }
     tileUi?.remove(); //destroy tileui
@@ -385,3 +388,4 @@ export function sideUI(side, div, reverse = false) {
     }
     
 }
+*/

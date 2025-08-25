@@ -1,3 +1,4 @@
+import Alea from "alea";
 import { inverseLerp, lerp } from "../n0math/ranges.mjs";
 
 export class RangeMap {
@@ -10,15 +11,23 @@ export class RangeMap {
   add(biome, weight=1) {
     this.array.push({ biome, weight });
     this.total += weight;
-   return this;
+    return this;
+  }
+  addRanges(arg) {
+    for (const a of arg) {
+      this.add(a);
+    }
   }
   remove(biome) {
     const index = this.array.findIndex(i => i.biome === biome);
     if (index !== -1) {
-      this.array.splice(index, 1);
       this.total -= this.array[index].weight;
+      this.array.splice(index, 1);
     }
     return this;
+  }
+  random(alea) {
+    return this.get(alea(), 0, 1)
   }
   exportRanges(title, i, o) {
     //i = i != null ? i : this.i != null ? this.i : 0

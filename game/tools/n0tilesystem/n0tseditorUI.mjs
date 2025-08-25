@@ -171,9 +171,7 @@ export let n0TileEditorMenu = {
             imgs: []
         }
         titlebox.input(() => {
-            // Immediate feedback - updates as user types
             set1.title = titlebox.value();
-            // Optional: trigger any live preview updates here
         });
         let selecti = () => {
             this.currentSet.select(set1);

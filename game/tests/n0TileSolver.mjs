@@ -98,7 +98,7 @@ console.log({tile, tile2, up: tile.isUp(tile2), right: tile.isRight(tile2), down
 n0tiles.set("purple0", tile);
 n0tiles.set("purple1", tile2);
 */
-function addTiles(def) {
+export function addTiles(def) {
     for (let i = 0; i < def.imgRules.length; i++) {
         let [index, file, sides] = def.imgRules[i];
         let n0tile = new Tile(`${def.path}/${file}`, def.name);
@@ -124,9 +124,9 @@ addTiles({
         [4, "4.png", [[0,1,0],[0,1,0],[0,0,0],[0,0,0]]],
         [5, "5.png", [[0,0,0],[0,1,0],[0,1,0],[0,0,0]]],
     ],
-    weight: .5,
+    weight: .15,
     thresholds: [{factor: "elevation", min: -1, max: 1}], 
-    biases: [{factor: "temperature", value: -1}]
+    biases: [{factor: "elevation", value: -1}]
 })
 
 addTiles({

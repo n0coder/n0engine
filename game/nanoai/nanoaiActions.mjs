@@ -364,6 +364,8 @@ export function walkObj(obj, nano) {
         nano.vy = obj.args[3] ?? 0;
     }
     let foundPath = (nano, obj) => {
+        
+        console.log(obj);
         findPath(nano.x, nano.y, obj.args[0], obj.args[1], 32, 7, (path) => {
         obj.path = path;
         p.fill(255,255,255)

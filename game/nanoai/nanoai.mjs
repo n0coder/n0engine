@@ -20,7 +20,7 @@ loadImgArray("assets/nano/left", 4, imgArray => {
     addAnimationSet("nano", "walkLeft", imgArray)
 });
 export class Nanoai {
-    constructor(name, x, y, z) {
+    constructor(name, x=0, y=0, z) {
         this.name = name
         this.x = x, this.vx = 0
         this.y = y, this.vy = 0

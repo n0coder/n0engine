@@ -8,9 +8,12 @@ import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine"
 import { WorldGrid, worldGrid } from "../../engine/grid/worldGrid.mjs"
 import { DebugCursor } from "../world/debugCursor.mjs";
+import { worldFactors } from "../world/FactorManager.mjs";
+import { buildn0ts, n0TileModules } from "../world/wave/n0.mjs";
+import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
-import { n0TileEditorMenu } from "./n0tilesystem/n0tseditorUI.mjs";
+import { invdiv, n0TileEditorMenu } from "./n0tilesystem/n0tseditorUI.mjs";
 
 let cursor = new DebugCursor()
 
@@ -31,6 +34,7 @@ function addTiles(def) {
         
     }
 }
+    sssss
 
 addTiles({
     name: "purple",
@@ -60,11 +64,9 @@ let tilesetWindow = {
     x:512-64, y:64, w: 512-128, h: 512-128,
     state: "tileset", grid: new WorldGrid(16, 4),
     selectedPos:null,
-    draw(){
+    draw() {
         p.fill(44,44,44);
         p.rect(this.x, this.y, this.w, this.h)
-    },
-    hover() {
         if (this.grid.mouseInRect(this.x,this.y,this.w,this.h)) {
             p.ellipse(this.x, this.y, 32, 32)
 
@@ -80,8 +82,8 @@ let tilesetWindow = {
     },
     click(){
         this.selectedPos = this.grid.mouseTilePos.screen();
-        this.camera.enabled=true;
-        this.camera.follow(this.selectedPos)
+        //this.camera.enabled=true;
+        //this.camera.follow(this.selectedPos)
     }
 }
 states.set("tileset", tilesetWindow)
@@ -90,7 +92,8 @@ function editTile (tile) {
     if (tile === editingTile) return;
     console.log("editing tile", tile);
     editingTile = tile;
-    ui.show(tile);
+
+    if (tile) ui.show(tile);
     // show ui
 }
 
@@ -133,7 +136,7 @@ states.set("add", {
 
         }
     },
-    hover() {
+    draw() {
         let mouse = worldGrid.mouseTilePos.screen();
         p.noFill();
         p.stroke(127,127,127)
@@ -146,6 +149,50 @@ states.set("add", {
             p.strokeWeight(.5)
             let tile = selectedPos.screen()
             p.rect(tile.x, tile.y, worldGrid.tileSize, worldGrid.tileSize)
+        }
+
+        /* aaaaaaaaaaaaaaaaaaaaa  */
+
+        let tile = selectedTile, tpos = selectedPos;
+        // TODO: remove this false flag or move the tech into the side module
+        if ( false && tile?.n0ts && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
+            
+            p.ellipse(32,32,32);
+            let size = worldGrid.tileSize / 3, hsize = size / 2, hgrid = worldGrid.tileSize / 2
+
+            p.strokeWeight(.5)
+            p.textAlign(p.CENTER, p.CENTER)
+
+            //move to rotational style
+            //so we can work on sixe vizualization tech
+            let xx = tile.wx*worldGrid.tileSize +hgrid
+            let yy = tile.wy*worldGrid.tileSize + hgrid
+            
+
+            var x = -1, y = -2.5
+            var x2 = 0, y2 = y, x3 = -x, y3 = y
+            
+            let drawSide = (i) => {
+                var side = shared.sides[i]
+                let data = side.get();
+                p.fill(side.protected ? 255 : 127)
+                //p.ellipse(xx+(x*size),yy+(y*size), 8);
+                p.text(data[0],xx+(x*size),yy+(y*size))
+                p.text(data[1],xx+(x2*size),yy+(y2*size))
+                p.text(data[2], xx+(x3*size),yy+(y3*size))
+                
+            }
+
+            p.textSize(16/1)
+            drawSide(0)
+            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
+            drawSide(1)
+            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
+            drawSide(2)
+            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
+            drawSide(3)
+        
+        
         }
     }
 });
@@ -182,49 +229,12 @@ let visualizer = {
         
         tilesetWindow.draw();
         let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
-        if (inWindow) 
+        if (inWindow)  {
             state = tilesetWindow.state;
-        else
+        } else
             state = editorState
-        states.get(state)?.hover?.();
-        // TODO: reimplement side visualization
-        /*
-if (this.state==="add")
-        if (tile?.wfc && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
-            let size = worldGrid.gridSize / 3, hsize = size / 2, hgrid = worldGrid.gridSize / 2
-
-            p.strokeWeight(.5)
-            p.textAlign(p.CENTER, p.CENTER)
-            
-
-            //move to rotational style
-            //so we can work on sixe vizualization tech
-
-            var x = -size, y = -size * 2.5
-            var x2 = 0, y2 = y, x3 = -x, y3 = y
-
-            let drawSide = (i) => {
-                var side = tile.wfc.shared.sides[i]
-                p.fill(side.protected ? 255 : 127)
-                p.text(side.get()[0], tile.pos.x + hgrid + x, tile.pos.y + hgrid + y)
-                p.text(side.get()[1], tile.pos.x + hgrid + x2, tile.pos.y + hgrid + y2)
-                p.text(side.get()[2], tile.pos.x + hgrid + x3, tile.pos.y + hgrid + y3)
-                
-            }
-
-            p.textSize(16/this.scale)
-            drawSide(0)
-            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
-            drawSide(1)
-            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
-            drawSide(2)
-            var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
-            drawSide(3)
         
-        
-        }
-        */
-
+        states.get(state)?.draw?.();
 
     },
     hover() {
@@ -252,234 +262,55 @@ if (this.state==="add")
 }
 cosmicEntityManager.addEntity(visualizer, -5)
 
+
+rightMenu.show();
 let ui = {
-    currentDiv: null,
-    
+    currentDiv: null, 
     show(tile) {
-        if (tile) 
-            rightMenu.show();
             //rightMenu.hide();
         
         this.drawUI(tile);
     },
 
     drawUI(tile) {
-        this.currentDiv?.remove(); // destroy old UI
-        this.currentDiv = p.createDiv(); // create new
-        this.currentDiv.id("tileEditor");
-        rightMenu.add(this.currentDiv);
-        
-        if (!tile?.n0tsEditorTile?.img?.shared) return;
-        
-        let shared = tile.n0tsEditorTile.img.shared;
-        this.createSidesUI(shared);
-        this.createWeightUI(shared);
-        this.createBiasesUI(shared);
-        this.createThresholdsUI(shared);
-    },
-
-    createSidesUI(shared) {
-        if (!shared.sides) return;
-        
-        const sideNames = ["Top", "Right", "Bottom", "Left"];
-        
-        for (let i = 0; i < shared.sides.length; i++) {
-            let sideDiv = p.createDiv().class('textdiv').parent(this.currentDiv);
-            let title = p.createDiv().class("sidebit").parent(sideDiv);
-            p.createDiv(sideNames[i]).parent(title);
-            this.createSideInputs(shared.sides[i], sideDiv);
-        }
-    },
-
-    createSideInputs(side, parent) {
-        let sideValues = side.get();
-        
-        for (let i = 0; i < sideValues.length; i++) {
-            let input = p.createInput('number')
-                .class("sidebit")
-                .parent(parent)
-                .value(sideValues[i]);
-                
-            input.input(() => {
-                let value = input.value();
-                if (value.length <= 0) return;
-                
-                let numValue = Number.parseFloat(value);
-                sideValues[i] = numValue;
-                side.set(sideValues);
-            });
-        }
-
-        let protectedCheckbox = p.createCheckbox('', side.protected)
-            .class("sidebit")
-            .parent(parent);
-            
-        protectedCheckbox.changed(() => {
-            side.protected = protectedCheckbox.checked();
-        });
-    },
-
-    createWeightUI(shared) {
-        let weightDiv = p.createDiv().parent(this.currentDiv);
-        let title = p.createDiv().class("title").parent(weightDiv);
-        p.createSpan("Weight").parent(title);
-        
-        let input = p.createInput('number')
-            .class("sidebit")
-            .parent(weightDiv)
-            .value(shared.weight);
-            
-        input.input(() => {
-            let value = input.value();
-            if (value.length <= 0) return;
-            shared.weight = Number.parseFloat(value);
-        });
-    },
-
-    createBiasesUI(shared) {
-        let biasesDiv = p.createDiv().parent(this.currentDiv);
-        let title = p.createDiv().class("title").parent(biasesDiv);
-        p.createSpan("Biases").parent(title);
-        
-        // Create bias entries
-        for (let i = 0; i < shared.biases.length; i++) {
-            this.createBiasEntry(shared.biases[i], biasesDiv, i, shared);
-        }
-        
-        // Add bias button
-        let addButton = p.createButton("Add Bias")
-            .class("buttonbit")
-            .parent(biasesDiv);
-            
-        addButton.mousePressed(() => {
-            // Find unused factor
-            for (const [factorKey, worldFactor] of worldFactors) {
-                if (shared.biases.find(b => b.factor === factorKey)) continue;
-                shared.biases.push({ factor: factorKey, value: 0 });
-                this.drawUI(editingTile); // Refresh UI
-                break;
+        if (this.currentDiv) {
+            var itemsa = Array.from(this.currentDiv.elt.children);
+            for (const node of itemsa) {
+                invdiv.elt.appendChild(node);
             }
-        });
-    },
-
-    createBiasEntry(bias, parent, index, shared) {
-        let biasDiv = p.createDiv().parent(parent);
-        
-        // Factor selector
-        let select = p.createSelect().class("buttonbit").parent(biasDiv);
-        for (const [factorKey] of worldFactors) {
-            select.option(factorKey);
         }
-        select.selected(bias.factor);
-        select.changed(() => {
-            bias.factor = select.value();
-            this.drawUI(editingTile);
-        });
-        
-        // Value input
-        let valueInput = p.createInput('number')
-            .class("sidebit")
-            .parent(biasDiv)
-            .value(bias.value);
-            
-        valueInput.input(() => {
-            let value = valueInput.value();
-            if (value.length <= 0) return;
-            bias.value = Number.parseFloat(value);
-        });
-        
-        // Remove button
-        let removeButton = p.createButton("X")
-            .class("buttonbit")
-            .parent(biasDiv);
-            
-        removeButton.mousePressed(() => {
-            shared.biases.splice(index, 1);
-            this.drawUI(editingTile);
-        });
-    },
-
-    createThresholdsUI(shared) {
-        let thresholdsDiv = p.createDiv().parent(this.currentDiv);
-        let title = p.createDiv().class("title").parent(thresholdsDiv);
-        p.createSpan("Thresholds").parent(title);
-        
-        // Create threshold entries
-        for (let i = 0; i < shared.thresholds.length; i++) {
-            this.createThresholdEntry(shared.thresholds[i], thresholdsDiv, i, shared);
+        else {
+            this.currentDiv = p.createDiv().id("tileEditor"); // create new
+            rightMenu.add(this.currentDiv);
         }
+
+        if (!tile?.n0tsEditorTile) return;
         
-        // Add threshold button
-        let addButton = p.createButton("Add Threshold")
-            .class("buttonbit")
-            .parent(thresholdsDiv);
-            
-        addButton.mousePressed(() => {
-            // Find unused factor
-            for (const [factorKey, worldFactor] of worldFactors) {
-                if (shared.thresholds.find(t => t.factor === factorKey)) continue;
-                shared.thresholds.push({ 
-                    factor: factorKey, 
-                    min: worldFactor.mini, 
-                    max: worldFactor.maxi 
-                });
-                this.drawUI(editingTile);
-                break;
+
+
+        if (!this.currentDiv.addModule) {
+            this.currentDiv.addModule =p.createDiv().parent(this.currentDiv)
+            let addbutton = p.createButton("add module").class("add").parent(this.currentDiv.addModule)
+            if ( addbutton.currentFN )
+                addbutton.elt.removeEventListener('click', addbutton.currentFN);
+            addbutton.currentFN =()=>{
+                tile.n0tsEditorTile.setSides([0,0,0],[0,0,0],[0,0,0],[0,0,0])
+                this.drawUI(tile);
             }
-        });
-    },
-
-    createThresholdEntry(threshold, parent, index, shared) {
-        let threshDiv = p.createDiv().parent(parent);
-        
-        // Factor selector
-        let select = p.createSelect().class("buttonbit").parent(threshDiv);
-        for (const [factorKey] of worldFactors) {
-            select.option(factorKey);
+            addbutton.elt.addEventListener('click',  addbutton.currentFN);
+            
+        } else {
+            this.currentDiv.addModule.parent(this.currentDiv);
         }
-        select.selected(threshold.factor);
-        select.changed(() => {
-            let factor = worldFactors.get(select.value());
-            threshold.factor = select.value();
-            threshold.min = factor.mini;
-            threshold.max = factor.maxi;
-            this.drawUI(editingTile);
-        });
-        
-        // Min input
-        let minInput = p.createInput('number')
-            .class("sidebit")
-            .parent(threshDiv)
-            .value(threshold.min);
+        for (const mod of tile.n0tsEditorTile.modules) {
+            let module = n0TileModules.get(mod);
+            console.log(mod, mod.key, module )
             
-        minInput.input(() => {
-            let value = minInput.value();
-            if (value.length <= 0) return;
-            threshold.min = Number.parseFloat(value);
-        });
-        
-        // Max input  
-        let maxInput = p.createInput('number')
-            .class("sidebit")
-            .parent(threshDiv)
-            .value(threshold.max);
-            
-        maxInput.input(() => {
-            let value = maxInput.value();
-            if (value.length <= 0) return;
-            threshold.max = Number.parseFloat(value);
-        });
-        
-        // Remove button
-        let removeButton = p.createButton("X")
-            .class("buttonbit")
-            .parent(threshDiv);
-            
-        removeButton.mousePressed(() => {
-            shared.thresholds.splice(index, 1);
-            this.drawUI(editingTile);
-        });
-    }
+            let modui = module.buildUI(tile);
+            console.log(modui);
+            modui.parent(this.currentDiv);
+        }
+    },
 };
 
 /*
@@ -523,7 +354,6 @@ let tiles = {
             }
         }        
         let imgdom = p.createImg(file.data, '', undefined, created);
-        console.log(imgdom, file)
         let clicked = () => {
             console.log({imgdom, ti: this})
             let tile = this.createTile(imgdom, true)
@@ -542,34 +372,56 @@ let tiles = {
         //imgdom.parent(tiles.div);
     },
     createTile(img, gen) {
-        let up = worldGrid.getTile(selectedPos.x, selectedPos.y - 1)
-        let right = worldGrid.getTile(selectedPos.x + 1, selectedPos.y)
-        let down = worldGrid.getTile(selectedPos.x, selectedPos.y + 1)
-        let left = worldGrid.getTile(selectedPos.x - 1, selectedPos.y)
+
+        
+        //side constraints gone, this tech won't handle them directly anymore
+
+        //let up = worldGrid.getTile(selectedPos.x, selectedPos.y - 1)
+        //let right = worldGrid.getTile(selectedPos.x + 1, selectedPos.y)
+        //let down = worldGrid.getTile(selectedPos.x, selectedPos.y + 1)
+        //let left = worldGrid.getTile(selectedPos.x - 1, selectedPos.y)
 
         let tile = worldGrid.getTile(selectedPos.x, selectedPos.y);
         tile ??= gen ? genTile(selectedPos.x, selectedPos.y, false) : {}
-        
-        let n0tsEditorTile = {
-            img,
-            shared: {
-            name: img.name,
-            sides: [],
-            weight: img.weight||1, 
-            biases: img.biases||[], 
-            thresholds: img.thresholds||[],
-            }
-        };
 
-        if(!this.createSide(n0tsEditorTile, up, 2, 0)) return null;
-        console.log("right")
-        if(!this.createSide(n0tsEditorTile, right, 3, 1)) return null;
-        console.log("down")
-        if(!this.createSide(n0tsEditorTile, down, 0, 2)) return null;
-        console.log("left")
-        if(!this.createSide(n0tsEditorTile, left, 1, 3)) return null;
-        tile.n0tsEditorTile = n0tsEditorTile;
-        if (!img.shared) img.shared = n0tsEditorTile.shared;
+        if (img.shared !== undefined) {
+            buildn0ts(tile, ["tile"] , new Map([["tile", img]]) )
+            return;
+        } 
+        
+        //let moduls = ["up", "right", "down", "left", "noiseBiases"];
+        //let modules = []
+        
+        let n0t = new Tile();
+        n0t.img = img;
+        img.tile = n0t;
+        n0t.name = img.name;
+        /*
+        for (const key of moduls) {
+            let module = n0TileModules.get(key);
+            if (module)
+                modules.push({ key, tile: n0tsEditorTile })    
+        }
+        */
+        tile.n0tsEditorTile = n0t;
+        
+        buildn0ts(tile, ["tile"] , new Map([["tile", n0t]]) )
+        if (tile.n0ts) {
+            if (tile.n0ts.placeholder){
+                console.log("placeholder", tile.n0ts.placeholder);
+            }
+            
+        
+        }        
+        /*
+        
+        */
+
+        //if(!this.createSide(n0tsEditorTile, up, 2, 0)) return null;
+        //if(!this.createSide(n0tsEditorTile, right, 3, 1)) return null;
+        //if(!this.createSide(n0tsEditorTile, down, 0, 2)) return null;
+        //if(!this.createSide(n0tsEditorTile, left, 1, 3)) return null;
+        //tile.n0tsEditorTile = n0tsEditorTile;
         return tile;
     },
     createSide(data, dir, index1, index2) {
@@ -607,18 +459,6 @@ let tiles = {
         }
         
         return true;
-        function makeSide2() {
-            return {
-                values: [0, 0, 0],
-                protected: false,
-                set(values) {
-                    this.values = values;
-                },
-                get() {
-                    return this.values;
-                }
-            };
-        }
     }
 }
 

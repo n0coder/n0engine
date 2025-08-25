@@ -58,6 +58,7 @@ export function genTile(x, y, n0=true) {
         tile.layers.push(o)
     }
     worldGrid.setTile(x, y, tile)
+
     return tile;
 }
 globalThis.tiles = 0;

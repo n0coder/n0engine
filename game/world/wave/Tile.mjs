@@ -5,6 +5,7 @@ import { worldFactors } from "../FactorManager.mjs";
 import { n0jointtiles, buildn0ts, n0TileModules } from "./n0.mjs";
 import { pinga } from "../../radio/linkingPings"
 import { p } from "../../../engine/core/p5engine";
+import { invdiv } from "../../tools/n0tilesystem/n0tseditorUI.mjs";
 //import {} from "./waveImport.mjs"
 
 function directionFailure(tile) {
@@ -48,6 +49,34 @@ let dir = (dir, fn) => {
         },
         failed(tile) {
             directionFailure(tile);
+        },
+        createState(tile) {
+            return {
+                values: [0, 0, 0],
+                protected: false
+            };
+        },
+        div: undefined, inputs: [], buildUI(currentTile) {
+            let n0ts = currentTile.n0tsEditorTile;
+            console.log(n0ts);
+            if (this.div === undefined) 
+                this.div = p.createDiv().class("side").parent(invdiv);
+            
+
+            for (let i = 0; i < 3; i++) {
+                if (!this.inputs[i]) 
+                this.inputs[i] = p.createInput().addClass("value").parent(this.div);
+                console.log(n0ts)
+                this.inputs[i].value(n0ts[dir][i])
+                if (this.inputs[i].currentFN)
+                this.inputs[i].elt.removeEventListener('input', this.inputs[i].currentFN);
+                this.inputs[i].currentFN =() => {
+                    n0ts[dir][i] = this.inputs[i].value();
+                } 
+                this.inputs[i].elt.addEventListener('input', this.inputs[i].currentFN);
+                
+            }
+            return this.div;
         }
     })
 }
@@ -108,7 +137,7 @@ function dirCheck(dx, dy, tile, option, dirFunction) {
     return true;
 
     
-   
+    
     
     
     //originally we filtered out a set of tiles
@@ -190,9 +219,12 @@ n0TileModules.set("*4sides*", {
     }
 })
 
-n0TileModules.set("noiseBiases", {
+n0TileModules.set("biases", {
+    createState: {
+        biases: [], weight: .5
+    },
     post(tile) {
-        let optionBiases = tile.n0ts.options.map(o => {
+        tile.n0ts.optionBiases = tile.n0ts.options.map(o => {
             var tvt = tile.n0ts.tileset.get(o);
 
             if (!tvt) return null;
@@ -208,43 +240,69 @@ n0TileModules.set("noiseBiases", {
             }
             return { option: o, bias: multiple }
         })
+    },
+    div: undefined, inputs: [], buildUI(tile) {
+            //todo: bias div
+            return this.div;
+        }
+})
+
+n0TileModules.set("thresholds", {
+    createState: {
+        thresholds: []
+    },
+    post(tile) {
         tile.n0ts.optionBiases = optionBiases.filter(({ option, bias }) => 
             tile.n0ts.noiseThresholdCondition(tile.genCache, option, bias)
         );
-
-        if ( tile.n0ts.optionBiases.length === 0 ) {
+    },
+    failed(tile) {
+    if ( tile.n0ts.optionBiases.length === 0 ) {
             if (!tile.n0ts.placeholder) tile.n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
             tile.n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
             tile.n0ts.placeholder.image = "filtered"; 
             //pinga.ping("harvest", tile.n0ts.placeholder, "error", false);
         }
-    }
+    },
+    div: undefined, inputs: [], buildUI(tile) {
+            //todo: bias div
+            return this.div;
+        }
 })
-
 
 
 export class Tile {
     constructor(path) {
-        this.path = path;
-        //console.log(`loading ${path}`)
+        if (path !== undefined) {
+            this.path = path;
+            //console.log(`loading ${path}`)
             loadImg(path, (i) => {
                 this.img = i 
             });
+        }
         }
         modules = new Set();
         weight = .5;
         biases = [];
         thresholds = [];
-        setSides(sides) {
-            this.up = sides[0];
-            this.right = sides[1];
-            this.down = sides[2];
-            this.left = sides[3];
-
-            this.modules.add("up");
-            this.modules.add("right");
+        setSides(up, right, down, left) {
+            if (up) {
+                this.up = up;
+                this.modules.add("up");
+            }
+            if (right) {
+                this.right = right;
+                this.modules.add("right")
+            }
+            if (down) {
+            this.down = down
             this.modules.add("down");
-            this.modules.add("left");
+            }
+
+            if (left) {
+                this.left = left;
+                this.modules.add("left");
+            }
         }
         setWeight(weight) {
             this.weight = weight;
@@ -383,3 +441,209 @@ export class PlaceholderTile {
         }
     }
 }
+
+/*
+
+    createSidesUI(shared) {
+        if (!shared.sides) return;
+        
+        const sideNames = ["Top", "Right", "Bottom", "Left"];
+        
+        for (let i = 0; i < shared.sides.length; i++) {
+            let sideDiv = p.createDiv().class('textdiv').parent(this.currentDiv);
+            let title = p.createDiv().class("sidebit").parent(sideDiv);
+            p.createDiv(sideNames[i]).parent(title);
+            this.createSideInputs(shared.sides[i], sideDiv);
+        }
+    },
+
+    createSideInputs(side, parent) {
+        let sideValues = side.get();
+        
+        for (let i = 0; i < sideValues.length; i++) {
+            let input = p.createInput('number')
+                .class("sidebit")
+                .parent(parent)
+                .value(sideValues[i]);
+                
+            input.input(() => {
+                let value = input.value();
+                if (value.length <= 0) return;
+                
+                let numValue = Number.parseFloat(value);
+                sideValues[i] = numValue;
+                side.set(sideValues);
+            });
+        }
+
+        let protectedCheckbox = p.createCheckbox('', side.protected)
+            .class("sidebit")
+            .parent(parent);
+            
+        protectedCheckbox.changed(() => {
+            side.protected = protectedCheckbox.checked();
+        });
+    },
+
+    createWeightUI(shared) {
+        let weightDiv = p.createDiv().parent(this.currentDiv);
+        let title = p.createDiv().class("title").parent(weightDiv);
+        p.createSpan("Weight").parent(title);
+        
+        let input = p.createInput('number')
+            .class("sidebit")
+            .parent(weightDiv)
+            .value(shared.weight);
+            
+        input.input(() => {
+            let value = input.value();
+            if (value.length <= 0) return;
+            shared.weight = Number.parseFloat(value);
+        });
+    },
+
+    createBiasesUI(shared) {
+        let biasesDiv = p.createDiv().parent(this.currentDiv);
+        let title = p.createDiv().class("title").parent(biasesDiv);
+        p.createSpan("Biases").parent(title);
+        
+        // Create bias entries
+        for (let i = 0; i < shared.biases.length; i++) {
+            this.createBiasEntry(shared.biases[i], biasesDiv, i, shared);
+        }
+        
+        // Add bias button
+        let addButton = p.createButton("Add Bias")
+            .class("buttonbit")
+            .parent(biasesDiv);
+            
+        addButton.mousePressed(() => {
+            // Find unused factor
+            for (const [factorKey, worldFactor] of worldFactors) {
+                if (shared.biases.find(b => b.factor === factorKey)) continue;
+                shared.biases.push({ factor: factorKey, value: 0 });
+                this.drawUI(editingTile); // Refresh UI
+                break;
+            }
+        });
+    },
+
+    createBiasEntry(bias, parent, index, shared) {
+        let biasDiv = p.createDiv().parent(parent);
+        
+        // Factor selector
+        let select = p.createSelect().class("buttonbit").parent(biasDiv);
+        for (const [factorKey] of worldFactors) {
+            select.option(factorKey);
+        }
+        select.selected(bias.factor);
+        select.changed(() => {
+            bias.factor = select.value();
+            this.drawUI(editingTile);
+        });
+        
+        // Value input
+        let valueInput = p.createInput('number')
+            .class("sidebit")
+            .parent(biasDiv)
+            .value(bias.value);
+            
+        valueInput.input(() => {
+            let value = valueInput.value();
+            if (value.length <= 0) return;
+            bias.value = Number.parseFloat(value);
+        });
+        
+        // Remove button
+        let removeButton = p.createButton("X")
+            .class("buttonbit")
+            .parent(biasDiv);
+            
+        removeButton.mousePressed(() => {
+            shared.biases.splice(index, 1);
+            this.drawUI(editingTile);
+        });
+    },
+
+    createThresholdsUI(shared) {
+        let thresholdsDiv = p.createDiv().parent(this.currentDiv);
+        let title = p.createDiv().class("title").parent(thresholdsDiv);
+        p.createSpan("Thresholds").parent(title);
+        
+        // Create threshold entries
+        for (let i = 0; i < shared.thresholds.length; i++) {
+            this.createThresholdEntry(shared.thresholds[i], thresholdsDiv, i, shared);
+        }
+        
+        // Add threshold button
+        let addButton = p.createButton("Add Threshold")
+            .class("buttonbit")
+            .parent(thresholdsDiv);
+            
+        addButton.mousePressed(() => {
+            // Find unused factor
+            for (const [factorKey, worldFactor] of worldFactors) {
+                if (shared.thresholds.find(t => t.factor === factorKey)) continue;
+                shared.thresholds.push({ 
+                    factor: factorKey, 
+                    min: worldFactor.mini, 
+                    max: worldFactor.maxi 
+                });
+                this.drawUI(editingTile);
+                break;
+            }
+        });
+    },
+
+    createThresholdEntry(threshold, parent, index, shared) {
+        let threshDiv = p.createDiv().parent(parent);
+        
+        // Factor selector
+        let select = p.createSelect().class("buttonbit").parent(threshDiv);
+        for (const [factorKey] of worldFactors) {
+            select.option(factorKey);
+        }
+        select.selected(threshold.factor);
+        select.changed(() => {
+            let factor = worldFactors.get(select.value());
+            threshold.factor = select.value();
+            threshold.min = factor.mini;
+            threshold.max = factor.maxi;
+            this.drawUI(editingTile);
+        });
+        
+        // Min input
+        let minInput = p.createInput('number')
+            .class("sidebit")
+            .parent(threshDiv)
+            .value(threshold.min);
+            
+        minInput.input(() => {
+            let value = minInput.value();
+            if (value.length <= 0) return;
+            threshold.min = Number.parseFloat(value);
+        });
+        
+        // Max input  
+        let maxInput = p.createInput('number')
+            .class("sidebit")
+            .parent(threshDiv)
+            .value(threshold.max);
+            
+        maxInput.input(() => {
+            let value = maxInput.value();
+            if (value.length <= 0) return;
+            threshold.max = Number.parseFloat(value);
+        });
+        
+        // Remove button
+        let removeButton = p.createButton("X")
+            .class("buttonbit")
+            .parent(threshDiv);
+            
+        removeButton.mousePressed(() => {
+            shared.thresholds.splice(index, 1);
+            this.drawUI(editingTile);
+        });
+    }
+*/
