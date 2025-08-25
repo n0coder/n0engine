@@ -285,24 +285,17 @@ export class Tile {
         weight = .5;
         biases = [];
         thresholds = [];
-        setSides(up, right, down, left) {
-            if (up) {
-                this.up = up;
-                this.modules.add("up");
-            }
-            if (right) {
-                this.right = right;
-                this.modules.add("right")
-            }
-            if (down) {
-            this.down = down
+        setSides(sides) {
+            this.up = sides[0];
+            this.right = sides[1];
+            this.down =  sides[2]
+            this.left  = sides[3]
+            
+            this.modules.add("up");
+            this.modules.add("right")
             this.modules.add("down");
-            }
-
-            if (left) {
-                this.left = left;
-                this.modules.add("left");
-            }
+            this.modules.add("left");
+            
         }
         setWeight(weight) {
             this.weight = weight;

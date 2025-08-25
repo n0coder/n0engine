@@ -99,6 +99,7 @@ n0tiles.set("purple0", tile);
 n0tiles.set("purple1", tile2);
 */
 export function addTiles(def) {
+    let tiles = []
     for (let i = 0; i < def.imgRules.length; i++) {
         let [index, file, sides] = def.imgRules[i];
         let n0tile = new Tile(`${def.path}/${file}`, def.name);
@@ -110,8 +111,9 @@ export function addTiles(def) {
             def.map.set(`${def.name}${index}`, n0tile)
         else
             n0tiles.set(`${def.name}${index}`, n0tile)
-        
+        tiles.push(n0tile)
     }
+    return tiles
 }
 
 
@@ -262,4 +264,4 @@ let tilevis = {
     }
 }
 
-cosmicEntityManager.addEntity( tilevis )
+//cosmicEntityManager.addEntity( tilevis )
