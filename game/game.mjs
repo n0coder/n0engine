@@ -62,7 +62,7 @@ n0.brain.do("ping", () => {
 				wt.push(biome);
 		}
 	}
-	console.logp(wt)
+	console.log(wt)
 })
 
 //this is a floating read
@@ -95,7 +95,7 @@ this wouldn't be super practical, as it expects one transition space, which mean
 let i = -1, o = 1;
 let p = lerp(i,o, 0.5), len = .1;
 let pi = p - len, po = p + len;
-console.logp([i, p, o], [i, pi, po, o])
+console.log([i, p, o], [i, pi, po, o])
 */
 //cardioid?
 
@@ -108,7 +108,7 @@ function cw(poso, pos, weight = .5) {
   let unhappy = cw(-1, hapiness)
   let neutral = cw(0, hapiness)
   let happy = cw(1, hapiness)
-  console.logp([unhappy, neutral, happy])
+  console.log([unhappy, neutral, happy])
 class iopVisualizer {
 	constructor() {
 		this.start = -1, this.end = 1;

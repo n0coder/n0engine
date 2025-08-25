@@ -24,7 +24,7 @@ jobTasksa.set("play", function(...args) { //this is singleplayer play function p
         interactions: [["playing"]],
         requires: [], done: [],
         work: function(nano, a2) {
-            console.logp("hi",this.done)
+            console.log("hi",this.done)
             this.done();
         }
     }
@@ -40,7 +40,7 @@ jobTasksa.set("playtogether",function(...args) {
         interactions: [["playing"]],
         requires: [], //filling with pt
         work: function(nano, a2) {
-            console.logp("hkioiiio",this.done)
+            console.log("hkioiiio",this.done)
             this.done()
         }
     }
@@ -60,7 +60,7 @@ n0radio.findJob(n0); //naturally this would make them start working if a job is 
 n0radio.findJob(abi); 
 
 let job2 = createJobu([{
-    play() {console.logp("playing")}, playerCount:2
+    play() {console.log("playing")}, playerCount:2
 }], "playtogether", "hi"); 
 n0radio.postJob("general", job2);  //the job post will tell the ais to start working
 
@@ -151,7 +151,7 @@ class TicTacToe {
                 y/=worldGrid.gridSize;
                 var trap = this.nanos.get(a).trap
                 a.brain.doBefore(trap,"walk", x+4, y+5)
-                console.logp(g, x,y)
+                console.log(g, x,y)
                 a.brain.doBefore(trap,"look", "down")
                 a.brain.doBefore(trap, "ping", ping)
                 var {x,y,w,h} = worldGrid.gridBoundsScreenSpace(g.x+1, g.y-1, 1,1);
@@ -181,13 +181,13 @@ class TicTacToe {
                 }
 
                 this.placePiece(()=>{
-                    //console.logp("okok")
+                    //console.log("okok")
                     this.state = "reposition"
                 })    
                 this.state = "placing"         
             },
             over: () => {
-                console.logp(this.board);
+                console.log(this.board);
                 for (const [nano, hook] of this.nanos) {
                     this.removeNano(nano);
                 }
@@ -234,7 +234,7 @@ n0.brain.do("dance");
 
 n0.brain.do({ //the character will walk, dance then say hi
     work(nano) {
-        console.logp("hi");
+        console.log("hi");
     }
 })
 
@@ -242,7 +242,7 @@ n0.brain.do({ //the character will walk, dance then say hi
 abi.brain.do("walk", 121, 111); //walk away from activity
 abi.brain.do("dance");
 
-abi.brain.do({work() {console.logp("doing work"); this.done?.(); return false;  }}, ()=>{console.logp("job done")})
+abi.brain.do({work() {console.log("doing work"); this.done?.(); return false;  }}, ()=>{console.log("job done")})
 
 let pickupMarker = abi.brain.do("pickup", n0);
 abi.brain.do("dance");

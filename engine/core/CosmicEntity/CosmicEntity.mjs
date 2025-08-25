@@ -2,9 +2,9 @@ import { cosmicEntityManager } from "./CosmicEntityManager.mjs";
 
 export class CosmicEntity {
     sedup() {
-        console.logp(this);
+        console.log(this);
     }
     setup() {
-        console.logp(this);
+        console.log(this);
     }
 }

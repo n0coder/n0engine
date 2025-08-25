@@ -50,7 +50,7 @@ export const nanoaiActions = new Map([
         args,
         work: function(nano) { 
             if (nano.inventory.has(this.args[0])) {
-                if (this.args[0].eaten) console.logp("eatened alreaddy")
+                if (this.args[0].eaten) console.log("eatened alreaddy")
                 this.args[0]?.onEat?.(nano)
                 nano.sugar += this.args[0].sugar      
                 nano.inventory.remove(this.args[0]);  
@@ -63,7 +63,7 @@ export const nanoaiActions = new Map([
     ["read",function(...args) { return  {
         args,
         work: function(nano) { 
-            console.logp(this.args)
+            console.log(this.args)
             let a = this.args[0][this.args[1]];
             this.args[2](a);
             return false;
@@ -99,7 +99,7 @@ export const nanoaiActions = new Map([
                 //no (or bitter nano)? look for food elsewhere //unfriendly hungry
                 
             } else {
-                console.logp("no longer hungry?!", nano)
+                console.log("no longer hungry?!", nano)
                 return false; //no longer hungry
             }
 
@@ -110,7 +110,7 @@ export const nanoaiActions = new Map([
     ["debug",function(...args) { return  {
         args,
         work: function (nano) {
-            console.logp(this);
+            console.log(this);
             return false
         },      
           
@@ -183,7 +183,7 @@ export const nanoaiActions = new Map([
     work(nano) {
         //take item out of chest inventory
         //put it into nano inventor
-        //console.logp(chest)
+        //console.log(chest)
         chest.take(nano, item, out)
         /*
         nano.brain.do("take", chest1, itema, (item)=>{
@@ -232,9 +232,9 @@ export const nanoaiActions = new Map([
             args, work: function (nano) {
                 let brain = nano.brain;
                 let t = .1;
-                console.logp("pinging dance")
+                console.log("pinging dance")
                 brain.doAfter(this, "hook", (marker) => {
-                    console.logp("starting dance", marker.okok)
+                    console.log("starting dance", marker.okok)
                     brain.doBefore(marker, "walkRelative", -1, 0) 
                     brain.doBefore(marker, "waitTime",t) 
                     brain.doBefore(marker, "walkRelative", 2, 0) 
@@ -254,7 +254,7 @@ export const nanoaiActions = new Map([
                     brain.doBefore(marker, "waitTime",t)
                     brain.doBefore(marker, "walkRelative", 0, - .51)
                     marker.pull();
-                    console.logp("ending dance", marker.okok)
+                    console.log("ending dance", marker.okok)
                 }) 
                 
 
@@ -346,9 +346,9 @@ export const nanoaiActions = new Map([
                             nano.mommy.inventory.refresh();
                         })
                     }
-                    else console.logp("held nanoai is not holding cloudium")
-                } else console.logp("not holding cloudium")
-            } else console.logp("not holding nanoai")
+                    else console.log("held nanoai is not holding cloudium")
+                } else console.log("not holding cloudium")
+            } else console.log("not holding nanoai")
             return false
         },
         
@@ -365,13 +365,13 @@ export function walkObj(obj, nano) {
     }
     let foundPath = (nano, obj) => {
         
-        //console.logp(obj);
+        //console.log(obj);
         findPath(nano.x, nano.y, obj.args[0], obj.args[1], 32, 7, (path) => {
         obj.path = path;
         p.fill(255,255,255)
         p.image(path.graphics, 0, 0)
-        //console.logp("BRO WHY")
-        //console.logp(path)
+        //console.log("BRO WHY")
+        //console.log(path)
         }, obj?.path?.graphics);
     }
 
@@ -433,7 +433,7 @@ export function followObj (obj, nano) {
     return processWalk(nano, obj,obj.args[0].x, obj.args[0].y, stopped,  foundPath);
 
 }
-//console.logp(Math.sqrt((1 * 1) + (1 * 1)))
+//console.log(Math.sqrt((1 * 1) + (1 * 1)))
 export function walk(nano, x, y, magn = 1) {
     var vx = x - nano.x;
     var vy = y - nano.y;
@@ -457,7 +457,7 @@ export function walk(nano, x, y, magn = 1) {
     var sod = inverseLerp(7,0, speed)
     sod = clamp(0, 1, sod);
     sod = lerp(.2, 1, sod);
-    //console.logp(sod)
+    //console.log(sod)
     //p.text(`${sod} | ${speed}`, nano.visualX, nano.visualY);
     nano.x += vx * deltaTime * nano.speed*sod;
     nano.y += vy * deltaTime * nano.speed*sod;

@@ -61,7 +61,7 @@ export class RangeMap {
       const item = this.array[index];
       let size = item.weight / this.total;
       //size = lerp(this.i, this.o, size);
-      //console.logp([value, item.weight, this.total, accumulatedSize, accumulatedSize+size, size])
+      //console.log([value, item.weight, this.total, accumulatedSize, accumulatedSize+size, size])
       if (v >= accumulatedSize && v < accumulatedSize + size) {
         return item.biome;
       }

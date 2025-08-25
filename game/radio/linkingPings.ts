@@ -21,9 +21,9 @@ n0pingJobs.set("harvest", harvest)
 harvest.set("insert",  {
     create: (a, itema, pos)=>{ 
         let tasks = a.map((a,i)=>{return {crop: a.a.resource, chest: a.b.resource, itema}}) 
-        //console.logp(tasks)
+        //console.log(tasks)
         let job = createJobu(splitArray(tasks,1),  "harvest-insert", itema, pos); 
-        //console.logp(job)
+        //console.log(job)
         n0radio.postJob("nano", job); 
     },
     canLink: (harvest, insert) => {
@@ -31,10 +31,10 @@ harvest.set("insert",  {
         return harvest.owner === insert.owner
     }
 })
-//console.logp(splitArray([1,2,3,4,5],2))
+//console.log(splitArray([1,2,3,4,5],2))
 jobTasksa.set("harvest-insert", function(a, itema, pos) {
-//console.logp("harvest insert", a)
-console.logp(pos)
+//console.log("harvest insert", a)
+console.log(pos)
 let {crop} = a[0]
     return {
         name: "harvest-insert", item:null, pos:[crop.x, crop.y],
@@ -48,7 +48,7 @@ jobTasksa.set("bundle", function(a, chunks, jobu, ...args){
     return {
         work(job, nano) {
             let b = a.splice(0, chunks)
-            //console.logp(b)
+            //console.log(b)
             if (b.length === 0) return
             nano.brain.do(createJobu(splitArray(b, 2), jobu, ...args ))
             
@@ -56,7 +56,7 @@ jobTasksa.set("bundle", function(a, chunks, jobu, ...args){
     }
 })
 jobTasksa.set("harvest", function({crop, itema}){
-    //console.logp(crop, itema)
+    //console.log(crop, itema)
     return {
         pos:[crop.x, crop.y],
         interactions: [["harvesting"]],
@@ -70,11 +70,11 @@ jobTasksa.set("harvest", function({crop, itema}){
 
 jobTasksa.set("insert", function(sci, req, ...args){
     let {chest, itema} = sci
-    //console.logp("insert", {sci, req, args})
+    //console.log("insert", {sci, req, args})
     return {
         requires: [[req, sci, ...args]],
         work(job, nano) {
-            //console.logp({chest, itema, insert:this, req})
+            //console.log({chest, itema, insert:this, req})
             nano.brain.do("insert", chest, ()=>this.items[0].o)
         }
     }
@@ -111,7 +111,7 @@ take.set("craft",  {
     create: (a, itema)=>{ 
         let tasks = a.map((a,i)=>{return {chest: a.a.resource, table: a.b.resource, itema}}) 
         
-        console.logp("take-craft", tasks)
+        console.log("take-craft", tasks)
         let job = createJobu(splitArray(tasks,1), "take-craft", itema); 
         n0radio.postJob("nano", job); 
     },
@@ -128,21 +128,21 @@ jobTasksa.set("take-craft", function(a, itema) {
             pos:[chest.x, chest.y],
             name: "take-craft", item:null,chest1: chest, table, itema, crafts:null,
             work: function(job, nano) {
-                console.logp(a)
+                console.log(a)
                 nano.brain.do(createJobu(a, "insert", "craft", "take"))
             }
         }
     });
 
     jobTasksa.set("craft", function(a, req){
-        //console.logp(a)
+        //console.log(a)
         let {table, itema} = a
         return {
             requires: [[req, a]],
             work(job, nano) {
-                console.logp(a)
-                //console.logp({ao: "crafting", a, items:this.items, req, table, itema})
-                nano.brain.do("craft", table, ()=> { console.logp(this);  return [this.items[0].o]}, (out)=>{
+                console.log(a)
+                //console.log({ao: "crafting", a, items:this.items, req, table, itema})
+                nano.brain.do("craft", table, ()=> { console.log(this);  return [this.items[0].o]}, (out)=>{
                     this.item.o = out
                 })
             }
@@ -164,7 +164,7 @@ jobTasksa.set("take-craft", function(a, itema) {
         }
     })
     jobTasksa.set("take-plant", function(a, itema) {
-        //console.logp(a)
+        //console.log(a)
         
         let cs= a[0], {chest, soil} = cs;
             return {
@@ -189,7 +189,7 @@ jobTasksa.set("take-craft", function(a, itema) {
     })
     jobTasksa.set("plant", function(sci){
         let {soil, itema} = sci
-        //console.logp(soil, itema)
+        //console.log(soil, itema)
         return {
             pos:[soil.x, soil.y],
             interactions: [["planting"]],
@@ -218,7 +218,7 @@ jobTasksa.set("checkrun", function(a, itema) {
     });
 
     jobTasksa.set("walk", function(a){
-       console.logp(a)
+       console.log(a)
         return {
             pos: a,
             work(job, nano) {
@@ -255,7 +255,7 @@ export let pinga = {
             i = [];
             o.set(item, i)
         }
-        //console.logp({action, resource, item, persistant})
+        //console.log({action, resource, item, persistant})
         i.push({
             resource, item, action, persistant
         })
@@ -300,11 +300,11 @@ export let pinga = {
         chusx.pops.set(key, () => {
 
         let items = chunka(chusx).slice();
-            console.logp("pop")
+            console.log("pop")
             if (items.every(ping => !ping.promise || ping.promise())) { //if every promise is met, or if no pings of this type have a promise
-                console.logp("popped")
+                console.log("popped")
                 for (const item of items) {
-                    console.logp("popping", item)
+                    console.log("popping", item)
                 for (let chunk of item.chunks){
                     let ps = chunk.pings.get(item.action).get(item.item)
                     let i = ps.indexOf(item);
@@ -376,7 +376,7 @@ export let pinga = {
                     })
                     ab = ab.filter(a=>a.a &&a.b)
                     if (!ab) continue;
-                    console.logp()
+                    console.log()
                     job.create(ab, item)
                 }
             }   

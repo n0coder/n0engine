@@ -36,4 +36,4 @@ export function cloneAction(obj, also, ...args) {
 //a test map for
 //
 
-//console.logp()
+//console.log()

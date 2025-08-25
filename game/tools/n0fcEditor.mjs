@@ -154,9 +154,9 @@ class n0tsEditor {
             let ts = tiles.map(t => {
                 return t.wfc.shared
             });
-            console.logp(ts)
+            console.log(ts)
             let tileJson = JSON.stringify(ts)
-            console.logp(tileJson)
+            console.log(tileJson)
             }
         }
 
@@ -362,7 +362,7 @@ function thresholdsUI(tile, div) {
     addThreshold.mousePressed(() => {
         for (const [factorKey, worldFactor] of worldFactors) {
             if (thresholds.find(b => b.factor === factorKey)) continue;
-            console.logp(factorKey, worldFactor)
+            console.log(factorKey, worldFactor)
             thresholds.push({ factor: factorKey, min: worldFactor.mini, max: worldFactor.maxi });
             drawUI(tile);
             break;

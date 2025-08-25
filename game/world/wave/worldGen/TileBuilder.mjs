@@ -46,7 +46,7 @@ export function genTile(x, y, n0=true) {
     /*
     let t = tile.genCache.get("elevation")
     let elevation = worldFactors.get("elevation")
-    console.logp(elevation);
+    console.log(elevation);
     let zz = inverseLerp(elevation.mini, elevation.maxi, t)
     tile.z = Math.floor( lerp(0, 32, zz) )
     */

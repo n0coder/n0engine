@@ -70,6 +70,6 @@ export class DebugCursor{
 
         //buildn0Collapse(tile);
         if (tile !== undefined)
-        console.logp({tile: tile, n0ts: tile?.n0ts}, isu)
+        console.log({tile: tile, n0ts: tile?.n0ts}, isu)
     }
 }

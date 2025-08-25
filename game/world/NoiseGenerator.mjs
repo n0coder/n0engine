@@ -133,7 +133,7 @@ export class NoiseGenerator {
         var offset = this.offset.getValue(x, y)
 
         var minmax = this.generateNoise(x, y);
-        //console.logp(minmax.sum, this);
+        //console.log(minmax.sum, this);
         //minmax.sum = minmax.maxm - minmax.sum
         if (this.abs) {
             minmax.sum = Math.abs(minmax.sum);
@@ -146,12 +146,12 @@ export class NoiseGenerator {
             minmax.minm = this.mapSpace[0]
             minmax.maxm = this.mapSpace[1]
         }
-        //console.logp(minmax.sum, this);
+        //console.log(minmax.sum, this);
         //sum = lerp(minm, maxm, sim);
         (this.doMultiply(x, y, minmax));
         (this.doAdd(x, y, minmax));
         this.doPow(x, y, minmax, 1);
-        //console.logp(minmax.sum, this);
+        //console.log(minmax.sum, this);
         //when we invert, and the maxm is too low, for whatever reason... 
         // (such as input "noise" function being an axis instead of a constant...)
         //this shifts the value way outside range; 
@@ -159,8 +159,8 @@ export class NoiseGenerator {
             minmax.sum = minmax.maxm - minmax.sum
         var offset;
         (offset = this.ampoffset(x, y, minmax, offset));
-        //console.logp(minmax.sum, this);
-        //console.logp({cola:"b4blend", aid: this.a,minm,sum,maxm})
+        //console.log(minmax.sum, this);
+        //console.log({cola:"b4blend", aid: this.a,minm,sum,maxm})
         if (this.blend.length > 1) {
             if (this.blendStyle === "new") {
                 this.newBlend(minmax, x, y, blendPower, blendWeight);
@@ -189,16 +189,16 @@ export class NoiseGenerator {
         minmax.maxm = lerp(minmax.maxm, max, blendWeight);
     }
     recubix(minmax, x, y, blenpa, blendWeight){
-        //console.logp(blendPower)
+        //console.log(blendPower)
         var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
         var sums = this.blend.map(b => {
             var v = b.getValue != null ? b.getValue(x, y) : b;
             if (v.sum != null) return v.sum;
             return v;
         });   
-        //console.logp({mxsum:minmax.sum, mxmin:minmax.minm, mxmax: minmax.maxm, sim});
+        //console.log({mxsum:minmax.sum, mxmin:minmax.minm, mxmax: minmax.maxm, sim});
         minmax.sum = recubic(sums, sim, blenpa);
-        //console.logp(minmax.sum, sim);
+        //console.log(minmax.sum, sim);
     }
 
     blendSumMinMax(x, y, sim, blendPower) {
@@ -225,7 +225,7 @@ export class NoiseGenerator {
         });
         var max = cubicBlendW(maxes, sim, blendPower);
         sums.push(max);
-        //console.logp({sums, nvu, mins, min, maxes, max})
+        //console.log({sums, nvu, mins, min, maxes, max})
         return { sums, nvu };
     }
 
@@ -244,18 +244,18 @@ export class NoiseGenerator {
     //should i pow in abs?
     //math.pow(math.abs(sim))
     doPow(x, y, minmax) {
-        if (minmax.minm > minmax.sum) console.logp("sum is lower than minm", minmax)
-        if (minmax.maxm < minmax.sum ) console.logp("sum is higher than maxm", minmax)
+        if (minmax.minm > minmax.sum) console.log("sum is lower than minm", minmax)
+        if (minmax.maxm < minmax.sum ) console.log("sum is higher than maxm", minmax)
         var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
 
-        // console.logp([1,minm, sum, maxm])
+        // console.log([1,minm, sum, maxm])
 
         var exponent = this.toValue(this.power, x, y);
         //world low blend
         var osim = Math.pow(sim, exponent);
 
         minmax.sum = lerp(minmax.minm, minmax.maxm, osim); //LOL
-        //console.logp([ exponent ]) 
+        //console.log([ exponent ]) 
         //we STILL have the issue where we are powing by a negative num
         return minmax.sum;
     }
@@ -343,7 +343,7 @@ export class NoiseGenerator {
             freq *= lac;
         }
         gens += 1
-        //console.logp({sum, minm, maxm, min:this.min, max:this.max})
+        //console.log({sum, minm, maxm, min:this.min, max:this.max})
         return { sum, minm, maxm };
     }
 }

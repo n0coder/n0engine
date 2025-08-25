@@ -48,7 +48,7 @@ export class TerrainGenerator {
                 
                 //if (biome.tags.some(t=>t==="surface")) //basically it would be possible to read biome tags, all surface biomes are valid starting spots basically
                 if (biome.biome.hasTag("surface")) {
-                    console.logp("found a spot for spawning",obj) //immediately we find a mountain as a starting position because we don't exclude it
+                    console.log("found a spot for spawning",obj) //immediately we find a mountain as a starting position because we don't exclude it
                     
                     return obj;
                 }
@@ -108,9 +108,9 @@ export class TerrainGenerator {
             }
         }
         this.map = obj;
-        console.logp(minmax)
+        console.log(minmax)
         this.noise = createNoise2D(this.alea)
-        console.logp(worldFactors.get("elevation"))
+        console.log(worldFactors.get("elevation"))
     }
     drawChunk(xv,yv) {
         var pc = worldGrid.screenToChunkPoint(this.nano.x, this.nano.y);

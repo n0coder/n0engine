@@ -63,12 +63,12 @@ export function addAnimationSet(key, key2, values){
 export function getAnimation(key, key2, frame) {
     var aset = animationSetMap.get(key);
     if (!aset) {
-        //console.logp(`there's no animation set for ${key}, ${key2}`,animationSetMap)
+        //console.log(`there's no animation set for ${key}, ${key2}`,animationSetMap)
         return null;
     }
     var aset2 = aset.get(key2)
     if (!aset2) {
-        //console.logp(`there's no animation set for ${key}, ${key2}`, animationSetMap)
+        //console.log(`there's no animation set for ${key}, ${key2}`, animationSetMap)
         return null;
     }
     return aset2[frame%aset2.length]

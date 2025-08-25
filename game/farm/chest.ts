@@ -19,12 +19,12 @@ export class Chest extends Inventory{
         if (ir) {}
         let c =this.add(item)
         pinga.ping("take", this, item.name)
-        //console.logp(item)
+        //console.log(item)
         return c;
         
     }
     take(nano:Nanoai, item, out) {
-        //console.logp({has:this.hasItem(item), chest: this})
+        //console.log({has:this.hasItem(item), chest: this})
         let i;
         if (typeof item === "string" )
             i = this.hasItem(item)

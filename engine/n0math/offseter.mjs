@@ -8,7 +8,7 @@ export class Offseter {
 
       var newX = (x2 * Math.cos(radians) - y2 * Math.sin(radians));
       var newY = (x2 * Math.sin(radians) + y2 * Math.cos(radians));
-      //console.logp({x2, y2, thisx: this.x, thisy: this.y, newX, newY})
+      //console.log({x2, y2, thisx: this.x, thisy: this.y, newX, newY})
       return {x: this.x + newX, y: this.y + newY};
     }
     scale(x2, y2, scale) {

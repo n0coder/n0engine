@@ -11,7 +11,7 @@ export class NanoInventory extends Inventory {
         return index >= 0 && index < this.offsets.length
     }
     equip(item) {
-        //console.logp(item)
+        //console.log(item)
         if (this.list.includes(item)) {
             var i = this.list.indexOf(item)
             var o = this.list.splice(i, 1) //split item out of list
@@ -74,7 +74,7 @@ return super.remove(item, ()=>{
             var offset = this.offsets[i]
 
             if (slot.x != undefined && slot.y != undefined) {
-                //console.logp(offset); 
+                //console.log(offset); 
                 slot.x = x + offset[0]
                 slot.y = y + offset[1]
             }

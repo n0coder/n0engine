@@ -13,7 +13,7 @@ export var jobTasksa = new Map([
             requires: [["hold", item]],
             interactions: [["smiling"]], 
             work: function(job, nano, done) {
-                console.logp(`${nano.name} smiling`, args, this.items);
+                console.log(`${nano.name} smiling`, args, this.items);
             }
         }
     }], ["wink", function() {
@@ -22,7 +22,7 @@ export var jobTasksa = new Map([
             interactions: [["winking"]], 
             work: function(job, nano, done) {
                 this.item.winked = "winked";
-                console.logp(`${nano.name} winking`, args);
+                console.log(`${nano.name} winking`, args);
                 done(this);
             }
         }
@@ -34,7 +34,7 @@ export var jobTasksa = new Map([
             work: function(job, nano, done) {
                 this.item.item = this.args[1];
                 nano.brain.do("pickup", this.item.item, null, (a)=>{
-                    console.logp("picked up", a);
+                    console.log("picked up", a);
                     this.args[0](this);
                 })
                 done(this);
@@ -50,7 +50,7 @@ export var jobTasksa = new Map([
             }
             nano.brain.do("read", this.crop.crop, "waterLevel", (out) => {
                 this.crop.waterLevel = out;
-                console.logp(this.crop)
+                console.log(this.crop)
                 done(this);
             });
         }}
@@ -121,7 +121,7 @@ var stageTemplate = {
     },
     validateStage(job){
         if (this.tasks.length === 0 && this.workIndex.size === 0) {
-            //console.logp("ready to pass to next stage?")
+            //console.log("ready to pass to next stage?")
             
               return job.stageComplete(this);
             
@@ -148,7 +148,7 @@ var job = {
             if (stage.tasks.length === 0) continue; 
             score += stage.rateStage(nano)
         }
-        //console.logp(score)
+        //console.log(score)
         return score
     },
     work: function(nano) {
@@ -160,7 +160,7 @@ var job = {
         let stage = this.stages[this.stage] 
         let a = stage?.work?.(this, nano);
 
-        //console.logp({stage,a, vol})
+        //console.log({stage,a, vol})
         return (a || vol) && this.stages.length > this.stage
     },
     stageComplete: function(stage) {
@@ -177,11 +177,11 @@ var job = {
         else { this.stage++; this.done(this); }
     },
     done: event((function(job) { //custom c# action style event
-        //console.logp("job done")
+        //console.log("job done")
         job.volunteerIndex.clear()
     })),
     failed: event((function(job) {
-       // console.logp("job failed")
+       // console.log("job failed")
         job.volunteerIndex.clear()
     })),
     nanoAssigned: event(),
@@ -293,7 +293,7 @@ export function createJobu(objs,task, ...argsa) {
     }
     let tasks = objs.map(o=>action(o, ...argsa))
     let stages = tasksToStages(tasks);
-    //console.logp(stages)
+    //console.log(stages)
     let jobu = atomicClone(job); //atomically clone the job template
     jobu.name = task
     jobu.stages = stages; //insert the job details

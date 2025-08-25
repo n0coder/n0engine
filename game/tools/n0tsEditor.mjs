@@ -90,7 +90,7 @@ states.set("tileset", tilesetWindow)
 
 function editTile (tile) {
     if (tile === editingTile) return;
-    console.logp("editing tile", tile);
+    console.log("editing tile", tile);
     editingTile = tile;
 
     if (tile) ui.show(tile);
@@ -114,9 +114,9 @@ states.set("add", {
             let ts = tiles.list.map(t => {
                 return t.n0tsEditorTile.img.shared
             });
-            console.logp(ts)
+            console.log(ts)
             let tileJson = JSON.stringify(ts)
-            console.logp(tileJson)
+            console.log(tileJson)
 
             let ideally = {
                 name: "purple",
@@ -132,7 +132,7 @@ states.set("add", {
                 biases: [{factor: "temperature", value: -1}]
             }
             tileJson = JSON.stringify(ideally)
-            console.logp(tileJson)
+            console.log(tileJson)
 
         }
     },
@@ -304,10 +304,10 @@ let ui = {
         }
         for (const mod of tile.n0tsEditorTile.modules) {
             let module = n0TileModules.get(mod);
-            console.logp(mod, mod.key, module )
+            console.log(mod, mod.key, module )
             
             let modui = module.buildUI(tile);
-            console.logp(modui);
+            console.log(modui);
             modui.parent(this.currentDiv);
         }
     },
@@ -355,7 +355,7 @@ let tiles = {
         }        
         let imgdom = p.createImg(file.data, '', undefined, created);
         let clicked = () => {
-            console.logp({imgdom, ti: this})
+            console.log({imgdom, ti: this})
             let tile = this.createTile(imgdom, true)
 
             if (tile === undefined) {
@@ -408,7 +408,7 @@ let tiles = {
         buildn0ts(tile, ["tile"] , new Map([["tile", n0t]]) )
         if (tile.n0ts) {
             if (tile.n0ts.placeholder){
-                console.logp("placeholder", tile.n0ts.placeholder);
+                console.log("placeholder", tile.n0ts.placeholder);
             }
             
         
@@ -438,18 +438,18 @@ let tiles = {
         }
         else { //if the image has data...
             n0.shared = n0.img.shared
-            console.logp("tile has data",n0, n1)
+            console.log("tile has data",n0, n1)
             if (n1?.shared?.sides?.[index1]) {
-                console.logp("neighbor exists");
+                console.log("neighbor exists");
                 if (n1.shared.sides[index1].protected) {
-                    console.logp("tile is neighboring protected"  )
+                    console.log("tile is neighboring protected"  )
                     let n0side = n0.img.shared.sides[index2].values;
                     let n1side = n1.shared.sides[index1].values;
 
                     for (let s = 0; s < n0side.length; s++) {
 
                         let v = n0side[s] !== n1side[s];
-                        console.logp({v, n0side, n1side});
+                        console.log({v, n0side, n1side});
                         if (n0side[s] !== n1side[s]) 
                             return null;
                     }

@@ -76,10 +76,10 @@ function makeTileArcValidation(x,y, tpos) {
 
             if (rup&&rright&&rdown&&rleft){
                 tile.v -= 1;
-                console.logp(tile)
+                console.log(tile)
             }
             if (rup||rright||rdown||rleft) {
-            console.logp({tile,n: {up, down, left, right},  ready})
+            console.log({tile,n: {up, down, left, right},  ready})
             up?.pop(tile, count-1)
             right?.pop(tile, count-1)
             down?.pop(tile, count-1)
@@ -92,7 +92,7 @@ function makeTileArcValidation(x,y, tpos) {
 
     worldGrid.setTile(x,y, tile)
     tile.pop(null,3);
-    console.logp(tile)
+    console.log(tile)
     
 
     

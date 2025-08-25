@@ -4,4 +4,4 @@ class Power{
 let a = () => {
     return {zap(){}}
 }
-console.logp(a().zap())
+console.log(a().zap())

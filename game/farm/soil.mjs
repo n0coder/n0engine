@@ -40,10 +40,10 @@ export class Soil {
             seed = nano.inventory.hasItem(seed)
         if(seed) {
         nano.inventory.remove(seed)
-        //console.logp(seed)
+        //console.log(seed)
         this.crop = seed.crop(this.x, this.y)
         this.crop.pop =()=>{
-            //console.logp("put seeds in me", this)
+            //console.log("put seeds in me", this)
             pinga.ping("plant", this, "seeds")
             this.crop = null;
         }

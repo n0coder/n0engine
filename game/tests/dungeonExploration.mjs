@@ -29,7 +29,7 @@ camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 
 let tile = genTile(100,100);
-console.logp(tile);
+console.log(tile);
 
 /*
 
@@ -115,7 +115,7 @@ let visualize = function visualize(w,h, s, fn) {
         }
     }
     return { work:() => {
-        //console.logp(map);
+        //console.log(map);
         for (let i = 0; i < w; i++) {
             for (let o = 0; o < h; o++) {
                 let n = map?.[i]?.[o] 
@@ -177,7 +177,7 @@ fgraph.fractal([inf]).newBlend([()=>0, 1, ()=>0]).map([
 //fgraph.invert().pow((o)=>1).newBlend([1, (o)=>0, 1])
 //fgraph.bicubic([(o)=>0, 1])
 
-console.logp(graph.create(0,0))
+console.log(graph.create(0,0))
 let hooki2 =n0.brain.do(visualize(fgraph))
 //let hooki =n0.brain.do("hook", visualize(noise) )
 //hooki.name = "visualize noise map"
@@ -211,7 +211,7 @@ while (roro.length<=roomCount) {
     }
 
 }
-console.logp(roro)
+console.log(roro)
 */
 
 /*
@@ -430,7 +430,7 @@ function edgeVoronoiNoise(x, y, rngx, rngy) {
 let a2d = new Map2d();
 a2d.set(0,0, { name: "hi" })
 
-console.logp(a2d.get(0,0), a2d.has(0,0));
+console.log(a2d.get(0,0), a2d.has(0,0));
 
 let size = 16, vsize= size /2
 let sol = 4;
@@ -458,17 +458,17 @@ xnb.anglize().cos()//.sin();
 /*
 let gra = new Worker('./game/tests/graphworker.mjs', {type: 'module'})
 gra.onmessage = function(e) {
-//    console.logp(e.data);
+//    console.log(e.data);
 }
-gra.onerror = function(e) { console.logp (e) }
+gra.onerror = function(e) { console.log (e) }
 gra.postMessage({x:3, y:3});
 */
 
 
-console.logp(xnb.create(3,3));
+console.log(xnb.create(3,3));
 //n0.brain.do(visualize(size,size, 1, xnb ))
 //n1.brain.do(visualize(size, size, 1, xxx))
-console.logp("sanitycheck")
+console.log("sanitycheck")
 //let hooki2 =n0.brain.do(visualize(rooma))
 
 /*
@@ -494,7 +494,7 @@ explorationProfiles.set("cunny", {
     create() { 
         return { cunny:"cute and funny", 
             work(nano) {
-              console.logp("cute and funny loop")
+              console.log("cute and funny loop")
               return true;
             }
         }
@@ -512,7 +512,7 @@ explorationProfiles.set("explorer", {
             */ 
             //nano.brain.doBefore(this, "search")
             //nano.brain.doBefore(this, "walk", 8, 8)
-            console.logp("explorer loop")
+            console.log("explorer loop")
             return true;
             } 
         }
@@ -539,7 +539,7 @@ function assignRoles(profilesa, nanos) {
         }
         posi.push({score, nano, prof})
     }
-    console.logp(posi);
+    console.log(posi);
     let bestNano = { score: -Infinity, nano: null, prof:null };
     for (let i = 0; i < posi.length; i++) {
         const prosa = posi[i];
@@ -549,7 +549,7 @@ function assignRoles(profilesa, nanos) {
             bestNano.prof = prosa.prof;
         }
     }
-    console.logp(bestNano.nano, bestNano.prof)
+    console.log(bestNano.nano, bestNano.prof)
     nanos.get(bestNano.nano).profile = bestNano.prof.create(bestNano.nano);
     nanos.delete(bestNano.nano)
     profilesa.splice(0, 1)
@@ -561,7 +561,7 @@ n1.identity.skills.set("searching", 1)
 let nanos = new Map([[n0, {profile:null}], [n1, {profile:null}], [n2, {profile:null}]])
 
 assignRoles(["explorer","cunny","cunny"], nanos)
-console.logp(nanos);
+console.log(nanos);
 //we can use the map directly to create and run the profiles now
 
 /*
@@ -577,13 +577,13 @@ let dungeon = {
         if (this.explorers.size < this.nanosNeeded) {
         let explorer = this.explorers.get(nano)
         if (explorer === undefined) {
-            console.logp(`${nano.name} is gonna try a dungeon`)
+            console.log(`${nano.name} is gonna try a dungeon`)
 
             /* we should choose exploration profiles based on nano skills 
                (nanos that have a high appraisal/disarming skill 
                would be good at finding and disarming traps?) */
 
-            //explorer = /* load in a exploration style... */ { work(nano) { console.logp(`${nano.name} is exploring?`); return false; /* how should this nano explore? */ } }
+            //explorer = /* load in a exploration style... */ { work(nano) { console.log(`${nano.name} is exploring?`); return false; /* how should this nano explore? */ } }
             
             let hooko = nano.brain.do("hook", (hook) => {  } )
             explorer = { profile: null, hook: hooko }; //we will load in the profile later
@@ -591,7 +591,7 @@ let dungeon = {
 
         } 
         if (this.explorers.size >= this.nanosNeeded) {
-            console.logp("enough workers to start exploring?", this.explorers);
+            console.log("enough workers to start exploring?", this.explorers);
             this.roleCheck(nano)
         }
         //work will be used first to hire nanos, then we can use work after everyones together to do work
@@ -601,18 +601,18 @@ let dungeon = {
     },
     roleCheck(nano) {
         // let explorers = ;
-        console.logp("gonna assign the nanos some roles", this.explorers)
+        console.log("gonna assign the nanos some roles", this.explorers)
         assignRoles(["explorer","cunny","cunny"], this.explorers)
         this.state = "explore"
-        console.logp(this.explorers)
+        console.log(this.explorers)
         for (const [explorer, XD] of this.explorers) {
-            console.logp(XD.profile)
+            console.log(XD.profile)
             explorer.brain.do(XD.profile);
             XD.hook.pull(); //kill the hook to allow the nano to start exploring
         }
     },
     explore(nano) {
-        console.logp(nano, "gonna explore");
+        console.log(nano, "gonna explore");
     }
     
 }

@@ -31,7 +31,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
 
     var a = worldGrid.tileBounds(cx, cy, endX, endY, pad);
     var ar = a.toRect();
-    //console.logp({ar,cx,cy,tx,ty}) //bounds
+    //console.log({ar,cx,cy,tx,ty}) //bounds
     
     let gridArray = [];
     for (let y = ar.y; y <= ar.h; y++) {
@@ -45,7 +45,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
         }
     }
 
-    //console.logp(gridArray)
+    //console.log(gridArray)
     let ss = 2;
     if (!agraphics) {
          agraphics = p.createGraphics((ar.w + 1) * ss, (ar.h + 1) * ss);
@@ -70,7 +70,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
 
     let ezstar = stars(gridArray);
     ezstar(currentoX + pad, currentoY + pad, endoX + pad, endoY + pad, (path) => {
-        //console.logp(path)
+        //console.log(path)
         if (path !== null) {
 
             agraphics.fill(255);
@@ -146,7 +146,7 @@ function stars(grid) {
     astar.setTileCost(8,8)
     astar.setTileCost(9,9)
     
-    //console.logp(grid)
+    //console.log(grid)
     return function (ax, ay, bx, by, pathFn) {
         let a = grid[ay][ax]
         let b = grid[by][bx]
@@ -156,9 +156,9 @@ function stars(grid) {
             let vectorX = ax - bx;
             let vectorY = ay - by;
             let vectorLength = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
-            //console.logp({ax,ay,bx,by,vectorLength}); //i'm betting on the idea nanos get confused when walkiing 0 distance
+            //console.log({ax,ay,bx,by,vectorLength}); //i'm betting on the idea nanos get confused when walkiing 0 distance
             astar.findPath(ax, ay, bx, by, (path)=>{ 
-            //console.logp(path)
+            //console.log(path)
             if (path.length === 0) path.push({x:bx, y:by}) //if 0 length path, fake one point so the nano can say it reached the point
             return pathFn(path)
         });
@@ -166,4 +166,4 @@ function stars(grid) {
     }
 }
 
-//stars([[0,0,0],[0,0,0],[0,0,0]])(0,0,0,0, (path)=>{console.logp(path)})
+//stars([[0,0,0],[0,0,0],[0,0,0]])(0,0,0,0, (path)=>{console.log(path)})

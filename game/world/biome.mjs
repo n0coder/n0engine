@@ -14,7 +14,7 @@ export function addBiomeFactors(map, factor, gens) {
         console.error(`${factor} could not be split into ranges. (please clarify this lol)`)
         return;
     } 
-    //console.logp(gen, factor);
+    //console.log(gen, factor);
     var ranges = map.exportRanges(factor, gen.minm, gen.maxm)
     
     ranges.forEach(r => {
@@ -22,9 +22,9 @@ export function addBiomeFactors(map, factor, gens) {
         var obj = { factor: fact, min: min, max: max }
     
         biomeFactorMap.set(tag, obj)
-        //console.logp(r);
+        //console.log(r);
     })
-    //console.logp({ranges, biomeFactorMap, factor})
+    //console.log({ranges, biomeFactorMap, factor})
 }
 //document.lutMissingMap = new Map()
 export class Biome {

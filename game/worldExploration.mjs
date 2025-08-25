@@ -74,9 +74,9 @@ n0.brain.do("search", search, 6, 120, onFound)
 // even better, mark the state of the search for later so the nano can start the search from their pre existing knowledge
 // what if we mark unexplored chunks in their group radio channel and have them randomly select one when starting to search again?
 // logically the world won't change on it's own, so you can reasonably expect a continuation tech to work like this
-console.logp(12%4)
-console.logp(12 / 4)
-console.logp(4/12)
+console.log(12%4)
+console.log(12 / 4)
+console.log(4/12)
 function* ringCast(cx, cy, radius = 3, visited, onVisited) {
 
 
@@ -108,7 +108,7 @@ function* ringCast(cx, cy, radius = 3, visited, onVisited) {
 			}
 		}
 	}
-	//console.logp(startQueue)
+	//console.log(startQueue)
 	let directions = [[0, 1], [0, -1], [1, 0], [-1, 0], [1, 1], [1, -1], [-1, 1], [-1, -1]];
 	for (let [oxz, [i,o]] of startQueue) {
 		for(let [a,b] of directions) {
@@ -213,7 +213,7 @@ nanoaiActions.set("radialSearch", function (search, onFound) {
 			//n0.brain.do("dance2"); //next frame do a dance
 			this.next = this.generator.next() //describing what happens next frame 
 			let waitAFrame= (( this.moveNext===null || this.moveNext === true) && (this.next != null && !this.next.done) );
-			console.logp({mn: this.moveNext, n:this.next, waitAFrame})
+			console.log({mn: this.moveNext, n:this.next, waitAFrame})
 			return waitAFrame; //true = keep going (this is like a really sophisticated do while system)
 		}, id: 0,
 		rotate: function*(nano) {
@@ -222,7 +222,7 @@ nanoaiActions.set("radialSearch", function (search, onFound) {
 					nano.brain.doBefore(marker, "look", direction) //before we can exit the hook... we look down, search
 					nano.brain.doBefore(marker, "search", search, nano.sightRadius, nano.fov, onFound)
 					nano.brain.doBefore(marker, "pull", hook) //then exit it; but not before pinging what happens as it falls back into the "radial search" action
-					nano.brain.doBefore(marker, "ping", ()=>{this.moveNext = true; console.logp(this)}) //ping that we're ready to move onto the next stage
+					nano.brain.doBefore(marker, "ping", ()=>{this.moveNext = true; console.log(this)}) //ping that we're ready to move onto the next stage
 				}) 
 				yield; //we yield to say we can do another round
 			}
@@ -230,8 +230,8 @@ nanoaiActions.set("radialSearch", function (search, onFound) {
 
 	}
 }) 
-console.logp(Math.sqrt(2)*2)
-console.logp(Math.sqrt(1))
+console.log(Math.sqrt(2)*2)
+console.log(Math.sqrt(1))
 
 //n0.brain.do("walk", 0, 0)			
 //n0.brain.do("exploreSearch")
@@ -241,16 +241,16 @@ n0.brain.do("hook", (hook, marker) => {
 	let x = n0.x, y = n0.y, tx = 7, ty = 7, vx = n0.vx, vy = n0.vy, fov = n0.fov; 
 	
 	n0.brain.doBefore(marker, "look", "up")
-	n0.brain.doBefore(marker, "ping", () => console.logp(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
 	n0.brain.doBefore(marker, "wait",.5) 
 	n0.brain.doBefore(marker, "look", "right")
-	n0.brain.doBefore(marker, "ping", () => console.logp(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
 	n0.brain.doBefore(marker, "wait",.5) 
 	n0.brain.doBefore(marker, "look", "down")
-	n0.brain.doBefore(marker, "ping", () => console.logp(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
 	n0.brain.doBefore(marker, "wait",.5) 
 	n0.brain.doBefore(marker, "look", "left")
-	n0.brain.doBefore(marker, "ping", () => console.logp(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
+	n0.brain.doBefore(marker, "ping", () => console.log(dotFov(n0.x, n0.y, tx, ty, n0.vx, n0.vy, fov)))
 	n0.brain.doBefore(marker, "pull", hook)
 })
 */
@@ -261,14 +261,14 @@ let search = (tile) => {
 //search = () => true;
 /*
 n0.brain.do( "search", search, 8, 360, (results) => {
-	console.logp(results); 
+	console.log(results); 
 	if (results.length > 0)
 	n0.brain.do("spin", 10, 12);
 })
 */
 /*
 n0.brain.do("radialSearch", search, (results) => {
-	console.logp(results); 
+	console.log(results); 
 	if (results.length > 0)
 	n0.brain.do("spin", 10, 10);
 });
@@ -330,7 +330,7 @@ export class Visualizer {
 		//this.ring = ringCast(3,, this.visited)
 		//ringCaster.cast(n0.x, n0.y, n0.sightRadius)
 		//this.r = [...ringCast(n0.x, n0.y, this.radi * 2.5, this.visited)]
-		//console.logp(this.r);
+		//console.log(this.r);
 	}
 	draw() {
 		let sm = inverseLerp(-1,1, Math.sin(ticks*.1));
@@ -371,8 +371,8 @@ export class Visualizer {
 }
 
 }
-console.logp((36)/(8*4))
-//console.logp(([[2,5], [2,2]]).find(a => [2,6]));
+console.log((36)/(8*4))
+//console.log(([[2,5], [2,2]]).find(a => [2,6]));
 //let bfs = new Visualizer(n0);
 //cosmicEntityManager.addEntity(bfs);
 
@@ -418,7 +418,7 @@ function searchSpace(nano, condition, radius, fov) {
 	//if (result.done && result.value === undefined && results.length === 0) {
 		//
 //}
-	//console.logp()
+	//console.log()
 	// we will need two systems (3?)
 	// radial bfs
 	// rotate 4 times to the right
@@ -462,7 +462,7 @@ let bxs = ()=> ({ visited: new Map(), visitedChunks: new Set(),
 		let bop = (xo,yo)=>{
 				
 			let v = this.visited.get(`${xo}, ${yo}`)
-			//console.logp(v)
+			//console.log(v)
 			let d = Math.floor(distance(ox,oy,xo,yo))
 			if (v===undefined &&  d < r)
 				queue.push(this.tile(xo,yo))
@@ -476,14 +476,14 @@ let bxs = ()=> ({ visited: new Map(), visitedChunks: new Set(),
 			queue.shift()
 		    var [x,y] = worldGrid.alignGridPosition(x,y)
             
-            //console.logp({x,y,cx,cy, dx: cx-x, dy:cy-y})
+            //console.log({x,y,cx,cy, dx: cx-x, dy:cy-y})
             
 		   
 			if (this.visited.get(`${x}, ${y}`)) { continue; };
 			//why is bop only exploring tiles that are diagonal (x+1, y+1) etc...
             bop(x-1, y); bop(x+1, y); bop(x, y-1); bop(x, y+1);
 			out(tile())
-	        //console.logp({x,y,tile: ;
+	        //console.log({x,y,tile: ;
 			this.visited.set(`${x}, ${y}`, {x,y, color})
 	    }
 	})
@@ -510,7 +510,7 @@ n0.brain.do("dance");
 
 n0.brain.do("ping-", () => {
 	let bopo = 0;
-	console.logp(`running a rountine bopo ${bopo}`)
+	console.log(`running a rountine bopo ${bopo}`)
     if (bopo === 2) return false;
     n0.brain.doNow("dance")
 	bopo++;
@@ -523,7 +523,7 @@ nanoaiActions.set("bopo", function () {
 			this.bopo = 0;
 		},
 		work() {
-			console.logp(`running a rountine bopo ${this.bopo}`)
+			console.log(`running a rountine bopo ${this.bopo}`)
 			if (this.bopo === 2) return false;
 			n0.brain.doNow("dance")
 			this.bopo++;

@@ -212,7 +212,7 @@ class Radio {
         job.done.add(this,(j,n)=>this.jobDone(j,n))
         job.failed.add(this,(j,n)=>this.jobFail(j,n))
         job.nanoAssigned.add(this, (j, nano)=>{
-            //console.logp(j)
+            //console.log(j)
             this.nanosSearching.delete(nano); //remove from searching
         })
     }
@@ -237,7 +237,7 @@ class Radio {
         return nanos.filter((n) => (this.getChannel(channel, n) === this.getChannel(channel, c)));
     }
     jobDone(job) {
-        //console.logp("job done", job)
+        //console.log("job done", job)
         for (const [key, channel] of job.keys) {
             this.removeJob(channel, job, key)
         } 
@@ -248,7 +248,7 @@ class Radio {
 
     }
     jobFail(job) {
-        console.logp("job failed", job)
+        console.log("job failed", job)
         for (const nano of job.nanos) {
             this.nanosWorking.delete(nano)
         }
@@ -283,7 +283,7 @@ class Radio {
             return;
         }
         */
-        //console.logp("(nano searching): nano is searching")
+        //console.log("(nano searching): nano is searching")
         
         function rateJobs(jobs, nano, channel) {
             
@@ -291,7 +291,7 @@ class Radio {
             let best = bestSearch([nano], jobs, (n,j)=>{ return j.rateJob(n); } )
             if (best.size > 0)
             jobScores.push([best, channel])
-            //console.logp(jobScores)
+            //console.log(jobScores)
             return jobScores
         }
         
@@ -304,7 +304,7 @@ class Radio {
         if (js) jobScores =js[0]
 
         if (!jobScores || jobScores.length === 0) {
-            //console.logp("(nano searching): no jobs right now", key)
+            //console.log("(nano searching): no jobs right now", key)
             return;
         }
         let job = jobScores[0].get(key).b
@@ -313,7 +313,7 @@ class Radio {
         this.nanosWorking.set(key, job)
     }
     ping(type, item) {
-        console.logp("ping appeared", {type, item})
+        console.log("ping appeared", {type, item})
     }
     constructor(){
         this.nanosSearching = new Map();
@@ -332,4 +332,4 @@ let nano = { name: "n0" }
 nano.lover = nanolover, nanolover.lover = nano;
 
 let lover = n0radio.getCreateChannel("lover", nano);
-//console.logp(lover);
+//console.log(lover);
