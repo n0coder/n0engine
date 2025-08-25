@@ -57,7 +57,7 @@ let dir = (dir, fn) => {
             };
         },
         div: undefined, inputs: [], buildUI(currentTile) {
-            let n0ts = currentTile.n0tsEditorTile;
+            let n0ts = currentTile;
             console.log(n0ts);
             if (this.div === undefined) 
                 this.div = p.createDiv().class("side").parent(invdiv);
@@ -241,10 +241,83 @@ n0TileModules.set("biases", {
             return { option: o, bias: multiple }
         })
     },
-    div: undefined, inputs: [], buildUI(tile) {
-            //todo: bias div
-            return this.div;
+    div: undefined, inputs: [],   div: undefined,
+    inputs: [],   // each { factor, value, remove }
+
+    buildUI(currentTile) {
+        let n0ts = currentTile;
+        if (!n0ts.biases) n0ts.biases = [];
+
+        // Create root div once
+        if (this.div === undefined)
+            this.div = p.createDiv().class("side").parent(invdiv);
+
+        // Ensure enough inputs exist for biases
+        for (let i = 0; i < n0ts.biases.length; i++) {
+            if (!this.inputs[i]) this.inputs[i] = {};
+
+            const row = this.inputs[i];
+            row.div = p.createDiv().class("bias").parent(this.div);
+            // Factor select
+            if (!row.factor) {
+                row.factor = p.createSelect().parent(row.div);
+                for (const [fk] of worldFactors) row.factor.option(fk);
+            }
+            row.factor.value(n0ts.biases[i].factor);
+
+            if (row.factor.currentFN)
+                row.factor.elt.removeEventListener("change", row.factor.currentFN);
+            row.factor.currentFN = () => {
+                n0ts.biases[i].factor = row.factor.value();
+            };
+            row.factor.elt.addEventListener("change", row.factor.currentFN);
+
+            // Value input
+            if (!row.value) {
+                row.value = p.createInput("", "number").addClass("value").parent(row.div);
+            }
+            row.value.value(n0ts.biases[i].value);
+
+            if (row.value.currentFN)
+                row.value.elt.removeEventListener("input", row.value.currentFN);
+            row.value.currentFN = () => {
+                let o = parseFloat(row.value.value());
+                if (!Number.isNaN(o)) n0ts.biases[i].value = o;
+            };
+            row.value.elt.addEventListener("input", row.value.currentFN);
+
+            // Remove button
+            if (!row.remove) {
+                row.remove = p.createButton("X").parent(row.div);
+            }
+            if (row.remove.currentFN)
+                row.remove.elt.removeEventListener("click", row.remove.currentFN);
+            row.remove.currentFN = () => {
+                n0ts.biases.splice(i, 1);
+                this.buildUI(n0ts); // rebuild view without nuking base div
+            };
+            row.remove.elt.addEventListener("click", row.remove.currentFN);
         }
+
+        // Add button (one per module)
+        if (!this.addBtn) {
+            this.addBtn = p.createButton("Add Bias").parent(this.div);
+        }
+        if (this.addBtn.currentFN)
+            this.addBtn.elt.removeEventListener("click", this.addBtn.currentFN);
+        this.addBtn.currentFN = () => {
+            for (const [fk] of worldFactors) {
+                if (!n0ts.biases.find(b => b.factor === fk)) {
+                    n0ts.biases.push({ factor: fk, value: 0 });
+                    break;
+                }
+            }
+            this.buildUI(n0ts);
+        };
+        this.addBtn.elt.addEventListener("click", this.addBtn.currentFN);
+
+        return this.div;
+    }
 })
 
 n0TileModules.set("thresholds", {
@@ -264,10 +337,104 @@ n0TileModules.set("thresholds", {
             //pinga.ping("harvest", tile.n0ts.placeholder, "error", false);
         }
     },
-    div: undefined, inputs: [], buildUI(tile) {
-            //todo: bias div
-            return this.div;
+    div: undefined, inputs: [], 
+
+    buildUI(currentTile) {
+        let n0ts = currentTile;
+        if (!n0ts.thresholds) n0ts.thresholds = [];
+
+        if (this.div === undefined)
+            this.div = p.createDiv().class("side").parent(invdiv);
+
+        for (let i = 0; i < n0ts.thresholds.length; i++) {
+            if (!this.inputs[i]) 
+                this.inputs[i] = {};
+            const row = this.inputs[i];
+            row.div = p.createDiv().class("threshold").parent(this.div);
+            // Factor select
+            if (!row.factor) {
+                row.factor = p.createSelect().parent(row.div);
+                for (const [fk] of worldFactors) row.factor.option(fk);
+            }
+            row.factor.value(n0ts.thresholds[i].factor);
+
+            if (row.factor.currentFN)
+                row.factor.elt.removeEventListener("change", row.factor.currentFN);
+            row.factor.currentFN = () => {
+                const fk = row.factor.value();
+                const wf = worldFactors.get(fk);
+                n0ts.thresholds[i].factor = fk;
+                if (wf) {
+                    n0ts.thresholds[i].min = wf.mini;
+                    n0ts.thresholds[i].max = wf.maxi;
+                }
+            };
+            row.factor.elt.addEventListener("change", row.factor.currentFN);
+
+            // Min input
+            if (!row.min) {
+                row.min = p.createInput("", "number").parent(row.div);
+            }
+            row.min.value(n0ts.thresholds[i].min);
+
+            if (row.min.currentFN)
+                row.min.elt.removeEventListener("input", row.min.currentFN);
+            row.min.currentFN = () => {
+                let o = parseFloat(row.min.value());
+                if (!Number.isNaN(o)) n0ts.thresholds[i].min = o;
+            };
+            row.min.elt.addEventListener("input", row.min.currentFN);
+
+            // Max input
+            if (!row.max) {
+                row.max = p.createInput("", "number").parent(row.div);
+            }
+            row.max.value(n0ts.thresholds[i].max);
+
+            if (row.max.currentFN)
+                row.max.elt.removeEventListener("input", row.max.currentFN);
+            row.max.currentFN = () => {
+                let o = parseFloat(row.max.value());
+                if (!Number.isNaN(o)) n0ts.thresholds[i].max = o;
+            };
+            row.max.elt.addEventListener("input", row.max.currentFN);
+
+            // Remove button
+            if (!row.remove) {
+                row.remove = p.createButton("X").parent(row.div);
+            }
+            if (row.remove.currentFN)
+                row.remove.elt.removeEventListener("click", row.remove.currentFN);
+            row.remove.currentFN = () => {
+                n0ts.thresholds.splice(i, 1);
+                this.buildUI(n0ts);
+            };
+            row.remove.elt.addEventListener("click", row.remove.currentFN);
         }
+
+        // Add threshold button
+        if (!this.addBtn) {
+            this.addBtn = p.createButton("Add Threshold").parent(this.div);
+        }
+        if (this.addBtn.currentFN)
+            this.addBtn.elt.removeEventListener("click", this.addBtn.currentFN);
+        this.addBtn.currentFN = () => {
+            for (const [fk, wf] of worldFactors) {
+                if (!n0ts.thresholds.find(t => t.factor === fk)) {
+                    n0ts.thresholds.push({
+                        factor: fk,
+                        min: wf.mini,
+                        max: wf.maxi
+                    });
+                    break;
+                }
+            }
+            this.buildUI(n0ts);
+        };
+        this.addBtn.elt.addEventListener("click", this.addBtn.currentFN);
+
+        return this.div;
+    } 
 })
 
 

@@ -34,7 +34,15 @@ let jtotile = {
     thresholds:[],
     path:"/assets/wave/purple/6.png",
     biases:[{"factor":"temperature","value":-1}],
-    up:[0,0,0],right:[0,0,0],down:[0,0,0],left:[0,0,0],
+    up:[0,2,0],right:[0,0,0],down:[0,0,0],left:[0,0,0],
+    modules:["up","right","down","left","noiseBiases"], weight:0.5,
+}
+
+let jtotile2 = {
+    thresholds:[],
+    path:"/assets/wave/purple/6.png",
+    biases:[{"factor":"temperature","value":-1}],
+    up:[2,2,2],right:[2,2,2],down:[2,2,2],left:[2,2,2],
     modules:["up","right","down","left","noiseBiases"], weight:0.5,
 }
 
@@ -45,23 +53,26 @@ nano.brain.do("walk", 3, 3);
 nano.brain.do("ping", () => console.log("nano time??"));
 
 let ui = {
-    div: p.createDiv().class("tilediv").parent(rightMenu.menu),
+    div: p.createDiv().id("tileEditor").parent(rightMenu.menu),
     modules:new Map([
-        ["up", {
-            div: n0TileModules.get("up").buildUI(jtotile)
-
-        }]
+        ["up", {}],["right", {}],["down", {}],["left", {}],["biases", {}],["thresholds", {}], 
     ]),
-    build(){
+    build(tile){
         var itemsa = Array.from(this.div.elt.children);
         for (const node of itemsa) {
             invdiv.elt.appendChild(node);
         }
         
-        for (const [name, module] of modules) {
-            module.div.parent(this.div)
+        for (const [name, module] of this.modules) {
+            module.div = n0TileModules.get(name)?.buildUI?.(tile)
+            
+            if (module.div) module.div.parent(this.div);
         }
     
     }
 }
-ui.build()
+
+
+let j1 = p.createButton("j1").mouseClicked(()=>{ui.build(jtotile)}).parent(rightMenu.menu)
+let j2 = p.createButton("j2").mouseClicked(()=>{ui.build(jtotile2)}).parent(rightMenu.menu)
+ui.build(jtotile)
