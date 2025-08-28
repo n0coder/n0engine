@@ -1,13 +1,13 @@
 //this file has concluded it's current purpose
 //i will keep it around to do additional UI techs improvements
 
-import { rightMenu } from "../../engine/core/Menu/menu.mjs";
+import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine";
 import { Nanoai } from "../nanoai/nanoai.mjs";
+import {  } from "../world/wave/TileMods.mjs"
 import { invdiv } from "../tools/n0tilesystem/n0tseditorUI.mjs";
 import { n0TileModules } from "../world/wave/n0.mjs";
 import { addTiles } from "./n0TileSolver.mjs";
-
 
 rightMenu.show();
 
@@ -52,27 +52,59 @@ let nano = new Nanoai();
 nano.brain.do("walk", 3, 3);
 nano.brain.do("ping", () => console.log("nano time??"));
 
+
+rightMenu.show();
 let ui = {
     div: p.createDiv().id("tileEditor").parent(rightMenu.menu),
     modules:new Map([
-        ["up", {}],["right", {}],["down", {}],["left", {}],["biases", {}],["thresholds", {}], 
+        //["up", {}],["right", {}],["down", {}],["left", {}],["biases", {}],["thresholds", {}], 
     ]),
     build(tile){
         var itemsa = Array.from(this.div.elt.children);
         for (const node of itemsa) {
             invdiv.elt.appendChild(node);
         }
-        
-        for (const [name, module] of this.modules) {
-            module.div = n0TileModules.get(name)?.buildUI?.(tile)
+        if (tile) {
+            for (const name of tile.modules) {
+                console.log(name);
+            let module = n0TileModules.get(name)
             
-            if (module.div) module.div.parent(this.div);
+            let ui = module?.buildUI?.(tile)
+                
+            if (module?.div) module.div.parent(this.div);
+        } 
+
+        /*
+        let row = this.div;
+        if (!row.div) row.div = p.createDiv().class("addMods")
+        row.div.parent(row);
+        if (!row.factor) {
+            row.factor = p.createButton("Add Modules").class("addMods")
         }
-    
+        row.factor.parent(row.div);
+        row.menu = p.createDiv().class("modules")
+        row.menu.parent(row.div);
+        row.menu.mods ??= [];
+        for (const [fk] of n0TileModules) { 
+            if (!row.menu.mods[fk]) {
+                row.menu.mods[fk] = p.createButton(fk).class("module");
+            }
+            row.menu.mods[fk].parent(row.menu);
+        }
+        */
+        //row.factor.value();
+        
+        //if (row.factor.currentFN)
+            //row.factor.elt.removeEventListener("change", row.factor.currentFN);
+        //row.factor.currentFN = () => {
+            //n0ts.biases[i].factor = row.factor.value();
+        //};
+        //row.factor.elt.addEventListener("change", row.factor.currentFN);
+        }
     }
 }
 
 
-let j1 = p.createButton("j1").mouseClicked(()=>{ui.build(jtotile)}).parent(rightMenu.menu)
-let j2 = p.createButton("j2").mouseClicked(()=>{ui.build(jtotile2)}).parent(rightMenu.menu)
-ui.build(jtotile)
+export let j1 = p.createButton("j1").mouseClicked(()=>{ui.build(tiles)}).parent(leftMenu.menu)
+let j2 = p.createButton("j2").mouseClicked(()=>{ui.build(jtotile2)}).parent(leftMenu.menu)
+//ui.build(tiles)

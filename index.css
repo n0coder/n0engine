@@ -67,7 +67,6 @@ flex-shrink: 0;
 }
 .menu Button {
   border-radius: 5px;
-  width: 90;
 } 
 .menu h3 {
   display: flex;
@@ -113,7 +112,11 @@ flex-shrink: 0;
   font-style: normal;
   line-height: normal;
 }
-
+.addMods {
+  display:flex;
+  flex-direction: column;
+  width: 200px;
+}
 body::before {
   content: "";
   position: absolute;
@@ -381,6 +384,16 @@ body::before {
   display: inline-block; 
 }
 
+.thresholds {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.biases {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 #tileEditor {
   
     display: flex;

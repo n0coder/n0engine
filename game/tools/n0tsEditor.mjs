@@ -7,6 +7,7 @@ import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntity
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine"
 import { WorldGrid, worldGrid } from "../../engine/grid/worldGrid.mjs"
+//import { j1, ui as oio } from "../tests/UItechs.mjs";
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { worldFactors } from "../world/FactorManager.mjs";
 import { buildn0ts, n0TileModules } from "../world/wave/n0.mjs";
@@ -14,7 +15,6 @@ import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks } from "../world/wave/worldGen/ChunkDrawer.mjs";
 import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
 import { invdiv, n0TileEditorMenu } from "./n0tilesystem/n0tseditorUI.mjs";
-
 let cursor = new DebugCursor()
 
 /* 
@@ -89,7 +89,7 @@ let tilesetWindow = {
 states.set("tileset", tilesetWindow)
 
 function editTile (tile) {
-    if (tile === editingTile) return;
+    if (tile === editingTile || tile === undefined ) return;
     console.log("editing tile", tile);
     editingTile = tile;
 
@@ -263,13 +263,14 @@ let visualizer = {
 cosmicEntityManager.addEntity(visualizer, -5)
 
 
-rightMenu.show();
+
 let ui = {
     currentDiv: null, 
     show(tile) {
-            //rightMenu.hide();
+        //rightMenu.hide();
+        ui2.build(tile.n0ts.tile);
         
-        this.drawUI(tile);
+        //this.drawUI(tile);
     },
 
     drawUI(tile) {
