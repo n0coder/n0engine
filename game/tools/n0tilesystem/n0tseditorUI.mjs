@@ -2,6 +2,7 @@ import { cosmicEntityManager } from "../../../engine/core/CosmicEntity/CosmicEnt
 import { leftMenu } from "../../../engine/core/Menu/menu.mjs";
 import { p } from "../../../engine/core/p5engine";
 import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
+import { n0tsEditorFiles, n0tsEditorTiles } from "../n0tsEditor.mjs";
 
 
 export let invdiv = p.createDiv().class("invisible").hide();
@@ -54,10 +55,7 @@ export let n0TileEditorMenu = {
         p.createSpan(name).parent(title);
         let buttons = p.createDiv().class("group-buttons").parent(titlebar)
         let svg = summonSvg('icon-plus', 32).parent(buttons)
-        svg.mouseClicked(() => {
-            console.log("implement add tileset")
-        })
-
+        
         //let btn = addButton("add-tileset", "/assets/editor/addgroup.png")
         //let img = p.createDiv().class(btn.cls).parent(buttons);
         //console.log({btn, img})
@@ -66,8 +64,8 @@ export let n0TileEditorMenu = {
         let div = p.createDiv().class("sets").parent(menu);
         let createSpace = this.createSpace;
         let group = {
-            menu, title, div,
-            set, spaces: [],
+            name, menu, title, div,
+            set, spaces: [], cls,
             rebuild() {
                 var itemsa = Array.from(div.elt.children);
                 for (const node of itemsa) {
@@ -109,7 +107,10 @@ export let n0TileEditorMenu = {
                 this.set.splice(index, 0, tile)
             }
         }
-
+        
+        svg.mouseClicked(() => {
+            n0TileEditorMenu.createSet(group, "tileset");
+        })
         this.sets.push(group);
         return group;
     },
@@ -158,13 +159,10 @@ export let n0TileEditorMenu = {
         let grab = p.createDiv("⋮⋮").class("grab").parent(titlebar);
         let buttons = p.createDiv().class("group-buttons").parent(titlebar)
         let svg = summonSvg('icon-plus', 32).parent(buttons)
-        svg.mouseClicked(() => {
-            console.log("implement add image")
-        })
-
+        
         let div = p.createDiv().class("set").parent(dib);
         let set1 = {
-            title,
+            title, group,
             titlediv: titlebar, titlebox,
             div: dib,
             imgsdiv: div,
@@ -197,7 +195,7 @@ export let n0TileEditorMenu = {
             }
         });
         set1.imgsdiv.elt.add = (a) => {
-            console.log(a);
+            console.log("adding img to div", set1, a);
             a.img.parent(set1.imgsdiv)
         }
 
@@ -239,6 +237,15 @@ export let n0TileEditorMenu = {
         set1.div.parent(group.div)
 
         this.rebuild();
+        svg.mouseClicked(() => {
+            let set = this.currentSet.set
+            this.currentSet.set = set1;
+            console.log("adding img to ", set1)
+            n0tsEditorFiles.openQuiet()
+            
+            this.currentSet.set = set1;
+            console.log("implement add image")
+        })
             //this.sets.push(set1);
         return set1;
     },
@@ -249,9 +256,8 @@ export let n0TileEditorMenu = {
         imgdiv.elt.addEventListener('dragstart', (e) => {
             if (this.src === null) {
                 this.src = imgdiv;
-                this.src.img = imgdiv;
                 imgdiv.addClass("dragging")
-                dragging = { img: this.src };
+                this.dragging = { img: this.src };
                 e.dataTransfer.setDragImage(emptyImg, 0, 0);
             }
 
@@ -259,13 +265,16 @@ export let n0TileEditorMenu = {
         imgdiv.elt.addEventListener('dragend', (e) => {
             if (imgdiv === this.src) {
                 imgdiv.removeClass("dragging")
-                target.add?.(this.src);
+                this.target.add?.(this.src);
                 this.src = null;
-                dragging = undefined;
+                this.dragging = undefined;
             }
         });
         this.currentSet.set.imgs.push(imgdiv);
 
+        imgdiv.set =  this.currentSet;
+        
+        console.log("adding img to set", imgdiv.set.set.group)
         imgdiv.parent(this.currentSet.set.imgsdiv);
     },
     rebuild() {

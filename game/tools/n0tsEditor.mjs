@@ -62,7 +62,14 @@ function editTile (tile) {
     if (tile) ui.show(tile);
     // show ui
 }
+function editTileImg (img) {
+    if (img === editingTile || img === undefined ) return;
+    console.log("editing tile", img);
+    editingTile = img;
 
+    if (img) ui.showImg(img);
+    // show ui
+}
 
 states.set("add", {
     click(pos) {
@@ -75,9 +82,9 @@ states.set("add", {
         let wtile = worldGrid.getTile(pos.x, pos.y)
         if (!wtile) {
             //placeUpload = true
-            files.open(true);
+            n0tsEditorFiles.open(true);
         } else {
-            let ts = tiles.list.map(t => {
+            let ts = n0tsEditorTiles.list.map(t => {
                 return t.n0tsEditorTile.img.shared
             });
             console.log(ts)
@@ -121,7 +128,7 @@ states.set("add", {
 
         let tile = selectedTile, tpos = selectedPos;
         // TODO: remove this false flag or move the tech into the side module
-        if ( true && tile?.n0ts && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
+        if ( true && tile?.n0ts && !tile.n0ts.placeholder && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
             
             p.ellipse(32,32,32);
             let size = worldGrid.tileSize / 3, hsize = size / 2, hgrid = worldGrid.tileSize / 2
@@ -293,158 +300,84 @@ let ui = {
         
         //this.drawUI(tile);
     },
-
-    drawUI(tile) {
-        if (this.currentDiv) {
-            var itemsa = Array.from(this.currentDiv.elt.children);
-            for (const node of itemsa) {
-                invdiv.elt.appendChild(node);
-            }
-        }
-        else {
-            this.currentDiv = p.createDiv().id("tileEditor"); // create new
-            rightMenu.add(this.currentDiv);
-        }
-
-        if (!tile?.n0tsEditorTile) return;
-        
-
-
-        if (!this.currentDiv.addModule) {
-            this.currentDiv.addModule =p.createDiv().parent(this.currentDiv)
-            let addbutton = p.createButton("add module").class("add").parent(this.currentDiv.addModule)
-            if ( addbutton.currentFN )
-                addbutton.elt.removeEventListener('click', addbutton.currentFN);
-            addbutton.currentFN =()=>{
-                tile.n0tsEditorTile.setSides([0,0,0],[0,0,0],[0,0,0],[0,0,0])
-                this.drawUI(tile);
-            }
-            addbutton.elt.addEventListener('click',  addbutton.currentFN);
-            
-        } else {
-            this.currentDiv.addModule.parent(this.currentDiv);
-        }
-        for (const mod of tile.n0tsEditorTile.modules) {
-            let module = n0TileModules.get(mod);
-            console.log(mod, mod.key, module )
-            
-            let modui = module.buildUI(tile);
-            console.log(modui);
-            modui.parent(this.currentDiv);
-        }
-    },
+    showImg(img) {
+        console.log("editing image tile data");
+    }
 };
 
-/*
-theoretically, when we upload an image, 
-that image is given side state data. 
-when we place or generate a tile next to another tile, 
-we want to share the side with both images. 
-the new image should gather any protected side into it's implementation. 
-we should not be automatically protecting sides. 
-if two protected sides happen to check each other,
-and they don't match we fail to place. 
-which means that tile copy is not created. 
-if we protect a new side, 
-we need to check all copies placements and delete any copies that have two clashing protected sides. 
-if up is protected (index 0), 
-we check the up neighbor and it's down is protected and it's side does not match, 
-this tile gets deleted. we don't delete neighbors. 
-*/
-
-let tiles = {
+export let n0tsEditorTiles = {
     list: [], 
     placeUpload: false,
     div: p.createDiv().class("tiles"),
-    add(file) {
+    add(file, set) {
         let created = (img)=> {
             img.name = file.name
             if (img.width > 0 && img.height > 0) {
-                let tile = this.createTile(img, true)
-
-                if (tile === undefined) {
-                    console.error('Tile does not fit'); // ? what
-                    return;
-                }
-
-                if (this.placeUpload) {
-                    tile.selectedPos = selectedPos;
+                let tile = this.createTile(img, this.placeUpload)
+                if (tile) {
+                tile.selectedPos = selectedPos;
                     tile.pos = selectedPos.screen();
                     editTile(tile)
-                }
-                this.list[this.list.length] = tile
+                    this.list[this.list.length] = tile
+                } else editTileImg(imgdom)
+                    
             }
         }        
         let imgdom = p.createImg(file.data, '', undefined, created);
         let clicked = () => {
-            console.log({imgdom, ti: this})
             let tile = this.createTile(imgdom, true)
-
-            if (tile === undefined) {
-                    console.error('Tile does not fit'); // ? what
-                    return;
-                }
-
+            console.log({imgdom, ti: this})
+            if (tile) {
+                console.log("creating tile", tile)
             tile.selectedPos = selectedPos;
             tile.pos = selectedPos.screen();
             editTile(tile)
+            } else {
+                editTileImg(imgdom)
+            }
+            
         }
         imgdom.mousePressed(clicked);
-        n0TileEditorMenu.addImage(imgdom)
+        n0TileEditorMenu.addImage(imgdom, set)
         //imgdom.parent(tiles.div);
     },
     createTile(img, gen) {
-
-        
-        //side constraints gone, this tech won't handle them directly anymore
-
-        //let up = worldGrid.getTile(selectedPos.x, selectedPos.y - 1)
-        //let right = worldGrid.getTile(selectedPos.x + 1, selectedPos.y)
-        //let down = worldGrid.getTile(selectedPos.x, selectedPos.y + 1)
-        //let left = worldGrid.getTile(selectedPos.x - 1, selectedPos.y)
-
-        let tile = worldGrid.getTile(selectedPos.x, selectedPos.y);
-        tile ??= gen ? genTile(selectedPos.x, selectedPos.y, false) : {}
-
-        if (img.shared !== undefined) {
-            buildn0ts(tile, ["tile"] , new Map([["tile", img]]) )
-            return;
-        } 
-        
-        //let moduls = ["up", "right", "down", "left", "noiseBiases"];
-        //let modules = []
         
         let n0t = new Tile();
         n0t.img = img;
         img.tile = n0t;
-        n0t.name = img.name;
-        /*
-        for (const key of moduls) {
-            let module = n0TileModules.get(key);
-            if (module)
-                modules.push({ key, tile: n0tsEditorTile })    
-        }
-        */
-        tile.n0tsEditorTile = n0t;
+        n0t.name = img.name;        
+        
+        if (gen) {
+        let tile = worldGrid.getTile(selectedPos.x, selectedPos.y);
+        tile ??=  genTile(selectedPos.x, selectedPos.y, false)
+
+            if (img.n0t !== undefined) {
+                
+                if (tile?.n0ts?.placeholder){ //if this tile has a placeholder on n0ts, destroy the n0ts
+                    tile.n0ts = null;
+                } else if (tile?.n0ts) { //if this tile has an n0ts but no placeholder, don't remake the tile
+                    return;
+                } 
+                //build the n0ts (build new tile or rebuild placeholder tile)
+                buildn0ts(tile, ["tile"] , new Map([["tile", img.n0t]]) )
+            return;
+        } 
+        
+        console.warn("creating new tile")
         
         buildn0ts(tile, ["tile"] , new Map([["tile", n0t]]) )
-        if (tile.n0ts) {
-            if (tile.n0ts.placeholder){
-                console.log("placeholder", tile.n0ts.placeholder);
+        tile.n0tsEditorTile = n0t;
+        if (tile?.n0ts?.placeholder){
+            console.log("placeholder", tile.n0ts.placeholder);
+            if (tile?.n0ts?.placeholder){
+                tile.n0ts = null;
             }
-            
+        }
+    }
         
-        }        
-        /*
+        img.n0t = n0t;   
         
-        */
-
-        //if(!this.createSide(n0tsEditorTile, up, 2, 0)) return null;
-        //if(!this.createSide(n0tsEditorTile, right, 3, 1)) return null;
-        //if(!this.createSide(n0tsEditorTile, down, 0, 2)) return null;
-        //if(!this.createSide(n0tsEditorTile, left, 1, 3)) return null;
-        //tile.n0tsEditorTile = n0tsEditorTile;
-        return tile;
     },
     createSide(data, dir, index1, index2) {
         let n0 = data;
@@ -486,22 +419,22 @@ let tiles = {
 
 let tilesetdiv = p.createDiv("tileset")
 leftMenu.add(tilesetdiv);
-tiles.div.parent(tilesetdiv);
+n0tsEditorTiles.div.parent(tilesetdiv);
 leftMenu.show();
 
-let files = {
+export let n0tsEditorFiles = {
     input: p.createFileInput((file) => {
         if (file.type.startsWith('image')) {
-            tiles.add(file)
+            n0tsEditorTiles.add(file);
         }
     }),
     open() {
-        tiles.placeUpload = true;
+        n0tsEditorTiles.placeUpload = true;
         this.input.elt.click();
     },
     openQuiet() {
-        tiles.placeUpload = true;
+        n0tsEditorTiles.placeUpload = false;
         this.input.elt.click();
     }
 }
-files.input.hide();
+n0tsEditorFiles.input.hide();

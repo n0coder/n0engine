@@ -97,6 +97,9 @@ tile2.setSides([[0,1,0],[0,0,0],[0,0,0],[0,1,0]]);
 console.log({tile, tile2, up: tile.isUp(tile2), right: tile.isRight(tile2), down: tile.isDown(tile2), left: tile.isLeft(tile2) })
 n0tiles.set("purple0", tile);
 n0tiles.set("purple1", tile2);
+
+i write with no abstractions, in vanilla javascript with surgical precision and create inverted systems where anything can happen because the specifics don't matter. objects describe themselves except actions. 
+i am n0coder, the atomic engineer.
 */
 export function addTiles(def) {
     let tiles = []

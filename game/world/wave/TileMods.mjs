@@ -3,6 +3,7 @@ import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { invdiv } from "../../tools/n0tilesystem/n0tseditorUI.mjs";
 import { worldFactors } from "../FactorManager.mjs";
 import { n0TileModules } from "./n0.mjs";
+import { PlaceholderTile } from "./Tile.mjs";
 
 function directionFailure(tile) {
     let n0ts = tile.n0ts;
@@ -339,7 +340,7 @@ n0TileModules.set("weight", {
         // Create root div once
         if (this.div === undefined)
             this.div = p.createDiv().class("weights").parent(invdiv);
-        
+
         this?.weightDiv?.parent(invdiv);
         if (!this.weightDiv) {
             this.weightDiv = p.createDiv().class("weight").parent(invdiv);
