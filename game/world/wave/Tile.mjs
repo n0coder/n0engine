@@ -11,7 +11,11 @@ export class Tile {
             });
         }
         }
-        modules = [];
+        modules = ["weight", "up", "right", "down", "left", "thresholds", "biases"];
+        up = [0,0,0];
+        right = [0,0,0];
+        down = [0,0,0];
+        left = [0,0,0];
         weight = .5;
         biases = [];
         thresholds = [];

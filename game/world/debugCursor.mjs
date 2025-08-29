@@ -32,33 +32,6 @@ export class DebugCursor{
             p.rect( pos.x, pos.y, worldGrid.tileSize, worldGrid.tileSize)
         }
 
-        return;
-        /*
-        var isu = worldGrid.screenToTile(p.mouseX, p.mouseY);
-        var wisu = worldGrid.tileToScreenBounds(isu.x, isu.y, 1,1);
-        //p.rect(wisu.x1, wisu.y1, wisu.x2, wisu.y2);
-        this.tile = worldGrid.getTile(isu.x, isu.y);
-        
-        //p.ellipse(p.mouseX, p.mouseY, 3,3);
-        p.fill(255)
-        
-        p.textSize(16);
-        if (this.tile?.biome) {
-        p.stroke(this.tile.biome.colorsugar (this.tile))
-        p.strokeWeight(5)
-        let txt =  (this.tile.layers.length > 0) ? this.tile.layers[this.tile.layers.length-1].name : this.tile.biome.name
-        p.text( this.tile != null ? txt : ":(", wisu.x1+(wisu.x2*1.5), wisu.y1+wisu.y2);
-        if (this.tile.n0ts.placeholder) {
-            p.stroke("#e02251ff")
-            p.text(this.tile.n0ts.placeholder.reason[0], wisu.x1+(wisu.x2*1.5), wisu.y1+15+wisu.y2)
-            p.noFill()
-            p.strokeWeight(5)
-            p.rect( wisu.x1, wisu.y1, worldGrid.tileSize, worldGrid.tileSize)
-        }
-        
-
-        }
-       */
     } 
     mouseClicked() {
         

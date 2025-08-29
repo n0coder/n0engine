@@ -1,7 +1,7 @@
 
 
 //n0ts.
-
+import {} from "../world/wave/TileMods.mjs"
 import { Camera } from "../../engine/core/Camera/camera.mjs";
 import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs"
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
@@ -17,40 +17,6 @@ import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
 import { invdiv, n0TileEditorMenu } from "./n0tilesystem/n0tseditorUI.mjs";
 let cursor = new DebugCursor()
 
-/* 
-
-function addTiles(def) {
-    for (let i = 0; i < def.imgRules.length; i++) {
-        let [index, file, sides] = def.imgRules[i];
-        let n0tile = new Tile(`${def.path}/${file}`, def.name);
-        n0tile.setSides(sides)
-        n0tile.setWeight(def.weight);
-        n0tile.addThresholds(def.thresholds);
-        n0tile.addBiases(def.biases);
-        if (def.map)
-            def.map.set(`${def.name}${index}`, n0tile)
-        else
-            n0tiles.set(`${def.name}${index}`, n0tile)
-        
-    }
-}
-    sssss
-
-addTiles({
-    name: "purple",
-    path: "/assets/wave/purple", 
-    imgRules: [
-        [2, "2.png", [[0,1,0],[0,0,0],[0,0,0],[0,1,0]]],
-        [3, "3.png", [[0,0,0],[0,0,0],[0,1,0],[0,1,0]]],
-        [4, "4.png", [[0,1,0],[0,1,0],[0,0,0],[0,0,0]]],
-        [5, "5.png", [[0,0,0],[0,1,0],[0,1,0],[0,0,0]]],
-    ],
-    weight: .5,
-    thresholds: [{factor: "elevation", min: -1, max: 1}], 
-    biases: [{factor: "temperature", value: -1}]
-})
-
-*/
 
 let editorState = "add", state = "add";
 let selectedPos = null;
@@ -155,7 +121,7 @@ states.set("add", {
 
         let tile = selectedTile, tpos = selectedPos;
         // TODO: remove this false flag or move the tech into the side module
-        if ( false && tile?.n0ts && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
+        if ( true && tile?.n0ts && tpos?.x == tile?.wx && tpos?.y == tile?.wy) {
             
             p.ellipse(32,32,32);
             let size = worldGrid.tileSize / 3, hsize = size / 2, hgrid = worldGrid.tileSize / 2
@@ -171,11 +137,12 @@ states.set("add", {
 
             var x = -1, y = -2.5
             var x2 = 0, y2 = y, x3 = -x, y3 = y
-            
+            let t = tile.n0ts.tile
+            var sides = [t.up, t.right, t.down, t.left]; 
             let drawSide = (i) => {
-                var side = shared.sides[i]
-                let data = side.get();
-                p.fill(side.protected ? 255 : 127)
+                
+                let data =  sides[i];
+                p.fill(255)
                 //p.ellipse(xx+(x*size),yy+(y*size), 8);
                 p.text(data[0],xx+(x*size),yy+(y*size))
                 p.text(data[1],xx+(x2*size),yy+(y2*size))
@@ -239,29 +206,83 @@ let visualizer = {
     },
     hover() {
         let mouse = worldGrid.mouseTilePos.screen()
+        let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
+        if (inWindow)  {
+            state = tilesetWindow.state;
+        } else
+            state = editorState
+        
         states.get(state)?.hover?.();
     },
     mousePressed() {
         if (!worldGrid.mouseOnScreen) return;
+        let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
+        if (inWindow)  {
+            state = tilesetWindow.state;
+        } else
+            state = editorState
+        
         let pos = worldGrid.mouseTilePos;
         states.get(state)?.click?.(pos)
     },
     mouseDragged() {
         if (!worldGrid.mouseOnScreen) return;
         let pos = worldGrid.mouseTilePos;
+        let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
+        if (inWindow)  {
+            state = tilesetWindow.state;
+        } else
+            state = editorState
+        
         states.get(state)?.drag?.(pos);
     },
     mouseReleased(){
+        let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
+        if (inWindow)  {
+            state = tilesetWindow.state;
+        } else
+            state = editorState
+        
         states.get(state)?.release?.();
     },
     doubleClicked() {
         if (!worldGrid.mouseOnScreen) return;        
+        let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);
+        if (inWindow)  {
+            state = tilesetWindow.state;
+        } else
+            state = editorState
+        
         let pos = worldGrid.mouseTilePos;
-        states.get("add").doubleClick?.(pos);
+        states.get(state).doubleClick?.(pos);
     }
 }
 cosmicEntityManager.addEntity(visualizer, -5)
 
+rightMenu.show();
+let ui2 = {
+    div: p.createDiv().id("tileEditor").parent(rightMenu.menu),
+    modules:new Map([
+        //["up", {}],["right", {}],["down", {}],["left", {}],["biases", {}],["thresholds", {}], 
+    ]),
+    build(tile){
+        this.div.elt.tile = tile;
+        var itemsa = Array.from(this.div.elt.children);
+        for (const node of itemsa) {
+            invdiv.elt.appendChild(node);
+        }
+        if (tile) {
+            for (const name of tile.modules) {
+                let module = n0TileModules.get(name)
+                
+                let ui = module?.buildUI?.(tile)
+                console.log(name, n0TileModules, module, ui);
+                
+            if (module?.div) module.div.parent(this.div);
+        } 
+        }
+    }
+}
 
 
 let ui = {

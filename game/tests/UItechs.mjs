@@ -16,11 +16,12 @@ let tiles = addTiles({
     path: "/assets/wave/purple", 
     imgRules: [
         [6, "6.png", [0,0,0],[0,0,0],[0,0,0],[0,0,0]],
+        [5, "5.png", [1,1,1],[1,1,1],[1,1,1],[1,1,1]]
     ],
     weight: .5,
     thresholds: [], 
     biases: [{factor: "temperature", value: -1}]
-})[0]
+})
 
 let json = {
     "thresholds":[],
@@ -43,7 +44,7 @@ let jtotile2 = {
     path:"/assets/wave/purple/6.png",
     biases:[{"factor":"temperature","value":-1}],
     up:[2,2,2],right:[2,2,2],down:[2,2,2],left:[2,2,2],
-    modules:["up","right","down","left","noiseBiases"], weight:0.5,
+    modules:["up","right","down","left","thresholds", "biases", "weight"], weight:0.5,
 }
 
 console.log(JSON.stringify(tiles));     
@@ -53,58 +54,8 @@ nano.brain.do("walk", 3, 3);
 nano.brain.do("ping", () => console.log("nano time??"));
 
 
-rightMenu.show();
-let ui = {
-    div: p.createDiv().id("tileEditor").parent(rightMenu.menu),
-    modules:new Map([
-        //["up", {}],["right", {}],["down", {}],["left", {}],["biases", {}],["thresholds", {}], 
-    ]),
-    build(tile){
-        var itemsa = Array.from(this.div.elt.children);
-        for (const node of itemsa) {
-            invdiv.elt.appendChild(node);
-        }
-        if (tile) {
-            for (const name of tile.modules) {
-                console.log(name);
-            let module = n0TileModules.get(name)
-            
-            let ui = module?.buildUI?.(tile)
-                
-            if (module?.div) module.div.parent(this.div);
-        } 
-
-        /*
-        let row = this.div;
-        if (!row.div) row.div = p.createDiv().class("addMods")
-        row.div.parent(row);
-        if (!row.factor) {
-            row.factor = p.createButton("Add Modules").class("addMods")
-        }
-        row.factor.parent(row.div);
-        row.menu = p.createDiv().class("modules")
-        row.menu.parent(row.div);
-        row.menu.mods ??= [];
-        for (const [fk] of n0TileModules) { 
-            if (!row.menu.mods[fk]) {
-                row.menu.mods[fk] = p.createButton(fk).class("module");
-            }
-            row.menu.mods[fk].parent(row.menu);
-        }
-        */
-        //row.factor.value();
-        
-        //if (row.factor.currentFN)
-            //row.factor.elt.removeEventListener("change", row.factor.currentFN);
-        //row.factor.currentFN = () => {
-            //n0ts.biases[i].factor = row.factor.value();
-        //};
-        //row.factor.elt.addEventListener("change", row.factor.currentFN);
-        }
-    }
-}
 
 
-export let j1 = p.createButton("j1").mouseClicked(()=>{ui.build(tiles)}).parent(leftMenu.menu)
-let j2 = p.createButton("j2").mouseClicked(()=>{ui.build(jtotile2)}).parent(leftMenu.menu)
+export let j1 = p.createButton("j1").mouseClicked(()=>{ui.build(tiles[0])}).parent(leftMenu.menu)
+let j2 = p.createButton("j2").mouseClicked(()=>{ui.build(tiles[1])}).parent(leftMenu.menu)
 //ui.build(tiles)

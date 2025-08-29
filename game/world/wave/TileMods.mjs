@@ -1,4 +1,5 @@
 import { p } from "../../../engine/core/p5engine";
+import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { invdiv } from "../../tools/n0tilesystem/n0tseditorUI.mjs";
 import { worldFactors } from "../FactorManager.mjs";
 import { n0TileModules } from "./n0.mjs";
@@ -329,41 +330,32 @@ n0TileModules.set("biases", {
 })
 
 
-n0TileModules.set("weights", {
+n0TileModules.set("weight", {
     div: undefined, inputs: [],   div: undefined,
     inputs: [],   // each { factor, value, remove }
-
     buildUI(n0ts) {
         if (!n0ts.biases) n0ts.biases = [];
 
         // Create root div once
         if (this.div === undefined)
             this.div = p.createDiv().class("weights").parent(invdiv);
-        else {
-
-            //var itemsa = Array.from(this.div.elt.children);
-            for (const node of this.inputs) {
-                invdiv.elt.appendChild(node.div.elt);
-            }
-        }
         
+        this?.weightDiv?.parent(invdiv);
         if (!this.weightDiv) {
-            this.weightDiv = p.createDiv().class("weightdiv").parent(invdiv);
-            this.weightDiv = p.createInput("", "number").class("value")
+            this.weightDiv = p.createDiv().class("weight").parent(invdiv);
+            this.weightDiv.input = p.createInput("", "number").class("value").parent(this.weightDiv);
         }
-        this.weightDiv.value(n0ts.weight);
+        console.log(n0ts);
+        this.weightDiv.parent(this.div);
+        this.weightDiv.input.value(n0ts.weight);
 
-            if (this.weightDiv.currentFN)
-                this.weightDiv.elt.removeEventListener("input", this.weightDiv.currentFN);
-            this.weightDiv.currentFN = () => {
+            if (this.weightDiv.input.currentFN)
+                this.weightDiv.input.elt.removeEventListener("input", this.weightDiv.currentFN);
+            this.weightDiv.input.currentFN = () => {
                 let o = parseFloat(this.weightDiv.value());
                 if (!Number.isNaN(o)) n0ts.weight = o;
             };
-            this.weightDiv.elt.addEventListener("input", this.weightDiv.currentFN);
-
-        
-        
-
+            this.weightDiv.input.elt.addEventListener("input", this.weightDiv.currentFN);
         return this.div;
     }
 })
@@ -373,12 +365,13 @@ n0TileModules.set("thresholds", {
         thresholds: []
     },
     post(tile) {
-        tile.n0ts.optionBiases = optionBiases.filter(({ option, bias }) => 
+        if (tile?.n0ts?.optionBiases)
+        tile.n0ts.optionBiases = tile.n0ts.optionBiases.filter(({ option, bias }) => 
             tile.n0ts.noiseThresholdCondition(tile.genCache, option, bias)
         );
     },
     failed(tile) {
-    if ( tile.n0ts.optionBiases.length === 0 ) {
+    if (tile?.n0ts?.optionBiases && tile.n0ts.optionBiases.length === 0 ) {
             if (!tile.n0ts.placeholder) tile.n0ts.placeholder = new PlaceholderTile(tile, "fully filtered out by noise")  //createPlaceholder(tile, neighborStates);
             tile.n0ts.placeholder.reason = ["fully filtered out by noise", tile.biome.genCache ]
             tile.n0ts.placeholder.image = "filtered"; 
@@ -393,13 +386,18 @@ n0TileModules.set("thresholds", {
 
         if (this.div === undefined)
             this.div = p.createDiv().class("thresholds").parent(invdiv);
-
+        else {
+            //var itemsa = Array.from(this.div.elt.children);
+            for (const node of this.inputs) {
+                invdiv.elt.appendChild(node.div.elt);
+            }
+        }
         // Add threshold button
         if (!this.addButton) {
             this.addButton = p.createButton("Add Threshold");
-        }
-        
+        }        
         this.addButton.parent(this.div);
+
         if (this.addButton.currentFN)
             this.addButton.elt.removeEventListener("click", this.addButton.currentFN);
         this.addButton.currentFN = () => {
@@ -422,12 +420,14 @@ n0TileModules.set("thresholds", {
                 this.inputs[i] = {};
             const row = this.inputs[i];
             if (!row.div)
-            row.div = p.createDiv().class("side").parent(this.div);
+            row.div = p.createDiv().class("side")
+            row.div.parent(this.div);
             // Factor select
             if (!row.factor) {
-                row.factor = p.createSelect().class("factors").parent(row.div);
+                row.factor = p.createSelect().class("factors")
                 for (const [fk] of worldFactors) row.factor.option(fk);
             }
+            row.factor.parent(row.div);
             row.factor.value(n0ts.thresholds[i].factor);
 
             if (row.factor.currentFN)
@@ -445,8 +445,9 @@ n0TileModules.set("thresholds", {
 
             // Min input
             if (!row.min) {
-                row.min = p.createInput("", "number").class("min").parent(row.div);
+                row.min = p.createInput("", "number").class("min")
             }
+            row.min.parent(row.div);
             row.min.value(n0ts.thresholds[i].min);
 
             if (row.min.currentFN)
@@ -459,8 +460,9 @@ n0TileModules.set("thresholds", {
 
             // Max input
             if (!row.max) {
-                row.max = p.createInput("", "number").class("max").parent(row.div);
+                row.max = p.createInput("", "number").class("max")
             }
+            row.max.parent(row.div);
             row.max.value(n0ts.thresholds[i].max);
 
             if (row.max.currentFN)
@@ -473,8 +475,9 @@ n0TileModules.set("thresholds", {
 
             // Remove button
             if (!row.remove) {
-                row.remove = p.createButton("X").class("x").parent(row.div);
+                row.remove = p.createButton("X").class("x")
             }
+            row.remove.parent(row.div);
             if (row.remove.currentFN)
                 row.remove.elt.removeEventListener("click", row.remove.currentFN);
             row.remove.currentFN = () => {
