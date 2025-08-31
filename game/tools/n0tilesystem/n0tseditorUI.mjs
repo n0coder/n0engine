@@ -136,6 +136,7 @@ export let n0TileEditorMenu = {
             //space.div.addClass("dropspace")
             //subscribe to p5.js draw:
             if (n0TileEditorMenu.src && !n0TileEditorMenu.src.img) {
+                console.log(n0TileEditorMenu)
                 drawTimer.space = space;
             }
         }
@@ -196,7 +197,8 @@ export let n0TileEditorMenu = {
         });
         set1.imgsdiv.elt.add = (a) => {
             console.log("adding img to div", set1, a);
-            a.img.parent(set1.imgsdiv)
+            a.cls = set1.group.cls;
+            a.parent(set1.imgsdiv)
         }
 
         let move = (other) => {
@@ -265,7 +267,8 @@ export let n0TileEditorMenu = {
         imgdiv.elt.addEventListener('dragend', (e) => {
             if (imgdiv === this.src) {
                 imgdiv.removeClass("dragging")
-                this.target.add?.(this.src);
+                this.target?.add?.(this.src);
+
                 this.src = null;
                 this.dragging = undefined;
             }
@@ -274,7 +277,7 @@ export let n0TileEditorMenu = {
 
         imgdiv.set =  this.currentSet;
         
-        console.log("adding img to set", imgdiv.set.set.group)
+        imgdiv.cls = imgdiv.set.set.group.cls;
         imgdiv.parent(this.currentSet.set.imgsdiv);
     },
     rebuild() {

@@ -17,24 +17,5 @@ export class Cell {
       this.filtered = new Set();
       this.sideConnection = [];
     }
-  noiseThresholdCondition(gencache, o, bias) {
-    if (bias == NaN) bias = 0
-      let tvt = n0tiles.get(o);
-      if (!tvt) return false;
-      
-      let valid = tvt.thresholds.map(t => {
-          let factor = gencache.get(t.factor);
-          
-          if (!factor) return true;
-          let sum =  factor +bias
-
-          let cond = sum > t.min && sum < t.max;
-          if (!cond) 
-            this.filtered.add(t.factor); //tiles filtered as to give reason for when all tiles fully filter out on a tile
-          return cond;
-      });
-
-      return valid.every(v => v);
-    }
   }
   

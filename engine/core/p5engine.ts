@@ -3,6 +3,48 @@ import { calculateDeltaTime, deltaTime, previousTime } from "./Time/n0Time.mjs";
 import { backgroundColor, gameH, gameW } from "../n0config.mjs";
 import { } from "./Utilities/MapUtils.mjs"
 import * as p5 from "p5";
+
+function cleanStackLine(line) {
+    const match = line.match(/at\s+(.*?)\s+\((.*):(\d+):\d+\)/i);
+    if (!match) return line.trim();
+    let [, fnName, url, lineNum] = match;
+    url = url.replace(/^https?:\/\/[^/]+\//, "").replace(/\?.*$/, "");
+    return `${lineNum} @ (${url}) ${fnName}`;
+}
+function cleanStackShort(line) {
+    const match = line.match(/at\s+(.*?)\s+\((.*):(\d+):\d+\)/i);
+    if (!match) return line.trim();
+
+    let [, , url, lineNum] = match;
+    // Strip everything but the filename and extension
+    url = url.replace(/^https?:\/\/[^/]+\//, "").replace(/\?.*$/, "");
+    url = url.split("/").pop(); // just the file name
+
+    return `${url}:${lineNum}`;
+}
+
+[
+    "createA", "createAudio", "createButton", "createCanvas",
+    "createCheckbox", "createColorPicker", "createDiv",
+    "createImg", "createInput", "createP", "createRadio",
+    "createElement", "createFileInput", "createImage",
+    "createSelect", "createSlider", "createSpan", "createVideo"
+].forEach(fn => {
+    const orig = window.p5.prototype[fn];
+    if (typeof orig === "function") {
+        window.p5.prototype[fn] = function (...args) {
+            const elt = orig.apply(this, args);
+            // Tag with callsite — adjust stack index if needed
+            let slice = new Error().stack.split("\n")[2].trim();
+
+            elt.elt.line = cleanStackLine(slice);
+            elt.attribute("code", cleanStackShort(slice) )
+            
+            return elt;
+        };
+    }
+});
+
 export let canvas: Element //give TS the type... idk why js and ts are like this
 class P5engine {
     p: p5;

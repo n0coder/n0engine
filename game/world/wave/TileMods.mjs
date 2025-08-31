@@ -20,7 +20,9 @@ function directionFailure(tile) {
     }
     //pinga.ping("harvest", n0ts.placeholder, "error", false);
 }
-
+function getCallSite(depth = 2) {
+    return new Error().stack.split("\n")[depth].trim();
+}
 let dir = (dir, fn) => {
     n0TileModules.set(dir, {
         mod(tile, option) {
@@ -56,13 +58,17 @@ let dir = (dir, fn) => {
         div: undefined, inputs: [], buildUI(currentTile) {
             let n0ts = currentTile;
             //console.error(currentTile)
-            if (this.div === undefined)
-                this.div = p.createDiv().class("side").parent(invdiv);
-
+            if (this.div === undefined) {
+                this.div = p.createDiv().class("mod").parent(invdiv);
+                this.titlebar = p.createDiv().class("titlebar").parent(this.div);
+                this.titlebar.buttons = p.createDiv().class("buttons").parent(this.titlebar);
+                this.inputsDiv=p.createDiv().class("side").parent(this.div);
+            }
             for (let i = 0; i < 3; i++) {
                 if (!this.inputs[i]) 
-                this.inputs[i] = p.createInput().addClass("value").parent(this.div);
-                
+                    this.inputs[i] = p.createInput().addClass("value")
+                this.inputs[i].parent(this.inputsDiv);
+
                 this.inputs[i].value(n0ts[dir][i])
                 if (this.inputs[i].currentFN)
                 this.inputs[i].elt.removeEventListener('input', this.inputs[i].currentFN);
@@ -243,7 +249,7 @@ n0TileModules.set("biases", {
 
         // Create root div once
         if (this.div === undefined)
-            this.div = p.createDiv().class("biases").parent(invdiv);
+            this.div = p.createDiv().class("mod").parent(invdiv);
         else {
 
             //var itemsa = Array.from(this.div.elt.children);
@@ -278,7 +284,7 @@ n0TileModules.set("biases", {
 
             const row = this.inputs[i];
             if (!row.div)
-                row.div = p.createDiv().class("side")
+                row.div = p.createDiv().class("side-field")
             
             row.div.parent(this.div);
             // Factor select
@@ -339,16 +345,25 @@ n0TileModules.set("weight", {
 
         // Create root div once
         if (this.div === undefined)
-            this.div = p.createDiv().class("weights").parent(invdiv);
-
+            this.div = p.createDiv().class("mod").parent(invdiv);
+        if (this.titlebar === undefined) {
+            this.titlebar = p.createDiv().class("titlebar");
+            //these aren't hooked up it appears.
+            p.createSpan("Weight").parent(this.titlebar);
+            this.titlebar.buttons = p.createDiv().class("buttons")
+            this.checkbox = p.createCheckbox("", true)
+        }
         this?.weightDiv?.parent(invdiv);
         if (!this.weightDiv) {
-            this.weightDiv = p.createDiv().class("weight").parent(invdiv);
+            this.weightDiv = p.createDiv().class("field").parent(invdiv);
             this.weightDiv.input = p.createInput("", "number").class("value").parent(this.weightDiv);
         }
         console.log(n0ts);
-        this.weightDiv.parent(this.div);
+        this.titlebar.buttons.parent(this.titlebar);
+        this.titlebar.parent(this.div);
         this.weightDiv.input.value(n0ts.weight);
+        this.weightDiv.parent(this.titlebar.buttons);
+        this.checkbox.parent(this.titlebar.buttons);
 
             if (this.weightDiv.input.currentFN)
                 this.weightDiv.input.elt.removeEventListener("input", this.weightDiv.currentFN);
@@ -386,7 +401,7 @@ n0TileModules.set("thresholds", {
         if (!n0ts.thresholds) n0ts.thresholds = [];
 
         if (this.div === undefined)
-            this.div = p.createDiv().class("thresholds").parent(invdiv);
+            this.div = p.createDiv().class("mod").parent(invdiv);
         else {
             //var itemsa = Array.from(this.div.elt.children);
             for (const node of this.inputs) {
@@ -421,7 +436,7 @@ n0TileModules.set("thresholds", {
                 this.inputs[i] = {};
             const row = this.inputs[i];
             if (!row.div)
-            row.div = p.createDiv().class("side")
+            row.div = p.createDiv().class("side-field")
             row.div.parent(this.div);
             // Factor select
             if (!row.factor) {
