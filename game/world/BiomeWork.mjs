@@ -1,7 +1,7 @@
 import { RangeMap } from "../../engine/collections/RangeMap.mjs";
 import { createCubicInterpolator, createInterpolator, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { worldFactors } from "./FactorManager.mjs";
-import { Biome, addBiomeFactors, biomeFactorMap, mapDeep } from "./biome.mjs";
+import { Biome, addBiomeFactors, biomeFactorMap, factorMaps, mapDeep } from "./biome.mjs";
 
 var height = new RangeMap(0, 1)
 height.add("deep", .05).add("low", 1).add("border", .35)
@@ -421,15 +421,24 @@ formBiome({
     bittertags: [...mountaintip,...bittera],
     difficulty: 3
 })
-function mapBiome(biome, soku) {
-    return biome.map(item => {
+function mapBiome(biome, soku, factorsUsed) {
+    factorsUsed ??= [];
+
+    let factors = biome.map(item => {
         if (Array.isArray(item)) {
-            return mapBiome(item, soku);
+            let sub = mapBiome(item, soku);
+            let sok = pop(sub.factors)
+            if (sok) factorsUsed.push(...sub.factorsUsed);            
+            return [sok]; 
         } else {
-            return soku(item)
+            let sok = soku(item);
+            return sok ? (factorsUsed.push(item), true) : false;
         }
     });
+
+    return { factors, factorsUsed };
 }
+
 
 function pop(array) {
     var member = true
@@ -448,9 +457,7 @@ function pop(array) {
 }
 
 export function buildBiome(tile) {
-    if (tile.tags) return tile;
-    tile.tags = [];
-    
+    if (!tile.tags) tile.tags = [];
     if (tile.biome) return tile;
     let biomex = [];
     /*
@@ -462,7 +469,7 @@ export function buildBiome(tile) {
     */
     for (const b of biomes) {
         //console.log(b.factors.map(f=>f.factor))
-        const mappedBiome = mapBiome(b.factors, s => {
+        const mapped = mapBiome(b.factors, s => {
             //console.log({b, s});
             if (s == null) return false;
             var factor = tile.genCache.get(s.factor)
@@ -473,12 +480,90 @@ export function buildBiome(tile) {
             //console.log(sum, s)
             return sum >= s.min && sum <= s.max;
         });
-        if (pop(mappedBiome)) biomex.push(b);
+        mapped.b = b;
+        if (pop(mapped.factors)) biomex.push(mapped);
     }
-    tile.biome = biomex.length > 0 ? biomex[0] : null
+    tile.biome = biomex?.[0]?.b
+    tile.biomeFactors = biomex?.[0]?.factorsUsed
 
     //console.log(tile)
 }
+
+export function buildTags(tile) {
+    let tags = [];
+    for (const [key, factor] of tile.genCache) {
+        let fm = factorMaps.get(key)
+        let wf = worldFactors.get(key)
+        tags.push(fm.get(factor, wf.mini, wf.maxi).out);
+    }
+    tile.tags = tags;
+}
+export function buildEdgeX(tile) {
+let dist = Infinity;
+let sign = 1;
+let fact = null;
+let edge = null;
+
+tile.genDistances = new Map()
+
+for (let factor of tile.biomeFactors) {
+    let value = tile.genCache.get(factor.factor)
+    let wf = worldFactors.get(factor.factor);
+
+    let mimi = lerp(wf.mini, wf.maxi,  factor.min);
+    let mixi = lerp(wf.mini, wf.maxi,  factor.max);
+    let vali = lerp(wf.mini, wf.maxi,  value);
+
+    if (mimi <wf.mini) mimi = wf.mini;
+    if (mixi > wf.maxi) mixi = wf.maxi;
+
+    let min = vali - mimi;
+    let max = mixi - vali;
+
+    let absMin = Math.abs(min);
+    let absMax = Math.abs(max);
+
+    if (absMin < dist || absMax < dist) {
+        dist = Math.min(absMin, absMax);
+        fact = factor.factor;
+        if (absMin < absMax) {
+            sign = -1;
+            edge = factor.min;
+        } else {
+            sign = 1;
+            edge = factor.max;
+        }
+    }
+}
+
+    // Pass 2: build peek genCache
+    const epsilon = 0.01;
+    let pseudotile = { genCache: new Map(tile.genCache) }; // shallow copy
+    if (fact) {
+        var nudgedValue = edge + (epsilon*sign);
+        pseudotile.genCache.set(fact, nudgedValue);
+        
+    }
+    const nextBiome = buildBiome(pseudotile);
+    pseudotile.fact = fact;
+    pseudotile.dist = dist;
+    tile.transition = {
+        pseudotile,
+        factor: fact,
+        proximity: dist,
+        sign: sign
+    };
+}
+
+export function buildEdge(tile) {
+    for (const gen of tile.genCache) {
+        let factormap = factorMaps.get(gen[0]);
+        let wf = worldFactors.get(gen[0])
+        let minmax = factormap.get(gen[1], wf.mini, wf.maxi)
+
+    }
+}
+
 export function getABiome(vx, vy) {
     let genCache = new Map();
     let biomex = [];

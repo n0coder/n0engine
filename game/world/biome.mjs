@@ -5,9 +5,10 @@ import { worldFactors } from "./FactorManager.mjs";
 export function mapDeep(arr, mapFn) {
     return arr.map(item => Array.isArray(item) ? mapDeep(item, mapFn) : mapFn(item));
 }
-
+export const factorMaps = new Map();
 export const biomeFactorMap = new Map()
 export function addBiomeFactors(map, factor, gens) {
+    factorMaps.set(factor, map);
     let f = gens.get(factor)
     let gen = f?.getValue?.(0,0) ?? f?.create?.(0,0) ?? 0
     if (gen === 0) {
@@ -24,7 +25,6 @@ export function addBiomeFactors(map, factor, gens) {
         biomeFactorMap.set(tag, obj)
         //console.log(r);
     })
-    //console.log({ranges, biomeFactorMap, factor})
 }
 //document.lutMissingMap = new Map()
 export class Biome {

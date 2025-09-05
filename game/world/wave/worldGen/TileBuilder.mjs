@@ -1,7 +1,7 @@
 import { Tile } from "../../../../engine/grid/tile.mjs";
 import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
-import { buildBiome } from "../../BiomeWork.mjs";
+import { buildBiome, buildEdge, buildEdgeX } from "../../BiomeWork.mjs";
 import { buildFactors, worldFactors } from "../../FactorManager.mjs";
 import { buildn0ts } from "../n0.mjs";
 // import { buildn0Collapse } from "../n0.mjs";
@@ -20,6 +20,37 @@ export function addSugar(tile) { //sugar data does not exist, make it using biom
     let facti = worldFactors.get("sugarzone")
     tile.sugar = { minm: 0, maxm: 2, sum: lerp(0, 2, inverseLerp(facti.mini, facti.maxi, sugar)) }
     tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9;
+}
+function buildTransition(tile) {
+    let minDist = Infinity;
+    let signedDist = Infinity;
+    let nextBiome = null;
+    console.log(tile.biome)
+    for (const factor of biomeFactors) {
+        const distToMin = tile[factor] - factor.min;
+        const distToMax = factor.max - tile[factor];
+
+        // Pick the closer edge
+        if (distToMin < distToMax) {
+            if (distToMin < Math.abs(minDist)) {
+                minDist = Math.abs(distToMin);
+                signedDist = -distToMin; // negative toward min bound
+                nextBiome = getBiomeAt(tile.x - 1, tile.y); // sample past edge
+            }
+        } else {
+            if (distToMax < Math.abs(minDist)) {
+                minDist = Math.abs(distToMax);
+                signedDist = distToMax; // positive toward max bound
+                nextBiome = getBiomeAt(tile.x + 1, tile.y);
+            }
+        }
+    }
+
+    tile.transition = {
+        proximity: minDist,           // always positive
+        signedProximity: signedDist,  // ± based on edge direction
+        biome: nextBiome
+    };
 }
 
 export function genTile(x, y, n0=true) {
@@ -40,8 +71,9 @@ export function genTile(x, y, n0=true) {
     tile.build([ //functions that modify the tile
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
+        buildEdgeX, //get proximity to biomes, enables blending over edges
         addSugar, //uss sugar and biome to set basic sugar level    
-        n0 ? buildn0ts : undefined
+        n0 ? buildn0ts : undefined //runs single pass "WFC"
     ])
     /*
     let t = tile.genCache.get("elevation")

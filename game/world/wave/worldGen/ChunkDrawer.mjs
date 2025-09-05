@@ -1,6 +1,6 @@
 import { p } from "../../../../engine/core/p5engine.ts";
 import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
-import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
+import { clamp, inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../../FactorManager.mjs";
 import { n0tiles } from "../n0.mjs";
 import { genTile } from "./TileBuilder.mjs";
@@ -34,6 +34,19 @@ export function drawTile(x,y, tile) {
     let color = tile.biome.colora(tile)
     if(color) {
         p.fill(color);
+
+        if (tile.transition ) {
+            let i = inverseLerp(0, .05, clamp(0,.05, tile.transition.proximity))
+            i = lerp(.5, 1, i);
+            let pseudocolor =  tile?.transition?.pseudotile?.biome?.colora(tile)
+            
+            if ( pseudocolor && tile.transition.proximity <= .1) {
+                let r = lerp(pseudocolor[0], color[0], i)
+                let g = lerp(pseudocolor[1], color[1], i)
+                let b = lerp(pseudocolor[2], color[2], i)
+                p.fill(r, g, b)
+            }
+        }
         p.rect(x * worldGrid.tileSize, y * worldGrid.tileSize, worldGrid.tileSize, worldGrid.tileSize)
     }
     let n0ts = tile.n0ts?.option !== undefined ? tile.n0ts.tile : undefined;
@@ -52,7 +65,7 @@ export function drawChunk(x, y, gen) {
     for (let xc = 0; xc < c; xc++) {
         for (let yc = 0; yc < c; yc++) {
             let xx = xc+x, yy = yc+y
-            if (gen) genTile5(xx, yy)
+            genTile5(xx, yy, gen)
             let tile = worldGrid.getTile(xx, yy);
             if (tile?.biome) {
                 drawTile(xx,yy, tile);

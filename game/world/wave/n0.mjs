@@ -33,7 +33,6 @@ export function buildn0ts(tile, source, sets ) {
         n0ts.placeholder.image = "unfinished"; 
         return;
     };
-
     n0ts.options = n0ts.options.filter(optionKey => {
         let option = tileset.get(optionKey); 
         if (!option) return false;
@@ -51,10 +50,11 @@ export function buildn0ts(tile, source, sets ) {
         }
         return true;
     });
-
+    
     for (const module of modules) {
         module?.post?.(tile);
     }
+    
     let rm = new RangeMap();
     if (n0ts.optionBiases) {
         for (const bias of n0ts.optionBiases) {
@@ -66,27 +66,11 @@ export function buildn0ts(tile, source, sets ) {
         rm.add(bias, bias.weight);
     }
     let option = rm.random(n0alea);
-    n0ts.option = option;
-    n0ts.tile = tileset.get(option);
-
-    if (option != undefined)
+    n0ts.option = option.out;
+    n0ts.tile = tileset.get(option.out);
+    if (option != undefined) {
     for (const module of modules) {
         module?.collapsed?.(tile);
     }
-}
-function weightedRandom(items) {
-    items = items.filter(a => a != null && n0tiles.get(a.option) != null)
-    let rm = new RangeMap();
-
-    var totalWeight = items.reduce((total, item) => total + ((n0tiles.get(item.option)?.weight ?? 1)  + (item.bias || 0) || 1), 0);
-    rm.total = totalWeight;
-    var random = n0alea() * totalWeight;
-
-    var cumulativeWeight = 0;
-    for (var i = 0; i < items.length; i++) {
-        cumulativeWeight += n0tiles.get(items[i].option).weight + (items[i].bias || 0) || 1;
-        if (random < cumulativeWeight) {
-            return items[i].option;
-        }
     }
 }

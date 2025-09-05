@@ -51,19 +51,19 @@ export class RangeMap {
   }
   //i think we're comparing
   get(value, i, o) {
-    var v = inverseLerp(i != null ? i : this.i != null ? this.i : 0, o != null ? o : this.o != null ? this.o : 0, value)
+    let ii = i ?? this.i ?? 0
+    let oo = o ?? this.o ?? 1;
+    var v = inverseLerp(ii, oo, value)
     //lookup value
 
 
     let accumulatedSize = 0;
-    let length = this.array.length;
-    for (let index = 0; index < length; index++) {
-      const item = this.array[index];
+    for (const item of this.array) {
       let size = item.weight / this.total;
       //size = lerp(this.i, this.o, size);
       //console.log([value, item.weight, this.total, accumulatedSize, accumulatedSize+size, size])
       if (v >= accumulatedSize && v < accumulatedSize + size) {
-        return item.biome;
+        return {min: lerp(ii,oo, accumulatedSize), max: lerp(ii,oo,accumulatedSize+size), out: item.biome};
       }
       accumulatedSize += size;
     }

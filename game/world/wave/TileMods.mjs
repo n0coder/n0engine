@@ -83,10 +83,10 @@ let dir = (dir, fn) => {
     })
 }
 
-dir("up",(tile, option)=>dirCheck(0, -1, tile, option, (a) => a.getUp()))
-dir("right",(tile, option)=>dirCheck(1, 0, tile, option, (a) => a.getRight()))
-dir("down",(tile, option)=>dirCheck(0, 1, tile, option, (a) => a.getDown()))
-dir("left",(tile, option)=>dirCheck(-1, 0, tile, option, (a) => a.getLeft()))
+dir("up",(tile, option)=>dirCheck(0, -1, tile, option, (a) => a?.getUp()))
+dir("right",(tile, option)=>dirCheck(1, 0, tile, option, (a) => a?.getRight()))
+dir("down",(tile, option)=>dirCheck(0, 1, tile, option, (a) => a?.getDown()))
+dir("left",(tile, option)=>dirCheck(-1, 0, tile, option, (a) => a?.getLeft()))
 
 
 function dirCheck(dx, dy, tile, option, dirFunction) {
@@ -123,6 +123,7 @@ function dirCheck(dx, dy, tile, option, dirFunction) {
     if (boption !== undefined) {
         let tileB = b.tile;
         let dir = dirFunction(tileB)
+        if (!dir) return;
         tile.n0ts.sideConnection.push(dir.connection)
         tile.n0ts.sets.add(tileB.set);
         let neighborfn = (tile, option)=>{

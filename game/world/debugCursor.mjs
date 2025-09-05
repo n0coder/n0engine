@@ -18,6 +18,14 @@ export class DebugCursor{
         p.fill(255) //white inside
         p.textSize(16) 
         p.strokeWeight(5)
+        if (tile?.transition) {
+            p.stroke("#338833")
+            p.text(tile.transition.proximity, pos.x+(size*1.5), pos.y+(15+size))
+            p.noFill()
+            p.strokeWeight(5)
+            p.rect( pos.x, pos.y, worldGrid.tileSize, worldGrid.tileSize)
+        }
+        /*
         if (tile?.biome) {
             p.stroke(tile.biome.colorsugar (tile))
             var txt = tile.layers?.[tile.layers.length-1]?.name
@@ -31,6 +39,7 @@ export class DebugCursor{
             p.strokeWeight(5)
             p.rect( pos.x, pos.y, worldGrid.tileSize, worldGrid.tileSize)
         }
+        */
 
     } 
     mouseClicked() {

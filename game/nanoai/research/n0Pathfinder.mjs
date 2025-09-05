@@ -2,7 +2,6 @@ import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager
 import { p } from "../../../engine/core/p5engine.ts";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
-import { p2 } from "../../visualizers/lineVisualizer.mjs";
 import star from "easystarjs"
 
 export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics) {

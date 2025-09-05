@@ -31,7 +31,7 @@ export class Nanoai {
         this.speed = 10;
         this.sugar = -4;
         this.lover = null;
-        loadImg('../nanoai.png', (img) => this.img = img);
+        loadImg('/assets/nanoai.png', (img) => this.img = img);
         this.brain = new NanoaiBrain(this);
         this.inventory = new NanoInventory(9, [[-0, -0], [1, -0], [0, -20]]);
         this.identity = {

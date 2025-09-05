@@ -24,7 +24,7 @@ let tilesetWindow = {
     x: 512 - 64, y: 64, w: 512 - 128, h: 512 - 128,
     state: "tileset", grid: new WorldGrid(16, 4),
     selectedPos: null,
-    draw() {
+    draw() {/*
         p.fill(44, 44, 44);
         p.rect(this.x, this.y, this.w, this.h)
         if (this.grid.mouseInRect(this.x, this.y, this.w, this.h)) {
@@ -39,7 +39,7 @@ let tilesetWindow = {
                 p.rect(this.selectedPos.x, this.selectedPos.y, this.grid.tileSize, this.grid.tileSize)
             }
         }
-    },
+    */},
     click() {
         this.selectedPos = this.grid.mouseTilePos.screen();
         //this.camera.enabled=true;
@@ -192,7 +192,7 @@ let nano = { x: 4, y: 4, sightRadius: worldGrid.tileSize * 4 }
 
 let visualizer = {
     draw() {
-        drawChunks(nano, false);
+        drawChunks(nano, true);
 
         tilesetWindow.draw();
         let inWindow = worldGrid.mouseInRect(tilesetWindow.x, tilesetWindow.y, tilesetWindow.w, tilesetWindow.h);

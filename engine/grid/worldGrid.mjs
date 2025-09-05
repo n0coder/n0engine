@@ -5,8 +5,8 @@ export class WorldGrid {
     constructor(tileSize, chunkSize, camera) {
         this.setTileSize(tileSize);
         this.setChunkSize(chunkSize);
-        this.x = 1_000_000_000 //-15 * this.chunkSize
-        this.y = 1_164_373_235 //240 * this.chunkSize;
+        this.x = 310_000_100 //-15 * this.chunkSize
+        this.y = 534_373_235 //240 * this.chunkSize;
         this.tiles = new Sparse2dMap();
         this.chunks = new Sparse2dMap();
         this.camera = camera

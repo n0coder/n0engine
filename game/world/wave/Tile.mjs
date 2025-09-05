@@ -111,7 +111,7 @@ export class PlaceholderTile {
         loadImg("/assets/wave/missingJoint.png", (i) => {
             this.missingJoint = i 
         });
-        loadImg("/assets/wave/unfinished.png", (i) => {
+        loadImg("/assets/wave/hide.png", (i) => {
             this.unfinished = i 
         });
         loadImg("/assets/wave/filtered.png", (i) => {

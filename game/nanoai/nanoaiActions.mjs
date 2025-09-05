@@ -4,7 +4,6 @@ import { p } from "../../engine/core/p5engine.ts";
 import { worldGrid } from "../../engine/grid/worldGrid.mjs";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
-import { p2 } from "../visualizers/lineVisualizer.mjs";
 import { Mommyai, Puff } from "./mommyai.mjs";
 import { findPath } from "./research/n0Pathfinder.mjs";
 
