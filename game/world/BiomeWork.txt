@@ -172,6 +172,12 @@ export let luts = {
     0: bitterlut, 1: neutrallut, 2:sweetlut
 }
 //console.log(luts);
+let sweet = ["sweet"];
+let puresweet = [ "puresweet"];
+let bitter = ["bitter"]
+let purebitter = [ "purebitter"]
+let lut =neutrallut;
+
 var grassy = [
     'purple0', 'purple1', 'purple2', 'purple3', 'purple4', 'purple5', 'purple6',
     'green0', 'green1', 'green2', 'green3', 'green4', 'green5', 'green6',

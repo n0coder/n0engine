@@ -1,7 +1,7 @@
 import { p } from "../../../../engine/core/p5engine.ts";
 import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { clamp, inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
-import { worldFactors } from "../../FactorManager.mjs";
+import { read, worldFactors } from "../../FactorManager.mjs";
 import { n0tiles } from "../n0.mjs";
 import { genTile } from "./TileBuilder.mjs";
 
@@ -47,6 +47,20 @@ export function drawTile(x,y, tile) {
                 p.fill(r, g, b)
             }
         }
+        //tile.preview = "elevation"
+        if ( read !== undefined) {
+            let preview = tile.genCache.get(read);
+            let wf = worldFactors.get(read)
+            let invpreview = inverseLerp(wf.min, wf.max, preview);
+            p.fill(invpreview*255)
+        }
+
+        if (false) {
+            let i = inverseLerp(0, .10, clamp(0,.10, tile.transition.proximity))
+            i = lerp(0, 1, i);
+            p.fill(255*i);
+        }
+
         p.rect(x * worldGrid.tileSize, y * worldGrid.tileSize, worldGrid.tileSize, worldGrid.tileSize)
     }
     let n0ts = tile.n0ts?.option !== undefined ? tile.n0ts.tile : undefined;

@@ -83,6 +83,7 @@ export class Graph {
         this.sequence.push(function(output) {
             a?.(output)
         })
+        return this;
     }
     cartesian() {
         this.sequence.push(function(output) {
@@ -147,28 +148,29 @@ export class Graph {
         this.sequence.push(function(output) {
             output.sum = Math.sqrt(output.sum)
         })
+        return this;
     }
-     add(v) {
+     add(v, m=1) {
         if (typeof v === "function") {
             this.sequence.push(function(output){
                 let tech = v(output);
-                output.sum += tech;
-                output.minm += tech;
-                output.maxm += tech;
+                output.sum += tech*m;
+                output.minm += tech*m;
+                output.maxm += tech*m;
             })
         } else 
         if (v instanceof Graph) {
             this.sequence.push(function(output) {
                 let tech = v.create(output.x, output.y);
-                output.sum += tech.sum;
-                output.minm += tech.minm;
-                output.maxm += tech.maxm;
+                output.sum += tech.sum*m;
+                output.minm += tech.minm*m;
+                output.maxm += tech.maxm*m;
             })
         } else {
         this.sequence.push(function (output) {
-            output.sum += v;
-            output.minm += v;
-            output.maxm += v;
+            output.sum += v*m;
+            output.minm += v*m;
+            output.maxm += v*m;
         })
         }
         return this;
@@ -197,9 +199,8 @@ export class Graph {
         })
         }
         return this;
-     }
-
-     newBlend(points, pow=1) {
+    }
+    newBlend(points, pow=1) {
         this.sequence.push(function (output) {
             let i = inverseLerp(output.minm, output.maxm, output.sum);
             var { sums, nvu } = blendSumMinMax(points, i, pow, output.x, output.y);
@@ -246,16 +247,30 @@ export class Graph {
      bicubic(points, power = 2, weight) {
         this.sequence.push((output)=> { 
             let i = inverseLerp(output.minm, output.maxm, output.sum);
-            let sums = points.map((v)=>{
-                if (typeof v === "function") return v(output);
-                if (v instanceof Graph) {
-                    let tech = v.create(output.x, output.y);
-                    return tech.sum;
-                } 
-                if (v.sum != null) return v.sum;
-                return v;
-            })
-            output.sum = lerp(output.minm, output.maxm,  recubic(sums, i, power));
+            let min = Infinity, max = -infinity;
+            let sums = points.map((v) => {
+            if (typeof v === "function") {
+                let sum = v(output);
+                min = Math.min(min, sum);
+                max = Math.max(max, sum);
+                return sum;
+            }
+            if (v instanceof Graph) {
+                let tech = v.create(output.x, output.y);
+                min = Math.min(min, tech.minm);
+                max = Math.max(max, tech.maxm);
+                return tech.sum;
+            }
+            if (v.sum != null) {
+                min = Math.min(min, v.minm ?? v.sum);
+                max = Math.max(max, v.maxm ?? v.sum);
+                return v.sum;
+            }
+            min = Math.min(min, v);
+            max = Math.max(max, v);
+            return v;
+        });
+            output.sum =recubic(sums, i, power);
          })
          return this;
      }
@@ -409,7 +424,8 @@ export class Graph {
         this.scaleY(value2)
         return this;
     }
-    fractal(fn, octaves=1, persistance=.5, lacunarity=1) {
+    fractal(fn={ input: 0, min: -1, max: 1 }, octaves=1, persistance=.5, lacunarity=1) {
+
         let inp = function(output) {
             let minm=0, maxm =0
             let amp=1, freq=1, sum =0;
@@ -420,7 +436,7 @@ export class Graph {
                 
                 var sx = output.x * freq;
                 var sy = output.y * freq;
-                let cfn = Array.isArray(fn) ? fn[o] : fn; 
+                let cfn = Array.isArray(fn) ? fn[o] : fn;
             
                 var value = cfn.input(sx, sy);
                 sum += value * amp;

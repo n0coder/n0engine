@@ -2,6 +2,7 @@
 import { ValueDriver } from "../../engine/n0math/ValueDriver.mjs";
 import { Map2d } from "../../engine/n0math/map2d.mjs";
 import { blendw, clamp, createCubicInterpolator, cubicBlendW, inverseLerp, lerp, recubic } from "../../engine/n0math/ranges.mjs";
+import { Graph } from "./noiseGen/graph.mjs";
 
 //octaves control how detailed a section is
 //
@@ -189,15 +190,42 @@ export class NoiseGenerator {
         minmax.maxm = lerp(minmax.maxm, max, blendWeight);
     }
     recubix(minmax, x, y, blenpa, blendWeight){
-        //console.log(blendPower)
-        var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
-        var sums = this.blend.map(b => {
-            var v = b.getValue != null ? b.getValue(x, y) : b;
+        let min = Infinity;
+        let max = -Infinity;
+        let sums = this.blend.map((v) => {
             if (v.sum != null) return v.sum;
+            if (typeof v === "function") {
+                let sum = v(output);
+                min = Math.min(min, sum);
+                max = Math.max(max, sum);
+                return sum;
+            }
+            if (v instanceof Graph) {
+                let tech = v.create(output.x, output.y);
+                min = Math.min(min, tech.minm);
+                max = Math.max(max, tech.maxm);
+                return tech.sum;
+            }
+            if (v && v.sum != null) {
+                min = Math.min(min, v.minm ?? v.sum);
+                max = Math.max(max, v.maxm ?? v.sum);
+                return v.sum;
+            }
+            if (v.getValue != null) {
+                let b = v.getValue(x, y)
+                min = Math.min(min, b.minm ?? b.sum);
+                max = Math.max(max, b.maxm ?? b.sum);
+                return b.sum;
+            }
+            min = Math.min(min, v);
+            max = Math.max(max, v);
             return v;
-        });   
+        });
+        let sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
         //console.log({mxsum:minmax.sum, mxmin:minmax.minm, mxmax: minmax.maxm, sim});
         minmax.sum = recubic(sums, sim, blenpa);
+        minmax.minm = min;
+        minmax.maxm = max;
         //console.log(minmax.sum, sim);
     }
 
@@ -244,8 +272,8 @@ export class NoiseGenerator {
     //should i pow in abs?
     //math.pow(math.abs(sim))
     doPow(x, y, minmax) {
-        if (minmax.minm > minmax.sum) console.log("sum is lower than minm", minmax)
-        if (minmax.maxm < minmax.sum ) console.log("sum is higher than maxm", minmax)
+        if (minmax.minm > minmax.sum) console.log("sum is lower than minm", this, minmax)
+        if (minmax.maxm < minmax.sum ) console.log("sum is higher than maxm", this, minmax)
         var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
 
         // console.log([1,minm, sum, maxm])
@@ -284,23 +312,45 @@ export class NoiseGenerator {
         return offset;
     }
 
-    doAdd(x, y, minmax) {
-        this.add.forEach(a => {
-            if (a.getValue != null) {
-                var value = a.getValue(x, y);
-                minmax.sum += value.sum;
-                minmax.minm += value.minm;
-                minmax.maxm += value.maxm;
-            } else if (Array.isArray(a)) {
-                if (a[0].getValue != null) {
-                    var value = a[0].getValue(x, y);
-                    minmax.sum += value.sum * a[1];
-                    minmax.minm += value.minm * Math.abs(a[1]);
-                    minmax.maxm += value.maxm * Math.abs(a[1]);
-                }
-            };
-        });
-    }
+doAdd(x, y, minmax) {
+    this.add.forEach(a => {
+        let ss = minmax.sum, smin = minmax.minm, smax = minmax.maxm;
+        if ( smax < ss || smin > ss ) {
+            console.log("started out of bounds", this, {sums: {ss, es}, min: {smin, emin}, max:{smax,emax}})
+            return;
+        }
+        if (a.getValue != null) {
+            const v = a.getValue(x, y);
+            minmax.sum += v.sum;
+            // union the bounds
+            minmax.minm = Math.min(minmax.minm, minmax.minm + v.minm);
+            minmax.maxm = Math.max(minmax.maxm, minmax.maxm + v.maxm);
+            
+            let es = minmax.sum, emin = minmax.minm, emax = minmax.maxm;
+            if ( emax < es || emin > es )  console.log("ended out of bounds num", {sums: {ss, es}, min: {smin, emin}, max:{smax,emax}})
+            return;
+        }
+
+        if (Array.isArray(a)) {
+            const m = a[1];
+            const v = a[0].getValue?.(x, y) ?? a[0];
+            let sign = Math.sign(m);
+            let min = v.minm*m;
+            let max = v.maxm*m;
+            if (m < 0){
+                max = v.minm*m;
+                min = v.maxm*m;
+            }
+            minmax.sum += v.sum * m;
+            minmax.minm = Math.min(minmax.minm, minmax.minm + min);
+            minmax.maxm = Math.max(minmax.maxm, minmax.maxm + max);
+            let es = minmax.sum, emin = minmax.minm, emax = minmax.maxm;
+            if ( emax < es || emin > es ) console.log("ended out of bounds range", {sums: {ss, es}, min: {smin, min, emin}, max:{smax, max, emax}})
+            return;
+        }
+    });
+}
+
 
     doMultiply(x, y, minmax) {
         this.multiply.forEach(a => {
