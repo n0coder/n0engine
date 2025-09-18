@@ -41,7 +41,10 @@ export class Biome {
         this.tags = tags;
         this.factors = (tags != null) ? mapDeep(tags, f => biomeFactorMap.get(f)) : []
         this.tiles = tiles || []
-        
+        this.c = {}
+        this.c[0]=this.bitter
+        this.c[1]=this.plain
+        this.c[2]=this.sugar
     }
     colorsugar (tile){
         if (!this.bitter || !this.plain || !this.sugar) {
@@ -49,18 +52,14 @@ export class Biome {
         }
         var gc = tile.sugar;
         let isu = inverseLerp(gc.minm, gc.maxm, gc.sum);
-       
+        
         let r = cubicBlendW([this.bitter[0], this.plain[0], this.sugar[0]], isu, 2)
         let g = cubicBlendW([this.bitter[1], this.plain[1], this.sugar[1]], isu, 2)
         let b = cubicBlendW([this.bitter[2], this.plain[2], this.sugar[2]], isu, 2)
         return [r,g,b]
     }
     colora(){
-        let c = {}
-        c[0]=this.bitter
-        c[1]=this.plain
-        c[2]=this.sugar
-        return c[this.sugara]
+        return this.c[this.sugara]
     }
     getDifficulty (tile) {
         var gc = tile.sugar;

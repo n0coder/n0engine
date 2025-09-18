@@ -46,6 +46,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
 
     //console.log(gridArray)
     let ss = 2;
+    /*
     if (!agraphics) {
          agraphics = p.createGraphics((ar.w + 1) * ss, (ar.h + 1) * ss);
     }
@@ -66,18 +67,19 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
             agraphics.rect((endoX + pad) * ss, (endoY + pad) * ss, 1 * ss, 1 * ss);
         }
     }
-
+    */
     let ezstar = stars(gridArray);
     ezstar(currentoX + pad, currentoY + pad, endoX + pad, endoY + pad, (path) => {
         //console.log(path)
         if (path !== null) {
-
+            /*
             agraphics.fill(255);
             agraphics.stroke(255);
             agraphics.strokeWeight(1)
             for (let i = 0; i < path.length - 1; i++) {
                 agraphics.line(path[i].x * 2, path[i].y * 2, path[i + 1].x * 2, path[i + 1].y * 2);
             }
+            */
             //draw path to graphics buffer
 
             var points = path.map(p => {
@@ -91,7 +93,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
 
            
             out({
-                points, index: 0, graphics:agraphics,
+                points, index: 0,
                 get currentPoint() {
                     return this.points[this.index];
                 },
@@ -121,7 +123,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
             });
         } else {
             
-            out({n:null, graphics:agraphics});
+            out({n:null, graphics});
         }
 
 

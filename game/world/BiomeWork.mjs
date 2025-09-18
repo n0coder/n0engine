@@ -2,9 +2,10 @@ import { RangeMap } from "../../engine/collections/RangeMap.mjs";
 import { createCubicInterpolator, createInterpolator, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { worldFactors } from "./FactorManager.mjs";
 import { Biome, addBiomeFactors, biomeFactorMap, factorMaps, mapDeep } from "./biome.mjs";
-
+import { addSugar } from "./wave/worldGen/TileBuilder.mjs";
+import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 var height = new RangeMap(0, 1)
-height.add("deep", .25).add("low", .675).add("border", .35)
+height.add("deep", .45).add("low", .575).add("border", .35)
 height.add("surface", 1).add("high", .75).add("cloud", .1)
 addBiomeFactors(height, "elevation",worldFactors);
 /*
@@ -31,7 +32,7 @@ addBiomeFactors(humidity, "humidity",worldFactors);
 var river = new RangeMap(0, 1)
 river.add("river", 1) //the split i thought
 river.add("riverborder", .1) //lowest part of the map i thought
-river.add("otheriver", 7) //bigest part i thought
+river.add("otheriver", 5) //bigest part i thought
 addBiomeFactors(river, "rivers",worldFactors);
 
 var sugarzone = new RangeMap(0, 1)
@@ -47,7 +48,7 @@ fantasy.add("ordinary").add("fantasy");
 addBiomeFactors(fantasy, "fantasy",worldFactors);
 
 export var biomes = []
-
+export var biomeMap = new Map();
 
 
 
@@ -184,20 +185,24 @@ for (let aih = 0; aih <= 17; aih++) {
     grassy.push(`dirtGrass${aih}`)
 }
 function formBiome(o) { //this is baking sugar into the generation... not ideal but it's ok.
-    
-    let plain = new Biome(o.name, o.name, 1, o.plaintags, o.tiles);
+    let pname = o.name;
+    let plain = new Biome(pname, o.name, 1, o.plaintags, o.tiles);
     plain.difficulty = o.difficulty;
     plain.sugara=1;
     biomes.unshift(plain)
-    
-    let sweet = new Biome("sweet"+o.name, o.name, 2, o.sweettags, o.tiles);
+    biomeMap.set(pname, plain)
+    let sname ="sweet"+ o.name;
+    let sweet = new Biome(sname, o.name, 2, o.sweettags, o.tiles);
     sweet.difficulty = o.difficulty-1;
     sweet.sugara =2;
     biomes.unshift(sweet)
-    let bitter = new Biome("bitter"+o.name, o.name, 0, o.bittertags, o.tiles);
+    biomeMap.set(sname, sweet)
+    let bname = "bitter"+o.name;
+    let bitter = new Biome(bname, o.name, 0, o.bittertags, o.tiles);
     bitter.difficulty = 3+o.difficulty;
     bitter.sugara=0
     biomes.unshift(bitter)
+    biomeMap.set(bname, bitter)
 }
 
 let sweeta = [["sweet"]];
@@ -354,7 +359,7 @@ formBiome({
     bittertags: [...desert, ...bittera],
     difficulty: 1
 })
-let lowsand = ["low", "hot"];
+let lowsand = ["low", "hot", ["arid"]];
 formBiome({
     name: "lowsand",
     plaintags: [...lowsand], tiles: ["dirt0", "dirt1", "dirt2"],
@@ -362,8 +367,7 @@ formBiome({
     bittertags: [...lowsand, ...bittera],
     difficulty: 2
 })
-
-let deepsand = ["deep", "hot"];
+let deepsand = ["deep", "hot", ["arid"]];
 formBiome({
     name: "deepsand",
     plaintags: [...deepsand], tiles: ["dirt0", "dirt1", "dirt2"],
@@ -371,7 +375,6 @@ formBiome({
     bittertags: [...deepsand, ...bittera],
     difficulty: 3
 })
-
 let riverborder = ["riverborder", surface ];
 formBiome({
     name: "riverborder",
@@ -419,11 +422,13 @@ function mapBiome(biome, soku, factorsUsed) {
         if (Array.isArray(item)) {
             let sub = mapBiome(item, soku);
             let sok = pop(sub.factors)
-            if (sok) factorsUsed.push(...sub.factorsUsed);            
+            if (sok) {
+                factorsUsed.push(...sub.factorsUsed);
+            }            
             return [sok]; 
         } else {
             let sok = soku(item);
-            return sok ? (factorsUsed.push(item), true) : false;
+            return sok ? (factorsUsed.push(atomicClone(item)), true) : false;
         }
     });
 
@@ -474,7 +479,7 @@ export function buildBiome(tile) {
         mapped.b = b;
         if (pop(mapped.factors)) biomex.push(mapped);
     }
-    tile.biome = biomex?.[0]?.b
+    tile.biome = biomex?.[0]?.b.name
     tile.biomeFactors = biomex?.[0]?.factorsUsed
 
     //console.log(tile)
@@ -489,7 +494,75 @@ export function buildTags(tile) {
     }
     tile.tags = tags;
 }
+
 export function buildEdgeX(tile) {
+let dist = Infinity;
+
+//tile.genDistances = new Map()
+
+    // Pass 2: build peek genCache
+    const epsilon = 0.01;
+for (let factor of tile.biomeFactors) {
+    let value = tile.genCache.get(factor.factor)
+    let wf = worldFactors.get(factor.factor);
+
+    let mimi = lerp(wf.mini, wf.maxi,  factor.min);
+    let mixi = lerp(wf.mini, wf.maxi,  factor.max);
+    let vali = lerp(wf.mini, wf.maxi,  value);
+
+    if (mimi <wf.mini) mimi = wf.mini;
+    if (mixi > wf.maxi) mixi = wf.maxi;
+
+    let min = vali - mimi;
+    let max = mixi - vali;
+
+    let absMin = Math.abs(min);
+    let absMax = Math.abs(max);
+
+    factor.proximity = Math.min(absMin, absMax);
+    if (absMin < absMax) {
+        factor.edgeSign = -1;
+        factor.edge = factor.min;
+    } else {
+        factor.edgeSign = 1;
+        factor.edge = factor.max;
+    }
+
+    let pseudotile = { genCache: new Map(tile.genCache) }; // shallow copy
+    factor.pseudotile = pseudotile;
+    var nudgedValue = factor.edge + (epsilon*factor.edgeSign);
+    pseudotile.genCache.set(factor.factor, nudgedValue);        
+    buildBiome(pseudotile);
+    addSugar(pseudotile);
+    /*
+    if (absMin < dist || absMax < dist) {
+        dist = Math.min(absMin, absMax);
+        fact = factor.factor;
+        sign = factor.edgeSign;
+        edge = factor.edge;
+    }
+    */
+}
+tile.edge = true;
+    /*
+    let pseudotile = { genCache: new Map(tile.genCache) }; // shallow copy
+    if (fact) {
+        var nudgedValue = edge + (epsilon*sign);
+        pseudotile.genCache.set(fact, nudgedValue);
+    }
+    
+    const nextBiome = buildBiome(pseudotile);
+    pseudotile.fact = fact;
+    pseudotile.dist = dist;
+    tile.transition = {
+        pseudotile,
+        factor: fact,
+        proximity: dist,
+        sign: sign
+    };
+    */
+}
+export function buildEdgeOldX(tile) {
 let dist = Infinity;
 let sign = 1;
 let fact = null;
@@ -524,6 +597,8 @@ for (let factor of tile.biomeFactors) {
             sign = 1;
             edge = factor.max;
         }
+
+
     }
 }
 
@@ -535,7 +610,8 @@ for (let factor of tile.biomeFactors) {
         pseudotile.genCache.set(fact, nudgedValue);
         
     }
-    const nextBiome = buildBiome(pseudotile);
+    buildBiome(pseudotile);
+    addSugar(pseudotile);
     pseudotile.fact = fact;
     pseudotile.dist = dist;
     tile.transition = {

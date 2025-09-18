@@ -118,7 +118,7 @@ export class NoiseGenerator {
     }
     toValue(value, x, y) {
         var octaves = value.getValue(x, y)
-        return octaves.sum != null ? octaves.sum : octaves;
+        return octaves.sum ?? octaves;
     }
     //ps, ways to optimize this
     //cache x and y values 
@@ -261,7 +261,7 @@ export class NoiseGenerator {
         var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
         var sums = this.blend.map(b => {
             var v = b.getValue != null ? b.getValue(x, y) : b;
-            return v.sum != null ? v.sum : v;
+            return v.sum ?? v;
         });
         var nvu = blendw(sums, sim);
         minmax.sum = lerp(minmax.sum, nvu, blendWeight);

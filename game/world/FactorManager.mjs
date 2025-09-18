@@ -24,7 +24,7 @@ export var minmax = []
 export var offsetX = 100, offsetY = 100
 export const one = false; //to display only one pixel (helpful for debugging)
 
-var vvscale = .40//140
+var vvscale = .75//140
 var scale = vvscale * .75
 var rscale = 50;
 // Base mountain ridges

@@ -49,13 +49,13 @@ let {crop} = a[0]
 });
 
 
-let n0 = new Nanoai(`n0`, 0, 0)
+let n0 = new Nanoai(`n0`, -0, -0)
 //let chest = new Chest(0, 0, 15, "error");
 camera.follow(n0);
 cosmicEntityManager.addEntity(camera);
 new DebugCursor()
 
-n0.brain.do("walk", -0, -1000)
+n0.brain.do("walk", -0, -5000)
 //worldGrid.x -= 10000000
 //n0.setActive(false); 
 // spawn the character but it's just the raw state, the loop and rendering is disabled

@@ -399,11 +399,11 @@ export function walkObj(obj, nano) {
         //console.log(obj);
         findPath(nano.x, nano.y, obj.args[0], obj.args[1], 32, 7, (path) => {
             obj.path = path;
-            p.fill(255, 255, 255)
-            p.image(path.graphics, 0, 0)
+            //p.fill(255, 255, 255)
+            //p.image(path.graphics, 0, 0)
             //console.log("BRO WHY")
             //console.log(path)
-        }, obj?.path?.graphics);
+        });
     }
 
 

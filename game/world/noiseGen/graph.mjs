@@ -1,4 +1,5 @@
 
+import { Map2d } from "../../../engine/n0math/map2d.mjs";
 import { createCubicInterpolator, cubicBlendW, inverseLerp, lerp, recubic } from "../../../engine/n0math/ranges.mjs";
 
 export class Graph {
@@ -500,6 +501,7 @@ export class Graph {
     }
     constructor() {
         this.sequence = [];
+        this.pointCache = new Map2d();
     }
     copy(graph) {
         this.sequence.unshift(...(graph.sequence))
@@ -512,10 +514,14 @@ export class Graph {
         return this;
     }
     create(x,y) {
+        var value = this.pointCache.get(x, y) //take from cache
+        if (value) return value;
+
         let output = { ox:x, oy: y, x, y, sum:0, minm:0, maxm:0, scale:1 }
         for (const fn of this.sequence) {
             fn(output);
         } 
+        this.pointCache.set(x,y,output);
         return output;
     }
     createIterator(x,y) {

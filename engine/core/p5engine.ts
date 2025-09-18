@@ -59,9 +59,10 @@ class P5engine {
     
         p.setup = function()  {
         window.p5.disableFriendlyErrors = true;
-
         document.getElementById('loading').style.display = 'none';
-        canvas = p.createCanvas(gameW, gameH).parent("sketch-holder");
+        p.webgl = false;
+        if (p.webgl) p.text = ()=>{}
+        canvas = p.createCanvas(gameW, gameH, p.webgl ? p.WEBGL : undefined).parent("sketch-holder");
         cosmicEntityManager.invoke("setup");
         canvasSetup=true;
     };
@@ -69,6 +70,8 @@ class P5engine {
     p.draw = function()  {
         p.background(backgroundColor);
         p.noStroke();
+        if (p.webgl)
+        p.rotateX(2.141592 / 3);
         calculateDeltaTime();
         cosmicEntityManager.invoke("draw", deltaTime);
     };

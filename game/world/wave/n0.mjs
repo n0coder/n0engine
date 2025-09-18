@@ -65,12 +65,15 @@ export function buildn0ts(tile, source, sets ) {
     for (const bias of n0ts.options) {
         rm.add(bias, bias.weight);
     }
-    let option = rm.random(n0alea);
-    n0ts.option = option.out;
-    n0ts.tile = tileset.get(option.out);
+    let option = rm.random(n0alea)?.out;
+    
+    
+
     if (option != undefined) {
-    for (const module of modules) {
-        module?.collapsed?.(tile);
-    }
+        n0ts.option = option;
+        n0ts.tile = tileset.get(option);
+        for (const module of modules) {
+            module?.collapsed?.(tile);
+        }
     }
 }

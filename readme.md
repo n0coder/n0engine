@@ -1,6 +1,144 @@
-# a small game engine designed to make open world sandbox games
+<!-- ─────────────  n0engine  ───────────── -->
+<!--  one seed → one universe → zero hype  -->
 
-![nano](./nanoai.png) **n0farm**: a game about nanoai girls farming in a big open world.
+# 🚀 n0engine  
+> *"I write with surgical precision in pure JS, no abstractions.  
+> Objects describe themselves—anything can happen, the specifics don’t matter."*
+
+---
+
+## 0.  TL;DR
+- 11,000 lines of **vanilla ES-modules**  
+- One deterministic seed → **infinite open-world**  
+- 32-pixel AI girls **farm, fish, mine, craft, love, fight, evolve**—no loading screens, no globals, no boiler-plate. **not llms nor neural networks**  
+- Every entity is **one Map entry**; every behaviour is **one function**; every art-file is **optional**.  
+- **Hot-reload the planet** while it runs—delete a tile, the world re-assembles; delete a line, the engine still boots.
+
+---
+
+## 1.  Philosophy – *The Atomic Way*
+| Abstraction | Cost | n0 replacement |
+|-------------|------|----------------|
+| class hierarchies | mental tax | **self-describing objects** |
+| frameworks | lock-in | **chainable micro-functions** |
+| config files | indirection | **code that *is* the config** |
+| docs | staleness | **comments = dev-log** |
+
+> A neutron has no charge—it slips through matter.  
+> n0 code has no indirection—it slips through problems.
+
+---
+
+## 2.  One-Minute Demo
+```js
+// spawn two friends
+let n0 = new Nanoai('n0', 4,4);
+let abi = new Nanoai('abi', 6,4);
+n0radio.addFriend(n0, abi);
+
+// drop a seed, a chest, a crafting table
+new Seed(5,5);
+new Chest(7,5, 9);
+new CraftingTable(3,5);
+
+// tell n0 to live
+n0.brain.do("hungry");           // find food autonomously
+n0.brain.do("pickup", seed);     // grab nearest seed
+n0.brain.do("plant", soil);      // plant if soil is near
+n0.brain.do("insert", chest);    // store harvest
+//the nanos will do this autonomously given we ping the seeds, soil, and chest on the radio
+```
+
+That is **the entire setup script**.  
+Run it—girls walk, path-find, chat on radio, co-operate, get sad, get sugar, ~~evolve into clouds, birth new girls~~. (we're almost to this point.)
+
+**No quest editor, no save button, no JSON.**
+
+---
+
+## 3.  Engine Layers (fractal)
+
+```n0
+├─ 0  Seed (32-bit)  →  whole universe
+├─ 1  Noise graphs   →  9-D planet
+├─ 2  Biome queries  →  tiles
+├─ 3  WFC decorator  →  pretty pixels
+├─ 4  Entities       →  inventories, jobs, love letters
+├─ 5  Radio          →  social protocol (no server)
+├─ 6  AI brain       →  queue of plain objects
+└─ 7  You            →  live-edit any layer
+```
+
+---
+
+## 4.  Spotlight Systems
+| File | Lines | Does |
+|------|-------|------|
+| `NoiseGenerator.mjs` and `graph.mjs` | 300 | Fluent planet-sculpting DSL |
+| `CosmicEntityManager.mjs` | 90 | Auto-discovers methods, builds per-frame call lists |
+| `n0.mjs` | 250 | Atomic WFC—tiles collapse themselves, gain/lose entropy live, fail gracefully, hot-reload PNGs |
+| `jobSystem.mjs` | 400 | Reactive task-graph with skill × opinion × relationship scoring |
+| `radio/n0radio.mjs` | 180 | Zero-server friend/lover/general item & job market |
+| `ranges.mjs` | 120 | `inverseLerp`, `lerp`, `cubicBlendW`—the *only* math the engine trusts |
+
+---
+
+## 5.  Hot-Load Examples
+| You type | Engine does |
+|----------|-------------|
+| `nanoaiActions.set("moonWalk", …)` | every nano instantly knows it |
+| `worldFactors.set("magic", new Graph().scale(200).fractal(…))` | planet regrows with magic veins |
+| drag PNG into browser | tile editor opens; paint sides; world re-decorates live |
+| `pinga.ping("take", chest, "sword")` | nearby nano autonomously crafts pickup job |
+
+---
+
+## 6.  Install & Run
+```bash
+git clone https://github.com/n0coder/n0engine
+cd n0engine
+npm install
+npm run start2
+# open localhost:5173
+```
+this loads into the current working file, modify game/tech.mjs to load other scripts...
+will eventually evolve it into a prototype selection menu
+Edit any `.mjs`, hit save, it auto refreshs—**the universe reboots in 700 ms**.
+
+---
+
+## 7.  Extending – *Add a Mini-Game in 60 s*
+```js
+// 1. define task
+jobTasksa.set("mineMeteor", (meteor) => ({
+  interactions: [["mining"], ["item", "pickaxe"], ["object", "meteor"]],
+  work(job, nano){ meteor.hp--; return meteor.hp > 0 }
+}));
+
+// 2. drop entity
+let m = new Meteor(12,34);
+n0radio.postObject("general", m);   // nanos can see it
+
+// 3. watch girls argue who has the better pickaxe
+```
+
+---
+
+## 8.  Credits
+Code & chaos – **n0coder**  
+Noise – `simplex-noise` (Alea seedable)  
+Path-finding – `easystarjs`  
+Renderer – p5.js  
+
+License – MIT (do whatever, atoms are free)
+
+---
+
+## 9.  Last Atom
+> Delete every comment, the code still tells the story.  
+> Delete every file, the seed still grows the world.  
+> That is the n0 way.
+```
 
 ---
 

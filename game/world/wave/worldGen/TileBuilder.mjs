@@ -1,7 +1,7 @@
 import { Tile } from "../../../../engine/grid/tile.mjs";
 import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
 import { inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
-import { buildBiome, buildEdge, buildEdgeX } from "../../BiomeWork.mjs";
+import { biomeMap, buildBiome, buildEdge, buildEdgeX } from "../../BiomeWork.mjs";
 import { buildFactors, worldFactors } from "../../FactorManager.mjs";
 import { buildn0ts } from "../n0.mjs";
 // import { buildn0Collapse } from "../n0.mjs";
@@ -19,7 +19,7 @@ export function addSugar(tile) { //sugar data does not exist, make it using biom
     let sugar = tile.genCache.get("sugarzone");
     let facti = worldFactors.get("sugarzone")
     tile.sugar = { minm: 0, maxm: 2, sum: lerp(0, 2, inverseLerp(facti.mini, facti.maxi, sugar)) }
-    tile.pathDifficulty = tile.biome?.getDifficulty(tile) ?? 9;
+    tile.pathDifficulty =  biomeMap.get(tile.biome)?.getDifficulty(tile) ?? 9;
 }
 function buildTransition(tile) {
     let minDist = Infinity;
@@ -52,7 +52,14 @@ function buildTransition(tile) {
         biome: nextBiome
     };
 }
-
+export function buildZ (tile) {
+    let wf = worldFactors.get("elevation");
+    let ff = tile.genCache.get("elevation");
+    let inv = inverseLerp(wf.mini, wf.maxi, ff)
+    let size = lerp(-8,8, inv);
+    tile.z = Math.floor(size)
+    tile.invZ = inverseLerp(-8, 8, size)//tile.z)
+}
 export function genTile(x, y, n0=true) {
     let w = worldGrid;
     var tilet = w.getTile(x, y), tile
@@ -66,22 +73,16 @@ export function genTile(x, y, n0=true) {
         t.layers.push(tile)
         tile = t
     } else return;
-    
+    n0= false;
     tile.wx = x, tile.wy = y;
     tile.build([ //functions that modify the tile
         buildFactors, //get noise maps
         buildBiome, //categorize noise to biomes
         buildEdgeX, //get proximity to biomes, enables blending over edges
         addSugar, //uss sugar and biome to set basic sugar level    
+        buildZ,
         n0 ? buildn0ts : undefined //runs single pass "WFC"
     ])
-    /*
-    let t = tile.genCache.get("elevation")
-    let elevation = worldFactors.get("elevation")
-    console.log(elevation);
-    let zz = inverseLerp(elevation.mini, elevation.maxi, t)
-    tile.z = Math.floor( lerp(0, 32, zz) )
-    */
     globalThis.tiles += 1
     
     if (typeof tilet === 'function') {

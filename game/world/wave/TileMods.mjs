@@ -1,5 +1,6 @@
 import { p } from "../../../engine/core/p5engine";
 import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
+import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { invdiv } from "../../tools/n0tilesystem/n0tseditorUI.mjs";
 import { worldFactors } from "../FactorManager.mjs";
 import { n0TileModules } from "./n0.mjs";
@@ -74,6 +75,8 @@ let dir = (dir, fn) => {
                 this.inputs[i].elt.removeEventListener('input', this.inputs[i].currentFN);
                 this.inputs[i].currentFN =() => {
                     n0ts[dir][i] = this.inputs[i].value();
+                    for(let fn of n0ts.rebuildFNs)
+                        fn();
                 } 
                 this.inputs[i].elt.addEventListener('input', this.inputs[i].currentFN);
                 

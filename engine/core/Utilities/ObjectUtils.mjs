@@ -2,7 +2,7 @@
 
 //this is a function to deep copy something so hard it duplicates atoms
 export function atomicClone(oldObj) {
-    let newObj = new Object();
+    let newObj = {};
     for (let key in oldObj) {
         if (oldObj[key] === null) {
             newObj[key] = oldObj[key];

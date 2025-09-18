@@ -5,13 +5,13 @@ export class WorldGrid {
     constructor(tileSize, chunkSize, camera) {
         this.setTileSize(tileSize);
         this.setChunkSize(chunkSize);
-        this.x = 310_000_100 //-15 * this.chunkSize
+        this.x = 110_000_100 //-15 * this.chunkSize
         this.y = 534_373_235 //240 * this.chunkSize;
         this.tiles = new Sparse2dMap();
         this.chunks = new Sparse2dMap();
         this.camera = camera
     }
-    tileSize = 16;
+    tileSize = 4;
     chunkSize = 4;
     setTileSize(a) {
         a = Math.abs(a);
@@ -48,8 +48,8 @@ export class WorldGrid {
         if ((a & (a - 1)) === 0) {
             this.chunkLog   = Math.log2(a);
             this.chunkMask  = a - 1;
-            this.floorChunk = x => x >> this.chunkLog;
-            this.modTile    = x => x & this.chunkMask;
+            this.floorChunk = x => { if (this.modChunk(x) > (3/4*a)) console.log(x);  return x >> this.chunkLog };
+            this.modChunk    = x => x & this.chunkMask;
         } else {
             this.chunkLog   = null;
             this.chunkMask  = null;
