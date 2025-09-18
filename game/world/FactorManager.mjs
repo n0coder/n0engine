@@ -28,29 +28,44 @@ var vvscale = .75//140
 var scale = vvscale * .75
 var rscale = 50;
 // Base mountain ridges
-var mountainRidges = new NoiseGenerator({ name: "mountainRidges", scale: scale * rscale, octaves: 1, persistance: .5, lacunarity: 1, offset: 0, offsetX: 3153, offsetY: 3222, amp: 1 })
+//var mountainRidges = new NoiseGenerator({ name: "mountainRidges", scale: scale * rscale, octaves: 1, persistance: .5, lacunarity: 1, offset: 0, offsetX: 3153, offsetY: 3222, amp: 1 })
+let mountainRidges = new Graph().scaleXY(scale*rscale).offsetXY(3153, 3222).fractal([xnf])
+
 
 // Mountain terrain with ridges  
-var mountainTerrain = new NoiseGenerator({ name: "mountainTerrain", scale: scale * rscale, 
+/*var mountainTerrain = new NoiseGenerator({ name: "mountainTerrain", scale: scale * rscale, 
     abs: true, octaves: 3, persistance: .5, lacunarity: 1.75, offsetX: 1553, 
-    add: [mountainRidges], amp: 1 })
+    add: [mountainRidges], amp: 1 })*/
+let mountainTerrain = new Graph().scaleXY(scale*rscale*.3).offsetX(1553).fractal(xnf, 1, .5, 1.75)
+mountainTerrain.abs().add(mountainRidges);
 
 var xx = 1533, yy = 1263, riverScale = 275;
 
 // River flow control
-var riverFlow = new NoiseGenerator({ name: "riverFlow", scale: scale * riverScale * 2.8, 
+/*var riverFlow = new NoiseGenerator({ name: "riverFlow", scale: scale * riverScale * 2.8, 
     add: [mountainTerrain], octaves: 1, persistance: .5, 
-    offset: 0, lacunarity: 1.75, offsetX: 353, offsetY: 3153, blend: [.1, .7] })
+    offset: 0, lacunarity: 1.75, offsetX: 353, offsetY: 3153, blend: [.1, .7] })*/
+let riverFlow = new Graph().scaleXY(scale*riverScale*2.8).offsetXY(353, 3153)
+riverFlow.fractal(xnf, 1, .5, 1.75).add(mountainTerrain).newBlend([.1, .7]);
+
 
 // Actual rivers with carved valleys
-var rivers = new NoiseGenerator({
+/*var rivers = new NoiseGenerator({
     name: "rivers",
     power: riverFlow, abs: true, scale: scale * riverScale, octaves: 1, persistance: .5, offset: 0, lacunarity: 1.75, offsetX: xx, offsetY: yy,
     mapSpace: [0, 1], map: [ //take in a map, (of relative height, controls)
         { "c": 0, "y": 0, "p": 4 }, { "c": 0.2, "y": .2, "p": 2 },
         { "c": 0.4, "y": 2.5, "p": 2 }, { "c": 0.6, "y": .6, "p": 2 }, { "c": 1, "y": 1, "p": 4 },
     ], blend: [-1, 1]
-})
+})*/
+let rivers = new Graph().scaleXY(scale*riverScale).offsetXY(xx,yy);
+rivers.fractal(xnf, 1, .5, 1.75).abs().map( [ //take in a map, (of relative height, controls)
+        { "c": 0, "y": 0, "p": 4 }, { "c": 0.2, "y": .2, "p": 2 },
+        { "c": 0.4, "y": 2.5, "p": 2 }, { "c": 0.6, "y": .6, "p": 2 }, 
+        { "c": 1, "y": 1, "p": 4 },
+    ], 0,1)
+rivers.pow(riverFlow).newBlend([-1, 1]);;
+
 
 // Large scale terrain blending
 var terrainBlendA = new NoiseGenerator({ name: "terrainBlendA", blendPower: 2, scale: scale * 150, octaves: 1, persistance: .5, lacunarity: 1, offset: 0, offsetX: -353, offsetY: -3222, amp: 1, blend: [1, 3] })

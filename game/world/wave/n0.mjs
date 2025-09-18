@@ -19,6 +19,7 @@ export function buildn0ts(tile, source, sets ) {
     let tiles = source ? source : tile.biome.tiles;
     // keep only tiles that have exists 
     let modules = new Set();
+    console.log({source, sets, tileset, tiles});
     let rules = tiles.filter(t => tileset.get(t))
 
     let n0ts = new Cell();

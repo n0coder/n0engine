@@ -101,6 +101,8 @@ export class PlaceholderTile {
         this.n0ts = tile.n0ts;
         this.state = state;
         this.reason = [];
+
+        this.n0ts.tile = undefined;
         //this.x = tile.wx;
         //this.y = tile.wy;
         //this.harvest = () => { p.ellipse(this.x, this.y, 30, 30);  return true; }
@@ -157,7 +159,7 @@ export class PlaceholderTile {
 
         let ns = 0;
         for (const [_, neighbor] of this.n0ts.neighbors) {
-            if (neighbor.tile) ns++;
+            if (neighbor.fn) ns++;
         }
 
         //one more attempt to build tile with a secondary tileset

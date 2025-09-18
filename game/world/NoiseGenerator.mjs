@@ -179,15 +179,21 @@ export class NoiseGenerator {
         return value
     }
 
-    newBlend(minmax, x, y, blendPower, blendWeight) {
-        var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
-        var { sums, nvu } = this.blendSumMinMax(x, y, sim, blendPower);
-
-        //cubic blend the mins and maxes too
-        minmax.sum = nvu;
-        let [min, max] = sums.reduce(([prevMin, prevMax], curr) => [Math.min(prevMin, curr), Math.max(prevMax, curr)], [Infinity, -Infinity]);
-        minmax.minm = lerp(minmax.minm, min, blendWeight);
-        minmax.maxm = lerp(minmax.maxm, max, blendWeight);
+    newBlend(minmax, x, y, blendPower) {
+        var spoints = this.blend.map(v => {
+            if (typeof v === "function") return v(x,y);
+            if (v.create) return v.create(x,y);
+            if (v.getValue) return v.getValue(x,y);
+            if (v.sum) return v;
+            return v
+        })
+        var i = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
+        var sums = spoints.map(v => v.sum ?? v );
+        var mins = spoints.map(v => v.minm ?? v );
+        var maxs = spoints.map(v => v.maxm ?? v );
+        minmax.sum = cubicBlendW(sums, i, blendPower);
+        minmax.minm = Math.min(...mins)
+        minmax.maxm = Math.max(...maxs)
     }
     recubix(minmax, x, y, blenpa, blendWeight){
         let min = Infinity;

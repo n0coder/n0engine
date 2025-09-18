@@ -1,6 +1,6 @@
 
 import { Map2d } from "../../../engine/n0math/map2d.mjs";
-import { createCubicInterpolator, cubicBlendW, inverseLerp, lerp, recubic } from "../../../engine/n0math/ranges.mjs";
+import { clamp, createCubicInterpolator, cubicBlendW, inverseLerp, lerp, recubic } from "../../../engine/n0math/ranges.mjs";
 
 export class Graph {
     input(fn, min=-1, max=1) {
@@ -102,76 +102,81 @@ export class Graph {
         }
         this.sequence.push(ampa);
         return this;
-     }
-     abs () {
+    }
+    abs () {
         this.sequence.push(function (output) {
             output.sum = Math.abs(output.sum);
+            output.maxm = Math.max(Math.abs(output.minm), output.maxm);
             output.minm = 0;
         })
+        //this.sequence.push(function(output) { console.log(output.minm, output.sum, output.maxm) })
         return this;
-     }
-     pow(p) {
+    }
+    pow(p=1) {
+        this.sequence.push((output) => {
+            if (output.maxm < output.sum || output.minm > output.sum) {
+                console.error("output is out of range for pow", this.sequence, output)
+            }
+        })
         if (typeof p === "function") {
             this.sequence.push(function (output) {
-                let tech= p(output);
-                output.sum = spow(output.sum, tech);
-           output.minm = spow(output.minm, tech);
-           output.maxm = spow(output.maxm, tech);
+                let i = inverseLerp(output.minm, output.maxm, output.sum);
+                let pi = Math.pow(i, p(output));
+                output.sum = lerp(output.minm, output.maxm, pi);
             })
         } else
-        if (p instanceof Graph) {
+        if (p.create) {            
             this.sequence.push(function (output) {
-                let tech = p.create(output.x, output.y);
-                
-                if (output.sum > output.maxm) output.sum = output.maxm;
-                if (output.sum < output.minm) output.sum = output.minm;
-                output.minm = spow(output.minm, tech.sum);
-                output.maxm = spow(output.maxm, tech.sum);
-                output.sum = spow(output.sum, tech.sum);
-                
-                })
+                let i = inverseLerp(output.minm, output.maxm, output.sum);    
+                let pox = p.create(output.ox, output.oy).sum;
+                let pi = Math.pow(i, pox);
+                output.sum = lerp(output.minm, output.maxm, pi);                
+            })
         } else {
-        this.sequence.push(function (output) {
-           output.sum = spow(output.sum, p);
-           output.minm = spow(output.minm, p);
-           output.maxm = spow(output.maxm, p);
-        })
+            this.sequence.push(function (output) {
+                let i = inverseLerp(output.minm, output.maxm, output.sum);                
+                let pi = Math.pow(i, p);
+                output.sum = lerp(output.minm, output.maxm, pi);
+            })
         } 
         return this;
-        function spow(sum, p) {
-            let sign = Math.sign(sum)
-            let abs = Math.abs(sum)
-            let pow = Math.pow(abs, p)
-            return pow*sign
-        }
-     }
-     sqrt () {
+    }
+    sqrt () {
         this.sequence.push(function(output) {
             output.sum = Math.sqrt(output.sum)
         })
         return this;
     }
-     add(v, m=1) {
+    add(v, m=1) {
+        
         if (typeof v === "function") {
             this.sequence.push(function(output){
                 let tech = v(output);
                 output.sum += tech*m;
-                output.minm += tech*m;
-                output.maxm += tech*m;
+                output.minm = Math.min(output.minm, output.minm + (tech*m));
+                output.maxm = Math.max(output.maxm, output.maxm + (tech*m));
             })
         } else 
         if (v instanceof Graph) {
             this.sequence.push(function(output) {
-                let tech = v.create(output.x, output.y);
-                output.sum += tech.sum*m;
-                output.minm += tech.minm*m;
-                output.maxm += tech.maxm*m;
+                let tech = v.create(output.ox, output.oy);
+
+                let min = tech.minm*m;
+                let max = tech.maxm*m;
+                if (m < 0){
+                    max = tech.minm*m;
+                    min = tech.maxm*m;
+                }
+
+                output.sum += tech.sum*m;                
+                output.minm = Math.min(output.minm, output.minm + min);
+                output.maxm = Math.max(output.maxm, output.maxm + max);
             })
         } else {
         this.sequence.push(function (output) {
-            output.sum += v*m;
-            output.minm += v*m;
-            output.maxm += v*m;
+            //output.sum += v*m;
+            //output.minm = Math.min(output.minm, output.minm + v*m);
+            //output.maxm = Math.max(output.maxm, output.maxm + v*m);;
         })
         }
         return this;
@@ -201,54 +206,29 @@ export class Graph {
         }
         return this;
     }
-    newBlend(points, pow=1) {
+    newBlend(points, pow=2) {
         this.sequence.push(function (output) {
-            let i = inverseLerp(output.minm, output.maxm, output.sum);
-            var { sums, nvu } = blendSumMinMax(points, i, pow, output.x, output.y);
-            output.sum = nvu;
-            let [min, max] = sums.reduce(([prevMin, prevMax], curr) => [Math.min(prevMin, curr), Math.max(prevMax, curr)], [Infinity, -Infinity]);
-            output.minm = min;// lerp(output.minm, min, blendWeight);
-            output.maxm = max;//lerp(output.maxm, max, blendWeight);    
-        })
-        return this;
-        //cubic blend the mins and maxes too
-        function blendSumMinMax(points, i, blendPower,x,y) {
             let spoints = points.map(v => {
-                if (typeof v === "function") return v(x,y);
-                if (v instanceof Graph) return v.create(x,y);
+                if (typeof v === "function") return v(output.ox,output.oy);
+                if (v.create) return v.create(output.ox,output.oy);
+                if (v.getValue) return v.getValue(output.ox,output.oy);
+                if (v.sum) return v;
                 return v
             })
-            var sums = spoints.map(v => {
-                
-                        if (v.sum != null) 
-                            return v.sum;
-                        return v;
-                    });
-                    /*
-                    var mins = spoints.map(v => {
-                        if (v.minm != null) 
-                            return v.minm;
-                        return v;
-                    });
-                    var maxes = spoints.map(v => {
-                        if (v.maxm != null) 
-                            return v.maxm;
-                        return v;
-                    });
-                    */
-                    var nvu = cubicBlendW(sums, i, blendPower);
-                    //var min = cubicBlendW(mins, i, blendPower);            
-                    //var max = cubicBlendW(maxes, i, blendPower);
-                    // sums.push(min);
-                    // sums.push(max);
-                    //console.log({sums, nvu, mins, min, maxes, max})
-                    return { sums, nvu };
-        }
+            let i = inverseLerp(output.minm, output.maxm, output.sum);            
+            var sums = spoints.map(v => v.sum ?? v );
+            var mins = spoints.map(v => v.minm ?? v );
+            var maxs = spoints.map(v => v.maxm ?? v );
+            output.sum = cubicBlendW(sums, i, pow); 
+            output.minm =  Math.min(...mins)
+            output.maxm = Math.max(...maxs) 
+        })
+        return this;
     }
-     bicubic(points, power = 2, weight) {
+    bicubic(points, power = 2, weight) {
         this.sequence.push((output)=> { 
             let i = inverseLerp(output.minm, output.maxm, output.sum);
-            let min = Infinity, max = -infinity;
+            let min = Infinity, max = -Infinity;
             let sums = points.map((v) => {
             if (typeof v === "function") {
                 let sum = v(output);
@@ -272,35 +252,29 @@ export class Graph {
             return v;
         });
             output.sum =recubic(sums, i, power);
-         })
-         return this;
-     }
-
-     map(points, min,max) {
-        
-        this.sequence.push((output)=>{
-            let poi = points.map(p=>{
-                let y = p.y;
-                if (typeof y === "function") y = y(output);
-                else if (y instanceof Graph) y = y.create(x,y).sum;
-                return { "c": p.c, "y": y, "p": p.p }
-            })
-        let mapper = createCubicInterpolator(poi);
-        var sim = inverseLerp(output.minm, output.maxm, output.sum); //shift into 0 to 1 space
-        output.sum = lerp (output.minm, output.maxm, mapper(sim));
-        //minmax.minm = min
-        //minmax.maxm = max
         })
         return this;
-     }
-     invert() {
+    }
+
+    map(points, min, max) {
+        let mapper = createCubicInterpolator(points);
+        this.sequence.push((output)=>{
+            
+            var sim = inverseLerp(output.minm, output.maxm, output.sum);            
+            output.sum = clamp(min, max, mapper(sim));
+            output.minm = min
+            output.maxm = max
+        })
+        return this;
+    }
+    invert() {
         this.sequence.push(function (output) {
             let i = inverseLerp(output.minm, output.maxm, output.sum);
             output.sum = lerp(output.maxm, output.minm, i);
         })
         return this;
-     }
-     lowClip(low) {
+    }
+    lowClip(low) {
         this.sequence.push(function (output) {
             if (output.sum < low) output.sum = low;
             if (output.minm < low) output.minm = low;
@@ -433,8 +407,7 @@ export class Graph {
             if (Array.isArray(fn)) {
                 octaves = fn.length;  
             }
-            for (let o = 0; o < octaves; o++) {
-                
+            for (let o = 0; o < octaves; o++) {                
                 var sx = output.x * freq;
                 var sy = output.y * freq;
                 let cfn = Array.isArray(fn) ? fn[o] : fn;
@@ -447,9 +420,9 @@ export class Graph {
                 amp *= persistance;
                 freq *= lacunarity;
             }
-            output.sum = output.sum ===undefined ? sum : output.sum + sum;
-            output.minm = output.minm ===undefined ? minm : output.minm + minm;
-            output.maxm = output.maxm ===undefined ? maxm : output.maxm + maxm;
+            output.sum  = sum;
+            output.minm = minm;
+            output.maxm = maxm;
         }
         this.sequence.push(inp);
         return this;

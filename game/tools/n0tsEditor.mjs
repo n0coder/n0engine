@@ -141,23 +141,23 @@ states.set("add", {
             var x2 = 0, y2 = y, x3 = -x, y3 = y
             let t = tile.n0ts.tile
             //var sides = [t.up, t.right, t.down, t.left];
-            let drawSide = (data) => {
+            let drawSide = (data, a,b,c) => {
                 p.fill(255)
                 //p.ellipse(xx+(x*size),yy+(y*size), 8);
-                p.text(data[0], xx + (x * size), yy + (y * size))
-                p.text(data[1], xx + (x2 * size), yy + (y2 * size))
-                p.text(data[2], xx + (x3 * size), yy + (y3 * size))
+                p.text(data[a], xx + (x * size), yy + (y * size))
+                p.text(data[b], xx + (x2 * size), yy + (y2 * size))
+                p.text(data[c], xx + (x3 * size), yy + (y3 * size))
 
             }
 
             p.textSize(16 / 1)
-            drawSide(t.up)
+            drawSide(t.up, 0, 1, 2)
             var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
-            drawSide(t.right)
+            drawSide(t.right, 0, 1, 2)
             var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
-            drawSide(t.down)
+            drawSide(t.down, 2, 1, 0)
             var [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3]
-            drawSide(t.left)
+            drawSide(t.left, 2, 1, 0)
 
         }
     }
@@ -267,18 +267,6 @@ let materials = [
     {name:"water", color: [100,100,255,255]},
     {name:"sand", color: [255,220,150,255]},
     {name:"stone", color: [200,200,200,255]},
-    {name:"water", color: [100,100,255,255]},
-    {name:"sand", color: [255,220,150,255]},
-    {name:"stone", color: [200,200,200,255]},
-    {name:"water", color: [100,100,255,255]},
-    {name:"sand", color: [255,220,150,255]},
-    {name:"stone", color: [200,200,200,255]},
-    {name:"water", color: [100,100,255,255]},
-    {name:"sand", color: [255,220,150,255]},
-    {name:"stone", color: [200,200,200,255]},
-    {name:"water", color: [100,100,255,255]},
-    {name:"sand", color: [255,220,150,255]},
-    {name:"stone", color: [200,200,200,255]},
 ];
 
 let mati = 0;
@@ -286,86 +274,45 @@ let drag = undefined;   // offset at drag start
 let scrollPos = 0;
 let sw = 16, space = 16, sh= 24, sws = sw + space;
 let lastChangeFrame = 1;
+let w = 64, w05 = w/2, w33 = w/3;
+
+// helper to check if mouse is inside a rect
+function inRect(mx, my, x, y, w, h) {
+    return mx >= x && mx < x + w && my >= y && my < y + h;
+}
 let p2 = new window.p5((p2) => {
     p2.draw = () => {
         p2.clear()
         if (timg) {
-            let w = 64, w05 = w/2, w33 = w/3;
-            /*
-            var color = materials[timg.n0t.up[0]].color;
-            if (color) p2.fill(color)
-            p2.rect((p2.width/2)-w05, ((p2.height-sh)/2)-w05-w33, w33,w33);
-            var color = materials[timg.n0t.up[1]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05+(w33), ((p2.height-sh)/2)-w05-w33, w33,w33);
-            var color = materials[timg.n0t.up[2]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05+(w33*2), ((p2.height-sh)/2)-w05-w33, w33,w33);
-        
-            var color = materials[timg.n0t.right[0]].color;
-            if (color) p2.fill(color)
-            p2.rect((p2.width/2)-w05+(w33*3), ((p2.height-sh)/2)-w05, w33,w33);
-            var color = materials[timg.n0t.right[1]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05+(w33*3), ((p2.height-sh)/2)-w05+(w33), w33,w33);
-            var color = materials[timg.n0t.right[2]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05+(w33*3), ((p2.height-sh)/2)-w05+(w33*2), w33,w33);
-            
-            var color = materials[timg.n0t.down[2]].color;
-            if (color) p2.fill(color)
-            p2.rect((p2.width/2)-w05, ((p2.height-sh)/2)-w05+(w33*3), w33,w33);
-            var color = materials[timg.n0t.down[1]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05+(w33), ((p2.height-sh)/2)-w05+(w33*3), w33,w33);
-            var color = materials[timg.n0t.down[0]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05+(w33*2), ((p2.height-sh)/2)-w05+(w33*3), w33,w33);
 
-            var color = materials[timg.n0t.left[2]].color;
-            if (color) p2.fill(color)
-            p2.rect((p2.width/2)-w05-(w33), ((p2.height-sh)/2)-w05, w33,w33);
-            var color = materials[timg.n0t.left[1]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05-(w33), ((p2.height-sh)/2)-w05+(w33), w33,w33);
-            var color = materials[timg.n0t.left[0]].color;
-            if (color) p2.fill(color) 
-            p2.rect((p2.width/2)-w05-(w33), ((p2.height-sh)/2)-w05+(w33*2), w33,w33);
-            */
-
-
-            if (timg && timg.n0t) {
-                let w = 64, w05 = w / 2, w33 = w / 3;
+            if (timg.n0t) {
                 let centerX = (p2.width / 2)-w33/2;
                 let centerY = ((p2.height - sh) / 2)-w33/2;
                 
                 var x = -1, y = -2
                 var x2 = 0, y2 = y, x3 = -x, y3 = y
 
-                // sides in clockwise order
-                let sides = [timg.n0t.up, timg.n0t.right, timg.n0t.down, timg.n0t.left];
-                
-                let drawSide = (data) => {
+                let drawSide = (data, a,b,c) => {
                     // draw three cells for this side
-                    let c0 = materials[data[0]]?.color;
+                    let c0 = materials[data[a]]?.color;
                     if (c0) p2.fill(c0);
                     p2.rect(centerX + (x  * w33), centerY + (y  * w33), w33, w33);                    
-                    let c1 = materials[data[1]]?.color;
+                    let c1 = materials[data[b]]?.color;
                     if (c1) p2.fill(c1);
                     p2.rect(centerX + (x2 * w33), centerY + (y2 * w33), w33, w33);                    
-                    let c2 = materials[data[2]]?.color;
+                    let c2 = materials[data[c]]?.color;
                     if (c2) p2.fill(c2);
                     p2.rect(centerX + (x3 * w33), centerY + (y3 * w33), w33, w33);
                 };
 
                 
-                drawSide(timg.n0t.up);
+                drawSide(timg.n0t.up, 0, 1, 2);
                 [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
-                drawSide(timg.n0t.right);
+                drawSide(timg.n0t.right, 0, 1, 2);
                 [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
-                drawSide(timg.n0t.down);
+                drawSide(timg.n0t.down, 2, 1, 0);
                 [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
-                drawSide(timg.n0t.left);
+                drawSide(timg.n0t.left, 2, 1, 0);
                 [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
             }
             
@@ -423,6 +370,63 @@ let p2 = new window.p5((p2) => {
                 frame: p2.frameCount
             }
         }
+
+        // painting logic
+    if (timg?.n0t) {
+        let centerX = (p2.width / 2) - w33/2;
+        let centerY = ((p2.height - sh) / 2) - w33/2;
+
+        let x = -1, y = -2;
+        let x2 = 0, y2 = y, x3 = -x, y3 = y;
+
+        let clickMat = (mat, a, b, c, d,e,f) => {
+            let coords = [
+                [centerX + (x  * w33), centerY + (y  * w33)],
+                [centerX + (x2 * w33), centerY + (y2 * w33)],
+                [centerX + (x3 * w33), centerY + (y3 * w33)]
+            ];
+            var i = a;
+            if (inRect(p2.mouseX, p2.mouseY, coords[i][0], coords[i][1], w33, w33)) {
+                mat[d] = mati; // paint!
+                for (let fn  of timg.n0t.rebuildFNs) {
+                    fn();
+                }
+                ui.showImg(timg);
+                return;
+            }
+            var i = b;
+            if (inRect(p2.mouseX, p2.mouseY, coords[i][0], coords[i][1], w33, w33)) {
+                mat[e] = mati; // paint!
+                for (let fn  of timg.n0t.rebuildFNs) {
+                    fn();
+                }
+                ui.showImg(timg);
+                return;
+            }
+            var i = c;
+            if (inRect(p2.mouseX, p2.mouseY, coords[i][0], coords[i][1], w33, w33)) {
+                mat[f] = mati; // paint!
+                for (let fn  of timg.n0t.rebuildFNs) {
+                    fn();
+                }
+                ui.showImg(timg);
+                return;
+            }
+        }
+        
+        clickMat(timg.n0t.up, 0, 1, 2, 0,1,2);
+        [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
+
+        clickMat(timg.n0t.right, 0, 1, 2, 0,1,2);
+        [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
+
+        clickMat(timg.n0t.down, 2, 1, 0, 0,1,2);
+        [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
+
+        clickMat(timg.n0t.left, 2, 1, 0, 0,1,2);
+        [x, y, x2, y2, x3, y3] = [-y, x, -y2, x2, -y3, x3];
+        
+    }
     };
     p2.mouseDragged = () => {
         if (drag)  {
@@ -541,7 +545,7 @@ export let n0tsEditorTiles = {
             let build = ()=>{
                 if (tile.n0ts) 
                     tile.lastN0ts = tile.n0ts;
-                tile.n0ts = null;
+                tile.n0ts = undefined;
 
                 buildn0ts(tile, ["tile"], new Map([["tile", img.n0t]]))
                 tile.n0tsEditorTile = n0t;
