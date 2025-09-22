@@ -21,6 +21,10 @@ export function atomicClone(oldObj) {
     }
     return newObj;
 }
+export function a0Clone(oldObj) {
+    return {...oldObj};
+}
+
 export function cloneAction(obj, also, ...args) {
     //let clone = atomicClone(obj);
     //clone.args = [...args];
