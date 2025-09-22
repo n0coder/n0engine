@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const OUTPUT_FILE = 'js_project_contents.txt';
+const folderName = path.basename(process.cwd());
+const OUTPUT_FILE = `${folderName}.jsproj.txt`;
+
 const EXTENSIONS = ['.js', '.mjs', '.json', '.html', '.css', '.jsx', '.ts', '.tsx'];
 const SKIP_FOLDERS = ['node_modules', '.git', 'dist', 'build', '.vscode'];
 const SKIP_FILES = [OUTPUT_FILE, '.gitignore'];
@@ -42,9 +44,9 @@ function concatenateFiles() {
     console.log(`Found ${files.length} files to process`);
     
     // Create output file
-    let output = `JavaScript Project Contents\n`;
+    let output = `${folderName} js\n`;
     output += `Generated on: ${new Date().toLocaleString()}\n`;
-    output += `${'='.repeat(50)}\n\n`;
+    output += `${'='.repeat(50)}\n`;
     
     // Process each file
     files.forEach((filePath, index) => {
@@ -55,15 +57,12 @@ function concatenateFiles() {
             
             output += `\n${'='.repeat(50)}\n`;
             output += `FILE: ${filePath}\n`;
-            output += `${'='.repeat(50)}\n`;
             output += content;
-            output += `\n\n`;
             
         } catch (error) {
             console.warn(`Could not read file ${filePath}: ${error.message}`);
             output += `\n${'='.repeat(50)}\n`;
             output += `FILE: ${filePath} (ERROR: Could not read)\n`;
-            output += `${'='.repeat(50)}\n\n`;
         }
     });
     
