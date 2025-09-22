@@ -4,7 +4,7 @@
 //it will wave around?
 
 import { deltaTime } from "../../../engine/core/Time/n0Time.mjs";
-import { p } from "../../../engine/core/p5engine.mjs"
+import { p } from "../../../engine/core/p5engine.ts"
 import { Offseter } from "../../../engine/n0math/offseter.mjs";
 import {inverseLerp} from "../../../engine/n0math/ranges.mjs"
 export class CottonCandyPlant { //THIS TURNED INTO HELL

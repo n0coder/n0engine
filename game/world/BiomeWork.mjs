@@ -2,7 +2,7 @@ import { RangeMap } from "../../engine/collections/RangeMap.mjs";
 import { createCubicInterpolator, createInterpolator, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { worldFactors } from "./FactorManager.mjs";
 import { Biome, addBiomeFactors, biomeFactorMap, factorMaps, mapDeep } from "./biome.mjs";
-import { addSugar } from "./wave/worldGen/TileBuilder.mjs";
+import { addSugar } from "./wave/worldGen/TileBuilder.ts";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 var height = new RangeMap(0, 1)
 height.add("deep", .45).add("low", .575).add("border", .35)
@@ -35,18 +35,20 @@ river.add("riverborder", .1) //lowest part of the map i thought
 river.add("otheriver", 5) //bigest part i thought
 addBiomeFactors(river, "rivers",worldFactors);
 
-var sugarzone = new RangeMap(0, 1)
-sugarzone.add("bitterzone",5).add("plainzone", 1).add("sweetzone",5)
-addBiomeFactors(sugarzone, "sugarzone",worldFactors);
+/* 
+    var sugarzone = new RangeMap(0, 1)
+    sugarzone.add("sweet",5).add("sweet", 1).add("sweet",5)
+    addBiomeFactors(sugarzone, "sugarzone",worldFactors);
+*/
 var sugar = new RangeMap(0, 1)
 sugar.add("bitter",5).add("plain",1).add("sweet",5)
 addBiomeFactors(sugar, "sugar",worldFactors);
 
-
-var fantasy = new RangeMap(0, 1);
-fantasy.add("ordinary").add("fantasy");
-addBiomeFactors(fantasy, "fantasy",worldFactors);
-
+/*
+    var fantasy = new RangeMap(0, 1);
+    fantasy.add("ordinary").add("fantasy");
+    addBiomeFactors(fantasy, "fantasy",worldFactors);
+*/
 export var biomes = []
 export var biomeMap = new Map();
 
@@ -111,7 +113,7 @@ let sweetlut = {
     "mountain": [209,209,234],
     "icymountain": [231,231,254],
     "mountaintip": [210,228,248],
-    "test": [0,0,0]
+    "test": [255,255,255]
     }
 let neutrallut = {
     "deepwater": [48, 81, 138],
@@ -139,7 +141,7 @@ let neutrallut = {
     "mountain": [160,160,170],
     "icymountain": [205,205,250],
     "mountaintip": [163,200,222],
-    "test": [0,0,0]
+    "test": [127,127,127]
 }
 let bitterlut = {
     "deepwater": [32, 43, 54], 
@@ -204,7 +206,7 @@ function formBiome(o) { //this is baking sugar into the generation... not ideal 
     biomes.unshift(bitter)
     biomeMap.set(bname, bitter)
 }
-
+let plaina = [["plain"]]
 let sweeta = [["sweet"]];
 let bittera = [["bitter"]];
 
@@ -223,15 +225,6 @@ formBiome({
     bittertags: ["deep", ...bittera],
     difficulty: 4
 })
-/*
-formBiome({
-    name: "icydeepwater",
-    plaintags: ["deep", "frozen"], tiles: [],
-    sweettags: ["deep", "frozen", ...sweeta],
-    bittertags: ["deep", "frozen",...bittera],
-    difficulty: 6 
-})
-*/
 formBiome({
     name: "water",
     plaintags: ["low"], tiles: ["ledgamo",  "vedgamo", "redgamo", "nedogamo","ledogamo", "vedogamo", "redogamo", "nedgamo"],
@@ -257,16 +250,16 @@ formBiome({
 formBiome({
     name: "icybeach",
     plaintags: ["border", "frozen"], tiles: ["dirt0", "dirt1", "dirt2"],
-    sweettags: ["border", "frozen", "sweetzone"],
-    bittertags: ["border", "frozen", "bitterzone"],
+    sweettags: ["border", "frozen", "sweet"],
+    bittertags: ["border", "frozen", "bitter"],
     difficulty: 2
 })
 
 formBiome({
     name: "dirt",
     plaintags: [surface], tiles: ["dirt0", "dirt1", "dirt2"],
-    sweettags: [surface, "sweetzone"],
-    bittertags: [surface, "bitterzone"],
+    sweettags: [surface, "sweet"],
+    bittertags: [surface, "bitter"],
     difficulty: 1
 })
 
@@ -415,6 +408,7 @@ formBiome({
     bittertags: [...mountaintip,...bittera],
     difficulty: 3
 })
+
 function mapBiome(biome, soku, factorsUsed) {
     factorsUsed ??= [];
 

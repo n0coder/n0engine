@@ -1,7 +1,7 @@
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.ts";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { n0radio } from "../radio/n0radio.mjs";
 import { Mommyai, Puff } from "./mommyai.mjs";
@@ -365,6 +365,8 @@ export const nanoaiActions = new Map([
                         if (cloudium2) {
                             this.puff = new Puff(nano.x, nano.y, 10, 60, 16, () => {
                                 nano.mommy = new Mommyai(nano.name, nano.x, nano.y);
+                                nano.lover =nano2;
+                                nano2.lover = nano;
                                 nano.mommy.nano = nano;
                                 nano.mommy.nano2 = nano2;
                                 nano.inventory.transfer(nano.mommy.inventory)

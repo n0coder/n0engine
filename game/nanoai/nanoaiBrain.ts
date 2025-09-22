@@ -2,9 +2,21 @@ import { t } from "../../engine/core/Time/n0Time.mjs";
 import { cloneAction as handleBefore } from "../../engine/core/Utilities/ObjectUtils.mjs";
 import { p } from "../../engine/core/p5engine.ts";
 import { n0radio } from "../radio/n0radio.mjs";
+import { Mommyai } from "./mommyai.mjs";
+import { Nanoai } from "./nanoai.mjs";
 import { nanoaiActions } from "./nanoaiActions.mjs";
 
+type Action = { work(nano: any): boolean; name?: string };
+
 export class NanoaiBrain {
+  state: "idle" | "active";
+  queue: (Action | Action[])[];
+  currentActivity: Action | null;
+  stateMachine: {
+    idle: (nano: any) => void;
+    active: (nano: any) => void;
+    processQueue: (nano: any, queue: string) => void;
+  };
   constructor() {
     this.state = "idle";
     this.queue = []
@@ -19,6 +31,7 @@ export class NanoaiBrain {
       active: function (nano) {
 
         if (nano.brain.currentActivity) {
+          console.log(nano.brain.currentActivity)
           var ou = nano.brain.currentActivity.work(nano);
           if (!ou) nano.brain.done(nano)
           
@@ -26,33 +39,46 @@ export class NanoaiBrain {
           nano.brain.done(nano);
         }
       }, 
-      processQueue(nano, queue) {
-        queue = nano.brain[queue];
-        for (let i = 0; i < queue.length; i++) {
-          let q = queue[i];
-          if (Array.isArray(q)) {
-            queue.splice(i, 1, ...q);
-            i += q.length - 1;
+      processQueue(nano) {
+      let brain: NanoaiBrain = nano.brain;
+      let queue = brain.queue;
+
+      function getFirstAction(item) {
+        if (typeof item?.work !== "function") {
+          queue.shift();
+          item = queue[0];
+        }
+
+        if (Array.isArray(item)) {
+          if (item.length === 0) {
+            // Remove empty arrays from the queue
+            queue.shift();
+            return getFirstAction(queue[0]);
           }
+          return getFirstAction(item[0]);
         }
-        var q = queue[0];
-        if (q) {
-          q.start?.(nano);
-          nano.brain.currentActivity = q;
-          nano.brain.active(nano);
-        }
-       }
+        return item;
+      }
+
+      const first = getFirstAction(queue[0]);
+
+
+      if (first) {
+        nano.brain.currentActivity = first;
+        nano.brain.active(nano);
+      }
+      }
     };
   }
   
-  do(task, ...args) {
+  do(task: string | Action, ...args: any[]): Action | Action[] {
     let action = this.actionBuilder(task, args, (t) => { this.queue.push(t); }); 
     if (typeof task === 'string' && action)
     action.name = task
     return action
   }
 
-  doNow(task, ...args) {
+  doNow(task: string | Action, ...args: any[]): Action | Action[] {
     let action = this.actionBuilder(task, args, (t) => { 
       this.queue.unshift(t);
       this.currentActivity = null; 
@@ -63,19 +89,52 @@ export class NanoaiBrain {
   }
   
 
-  doBefore(targetTasks, task, ...args) {
-    let action = this.doRelative(targetTasks, task, (t, index) => {
+  doBefore(
+    target: (Action | Action[])&{qarry:Action[]},
+    task: string | Action, ...args: any[]
+  ): Action | Action[] {
+    let group: Action[];
+    // If target is already in a group, use it
+  if (target.qarry) {
+    group = target.qarry;
+  } else {
+    // Not in a group, create one and replace in queue
+    let idx = this.queue.indexOf(target);
+    if (idx !== -1) {
+      group = [target];
+      this.queue[idx] = group;
+      target.qarry = group;
+    }
+  }
+
+
+    let action = this.doRelative(target, task, (t, index) => {
       this.queue.splice(index, 0, t); 
       this.currentActivity = null; 
       this.state = "idle"
-
     }, (array)=> array[0], ...args); 
      action.name = `${action?.name??"O"} -> ${task}`
     return action
   }
-  doAfter(targetTasks, task, ...args) {
-    let action = this.doRelative(targetTasks, task,  (t, index)  => { 
-     
+  doAfter(
+    target: (Action | Action[])&{qarry},
+    task: string | Action, ...args: any[]
+  ): Action | Action[] {
+    let group: Action[];
+    // If target is already in a group, use it
+  if (target.qarry) {
+    group = target.qarry;
+  } else {
+    // Not in a group, create one and replace in queue
+    let idx = this.queue.indexOf(target);
+    if (idx !== -1) {
+      group = [target];
+      this.queue[idx] = group;
+      target.qarry = group;
+    }
+  }
+
+    let action = this.doRelative(target, task,  (t, index)  => {       
       this.queue.splice(index+1, 0, t);
     }, (array)=> array[array.length], ...args);  
     action.name = `${task} <| ${action?.name??"O"}`
@@ -83,7 +142,10 @@ export class NanoaiBrain {
   }
 
 
-  doRelative(targetTasks, task, builder, arrayIndex, ...args) {
+  doRelative(
+    targetTasks: Action | Action[],
+    task: string | Action, builder: any, arrayIndex: any, ...args: any[]
+  ): Action | Action[] {
     let doR = (targetTask, task, args) => { 
       var index = this.queue.indexOf(targetTask);
       if (index !== -1) { 
@@ -96,11 +158,15 @@ export class NanoaiBrain {
     let targetTask = Array.isArray(targetTasks) ? arrayIndex(targetTasks) : targetTasks
     return doR(targetTask, task, args)
   }
-  remove(task) {
+  remove(task: Action): void {
     var i = this.queue.indexOf(task);
     this.queue.splice(i, 1);
   }
-  actionBuilder(task, args, found) {
+  actionBuilder(
+    task: string | Action,
+    args: any[],
+    found: (t: any) => void
+  ): Action | Action[] {
     if (typeof task === 'string') {
     var action = nanoaiActions.get(task);
     if (!action) {

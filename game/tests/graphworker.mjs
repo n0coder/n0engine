@@ -1,7 +1,7 @@
 import { createNoise2D } from "simplex-noise";
 import { Graph } from "../world/noiseGen/graph.mjs";
 import Alea from "alea";
-import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
+import { genTile } from "../world/wave/worldGen/TileBuilder.ts";
 
 let xna = new Graph();
 let xnf = {

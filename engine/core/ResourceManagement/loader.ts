@@ -1,16 +1,25 @@
+export type LoaderItem = (cb: () => void) => void;
+export type PhaseChangeCallback = (phase: string, loader: Loader) => void;
+
 export class Loader {
+    loadingItems: Map<string, LoaderItem>;
+    loadedItems: Map<string, LoaderItem>;
+    queue: Map<string, [LoaderItem, string[]]>;
+    phase: string;
+    phaseHistory: string[];
+    phaseChangeCallbacks: PhaseChangeCallback[];
     constructor() {
         this.loadingItems = new Map();
         this.loadedItems = new Map();
         this.queue = new Map();
-        
         // Phase tracking
         this.phase = 'init';
         this.phaseHistory = [this.phase];
         this.phaseChangeCallbacks = [];
     }
 
-    setPhase(newPhase) {
+
+    setPhase(newPhase: string) {
         if (this.phase !== newPhase) {
             this.phase = newPhase;
             this.phaseHistory.push(newPhase);
@@ -18,11 +27,11 @@ export class Loader {
         }
     }
 
-    onPhaseChange(cb) {
+    onPhaseChange(cb: PhaseChangeCallback) {
         this.phaseChangeCallbacks.push(cb);
     }
 
-    loadItem(key, item) {
+    loadItem(key: string, item: LoaderItem) {
         this.loadingItems.set(key, item);
         if (item) {
             item(() => {
@@ -37,12 +46,11 @@ export class Loader {
         }
     }
 
-    startLoading(key, item, dependencies) {
+    startLoading(key: string, item: LoaderItem, dependencies?: string[]) {
         if (!dependencies) {
             this.loadItem(key, item);
             return;
         }
-        
         if (dependencies.every(dep => this.loadedItems.has(dep))) {
             this.queue.delete(key);
             this.loadItem(key, item); 
@@ -57,14 +65,14 @@ export class Loader {
         }
     }
 
-    isLoading(item) {
+    isLoading(item: string): LoaderItem | undefined {
         return this.loadingItems.get(item);
     }
-    isPending(item) {
+    isPending(item: string): [LoaderItem, string[]] | undefined {
         return this.queue.get(item);
     }
 
-    loaded(item) {
+    loaded(item: string) {
         //console.log("loaded item", item);
     }
 }

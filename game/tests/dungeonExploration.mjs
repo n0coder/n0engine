@@ -3,7 +3,7 @@ import { p } from "../../engine/core/p5engine.ts";
 import { Nanoai } from "../nanoai/nanoai.mjs";
 import { NoiseGenerator } from "../world/NoiseGenerator.mjs";
 import Alea from "alea";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import {camera} from "../../engine/core/Camera/camera.mjs"
 import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
@@ -11,7 +11,7 @@ import { WorldGenerator } from "../world/wave/worldGen/worldGenerator.mjs";
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { Graph } from "../world/noiseGen/graph.mjs"
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
-import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
+import { genTile } from "../world/wave/worldGen/TileBuilder.ts";
 import { } from "./graphworker.mjs"
 import { Map2d } from "../../engine/n0math/map2d.mjs";
 import { drawChunk } from "../world/wave/worldGen/ChunkDrawer.mjs";

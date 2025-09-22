@@ -1,7 +1,7 @@
 import { Highgrass } from "./world/props/highgrass.mjs";
 import { Wall } from "./world/props/wall.mjs";
 import {Nanoai} from "./nanoai/nanoai.mjs"
-import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../engine/grid/worldGrid.ts";
 import {Circle} from "./farm/circle.mjs"
 import { n0radio } from "./radio/n0radio.mjs";
 import { SquareName } from "./world/props/squareName.mjs";

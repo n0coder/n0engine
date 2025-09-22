@@ -5,10 +5,10 @@ import { n0radio } from "./radio/n0radio.mjs";
 import { nanoaiActions, normalize } from "./nanoai/nanoaiActions.mjs";
 import { createJobu, jobTasksa } from "./radio/jobSystem.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../engine/core/p5engine.mjs";
+import { p } from "../engine/core/p5engine.ts";
 import { deltaTime } from "../engine/core/Time/n0Time.mjs";
 import { atomicClone } from "../engine/core/Utilities/ObjectUtils.mjs";
-import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../engine/grid/worldGrid.ts";
 import { DebugCursor } from "./world/debugCursor.mjs";
 
 let n0 = new Nanoai("n0", 4,4); 

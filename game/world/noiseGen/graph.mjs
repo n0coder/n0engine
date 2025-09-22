@@ -32,6 +32,7 @@ export class Graph {
         }
         return this;
     }
+    
     offsetX(x=0) {
         if (typeof x === "function") {
             this.sequence.push(function (output) {
@@ -40,27 +41,28 @@ export class Graph {
         } else
         if (x instanceof Graph) {
             this.sequence.push(function (output) {
-                let tech = x.create(output.x, output.y);
+                let tech = x.create(output.ox, output.oy);
                 output.x += tech.sum;
             })
-        } else {
-            this.sequence.push(function (output) {
-                output.x += x;
-            })
-        }
+        }      
+        else 
+        this.sequence.push(function (output) {
+            output.x += x;
+        })
+        
         return this;
     }
-    offsetY(x=0) {
-        if (typeof x === "function") {
+    offsetY(x=0) {if (typeof x === "function") {
             this.sequence.push(function (output) {
                 output.y += x(output);
-            })
+            })            
         } else
-        if (x instanceof Graph) {
-            this.sequence.push(function (output) {
-                let tech = x.create(output.x, output.y);
-                output.y += tech.sum;
-            })
+        if (x instanceof Graph) {            
+                this.sequence.push(function (output) {
+                    let tech = x.create(output.ox, output.oy);
+                    output.y += tech.sum;
+                })
+            
         } else {
             this.sequence.push(function (output) {
                 output.y += x;
@@ -68,8 +70,8 @@ export class Graph {
         }
         return this;
     }
-    offsetXY(x=0, y=0) {
-        this.offsetX(x).offsetY(y);
+    offsetXY(x=0, y=0, fractal) {
+        this.offsetX(x, fractal).offsetY(y, fractal);
         return this;
     }
     polar() {
@@ -94,15 +96,39 @@ export class Graph {
         })
         return this;
     }
-    offset(offset=1) {
-        let ampa =  function (output) {
-            output.sum += offset;
-            output.minm += offset;
-            output.maxm += offset;
+    offset(v) {
+        
+        if (typeof v === "function") {
+            this.sequence.push(function(output){
+                let tech = v(output);
+                output.sum += tech;
+                output.minm = Math.min(output.minm, output.minm + (tech));
+                output.maxm = Math.max(output.maxm, output.maxm + (tech));
+            })
+        } else if (v instanceof Graph) {
+            this.sequence.push(function(output) {
+                let tech = v.create(output.ox, output.oy);
+
+                let min = tech.minm*m;
+                let max = tech.maxm*m;
+                if (m < 0){
+                    max = tech.minm*m;
+                    min = tech.maxm*m;
+                }
+
+                output.sum += tech.sum*m;                
+                output.minm = Math.min(output.minm, output.minm + min);
+                output.maxm = Math.max(output.maxm, output.maxm + max);
+            })
+        } else {
+        this.sequence.push(function (output) {
+            output.sum += v;
+            output.minm = Math.min(output.minm, output.minm + v);
+            output.maxm = Math.max(output.maxm, output.maxm + v);
+        })
         }
-        this.sequence.push(ampa);
         return this;
-    }
+     }
     abs () {
         this.sequence.push(function (output) {
             output.sum = Math.abs(output.sum);
@@ -174,9 +200,9 @@ export class Graph {
             })
         } else {
         this.sequence.push(function (output) {
-            //output.sum += v*m;
-            //output.minm = Math.min(output.minm, output.minm + v*m);
-            //output.maxm = Math.max(output.maxm, output.maxm + v*m);;
+            output.sum += v*m;
+            output.minm = Math.min(output.minm, output.minm + v*m);
+            output.maxm = Math.max(output.maxm, output.maxm + v*m);;
         })
         }
         return this;
@@ -258,8 +284,7 @@ export class Graph {
 
     map(points, min, max) {
         let mapper = createCubicInterpolator(points);
-        this.sequence.push((output)=>{
-            
+        this.sequence.push((output)=>{            
             var sim = inverseLerp(output.minm, output.maxm, output.sum);            
             output.sum = clamp(min, max, mapper(sim));
             output.minm = min
@@ -411,7 +436,6 @@ export class Graph {
                 var sx = output.x * freq;
                 var sy = output.y * freq;
                 let cfn = Array.isArray(fn) ? fn[o] : fn;
-            
                 var value = cfn.input(sx, sy);
                 sum += value * amp;
                 minm += cfn.min * amp;
@@ -475,6 +499,8 @@ export class Graph {
     constructor() {
         this.sequence = [];
         this.pointCache = new Map2d();
+        this.mini = Infinity;
+        this.maxi = -Infinity;
     }
     copy(graph) {
         this.sequence.unshift(...(graph.sequence))
@@ -490,11 +516,13 @@ export class Graph {
         var value = this.pointCache.get(x, y) //take from cache
         if (value) return value;
 
-        let output = { ox:x, oy: y, x, y, sum:0, minm:0, maxm:0, scale:1 }
+        let output = { ox:x, oy: y, x, y, fx:0, fy:0, scaleX:1, scaleY: 1, sum:0, minm:0, maxm:0, scale:1 }
         for (const fn of this.sequence) {
             fn(output);
         } 
         this.pointCache.set(x,y,output);
+        this.mini = output.minm;
+        this.maxi = output.maxm;
         return output;
     }
     createIterator(x,y) {

@@ -1,5 +1,5 @@
 import { p } from "../../../engine/core/p5engine";
-import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../../engine/grid/worldGrid.ts";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { invdiv } from "../../tools/n0tilesystem/n0tseditorUI.mjs";
 import { worldFactors } from "../FactorManager.mjs";

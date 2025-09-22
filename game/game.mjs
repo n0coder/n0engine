@@ -1,10 +1,9 @@
 import { DebugCursor } from "./world/debugCursor.mjs"
 import {Nanoai} from "./nanoai/nanoai.mjs"
-import { worldGrid } from "../engine/grid/worldGrid.mjs";
-import { DecoCollapse } from "./world/wave/decoCollapse.mjs";
+import { worldGrid } from "../engine/grid/worldGrid.ts";
 import { clamp, inverseLerp, lerp } from "../engine/n0math/ranges.mjs";
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../engine/core/p5engine.mjs";
+import { p } from "../engine/core/p5engine.ts";
 import { gameW } from "../engine/n0config.mjs";
 import { deltaTime } from "../engine/core/Time/n0Time.mjs";
 import { perpandicular } from "../engine/n0math/vectorMath.mjs";

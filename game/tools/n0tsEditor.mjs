@@ -2,12 +2,12 @@ import { } from "../world/wave/TileMods.mjs"
 import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs"
 import { leftMenu, rightMenu } from "../../engine/core/Menu/menu.mjs";
 import { p } from "../../engine/core/p5engine"
-import { WorldGrid, worldGrid } from "../../engine/grid/worldGrid.mjs"
+import { WorldGrid, worldGrid } from "../../engine/grid/worldGrid.ts"
 import { DebugCursor } from "../world/debugCursor.mjs";
 import { buildn0ts, n0TileModules } from "../world/wave/n0.mjs";
 import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks } from "../world/wave/worldGen/ChunkDrawer.mjs";
-import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
+import { genTile } from "../world/wave/worldGen/TileBuilder.ts";
 import { invdiv, n0TileEditorMenu } from "./n0tilesystem/n0tseditorUI.mjs";
 import { clamp, inverseLerp } from "../../engine/n0math/ranges.mjs";
 let cursor = new DebugCursor()

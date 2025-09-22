@@ -2,7 +2,7 @@
 
 import { event } from "../../engine/core/Utilities/events.mjs";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { nanoaiActions } from "../nanoai/nanoaiActions.mjs";
 
 export var jobTasksa = new Map([

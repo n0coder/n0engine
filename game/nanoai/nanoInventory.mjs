@@ -1,4 +1,4 @@
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { Inventory } from "../shared/Inventory.mjs";
 //i generally hate inheritance, but in this case i really needed it
 export class NanoInventory extends Inventory {

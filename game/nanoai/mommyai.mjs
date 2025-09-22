@@ -4,7 +4,7 @@ import { loadImg } from "../../engine/core/Utilities/ImageUtils";
 import { p } from "../../engine/core/p5engine.ts";
 import { clamp, inverseLerp, lerp } from "../../engine/n0math/ranges.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
-import { NanoaiBrain } from "./nanoaiBrain.mjs";
+import { NanoaiBrain } from "./nanoaiBrain.ts";
 import { Poser } from "./poser.mjs";
 export class Puff {
     constructor(x, y, w, h, s = 15, boom) {

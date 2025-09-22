@@ -1,6 +1,6 @@
 import { cosmicEntityManager } from "./CosmicEntity/CosmicEntityManager.mjs";
 import { calculateDeltaTime, deltaTime, previousTime } from "./Time/n0Time.mjs";
-import { backgroundColor, gameH, gameW } from "../n0config.mjs";
+import { backgroundColor, gameH, gameW, webgl } from "../n0config.mjs";
 import { } from "./Utilities/MapUtils.mjs"
 import * as p5 from "p5";
 
@@ -60,7 +60,7 @@ class P5engine {
         p.setup = function()  {
         window.p5.disableFriendlyErrors = true;
         document.getElementById('loading').style.display = 'none';
-        p.webgl = false;
+        
         if (p.webgl) p.text = ()=>{}
         canvas = p.createCanvas(gameW, gameH, p.webgl ? p.WEBGL : undefined).parent("sketch-holder");
         cosmicEntityManager.invoke("setup");

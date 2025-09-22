@@ -1,6 +1,6 @@
 //start outside a class, like usual
 
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { Circle } from "../farm/circle.mjs";
 import { Inventory } from "../shared/Inventory.mjs";
 import { bestSearch } from "./jobSystem.mjs";

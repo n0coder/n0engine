@@ -1,7 +1,7 @@
 import { DebugCursor } from "./world/debugCursor.mjs";
 import { WorldGenerator } from "./world/wave/worldGen/worldGenerator.mjs";
 import {Nanoai} from "./nanoai/nanoai.mjs"
-import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../engine/grid/worldGrid.ts";
 import { Soil } from "./farm/soil.mjs";
 import { CraftingTable } from "./farm/craftingTable.mjs";
 import { createJobu, jobTasksa } from "./radio/jobSystem.mjs";

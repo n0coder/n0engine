@@ -1,10 +1,11 @@
 //load loader
 //setup dependancies
 import { p } from "../engine/core/p5engine.ts";
-import { n0loader } from "../engine/core/ResourceManagement/loader.mjs";
+import { n0loader } from "../engine/core/ResourceManagement/loader.ts";
+import { worldGrid } from "../engine/grid/worldGrid.ts";
 
 n0loader.startLoading('world', (done) => {
-    import("./tests/noiseRework.mjs")
+    import("./tests/saving.mjs")
       .then(() => done())
       .catch((e) => {
         console.error("Failed to load world", e); //this never runs btw XD

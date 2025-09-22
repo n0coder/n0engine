@@ -1,5 +1,5 @@
 import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
-import { p } from "../../../engine/core/p5engine.mjs";
+import { p } from "../../../engine/core/p5engine.ts";
 
 export class SquareName{
     constructor(name, x,y, w,h, color){

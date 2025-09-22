@@ -1,7 +1,7 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../engine/core/p5engine.ts";
 import { deltaTime } from "../../engine/core/Time/n0Time.mjs";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { pinga } from "../radio/linkingPings";
 import { craftingRecipes } from "./craftingTable.mjs";
 

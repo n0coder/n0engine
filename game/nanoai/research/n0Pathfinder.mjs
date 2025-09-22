@@ -1,6 +1,6 @@
 import { setActive } from "../../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../../engine/core/p5engine.ts";
-import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../../engine/grid/worldGrid.ts";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import star from "easystarjs"
 
@@ -134,7 +134,7 @@ export function findPath(cx, cy, tx, ty, sightDistance, padding, out, agraphics)
 function stars(grid) {
     let astar = new star.js();
     astar.setGrid(grid);
-    astar.setAcceptableTiles([0, 1, 2, 3, 4, 5, 6, 7]);
+    astar.setAcceptableTiles([0, 1, 2, 3, 4, 5, 6, 7, 8]);
     //astar.disableDiagonals();
     astar.setTileCost(0, 0); // Clouds
     astar.setTileCost(1, 1); // Dirt
@@ -153,12 +153,12 @@ function stars(grid) {
         let b = grid[by][bx]
         if (a > 7) console.error("path starts in a wall", {ax,ay,a:worldGrid.getTile(ax, ay)});
         if (b > 7) console.error("path ends in a wall",{bx,by,b:worldGrid.getTile(bx, by)});
-
-            let vectorX = ax - bx;
-            let vectorY = ay - by;
-            let vectorLength = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
-            //console.log({ax,ay,bx,by,vectorLength}); //i'm betting on the idea nanos get confused when walkiing 0 distance
-            astar.findPath(ax, ay, bx, by, (path)=>{ 
+        //let vectorX = ax - bx;
+        //let vectorY = ay - by;
+        //let vectorLength = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+        //console.log({ax,ay,bx,by,vectorLength}); //i'm betting on the idea nanos get confused when walkiing 0 distance
+        astar.findPath(ax, ay, bx, by, (path)=>{ 
+                if (!path) return null;
             //console.log(path)
             if (path.length === 0) path.push({x:bx, y:by}) //if 0 length path, fake one point so the nano can say it reached the point
             return pathFn(path)

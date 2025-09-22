@@ -1,5 +1,5 @@
 import { gameH, gameW } from "../../engine/core/n0config.mjs";
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import {inverseLerp, lerp} from "../../engine/n0math/ranges.mjs"
 export class DistanceVisualizer {
     constructor(color, color2) {

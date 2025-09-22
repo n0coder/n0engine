@@ -2,10 +2,10 @@ import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mj
 import { ticks } from "../../engine/core/Time/n0Time.mjs";
 import { addAnimationSet, getAnimation, loadImg, loadImgArray } from "../../engine/core/Utilities/ImageUtils";
 import { p } from "../../engine/core/p5engine.ts";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { n0radio } from "../radio/n0radio.mjs";
 import { NanoInventory } from "./nanoInventory.mjs";
-import { NanoaiBrain } from "./nanoaiBrain.mjs";
+import { NanoaiBrain } from "./nanoaiBrain.ts";
 
 loadImgArray("assets/nano/up", 4, imgArray => {
     addAnimationSet("nano", "walkUp", imgArray)

@@ -1,6 +1,6 @@
 import { setActive } from "../../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { p } from "../../engine/core/p5engine.ts";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { Nanoai } from "../nanoai/nanoai.mjs";
 import { pinga } from "../radio/linkingPings";
 import { Inventory } from "../shared/Inventory.mjs";

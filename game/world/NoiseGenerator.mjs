@@ -14,8 +14,8 @@ export class NoiseGenerator {
         this.offsetY = new ValueDriver(huh.offsetY || 0);
         this.offset = new ValueDriver(huh.offset || 0)
         this.blendWeight = new ValueDriver(huh.blendWeight || 1)
-        this.highClip = new ValueDriver(huh.highClip != null ? huh.highClip : Infinity)
-        this.lowClip = new ValueDriver(huh.lowClip != null ? huh.lowClip : -Infinity)
+        this.highClip = new ValueDriver(huh.highClip !== undefined ? huh.highClip : Infinity)
+        this.lowClip = new ValueDriver(huh.lowClip !== undefined ? huh.lowClip : -Infinity)
         this.abs = huh.abs || false;
         this.inverted = huh.inverted || false;
         this.blendStyle = huh.blendStyle || "new" //i just realized this or false will never happen
@@ -144,9 +144,10 @@ export class NoiseGenerator {
         if (this.mapper) {
             var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum); //shift into 0 to 1 space
             minmax.sum = clamp(this.mapSpace[0], this.mapSpace[1], this.mapper(sim));
-            minmax.minm = this.mapSpace[0]
-            minmax.maxm = this.mapSpace[1]
+            minmax.minm = this.mapSpace[0];
+            minmax.maxm = this.mapSpace[1];
         }
+        
         //console.log(minmax.sum, this);
         //sum = lerp(minm, maxm, sim);
         (this.doMultiply(x, y, minmax));
@@ -199,25 +200,25 @@ export class NoiseGenerator {
         let min = Infinity;
         let max = -Infinity;
         let sums = this.blend.map((v) => {
-            if (v.sum != null) return v.sum;
+            if (v.sum !== undefined) return v.sum;
             if (typeof v === "function") {
                 let sum = v(output);
                 min = Math.min(min, sum);
                 max = Math.max(max, sum);
                 return sum;
             }
-            if (v instanceof Graph) {
+            if (v.create) {
                 let tech = v.create(output.x, output.y);
                 min = Math.min(min, tech.minm);
                 max = Math.max(max, tech.maxm);
                 return tech.sum;
             }
-            if (v && v.sum != null) {
+            if (v && v.sum !== undefined) {
                 min = Math.min(min, v.minm ?? v.sum);
                 max = Math.max(max, v.maxm ?? v.sum);
                 return v.sum;
             }
-            if (v.getValue != null) {
+            if (v.getValue) {
                 let b = v.getValue(x, y)
                 min = Math.min(min, b.minm ?? b.sum);
                 max = Math.max(max, b.maxm ?? b.sum);
@@ -237,24 +238,24 @@ export class NoiseGenerator {
 
     blendSumMinMax(x, y, sim, blendPower) {
         var sums = this.blend.map(b => {
-            var v = b.getValue != null ? b.getValue(x, y) : b;
-            if (v.sum != null) return v.sum;
+            var v = b.getValue !== undefined ? b.getValue(x, y) : b;
+            if (v.sum !== undefined) return v.sum;
             return v;
         });
 
         var nvu = cubicBlendW(sums, sim, blendPower);
 
         var mins = this.blend.map(b => {
-            var v = b.getValue != null ? b.getValue(x, y) : b;
-            if (v.minm != null) return v.minm;
+            var v = b.getValue !== undefined ? b.getValue(x, y) : b;
+            if (v.minm !== undefined) return v.minm;
             return v;
         });
         var min = cubicBlendW(mins, sim, blendPower);
         sums.push(min);
 
         var maxes = this.blend.map(b => {
-            var v = b.getValue != null ? b.getValue(x, y) : b;
-            if (v.maxm != null) return v.maxm;
+            var v = b.getValue !== undefined ? b.getValue(x, y) : b;
+            if (v.maxm !== undefined) return v.maxm;
             return v;
         });
         var max = cubicBlendW(maxes, sim, blendPower);
@@ -266,7 +267,7 @@ export class NoiseGenerator {
     classicBlend(x, y, minmax, blendWeight) {
         var sim = inverseLerp(minmax.minm, minmax.maxm, minmax.sum);
         var sums = this.blend.map(b => {
-            var v = b.getValue != null ? b.getValue(x, y) : b;
+            var v = b.getValue !== undefined ? b.getValue(x, y) : b;
             return v.sum ?? v;
         });
         var nvu = blendw(sums, sim);
@@ -296,7 +297,7 @@ export class NoiseGenerator {
 
     ampoffset(x, y, minmax, offset) {
         var ampa = this.amp.getValue(x, y);
-        if (ampa.sum != null) {
+        if (ampa.sum !== undefined) {
             minmax.sum *= ampa.sum;
             minmax.minm *= ampa.minm;
             minmax.maxm *= ampa.maxm;
@@ -306,7 +307,7 @@ export class NoiseGenerator {
             minmax.maxm *= ampa;
         }
         var offset = this.offset.getValue(x, y);
-        if (offset.sum != null) {
+        if (offset.sum !== undefined) {
             minmax.sum += offset.sum;
             minmax.minm += offset.minm;
             minmax.maxm += offset.maxm;
@@ -325,8 +326,8 @@ doAdd(x, y, minmax) {
             console.log("started out of bounds", this, {sums: {ss, es}, min: {smin, emin}, max:{smax,emax}})
             return;
         }
-        if (a.getValue != null) {
-            const v = a.getValue(x, y);
+        if (a.getValue !== undefined || a.create !== undefined) {
+            const v = a.getValue?.(x, y) ?? a.create?.(x,y);
             minmax.sum += v.sum;
             // union the bounds
             minmax.minm = Math.min(minmax.minm, minmax.minm + v.minm);
@@ -339,7 +340,7 @@ doAdd(x, y, minmax) {
 
         if (Array.isArray(a)) {
             const m = a[1];
-            const v = a[0].getValue?.(x, y) ?? a[0];
+            const v = a[0].getValue?.(x, y) ?? a[0].create?.(x, y) ?? a[0];
             let sign = Math.sign(m);
             let min = v.minm*m;
             let max = v.maxm*m;
@@ -360,13 +361,13 @@ doAdd(x, y, minmax) {
 
     doMultiply(x, y, minmax) {
         this.multiply.forEach(a => {
-            if (a.getValue != null) {
+            if (a.getValue !== undefined) {
                 var value = a.getValue(x, y);
                 minmax.sum *= value.sum;
                 minmax.minm *= value.minm;
                 minmax.maxm *= value.maxm;
             } else if (Array.isArray(a)) {
-                if (a[0].getValue != null) {
+                if (a[0].getValue !== undefined) {
                     var value = a[0].getValue(x, y);
                     minmax.sum *= value.sum * a[1];
                     minmax.minm *= Math.abs(value.minm * a[1]);
@@ -398,7 +399,7 @@ doAdd(x, y, minmax) {
             amp *= pers;
             freq *= lac;
         }
-        gens += 1
+        globalThis. gens  += 1
         //console.log({sum, minm, maxm, min:this.min, max:this.max})
         return { sum, minm, maxm };
     }

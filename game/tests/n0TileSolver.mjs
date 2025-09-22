@@ -5,7 +5,7 @@ import { cosmicEntityManager } from "../../engine/core/CosmicEntity/CosmicEntity
 import { p } from "../../engine/core/p5engine.ts";
 import { loadImg } from "../../engine/core/Utilities/ImageUtils.ts";
 import { atomicClone } from "../../engine/core/Utilities/ObjectUtils.mjs";
-import { worldGrid } from "../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../engine/grid/worldGrid.ts";
 import { Chest } from "../farm/chest.ts";
 import { Nanoai } from "../nanoai/nanoai.mjs";
 import { jobTasksa } from "../radio/jobSystem.mjs";
@@ -15,7 +15,7 @@ import { buildn0ts } from "../world/wave/n0.mjs";
 import { n0jointtiles, n0tiles } from "../world/wave/n0.mjs";
 import { Tile } from "../world/wave/Tile.mjs";
 import { drawChunks, drawTile } from "../world/wave/worldGen/ChunkDrawer.mjs";
-import { genTile } from "../world/wave/worldGen/TileBuilder.mjs";
+import { genTile } from "../world/wave/worldGen/TileBuilder.ts";
 
 
 let error = new Map();

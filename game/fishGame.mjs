@@ -1,5 +1,5 @@
 import { gameH, gameW } from "../engine/core/n0config.mjs";
-import {p} from "../engine/core/p5engine.mjs"
+import {p} from "../engine/core/p5engine.ts"
 export class FishGame {
     constructor(x,y){
         this.x = x;

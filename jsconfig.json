@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "es2024",
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "checkJs": true,          // ← gives you types even inside .mjs
+        "noEmit": true,           // ← we never compile, only check
+        "allowJs": true,
+        "allowImportingTsExtensions": true,
+    },
+    "include": [
+        "engine/**/*.mjs",
+        "game/**/*.mjs",
+        "*.d.ts"
+, "engine/grid/worldGrid.ts", "engine/grid/experiments/sparceMap.ts", "game/world/wave/worldGen/TileBuilder.ts", "engine/core/ResourceManagement/loader.ts", "game/nanoai/nanoaiActions.mjs", "game/nanoai/nanoaiBrain.ts"    ]
+}

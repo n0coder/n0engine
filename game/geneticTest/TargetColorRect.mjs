@@ -1,4 +1,4 @@
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 import { GeneticSquare } from "./geneticSquare.mjs";
 
 export class TargetColorRect {

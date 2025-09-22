@@ -1,4 +1,4 @@
-import { p } from "../../engine/core/p5engine.mjs";
+import { p } from "../../engine/core/p5engine.ts";
 
 export class GeneticSquare {
     constructor(r,g,b, x,y,size, mut=30){

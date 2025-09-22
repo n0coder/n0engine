@@ -1,19 +1,20 @@
-export class Sparse2dMap {
+export class Sparse2dMap<T> {
     constructor() {
         this.tiles = new Map();
         this.offset = 2 ** 15;
     }
-
-    set(x, y, tile) {
+    tiles: Map<string|number|bigint|boolean, T|{  }>
+    offset: number
+    set(x:number, y:number, tile: any) {
         const key = this.getKey(x, y);
         this.tiles.set(key, tile);
     }
 
-    get(x, y) {
+    get(x:number, y:number) {
         const key = this.getKey(x, y);
         return this.tiles.get(key);
     }
-    getKey(x, y) {
+    getKey(x:number, y:number) {
         const shiftedX = x + this.offset;
         const shiftedY = y + this.offset;
         return (BigInt(shiftedX) << 32n) | BigInt(shiftedY & 0xFFFFFFFF);

@@ -1,6 +1,6 @@
 import Alea from "alea";
 import { Cell } from "./Cell.mjs";
-import { worldGrid } from "../../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../../engine/grid/worldGrid.ts";
 import { inverseLerp, lerp } from "../../../engine/n0math/ranges.mjs";
 import { worldFactors } from "../FactorManager.mjs";
 import { PlaceholderTile } from "./Tile.mjs";

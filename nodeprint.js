@@ -3,7 +3,7 @@ const path = require('path');
 
 // Configuration
 const OUTPUT_FILE = 'js_project_contents.txt';
-const EXTENSIONS = ['.js', '.mjs', '.json', '.html', '.css', '.md', '.jsx', '.ts', '.tsx'];
+const EXTENSIONS = ['.js', '.mjs', '.json', '.html', '.css', '.jsx', '.ts', '.tsx'];
 const SKIP_FOLDERS = ['node_modules', '.git', 'dist', 'build', '.vscode'];
 const SKIP_FILES = [OUTPUT_FILE, '.gitignore'];
 

@@ -1,11 +1,11 @@
 import { p } from "../../../../engine/core/p5engine.ts";
 import { ticks } from "../../../../engine/core/Time/n0Time.mjs";
-import { worldGrid } from "../../../../engine/grid/worldGrid.mjs";
+import { worldGrid } from "../../../../engine/grid/worldGrid.ts";
 import { clamp, inverseLerp, lerp } from "../../../../engine/n0math/ranges.mjs";
 import { biomeMap } from "../../BiomeWork.mjs";
 import { read, worldFactors } from "../../FactorManager.mjs";
 import { n0tiles } from "../n0.mjs";
-import { genTile } from "./TileBuilder.mjs";
+import { genTile } from "./TileBuilder.ts";
 
 let c = worldGrid.chunkSize, chunks = 8
 export function drawChunks(nano, gen) {
@@ -55,7 +55,9 @@ export function drawTile(x,y, tile) {
             for (const factor of tile.biomeFactors) {
                 let i = inverseLerp(0, .1, clamp(0,.1, factor.proximity))
                 let invi = lerp(.5, 1, i);
-                let pseudocolor =  biomeMap.get(factor.pseudotile.biome).colora(factor.pseudotile)
+                let pseu =  biomeMap.get(factor.pseudotile.biome)
+                if (!pseu) continue;
+                let pseudocolor = pseu.colora(factor.pseudotile)
                 if (pseudocolor && factor.proximity < .05 ) {
                     r = lerp( pseudocolor[0], r,  invi)
                     g = lerp( pseudocolor[1], g, invi)

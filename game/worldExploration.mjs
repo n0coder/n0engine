@@ -1,7 +1,7 @@
 import { cosmicEntityManager } from "../engine/core/CosmicEntity/CosmicEntityManager.mjs";
 import { ticks } from "../engine/core/Time/n0Time.mjs";
-import { p } from "../engine/core/p5engine.mjs";
-import { worldGrid } from "../engine/grid/worldGrid.mjs";
+import { p } from "../engine/core/p5engine.ts";
+import { worldGrid } from "../engine/grid/worldGrid.ts";
 import { gameH, gameW } from "../engine/n0config.mjs";
 import { inverseLerp, lerp } from "../engine/n0math/ranges.mjs";
 import { Nanoai } from "./nanoai/nanoai.mjs";
