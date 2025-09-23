@@ -6,7 +6,7 @@ import { Mommyai } from "./mommyai.mjs";
 import { Nanoai } from "./nanoai.mjs";
 import { nanoaiActions } from "./nanoaiActions.mjs";
 
-type Action = { work(nano: any): boolean; name?: string };
+type Action = { work(nano: any): (boolean|void); name?: string };
 
 export class NanoaiBrain {
   state: "idle" | "active";
@@ -31,7 +31,7 @@ export class NanoaiBrain {
       active: function (nano) {
 
         if (nano.brain.currentActivity) {
-          console.log(nano.brain.currentActivity)
+          //console.log(nano.brain.currentActivity)
           var ou = nano.brain.currentActivity.work(nano);
           if (!ou) nano.brain.done(nano)
           
@@ -45,7 +45,7 @@ export class NanoaiBrain {
 
       function getFirstAction(item) {
         if (typeof item?.work !== "function") {
-          queue.shift();
+          //queue.shift();
           item = queue[0];
         }
 
@@ -72,7 +72,9 @@ export class NanoaiBrain {
   }
   
   do(task: string | Action, ...args: any[]): Action | Action[] {
-    let action = this.actionBuilder(task, args, (t) => { this.queue.push(t); }); 
+    let action = this.actionBuilder(task, args, (t) => { 
+      this.queue.push(t); 
+    }); 
     if (typeof task === 'string' && action)
     action.name = task
     return action
